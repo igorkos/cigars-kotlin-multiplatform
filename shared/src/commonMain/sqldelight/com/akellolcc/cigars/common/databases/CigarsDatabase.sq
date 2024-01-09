@@ -1,0 +1,87 @@
+import kotlin.Boolean;
+
+CREATE TABLE Cigars (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    binder TEXT,
+    brand TEXT,
+    cigar TEXT,
+    count INTEGER,
+    country TEXT,
+    date INTEGER,
+    favorites INTEGER AS Boolean,
+    filler TEXT,
+    gauge REAL,
+    lenght TEXT,
+    link TEXT,
+    myrating INTEGER,
+    name TEXT,
+    notes TEXT,
+    rating INTEGER,
+    shopping INTEGER AS Boolean,
+    strenght INTEGER,
+    wrapper TEXT,
+    historyId INTEGER,
+    humidorId  INTEGER,
+    imagesId  INTEGER,
+    FOREIGN KEY (historyId) REFERENCES History(id) ON DELETE CASCADE,
+    FOREIGN KEY (humidorId) REFERENCES Humidor(id) ON DELETE CASCADE,
+    FOREIGN KEY (imagesId) REFERENCES Images(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Humidor (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    auto_open INTEGER AS Boolean,
+    brand TEXT,
+    count INTEGER,
+    holds INTEGER,
+    humidity REAL,
+    link TEXT,
+    name TEXT,
+    notes TEXT,
+    sorting INTEGER,
+    temperature INTEGER,
+    type INTEGER,
+    historyId INTEGER,
+    cigarsId  INTEGER,
+    imagesId  INTEGER,
+    FOREIGN KEY (historyId) REFERENCES History(id) ON DELETE CASCADE,
+    FOREIGN KEY (cigarsId) REFERENCES Cigars(id) ON DELETE CASCADE,
+    FOREIGN KEY (imagesId) REFERENCES Images(id) ON DELETE CASCADE
+);
+
+CREATE TABLE History (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    count INTEGER,
+    date INTEGER,
+    left INTEGER,
+    price REAL,
+    type INTEGER
+);
+
+CREATE TABLE Images (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    data BLOB,
+    image TEXT,
+    notes TEXT,
+    type INTEGER
+  );
+
+
+allCigars:
+SELECT Cigars.*
+FROM Cigars;
+
+
+allHumidors:
+SELECT Humidor.*
+FROM Humidor;
+
+addHumidor:
+INSERT INTO Humidor (name, brand, holds, notes, humidity, temperature)
+VALUES (?, ?, ?, ?, ?, ?);
+
+removeAllCigars:
+DELETE FROM Cigars;
+
+removeAllHumidors:
+DELETE FROM Humidor;

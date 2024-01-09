@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="seed">#ffc107</color>
+
+    <color name="color_primary">
+        <light>#775A0B</light>
+        <dark>#E9C16C</dark>
+    </color>
+
+    <color name="color_onPrimary">#FFFFFF
+        <light>#FFFFFF</light>
+        <dark>#3F2E00</dark>
+    </color>
+
+    <color name="color_primaryContainer">
+        <light>#FFDF9E</light>
+        <dark>#5B4300</dark>
+    </color>
+
+    <color name="color_onPrimaryContainer">
+        <light>#261A00</light>
+        <dark>#FFDF9E</dark>
+    </color>
+
+    <color name="color_secondary">
+        <light>#6B5D3F</light>
+        <dark>#D8C4A0</dark>
+    </color>
+
+    <color name="color_onSecondary">
+        <light>#FFFFFF</light>
+        <dark>#3A2F15</dark>
+    </color>
+
+    <color name="color_secondaryContainer">
+        <light>#F5E0BB</light>
+        <dark>#52452A</dark>
+    </color>
+
+    <color name="color_onSecondaryContainer">
+        <light>#241A04</light>
+        <dark>#F5E0BB</dark>
+    </color>
+
+    <color name="color_tertiary">
+        <light>#4A6547</light>
+        <dark>#B0CFAA</dark>
+    </color>
+
+    <color name="color_onTertiary">
+        <light>#FFFFFF</light>
+        <dark>#1D361C</dark>
+    </color>
+
+    <color name="color_tertiaryContainer">
+        <light>#CCEBC4</light>
+        <dark>#334D31</dark>
+    </color>
+
+    <color name="color_onTertiaryContainer">
+        <light>#072109</light>
+        <dark>#CCEBC4</dark>
+    </color>
+
+    <color name="color_error">
+        <light>#BA1A1A</light>
+        <dark>#FFB4AB</dark>
+    </color>
+
+    <color name="color_errorContainer">
+        <light>#FFDAD6</light>
+        <dark>#93000A</dark>
+    </color>
+
+    <color name="color_onError">
+        <light>#FFFFFF</light>
+        <dark>#690005</dark>
+    </color>
+
+    <color name="color_onErrorContainer">
+        <light>#410002</light>
+        <dark>#FFDAD6</dark>
+    </color>
+
+    <color name="color_background">#
+        <light>#FFF8F2</light>
+        <dark>#17130B</dark>
+    </color>
+
+    <color name="color_onBackground">
+        <light>#1F1B13</light>
+        <dark>#EBE1D4</dark>
+    </color>
+
+    <color name="color_outline">
+        <light>#7F7667</light>
+        <dark>#998F80</dark>
+    </color>
+
+    <color name="color_inverseOnSurface">
+        <light>#F9EFE2</light>
+        <dark>#353027</dark>
+    </color>
+
+    <color name="color_inverseSurface">
+        <light>#353027</light>
+        <dark>#EBE1D4</dark>
+    </color>
+
+    <color name="color_inversePrimary">
+        <light>#E9C16C</light>
+        <dark>#775A0B</dark>
+    </color>
+
+    <color name="color_shadow">
+        <light>#000000</light>
+        <dark>#000000</dark>
+    </color>
+
+    <color name="color_surfaceTint">
+        <light>#775A0B</light>
+        <dark>#E9C16C</dark>
+    </color>
+
+    <color name="color_outlineVariant">
+        <light>#D0C5B4</light>
+        <dark>#4D4639</dark>
+    </color>
+
+    <color name="color_scrim">
+        <light>#000000</light>
+        <dark>#000000</dark>
+    </color>
+
+    <color name="color_surface">
+        <light>#FFF8F2</light>
+        <dark>#17130B</dark>
+    </color>
+
+    <color name="color_onSurface">
+        <light>#1F1B13</light>
+        <dark>#EBE1D4</dark>
+    </color>
+
+    <color name="color_surfaceVariant">
+        <light>#EDE1CF</light>
+        <dark>#4D4639</dark>
+    </color>
+
+    <color name="color_onSurfaceVariant">
+        <light>#4D4639</light>
+        <dark>#D0C5B4</dark>
+    </color>
+</resources>
