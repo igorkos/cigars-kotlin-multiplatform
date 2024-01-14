@@ -3,21 +3,28 @@ package com.akellolcc.cigars.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
-import com.akellolcc.cigars.common.MainView
-import com.akellolcc.cigars.common.databases.Database
-import com.akellolcc.cigars.common.databases.DatabaseDriverFactory
-import com.akellolcc.cigars.common.logging.initLog
+import androidx.compose.ui.Modifier
+import com.akellolcc.cigars.MainView
+import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.DatabaseDriverFactory
+import com.akellolcc.cigars.logging.Log
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        initLog()
+        Log.initLog()
         Database.createInstance(DatabaseDriverFactory(this.applicationContext))
-        //installSplashScreen()
         super.onCreate(savedInstanceState)
-
         setContent {
-            MainView()
+            MyApplicationTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainView()
+                }
+            }
         }
     }
 }

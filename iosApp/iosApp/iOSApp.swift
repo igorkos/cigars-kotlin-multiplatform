@@ -1,4 +1,5 @@
 import SwiftUI
+import shared
 
 @main
 struct iOSApp: App {
@@ -7,4 +8,10 @@ struct iOSApp: App {
 			ContentView()
 		}
 	}
+
+	init() {
+           Log.companion.doInitLog()
+           var driver = DatabaseDriverFactory()
+           Database.companion.createInstance(databaseDriverFactory: driver)
+        }
 }

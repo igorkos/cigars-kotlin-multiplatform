@@ -1,14 +1,12 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.i18n)
     alias(libs.plugins.mokoCompose)
-    kotlin("plugin.serialization").version(libs.versions.kotlin)
-    id("app.cash.sqldelight").version(libs.versions.sqldelight.plugin.version)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.sqldelight)
 }
-
-
 
 kotlin {
     androidTarget {
@@ -18,11 +16,24 @@ kotlin {
             }
         }
     }
-
     iosX64()
     iosArm64()
     iosSimulatorArm64()
 
+    cocoapods {
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**']"
+        extraSpecAttributes["exclude_files"] = "['src/commonMain/resources/MR/**']"
+    }
+    
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -31,15 +42,19 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.material3)
 
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+                implementation(libs.napier)
 
                 implementation(libs.moko.resources)
                 implementation(libs.moko.resources.compose)
 
-                implementation(libs.napier)
-                implementation(libs.i18n)
-                implementation(libs.locale)
+                // Navigator
+                implementation(libs.voyager.navigator)
+                // BottomSheetNavigator
+                implementation(libs.voyager.bottom.sheet.navigator)
+                // TabNavigator
+                implementation(libs.voyager.tab.navigator)
+                // Transitions
+                implementation(libs.voyager.transitions)
 
                 implementation(libs.mvvm.core) // only ViewModel, EventsDispatcher, Dispatchers.UI
                 implementation(libs.mvvm.flow) // api mvvm-core, CFlow for native and binding extensions
@@ -50,21 +65,12 @@ kotlin {
                 implementation(libs.mvvm.flow.compose) // api mvvm-flow, binding extensions for Compose Multiplatform
                 implementation(libs.mvvm.livedata.compose) // api mvvm-livedata, binding extensions for Compose Multiplatform
                 implementation(libs.moko.mvvm)
-
-                // Navigator
-                implementation(libs.voyager.navigator)
-
-                // BottomSheetNavigator
-                implementation(libs.voyager.bottom.sheet.navigator)
-
-                // TabNavigator
-                implementation(libs.voyager.tab.navigator)
-
-                // Transitions
-                implementation(libs.voyager.transitions)
-
-                //Database
-                implementation(libs.sqldelight.driver)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.moko.resources.test)
             }
         }
 
@@ -95,15 +101,16 @@ kotlin {
     }
 }
 
+
 multiplatformResources {
-    multiplatformResourcesPackage = "com.akellolcc.cigars.common"
+    multiplatformResourcesPackage = "com.akellolcc.cigars"
 }
 
 android {
-    namespace = "com.akellolcc.cigars.common"
+    namespace = "com.akellolcc.cigars"
     compileSdk = 34
     defaultConfig {
-        minSdk = 26
+        minSdk = 29
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -117,7 +124,7 @@ android {
 sqldelight {
     databases {
         create("CigarsDatabase") {
-            packageName.set( "com.akellolcc.cigars.common.databases")
+            packageName.set( "com.akellolcc.cigars.databases")
             generateAsync.set(true)
         }
     }
