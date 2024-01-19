@@ -17,7 +17,8 @@ class Home : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val postLoginScreen= rememberScreen(SharedScreen.LoginScreen)
+        val postMainScreen= rememberScreen(SharedScreen.MainScreen)
 
-        navigator.push(postLoginScreen)
+        navigator.push(postMainScreen)
     }
 }

@@ -20,7 +20,7 @@ class FavoritesScreen(override val route: NavRoute) : TabItem, Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = Localize.title_camera
+            val title = Localize.title_favorites
             val icon = imagePainter(Images.tab_icon_favorites)
 
             return remember {

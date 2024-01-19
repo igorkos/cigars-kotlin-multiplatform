@@ -1,0 +1,142 @@
+[
+	{
+		"binder": "Honduras",
+		"brand": "Fabrica de Tabacos Raices Cubanas S. de R.L.",
+		"cigar": "Churchill",
+		"country": "Honduras",
+		"favorites": "true",
+		"filler": "Honduras, Nicaragua",
+		"gauge": 48,
+		"images": [
+			{
+				"file": "cigar_01.png",
+				"type": 1
+			},
+			{
+				"file": "cigar_01_binder.png",
+				"type": 0
+			}
+		],
+		"length": "7",
+		"link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/1",
+		"myrating": 4,
+		"name": "Alec Bradley Prensado Churchill",
+		"notes": "The Alec Bradley Prensado Churchill, made at the superb Raices Cubanas factory in Danlí, Honduras, is as gorgeous a cigar as you’ll ever see, with a picture-perfect head and a stunning wrapper. But it is the flavor that makes it a classic smoke. The Honduran and Nicaraguan tobaccos come together to create leather, chocolate and spice notes, and a long, lush finish. ",
+		"rating": 96,
+		"shopping": "false",
+		"strength": 4,
+		"wrapper": "Honduras"
+	},
+	{
+		"binder": "Nicaragua",
+		"brand": "My Father Cigars S.A.",
+		"cigar": "Belicoso",
+		"country": "Nicaragua",
+		"favorites": "false",
+		"filler": "Nicaragua",
+		"gauge": 54,
+		"images": [
+			{
+				"file": "cigar_02.png",
+				"type": 1
+			},
+			{
+				"file": "cigar_02_binder.png",
+				"type": 0
+			}
+		],
+		"length": "5 1/2",
+		"link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/2",
+		"myrating": 3,
+		"name": "La Aroma de Cuba Mi Amor Belicoso",
+		"notes": "La Aroma de Cuba Mi Amor is rolled for Ashton in Nicaragua at My Father Cigars, the massive factory run by the talented Garcia family. Originally from Cuba, José Garcia, his son Jaime and daughter Janny now make millions of cigars at My Father, perhaps none finer than the La Aroma de Cuba Mi Amor Belicoso. They combine Nicaraguan tobacco they grow themselves—using two binder leaves, as is their custom—with this dark, Mexican wrapper, and the combination is sublime. The tidy Belicoso is a box-pressed smoke that burns beautifully and has a lovely woody component balanced by notes of sweet nougat and copious amounts of nuts on the palate. ",
+		"rating": 95,
+		"shopping": "false",
+		"strength": 2,
+		"wrapper": "Mexico"
+	},
+	{
+		"binder": "Nicaragua",
+		"brand": "Tabacalera Villa Cuba (Tavicusa)",
+		"cigar": "Torpedo",
+		"country": "Nicaragua",
+		"favorites": "false",
+		"filler": "Nicaragua",
+		"gauge": 52,
+		"images": [
+			{
+				"file": "cigar_03.png",
+				"type": 1
+			},
+			{
+				"file": "cigar_03_binder.png",
+				"type": 0
+			}
+		],
+		"length": "6 1/8",
+		"link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/6",
+		"myrating": 2,
+		"name": "Rocky Patel Fifteenth Anniversary Torpedo",
+		"notes": "The Rocky Patel Fifteenth Anniversary Torpedo is dark and box-pressed, with superb construction. Its lush draw is laden with coffee bean, cocoa and earthy flavors that grow in power as the cigar is puffed. ",
+		"rating": 93,
+		"shopping": "false",
+		"strength": 2,
+		"wrapper": "Ecuador"
+	},
+	{
+		"binder": "Cuba",
+		"brand": "Habanos S.A.",
+		"cigar": "Pyramid",
+		"country": "Cuba",
+		"favorites": "false",
+		"filler": "Cuba",
+		"gauge": 52,
+		"images": [
+			{
+				"file": "cigar_04.png",
+				"type": 1
+			},
+			{
+				"file": "cigar_04_binder.png",
+				"type": 0
+			}
+		],
+		"length": "6 1/8",
+		"link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/4",
+		"myrating": 1,
+		"name": "Partagás Serie P No. 2",
+		"notes": "Brimming with black pepper, coffee bean, leather and sweet cappuccino notes, the cigars are powerful and complex, loaded with bold Cuban flavors. This Partagás smoke shows true evolution: it has been transformed into something incredible, a perfect example of the level of top-quality smokes that are being made in Cuba today. ",
+		"rating": 94,
+		"shopping": "false",
+		"strength": 2,
+		"wrapper": "Cuba"
+	},
+	{
+		"binder": "Nicaragua",
+		"brand": "Tabacos Cubanica S.A.",
+		"cigar": "Corona gorda",
+		"country": "Nicaragua",
+		"favorites": "false",
+		"filler": "Nicaragua",
+		"gauge": 50,
+		"images": [
+			{
+				"file": "cigar_05.png",
+				"type": 1
+			},
+			{
+				"file": "cigar_05_binder.png",
+				"type": 0
+			}
+		],
+		"length": "5 1/2",
+		"link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/5",
+		"myrating": 0,
+		"name": "Padrón 1964 Anniversary Series Exclusivo Maduro",
+		"notes": "The Exclusivo size is a bit thinner than the typical corona gorda, and longer than the typical robusto. The smokes are packed with Nicaraguan tobaccos from Jalapa, Condega and Estelí, all of it grown in the open sunlight. Then they are sharply pressed in a distinctive style.In maduro wrapper, the cigar is dark, with that trademark rich Padrón cocoa flavor. ",
+		"rating": 94,
+		"shopping": "false",
+		"strength": 2,
+		"wrapper": "Nicaragua"
+	}
+]

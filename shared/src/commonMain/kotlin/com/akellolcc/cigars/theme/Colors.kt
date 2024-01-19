@@ -114,6 +114,8 @@ class MaterialColors {
         val color_surfaceVariant = MR.colors.color_surfaceVariant
 
         val color_onSurfaceVariant = MR.colors.color_onSurfaceVariant
+
+        val color_transparent = MR.colors.color_transparent
     }
 }
 

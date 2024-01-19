@@ -1,4 +1,4 @@
-package com.akellolcc.cigars
+package com.akellolcc.cigars.utils
 
 import platform.UIKit.UIDevice
 
@@ -7,3 +7,5 @@ class IOSPlatform: Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+actual fun setAppContext(context: Any) {
+}

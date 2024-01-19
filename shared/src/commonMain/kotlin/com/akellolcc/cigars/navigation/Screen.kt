@@ -2,18 +2,17 @@ package com.akellolcc.cigars.navigation
 
 import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
-import com.akellolcc.cigars.MR
-import dev.icerock.moko.resources.StringResource
+import com.akellolcc.cigars.theme.Localize
 
 interface TabItem {
     val route: NavRoute
 }
 
-sealed class NavRoute(val route: String, val title: StringResource, val icon: ImageResource? = null) {
-    data object Home : NavRoute("gallery_screen", MR.strings.title_gallery)
-    data object Login : NavRoute("login_screen", MR.strings.title_login)
+sealed class NavRoute(val route: String, val title: String, val icon: ImageResource? = null) {
+    data object Home : NavRoute("gallery_screen", "")
+    data object Login : NavRoute("login_screen", "")
 
-    data object Cigars : NavRoute("photos_screen", MR.strings.title_cigars, Images.tab_icon_cigars)
-    data object Humidors : NavRoute("albums_screen", MR.strings.title_humidors, Images.tab_icon_humidors)
-    data object Favorites : NavRoute("camera_screen", MR.strings.title_favorites, Images.tab_icon_favorites)
+    data object Cigars : NavRoute("photos_screen", Localize.title_cigars, Images.tab_icon_cigars)
+    data object Humidors : NavRoute("albums_screen", Localize.title_humidors, Images.tab_icon_humidors)
+    data object Favorites : NavRoute("camera_screen", Localize.title_favorites, Images.tab_icon_favorites)
 }

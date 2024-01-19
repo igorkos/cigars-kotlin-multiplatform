@@ -151,4 +151,9 @@
         <light>#4D4639</light>
         <dark>#D0C5B4</dark>
     </color>
+
+    <color name="color_transparent">
+        <light>#00000000</light>
+        <dark>#00000000</dark>
+    </color>
 </resources>

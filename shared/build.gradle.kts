@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.i18n)
     alias(libs.plugins.mokoCompose)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.sqldelight)
@@ -42,7 +43,12 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.material3)
 
+                implementation(libs.kotlin.datetime)
+                implementation(libs.kotlin.serialization)
+
                 implementation(libs.napier)
+                implementation(libs.i18n)
+                implementation(libs.locale)
 
                 implementation(libs.moko.resources)
                 implementation(libs.moko.resources.compose)
@@ -65,6 +71,8 @@ kotlin {
                 implementation(libs.mvvm.flow.compose) // api mvvm-flow, binding extensions for Compose Multiplatform
                 implementation(libs.mvvm.livedata.compose) // api mvvm-livedata, binding extensions for Compose Multiplatform
                 implementation(libs.moko.mvvm)
+
+                implementation(libs.multiplatform.settings)
             }
         }
         val commonTest by getting {
@@ -106,6 +114,10 @@ multiplatformResources {
     multiplatformResourcesPackage = "com.akellolcc.cigars"
 }
 
+i18n4k {
+    sourceCodeLocales = listOf("en", "ru")
+}
+
 android {
     namespace = "com.akellolcc.cigars"
     compileSdk = 34
@@ -119,6 +131,9 @@ android {
     kotlin {
         jvmToolchain(11)
     }
+}
+dependencies {
+    implementation(libs.androidx.foundation.android)
 }
 
 sqldelight {

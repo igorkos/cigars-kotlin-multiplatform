@@ -1,87 +1,172 @@
 import kotlin.Boolean;
 
-CREATE TABLE Cigars (
+CREATE TABLE CigarsTable (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    binder TEXT,
+    name TEXT,
     brand TEXT,
-    cigar TEXT,
-    count INTEGER,
     country TEXT,
     date INTEGER,
-    favorites INTEGER AS Boolean,
-    filler TEXT,
-    gauge REAL,
-    lenght TEXT,
-    link TEXT,
-    myrating INTEGER,
-    name TEXT,
-    notes TEXT,
-    rating INTEGER,
-    shopping INTEGER AS Boolean,
-    strenght INTEGER,
+    cigar TEXT,
     wrapper TEXT,
-    historyId INTEGER,
-    humidorId  INTEGER,
-    imagesId  INTEGER,
-    FOREIGN KEY (historyId) REFERENCES History(id) ON DELETE CASCADE,
-    FOREIGN KEY (humidorId) REFERENCES Humidor(id) ON DELETE CASCADE,
-    FOREIGN KEY (imagesId) REFERENCES Images(id) ON DELETE CASCADE
-);
-
-CREATE TABLE Humidor (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    auto_open INTEGER AS Boolean,
-    brand TEXT,
-    count INTEGER,
-    holds INTEGER,
-    humidity REAL,
-    link TEXT,
-    name TEXT,
+    binder TEXT,
+    gauge REAL,
+    length TEXT,
+    strength INTEGER,
+    rating INTEGER,
+    myrating INTEGER,
     notes TEXT,
-    sorting INTEGER,
-    temperature INTEGER,
-    type INTEGER,
-    historyId INTEGER,
-    cigarsId  INTEGER,
-    imagesId  INTEGER,
-    FOREIGN KEY (historyId) REFERENCES History(id) ON DELETE CASCADE,
-    FOREIGN KEY (cigarsId) REFERENCES Cigars(id) ON DELETE CASCADE,
-    FOREIGN KEY (imagesId) REFERENCES Images(id) ON DELETE CASCADE
+    filler TEXT,
+    link TEXT,
+    shopping INTEGER AS Boolean,
+    favorites INTEGER AS Boolean
 );
 
-CREATE TABLE History (
+CREATE TABLE HumidorsTable (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    brand TEXT,
+    holds INTEGER,
+    count INTEGER,
+    temperature INTEGER,
+    humidity REAL,
+    notes TEXT,
+    link TEXT,
+    autoOpen INTEGER AS Boolean,
+    sorting INTEGER,
+    type INTEGER
+);
+
+CREATE TABLE CigarHumidorTable (
+    humidorId INTEGER,
+    cigarId INTEGER ,
+    PRIMARY KEY (humidorId, cigarId),
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id),
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id)
+);
+
+CREATE TABLE HistoryTable (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     count INTEGER,
     date INTEGER,
     left INTEGER,
     price REAL,
-    type INTEGER
+    type INTEGER,
+    cigarId  INTEGER,
+    humidorId  INTEGER,
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id) ON DELETE NO ACTION ,
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id) ON DELETE NO ACTION
 );
 
-CREATE TABLE Images (
+CREATE TABLE ImagesTable (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    data BLOB,
     image TEXT,
+    data BLOB,
     notes TEXT,
-    type INTEGER
+    type INTEGER,
+    cigarId  INTEGER,
+    humidorId  INTEGER,
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id) ON DELETE NO ACTION,
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id) ON DELETE NO ACTION
   );
 
 
 allCigars:
-SELECT Cigars.*
-FROM Cigars;
+SELECT CigarsTable.*
+FROM CigarsTable;
+
+addCigar:
+INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+removeAllCigars:
+DELETE FROM CigarsTable;
+
+cigar:
+SELECT CigarsTable.* FROM CigarsTable WHERE id = :id;
+
+cigarImages:
+SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
+
+cigarHumidors:
+SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE cigarId = :cigar;
+
+addHistoryToCigar:
+UPDATE HistoryTable SET cigarId = :cigar WHERE id = :history;
+
+cigarHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar;
+
 
 
 allHumidors:
-SELECT Humidor.*
-FROM Humidor;
-
-addHumidor:
-INSERT INTO Humidor (name, brand, holds, notes, humidity, temperature)
-VALUES (?, ?, ?, ?, ?, ?);
-
-removeAllCigars:
-DELETE FROM Cigars;
+SELECT HumidorsTable.*
+FROM HumidorsTable;
 
 removeAllHumidors:
-DELETE FROM Humidor;
+DELETE FROM HumidorsTable;
+
+addHumidor:
+INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateHumidor:
+UPDATE HumidorsTable SET
+    name = :name,
+    brand = :brand,
+    holds = :holds,
+    count = :count,
+    temperature = :temperature,
+    humidity = :humidity,
+    notes = :notes,
+    link = :link,
+    autoOpen = :autoOpen,
+    sorting = :sorting,
+    type = :type
+ WHERE id = :humidorId;
+
+
+humidor:
+SELECT HumidorsTable.* FROM HumidorsTable WHERE id = :id;
+
+addCigarToHumidor:
+INSERT INTO CigarHumidorTable (humidorId, cigarId)
+VALUES (?,?);
+
+humidorCigars:
+SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
+
+addHistoryToHumidor:
+UPDATE HistoryTable SET humidorId = :humidor WHERE id = :history;
+
+humidorHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor;
+
+humidorImages:
+SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
+
+
+allHistory:
+SELECT HistoryTable.*
+FROM HistoryTable;
+
+history:
+SELECT HistoryTable.* FROM HistoryTable WHERE id = :id;
+
+addHistory:
+INSERT INTO HistoryTable (count, date, left, price, type)
+VALUES (?, ?, ?, ?, ?);
+
+addImage:
+INSERT INTO ImagesTable (image, data, notes, type)
+VALUES (?, ?, ?, ?);
+
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+
+
+
+
+
+

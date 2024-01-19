@@ -40,13 +40,12 @@ import dev.icerock.moko.resources.compose.stringResource
 
 
 class MainScreen : Screen {
-    //val tabItems = arrayOf(NavRoute.Gallery, NavRoute.Albums, NavRoute.Camera)
 
     @OptIn(ExperimentalVoyagerApi::class, ExperimentalStdlibApi::class)
     @Composable
     override fun Content() {
         DefaultTheme {
-            val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
+            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
             val scope = rememberCoroutineScope()
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -105,7 +104,7 @@ class MainScreen : Screen {
             selected = selected,
             onClick = { tabNavigator.current = tab as Tab },
             icon = { loadIcon(tab.route.icon!!, Size(width = 24f, height = 24f)) },
-            label = { Text(text = stringResource(tab.route.title), fontSize = 12.sp) },
+            label = { Text(text = tab.route.title, fontSize = 12.sp) },
         )
     }
 }
