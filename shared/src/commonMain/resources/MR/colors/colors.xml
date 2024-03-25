@@ -7,18 +7,18 @@
         <dark>#E9C16C</dark>
     </color>
 
-    <color name="color_onPrimary">#FFFFFF
+    <color name="color_onPrimary">
         <light>#FFFFFF</light>
         <dark>#3F2E00</dark>
     </color>
 
     <color name="color_primaryContainer">
-        <light>#FFDF9E</light>
+        <light>#FFDF9C</light>
         <dark>#5B4300</dark>
     </color>
 
     <color name="color_onPrimaryContainer">
-        <light>#261A00</light>
+        <light>#251A00</light>
         <dark>#FFDF9E</dark>
     </color>
 
@@ -53,7 +53,7 @@
     </color>
 
     <color name="color_tertiaryContainer">
-        <light>#CCEBC4</light>
+        <light>#CCEBC5</light>
         <dark>#334D31</dark>
     </color>
 

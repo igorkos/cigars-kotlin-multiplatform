@@ -49,7 +49,6 @@ fun AnimatedSplashScreenTheme(
 }
 
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun DefaultTheme(
     content: @Composable () -> Unit,

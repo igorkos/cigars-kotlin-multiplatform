@@ -5,9 +5,9 @@ kotlin = "1.9.20"
 kotlin-dateTime = "0.5.0"
 kotlin-serialization = "1.6.2"
 
-compose = "1.5.4"
+compose = "1.6.4"
 compose-compiler = "1.5.4"
-compose-material3 = "1.1.2"
+compose-material3 = "1.2.1"
 androidx-activityCompose = "1.8.2"
 jetbrains-compose-version = "1.5.11"
 
@@ -27,7 +27,6 @@ mvvmCore = "0.16.1"
 moko-mvvm-version = "0.16.0"
 
 multiplatform-settings-version = "1.1.1"
-foundationAndroid = "1.5.4"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -68,7 +67,8 @@ sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.re
 sqldelight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight-version" }
 
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings-version" }
-androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "compose" }
+ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "compose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

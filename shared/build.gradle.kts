@@ -87,6 +87,10 @@ kotlin {
             dependencies {
                 api(libs.androidx.activity.compose)
                 implementation(libs.sqldelight.android)
+                implementation(libs.compose.ui.tooling)
+                implementation(libs.compose.ui.tooling.preview)
+                implementation(libs.androidx.foundation.android)
+                implementation(libs.ui.tooling.preview.android)
             }
         }
 
@@ -133,7 +137,7 @@ android {
     }
 }
 dependencies {
-    implementation(libs.androidx.foundation.android)
+
 }
 
 sqldelight {

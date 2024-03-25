@@ -26,10 +26,10 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         fun  createInstance(databaseDriverFactory: DatabaseDriverFactory): Database {
             if (instance == null)
                 instance = Database(databaseDriverFactory)
-            /*if (Pref.isFirstStart) {
-                instance?.reset()
+           if (Pref.isFirstStart) {
+                //instance?.reset()
                 instance?.createDemoSet()
-            }*/
+            }
             return instance!!
         }
 
@@ -79,13 +79,10 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         }
     }
 
-    @Composable
-    fun cigars() : State<List<Cigar>> {
-        return produceState(initialValue = listOf()) {
-            value = dbQueries.allCigars().executeAsList().map {
+    fun cigars() : List<Cigar> {
+        return dbQueries.allCigars().executeAsList().map {
                 Cigar(it)
             }
-        }
     }
 
     fun reset() {

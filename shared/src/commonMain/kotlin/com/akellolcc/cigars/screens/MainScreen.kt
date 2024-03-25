@@ -1,5 +1,6 @@
 package com.akellolcc.cigars.screens
 
+import TextStyled
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -34,6 +35,7 @@ import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.navigation.TabItem
 import com.akellolcc.cigars.theme.LocalBackgroundTheme
 import com.akellolcc.cigars.theme.MaterialColors
+import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import dev.icerock.moko.resources.compose.stringResource
@@ -79,9 +81,7 @@ class MainScreen : Screen {
                     }) {
                         Scaffold(
                             bottomBar = {
-                                NavigationBar(
-                                    containerColor = materialColor(MaterialColors.color_surfaceTint).copy(alpha = 0.6f),
-                                ) {
+                                NavigationBar {
                                     TabNavigationItem(CigarsScreen(NavRoute.Cigars))
                                     TabNavigationItem(HumidorsScreen(NavRoute.Humidors))
                                     TabNavigationItem(FavoritesScreen(NavRoute.Favorites))
@@ -103,8 +103,8 @@ class MainScreen : Screen {
         NavigationBarItem(
             selected = selected,
             onClick = { tabNavigator.current = tab as Tab },
-            icon = { loadIcon(tab.route.icon!!, Size(width = 24f, height = 24f)) },
-            label = { Text(text = tab.route.title, fontSize = 12.sp) },
+            icon = { loadIcon(tab.route.icon!!, Size(width = 24f, height = 24f), materialColor(MaterialColors.color_primary)) },
+            label = { TextStyled(text = tab.route.title, style = TextStyles.BarItemTitle) },
         )
     }
 }

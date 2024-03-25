@@ -81,10 +81,10 @@ fun DefaultBackground(
     Box(
         modifier = with(Modifier) {
             fillMaxSize()
-                .paint(
-                    imagePainter(Images.default_background),
-                    contentScale = ContentScale.FillBounds
-                )
+              //  .paint(
+              //      imagePainter(Images.default_background),
+              //      contentScale = ContentScale.FillBounds
+              //  )
 
         }
     ) {

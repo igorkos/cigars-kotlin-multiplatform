@@ -49,8 +49,9 @@ fun createColorsTheme(): ColorScheme {
 }
 
 @Composable
-fun materialColor(color: ColorResource): Color {
-    return colorResource(color)
+fun materialColor(color: ColorResource, alpha: Float = 1.0f): Color {
+    val resColor = colorResource(color)
+    return if (alpha != 1.0f)  Color(resColor.red, resColor.green, resColor.blue, alpha) else resColor
 }
 
 class MaterialColors {
