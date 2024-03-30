@@ -223,7 +223,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             }
                         },
                         title = {})
-                },*/
+                },
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
@@ -236,7 +236,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                         ) {
                             PagedCarousel(
                                 images,
-                                modifier = Modifier.aspectRatio(ratio = 2.0f)
+                                modifier = Modifier.aspectRatio(ratio = 1.8f)
                             )
                         }
                         Column(modifier = with(Modifier) {
@@ -252,7 +252,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                         }) {
                             Column {
                                 TextStyled(
-                                    cigar.name,
+                                    viewModel.cigar.name,
                                     TextStyles.Headline,
                                     editable = isEdit,
                                     maxLines = 2,
@@ -260,12 +260,12 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     keepHeight = false
                                 )
                                 TextStyled(
-                                    cigar.brand,
+                                    viewModel.cigar.brand,
                                     TextStyles.Subhead,
                                     editable = isEdit,
                                     modifier = Modifier.padding(end = 4.dp)
                                 )
-                                TextStyled(cigar.country, TextStyles.Subhead, editable = isEdit)
+                                TextStyled(viewModel.cigar.country, TextStyles.Subhead, editable = isEdit)
                             }
                             Row(modifier = Modifier.padding(top = 10.dp)) {
                                 Column(
@@ -275,9 +275,9 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     ValuesCard(
                                         label = "Cigar"
                                     ) {
-                                        ValueCard("Shape", cigar.cigar)
-                                        ValueCard("Length", cigar.length)
-                                        ValueCard("Gauge", cigar.gauge.toString())
+                                        ValueCard("Shape", viewModel.cigar.cigar)
+                                        ValueCard("Length", viewModel.cigar.length)
+                                        ValueCard("Gauge", viewModel.cigar.gauge.toString())
                                     }
                                 }
                             }
@@ -287,29 +287,45 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     vertical = true
                                 ) {
                                     TextStyled(
-                                        cigar.wrapper,
-                                        TextStyles.Headline,
+                                        viewModel.cigar.wrapper,
+                                        TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Wrapper",
                                         editable = isEdit,
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                     TextStyled(
-                                        cigar.binder,
-                                        TextStyles.Headline,
+                                        viewModel.cigar.binder,
+                                        TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Binder",
                                         editable = isEdit,
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                     TextStyled(
-                                        cigar.filler,
-                                        TextStyles.Headline,
+                                        viewModel.cigar.filler,
+                                        TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Filler",
                                         editable = isEdit,
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
+                                    TextStyled(
+                                        viewModel.cigar.strength.toString(),
+                                        TextStyles.Subhead,
+                                        labelStyle = TextStyles.Subhead,
+                                        label = "Strength",
+                                        editable = isEdit,
+                                        modifier = Modifier.padding(bottom = 10.dp)
+                                    )
+                                }
+                            }
+                            Column {
+                                ValuesCard(
+                                    label = "Humidors",
+                                    vertical = true
+                                ) {
+                                    
                                 }
                             }
                             Column(
@@ -320,8 +336,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     }
                             ) {
                                     TextStyled(
-                                        cigar.notes,
-                                        TextStyles.Headline,
+                                        viewModel.cigar.notes,
+                                        TextStyles.Subhead,
                                         //label = "Notes",
                                         editable = isEdit,
                                        // maxLines = 5,
@@ -332,8 +348,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 modifier = Modifier.padding(bottom = 10.dp)
                             ) {
                                 TextStyled(
-                                    cigar.link,
-                                    TextStyles.Headline,
+                                    viewModel.cigar.link,
+                                    TextStyles.Subhead,
                                     label = "Link",
                                     labelStyle = TextStyles.Subhead,
                                     editable = isEdit,
