@@ -29,6 +29,7 @@ moko-mvvm-version = "0.16.0"
 multiplatform-settings-version = "1.1.1"
 accompanist = "0.35.0-alpha"
 
+reaktive-version = "2.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -73,6 +74,12 @@ multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "compose" }
 ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "compose" }
 accompanist-permissions = { group =  "com.google.accompanist", name =  "accompanist-permissions", version.ref = "accompanist" }
+
+reaktive-reaktive = { group =  "com.badoo.reaktive", name = "reaktive", version.ref = "reaktive-version" }
+reaktive-annotations = { group =  "com.badoo.reaktive", name = "reaktive-annotations", version.ref = "reaktive-version" }
+reaktive-coroutines = { group =  "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
+reaktive-rxjava2 = { group =  "com.badoo.reaktive", name = "rxjava2-interop", version.ref = "reaktive-version" }
+reaktive-rxjava3 = { group =  "com.badoo.reaktive", name = "rxjava3-interop", version.ref = "reaktive-version" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -37,7 +37,7 @@ fun ValueCard(label: String, value: String?) {
             )
             TextStyled(
                 value,
-                TextStyles.Headline,
+                TextStyles.Subhead,
             )
         }
     }

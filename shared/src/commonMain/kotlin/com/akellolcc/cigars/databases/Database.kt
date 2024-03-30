@@ -23,7 +23,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
             if (instance == null)
                 instance = Database(databaseDriverFactory)
            if (Pref.isFirstStart) {
-                //instance?.reset()
+                Pref.isFirstStart = false
                 instance?.createDemoSet()
             }
             return instance!!

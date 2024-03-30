@@ -73,6 +73,12 @@ kotlin {
                 implementation(libs.mvvm.livedata.compose) // api mvvm-livedata, binding extensions for Compose Multiplatform
                 implementation(libs.moko.mvvm)
 
+                implementation(libs.reaktive.reaktive)
+                implementation(libs.reaktive.annotations)
+                implementation(libs.reaktive.coroutines)
+               // implementation(libs.reaktive.rxjava2)
+               // implementation(libs.reaktive.rxjava3)
+
                 implementation(libs.multiplatform.settings)
             }
         }

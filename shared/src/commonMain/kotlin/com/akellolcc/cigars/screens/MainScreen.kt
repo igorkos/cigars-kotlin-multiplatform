@@ -97,26 +97,8 @@ class MainScreen : Screen {
 }
 
 @Composable
-expect fun BottomTabNavigation(tabs: List<ITabItem>)/* {
-    var isTabsVisible by remember {mutableStateOf(TabBarVisibility.TabBarVisible)}
+expect fun BottomTabNavigation(tabs: List<ITabItem>)
 
-    val tabsVisibility =  remember{{ visible: Boolean ->
-        isTabsVisible = if(visible) TabBarVisibility.TabBarVisible else TabBarVisibility.TabBarHidden
-    }}
-
-    AnimatedVisibility(visible = isTabsVisible == TabBarVisibility.TabBarVisible, enter = slideInVertically { height ->
-        height
-    }, exit = slideOutVertically { height ->
-        height
-    }) {
-        NavigationBar {
-            tabs.forEach {
-                it.route.updateTabState = tabsVisibility
-                TabNavigationItem(it.route, tabs)
-            }
-        }
-    }
-}*/
 @Composable
 fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
     val tabNavigator = LocalTabNavigator.current

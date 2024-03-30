@@ -29,6 +29,7 @@ actual fun rememberGalleryManager(onResult: (SharedImage?) -> Unit): GalleryMana
     }
 }
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class GalleryManager actual constructor(private val onLaunch: () -> Unit) {
     actual fun launch() {
         onLaunch()
