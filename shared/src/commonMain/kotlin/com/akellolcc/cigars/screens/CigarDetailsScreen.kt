@@ -161,17 +161,21 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             viewModel.fetchImages()
         }
 
+        val topColors = centerAlignedTopAppBarColors(containerColor = materialColor(MaterialColors.color_transparent),
+            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),)
         val navigator = LocalNavigator.currentOrThrow
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
-               /* topBar = {
+                topBar = {
                     CenterAlignedTopAppBar(
-                        modifier = Modifier.background(materialColor(MaterialColors.color_error)),
+                       // modifier = Modifier.background(materialColor(MaterialColors.color_error)),
+                        colors = topColors,
                         navigationIcon = {
                             IconButton(onClick = {
+                                route.updateTabState?.invoke(true)
                                 navigator.pop()
-                                MainScreen.isTabsVisible
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
