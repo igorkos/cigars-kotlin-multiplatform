@@ -9,8 +9,8 @@ import com.akellolcc.cigars.screens.MainScreen
 
 
 sealed class SharedScreen : ScreenProvider {
-    object LoginScreen : SharedScreen()
-    object MainScreen : SharedScreen()
+    data object LoginScreen : SharedScreen()
+    data object MainScreen : SharedScreen()
 }
 
 val mainScreenModule = screenModule {
@@ -23,7 +23,7 @@ val mainScreenModule = screenModule {
 
 }
 
-fun SetupNavGraph() {
+fun setupNavGraph() {
     ScreenRegistry {
         register<SharedScreen.LoginScreen> { provider ->
             LoginScreen()

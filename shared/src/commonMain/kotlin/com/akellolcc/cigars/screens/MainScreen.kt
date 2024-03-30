@@ -1,54 +1,63 @@
 package com.akellolcc.cigars.screens
 
 import TextStyled
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
+import com.akellolcc.cigars.navigation.CigarsRoute
+import com.akellolcc.cigars.navigation.FavoritesRoute
+import com.akellolcc.cigars.navigation.HumidorsRoute
+import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
-import com.akellolcc.cigars.navigation.TabItem
-import com.akellolcc.cigars.theme.LocalBackgroundTheme
-import com.akellolcc.cigars.theme.MaterialColors
+import com.akellolcc.cigars.navigation.TabBarVisibility
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import com.akellolcc.cigars.theme.materialColor
-import dev.icerock.moko.resources.compose.stringResource
 
 
 class MainScreen : Screen {
 
-    @OptIn(ExperimentalVoyagerApi::class, ExperimentalStdlibApi::class)
+    private var tabs : List<ITabItem> = listOf(
+        CigarsScreen(CigarsRoute),
+        HumidorsScreen(HumidorsRoute),
+        FavoritesScreen(FavoritesRoute)
+    )
+
+
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
         DefaultTheme {
-            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-            val scope = rememberCoroutineScope()
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
@@ -68,43 +77,58 @@ class MainScreen : Screen {
                 },
                 gesturesEnabled = true
             ) {
-                CompositionLocalProvider(LocalContentColor provides LocalBackgroundTheme.current.color) {
-                    TabNavigator(CigarsScreen(NavRoute.Cigars), tabDisposable = {
+                    TabNavigator(tabs[0], tabDisposable = { tabNavigator ->
                         TabDisposable(
-                            navigator = it,
-                            tabs = listOf(
-                                CigarsScreen(NavRoute.Cigars),
-                                HumidorsScreen(NavRoute.Humidors),
-                                FavoritesScreen(NavRoute.Favorites)
-                            )
+                            navigator = tabNavigator,
+                            tabs = tabs
                         )
                     }) {
                         Scaffold(
                             bottomBar = {
-                                NavigationBar {
-                                    TabNavigationItem(CigarsScreen(NavRoute.Cigars))
-                                    TabNavigationItem(HumidorsScreen(NavRoute.Humidors))
-                                    TabNavigationItem(FavoritesScreen(NavRoute.Favorites))
-                                }
+                                BottomTabNavigation(tabs)
                             },
                         ) {
                             CurrentTab()
                         }
                     }
-                }
             }
         }
     }
+}
 
-    @Composable
-    private fun RowScope.TabNavigationItem(tab: TabItem) {
-        val tabNavigator = LocalTabNavigator.current
-        val selected = (tabNavigator.current as TabItem).route.route == tab.route.route
-        NavigationBarItem(
-            selected = selected,
-            onClick = { tabNavigator.current = tab as Tab },
-            icon = { loadIcon(tab.route.icon!!, Size(width = 24f, height = 24f), materialColor(MaterialColors.color_primary)) },
-            label = { TextStyled(text = tab.route.title, style = TextStyles.BarItemTitle) },
-        )
+@Composable
+expect fun BottomTabNavigation(tabs: List<ITabItem>)/* {
+    var isTabsVisible by remember {mutableStateOf(TabBarVisibility.TabBarVisible)}
+
+    val tabsVisibility =  remember{{ visible: Boolean ->
+        isTabsVisible = if(visible) TabBarVisibility.TabBarVisible else TabBarVisibility.TabBarHidden
+    }}
+
+    AnimatedVisibility(visible = isTabsVisible == TabBarVisibility.TabBarVisible, enter = slideInVertically { height ->
+        height
+    }, exit = slideOutVertically { height ->
+        height
+    }) {
+        NavigationBar {
+            tabs.forEach {
+                it.route.updateTabState = tabsVisibility
+                TabNavigationItem(it.route, tabs)
+            }
+        }
     }
+}*/
+@Composable
+fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
+    val tabNavigator = LocalTabNavigator.current
+    val selected = (tabNavigator.current as ITabItem).route.route == tab.route
+    NavigationBarItem(
+        selected = selected,
+        onClick = {
+            tabNavigator.current = tabs.first{
+                it.route.route == tab.route
+            }
+        },
+        icon = { tab.icon?.let { loadIcon(it, Size(width = 24f, height = 24f))} },
+        label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
+    )
 }

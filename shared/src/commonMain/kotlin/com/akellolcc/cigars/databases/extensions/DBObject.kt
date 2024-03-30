@@ -18,8 +18,10 @@ open class DBObject<T>() {
                    type: Long? = 1,date: Long? = Clock.System.now().toEpochMilliseconds()
     ): History {
         return runBlocking {
-            this@DBObject.dbQuery.addHistory(count, date, left, price, type)
-            val historyID = this@DBObject.dbQuery.lastInsertRowId().executeAsOne()
+            val historyID = dbQuery.transactionWithResult {
+                dbQuery.addHistory(count, date, left, price, type)
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
             return@runBlocking History(historyID)
         }
     }

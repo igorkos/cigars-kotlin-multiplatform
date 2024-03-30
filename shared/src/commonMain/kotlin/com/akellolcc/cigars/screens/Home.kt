@@ -5,12 +5,12 @@ import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.navigation.SetupNavGraph
 import com.akellolcc.cigars.navigation.SharedScreen
+import com.akellolcc.cigars.navigation.setupNavGraph
 
 class Home : Screen {
     init {
-        SetupNavGraph()
+        setupNavGraph()
     }
 
     @Composable
@@ -18,7 +18,6 @@ class Home : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val postLoginScreen= rememberScreen(SharedScreen.LoginScreen)
         val postMainScreen= rememberScreen(SharedScreen.MainScreen)
-
         navigator.push(postMainScreen)
     }
 }

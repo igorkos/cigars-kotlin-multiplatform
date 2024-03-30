@@ -12,11 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.imagePainter
 import dev.icerock.moko.resources.ImageResource
+import kotlin.math.roundToInt
 
 @Composable
 expect fun screenWidth(): Dp
@@ -41,4 +43,7 @@ fun rotateImage(image: ImageResource, size: Size) {
         contentScale = ContentScale.Fit
     )
 }
+
+fun Float.toIntPx(density: Float) = (this * density).roundToInt()
+expect fun toImageBitmap(data: ByteArray): ImageBitmap?
 

@@ -5,12 +5,10 @@ import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.navigation.mainScreenModule
 import com.akellolcc.cigars.screens.Home
-import com.akellolcc.cigars.screens.MainScreen
 
 @Composable fun MainView() {
     ScreenRegistry {
         mainScreenModule()
     }
-
     Navigator(Home())
 }

@@ -45,6 +45,7 @@ kotlin {
 
                 implementation(libs.kotlin.datetime)
                 implementation(libs.kotlin.serialization)
+                implementation(libs.kotlin.stdlib)
 
                 implementation(libs.napier)
                 implementation(libs.i18n)
@@ -91,6 +92,7 @@ kotlin {
                 implementation(libs.compose.ui.tooling.preview)
                 implementation(libs.androidx.foundation.android)
                 implementation(libs.ui.tooling.preview.android)
+                implementation(libs.accompanist.permissions)
             }
         }
 
@@ -126,7 +128,7 @@ android {
     namespace = "com.akellolcc.cigars"
     compileSdk = 34
     defaultConfig {
-        minSdk = 29
+        minSdk = 31
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -138,6 +140,7 @@ android {
 }
 dependencies {
 
+    implementation(libs.ui.tooling.preview.android)
 }
 
 sqldelight {

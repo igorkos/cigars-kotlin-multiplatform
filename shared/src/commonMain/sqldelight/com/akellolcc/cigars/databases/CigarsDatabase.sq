@@ -1,7 +1,7 @@
 import kotlin.Boolean;
 
 CREATE TABLE CigarsTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     brand TEXT,
     country TEXT,
@@ -22,7 +22,7 @@ CREATE TABLE CigarsTable (
 );
 
 CREATE TABLE HumidorsTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     brand TEXT,
     holds INTEGER,
@@ -40,12 +40,12 @@ CREATE TABLE CigarHumidorTable (
     humidorId INTEGER,
     cigarId INTEGER ,
     PRIMARY KEY (humidorId, cigarId),
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id),
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id)
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid),
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid)
 );
 
 CREATE TABLE HistoryTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     count INTEGER,
     date INTEGER,
     left INTEGER,
@@ -53,26 +53,29 @@ CREATE TABLE HistoryTable (
     type INTEGER,
     cigarId  INTEGER,
     humidorId  INTEGER,
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id) ON DELETE NO ACTION ,
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id) ON DELETE NO ACTION
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION ,
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
 );
 
 CREATE TABLE ImagesTable (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     image TEXT,
     data BLOB,
     notes TEXT,
     type INTEGER,
     cigarId  INTEGER,
     humidorId  INTEGER,
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(id) ON DELETE NO ACTION,
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(id) ON DELETE NO ACTION
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION,
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
   );
 
 
 allCigars:
 SELECT CigarsTable.*
 FROM CigarsTable;
+
+cigar:
+SELECT CigarsTable.* FROM CigarsTable WHERE rowid = :id;
 
 addCigar:
 INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
@@ -81,9 +84,6 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 removeAllCigars:
 DELETE FROM CigarsTable;
 
-cigar:
-SELECT CigarsTable.* FROM CigarsTable WHERE id = :id;
-
 cigarImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
 
@@ -91,16 +91,21 @@ cigarHumidors:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE cigarId = :cigar;
 
 addHistoryToCigar:
-UPDATE HistoryTable SET cigarId = :cigar WHERE id = :history;
+UPDATE HistoryTable SET cigarId = :cigar WHERE rowid = :history;
+
+addImageToCigar:
+UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
 
 cigarHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar;
 
 
-
 allHumidors:
 SELECT HumidorsTable.*
 FROM HumidorsTable;
+
+humidor:
+SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;
 
 removeAllHumidors:
 DELETE FROM HumidorsTable;
@@ -122,11 +127,7 @@ UPDATE HumidorsTable SET
     autoOpen = :autoOpen,
     sorting = :sorting,
     type = :type
- WHERE id = :humidorId;
-
-
-humidor:
-SELECT HumidorsTable.* FROM HumidorsTable WHERE id = :id;
+ WHERE rowid = :humidorId;
 
 addCigarToHumidor:
 INSERT INTO CigarHumidorTable (humidorId, cigarId)
@@ -136,7 +137,7 @@ humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
 
 addHistoryToHumidor:
-UPDATE HistoryTable SET humidorId = :humidor WHERE id = :history;
+UPDATE HistoryTable SET humidorId = :humidor WHERE rowid = :history;
 
 humidorHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor;
@@ -150,14 +151,18 @@ SELECT HistoryTable.*
 FROM HistoryTable;
 
 history:
-SELECT HistoryTable.* FROM HistoryTable WHERE id = :id;
+SELECT HistoryTable.* FROM HistoryTable WHERE rowid = :id;
 
 addHistory:
 INSERT INTO HistoryTable (count, date, left, price, type)
 VALUES (?, ?, ?, ?, ?);
 
+
+image:
+SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
+
 addImage:
-INSERT INTO ImagesTable (image, data, notes, type)
+INSERT INTO ImagesTable (data,  type, image, notes)
 VALUES (?, ?, ?, ?);
 
 

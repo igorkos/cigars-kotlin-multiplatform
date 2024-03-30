@@ -1,7 +1,5 @@
 package com.akellolcc.cigars.utils
 
-import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.DatabaseDriverFactory
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.set
 

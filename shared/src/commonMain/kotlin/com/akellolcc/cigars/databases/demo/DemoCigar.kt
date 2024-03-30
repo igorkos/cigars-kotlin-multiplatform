@@ -1,11 +1,10 @@
 package com.akellolcc.cigars.databases.demo
 
-import com.akellolcc.cigars.databases.CigarsTable
-import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.extensions.Image
-import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
+
+@Serializable
+data class Image(  val file: String?,
+                   val type: Long?)
 
 @Serializable
 data class DemoCigar(

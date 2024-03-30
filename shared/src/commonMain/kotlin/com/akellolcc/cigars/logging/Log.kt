@@ -47,9 +47,9 @@ class Log {
             val call = getCallStack()
             return if (call != null) {
                 if(call.file != null) {
-                    "sf: " + call.file + " (" + call.line + ")"
+                    "cg: " + call.file + " (" + call.line + ")"
                 } else {
-                    "sf: " + call.function
+                    "cg: " + call.function
                 }
             } else {
                 null

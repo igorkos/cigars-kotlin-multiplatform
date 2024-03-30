@@ -18,14 +18,14 @@ class HumidorsViewModel : ViewModel() {
 
     private val database: Database = Database.getInstance();
 
-    private val _humidors: CMutableStateFlow<List<Humidor>> = MutableStateFlow(database.humidors()).cMutableStateFlow()
+    private val _humidors: CMutableStateFlow<List<Humidor>> = MutableStateFlow(listOf<Humidor>()).cMutableStateFlow()
     val humidors: StateFlow<List<Humidor>> = _humidors
 
     private val _actions = Channel<Action>(Channel.BUFFERED)
     val actions: CFlow<Action> get() = _actions.receiveAsFlow().cFlow()
 
     sealed interface Action {
-        object RouteToSuccess : Action
+        data class RouteToHumidor(val humidor: Humidor) : Action
         data class ShowError(val error: StringDesc) : Action
     }
 }

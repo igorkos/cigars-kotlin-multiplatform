@@ -1,12 +1,11 @@
 package com.akellolcc.cigars.databases.extensions
 
-import com.akellolcc.cigars.databases.CigarsTable
 import com.akellolcc.cigars.databases.HistoryTable
 import kotlinx.datetime.Clock
 
 class History: DBObject<HistoryTable> {
     public val id: Long
-        get() { return this.dbObject?.id ?: -1 }
+        get() { return this.dbObject?.rowid ?: -1 }
     public val count: Long
         get() { return this.dbObject?.count ?: 0 }
     public val date: Long
@@ -38,10 +37,12 @@ class History: DBObject<HistoryTable> {
                  date: Long = Clock.System.now().toEpochMilliseconds()
                  ) : super() {
         runDbQuery {
-            this.dbQuery.addHistory(count, date, left, price, type)
-            val historyID = this.dbQuery.lastInsertRowId().executeAsOne()
+            val historyID = this.dbQuery.transactionWithResult {
+                dbQuery.addHistory(count, date, left, price, type)
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
             this.dbObject = this.dbQuery.history(historyID).executeAsOne()
-            return@runDbQuery null
+            return@runDbQuery this
         }
     }
 }

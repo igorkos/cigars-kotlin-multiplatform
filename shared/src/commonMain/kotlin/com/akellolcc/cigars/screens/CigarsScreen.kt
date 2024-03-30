@@ -14,18 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults.exitUntilCollapsedScrollBehavior
-import androidx.compose.material3.TopAppBarDefaults.largeTopAppBarColors
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,19 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
+import com.akellolcc.cigars.navigation.CigarsDetailsRoute
+import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
-import com.akellolcc.cigars.navigation.TabItem
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -61,10 +53,35 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import dev.icerock.moko.mvvm.flow.compose.observeAsActions
 
-class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
+class CigarsScreen(
+    override val route: NavRoute
+) : ITabItem {
 
-    private lateinit var viewModel: CigarsScreenViewModel
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = Localize.title_cigars
+            val icon = imagePainter(Images.tab_icon_cigars)
 
+            return remember {
+                TabOptions(
+                    index = 0u,
+                    title = title,
+                    icon = icon
+                )
+            }
+        }
+
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        navigator.push(CigarsListScreen(route))
+       //Navigator(CigarsListScreen(route.updateTabState))
+    }
+}
+
+class CigarsListScreen(override val route: NavRoute
+) : ITabItem {
     override val options: TabOptions
         @Composable
         get() {
@@ -83,9 +100,9 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.current
 
-        viewModel = getViewModel(key = route, factory = viewModelFactory { CigarsScreenViewModel() })
+        val viewModel = getViewModel(key = "CigarsListScreen", factory = viewModelFactory { CigarsScreenViewModel() })
         val cigars by viewModel.cigars.collectAsState()
 
         LaunchedEffect(Unit) {
@@ -96,7 +113,10 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
             when (it) {
                 is CigarsScreenViewModel.Action.RouteToCigar -> {
                     Log.debug("Selected cigar ${it.cigar.id}")
-                    //navigator.push(postScreen)
+                    route.updateTabState?.invoke(false)
+                    navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
+                        this.data = it.cigar
+                    }))
                 }
 
                 is CigarsScreenViewModel.Action.ShowError -> TODO()
@@ -105,34 +125,35 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
 
         val scrollBehavior = exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
-        Log.debug("Cigars : $cigars")
+        //Log.debug("Cigars : $cigars")
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     CenterAlignedTopAppBar(
-                         navigationIcon = { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F), materialColor(MaterialColors.color_onSurface)) },
-                         actions = {loadIcon(Images.icon_menu, Size(24.0F, 24.0F), materialColor(MaterialColors.color_onSurface))},
-                         title = { TextStyled(text = Localize.title_cigars, style = TextStyles.ScreenTitle) },
-                         scrollBehavior = scrollBehavior)
+                        navigationIcon = { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) },
+                        actions = { loadIcon(Images.icon_menu, Size(24.0F, 24.0F)) },
+                        title = { TextStyled(text = Localize.title_cigars, style = TextStyles.ScreenTitle) },
+                        scrollBehavior = scrollBehavior)
                 },
                 content = {
                     if (cigars.isNotEmpty()) {
                         LazyColumn(
                             verticalArrangement = Arrangement.Top,
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
                             modifier = Modifier
-                            .fillMaxSize()
-                           // .padding(top = 64.dp, bottom = 80.dp)
+                                .fillMaxSize()
                         )
                         {
+                            val top = it.calculateTopPadding() + 16.dp
+                            val bottom = it.calculateBottomPadding() + 16.dp
                             item { Box( modifier = Modifier
                                 .fillMaxWidth()
-                                .height(56.dp)
+                                .height(top)
                                 .background(Color.Transparent)
                             ) }
                             items(cigars) {
-                                ListRow(it)
+                                ListRow(it, viewModel)
                                 Spacer( modifier = Modifier
                                     .fillMaxWidth()
                                     .height(4.dp)
@@ -141,7 +162,7 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
                             }
                             item { Box( modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp)
+                                .height(bottom)
                                 .background(Color.Transparent)
                             ) }
                         }
@@ -151,14 +172,13 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
         }
     }
     @Composable
-    fun ListRow(cigar: Cigar) {
+    fun ListRow(cigar: Cigar, viewModel: CigarsScreenViewModel) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = materialColor(MaterialColors.color_onPrimary),
+                containerColor = materialColor(MaterialColors.color_primaryContainer),
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(130.dp)
                 .clickable(onClick = {
                     viewModel.cigarSelected(cigar)
                 })
@@ -182,7 +202,7 @@ class CigarsScreen(override val route: NavRoute) : TabItem, Tab {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                   .padding(16.dp)
+                    .padding(12.dp)
             ) {
                 TextStyled(
                     text = cigar.cigar,

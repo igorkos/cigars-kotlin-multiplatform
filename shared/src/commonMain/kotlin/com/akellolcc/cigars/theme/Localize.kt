@@ -1,15 +1,10 @@
 package com.akellolcc.cigars.theme
 
 import Strings
-import androidx.compose.runtime.Composable
-import com.akellolcc.cigars.MR
 import com.vanniktech.locale.Locales
 import de.comahe.i18n4k.Locale
 import de.comahe.i18n4k.config.I18n4kConfigDefault
 import de.comahe.i18n4k.i18n4k
-import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
 
 object Localize {
     init {
@@ -31,5 +26,9 @@ object Localize {
     val title_login: String = Strings.login.toString()
 
     val demo_humidor_name: String = Strings.demo_humidor_name.toString()
+
+    val menu_item_camera: String = Strings.menu_item_camera.toString()
+
+    val menu_item_gallery: String = Strings.menu_item_gallery.toString()
 
 }

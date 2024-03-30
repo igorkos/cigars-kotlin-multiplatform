@@ -20,7 +20,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.components.DefaultButton
 import com.akellolcc.cigars.mvvm.LoginViewModel
-import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.navigation.SharedScreen
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
@@ -39,7 +38,7 @@ class LoginScreen: Screen {
     override fun Content() {
         if (viewModel == null) {
             viewModel = getViewModel(
-                key = NavRoute.Login.route,
+                key = "Login",
                 factory = viewModelFactory { LoginViewModel() })
         }
 

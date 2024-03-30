@@ -1,52 +1,56 @@
 package com.akellolcc.cigars.databases.extensions
 
+import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.databases.CigarsTable
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class Image( public val file: String?,
-                         public val type: Long?)
-
-@Serializable
 class Cigar : DBObject<CigarsTable> {
-    public val id: Long
-        get() { return this.dbObject?.id ?: -1 }
-    public val name: String
+     val id: Long
+        get() { return this.dbObject?.rowid ?: -1 }
+     val name: String
         get() { return this.dbObject?.name ?: "" }
-    public val brand: String?
+     val brand: String?
         get() { return this.dbObject?.brand}
-    public val country: String?
+     val country: String?
         get() { return this.dbObject?.country}
-    public val date: Long?
+     val date: Long?
         get() { return this.dbObject?.date}
-    public val cigar: String?
+     val cigar: String?
         get() { return this.dbObject?.cigar}
-    public val wrapper: String?
+     val wrapper: String?
         get() { return this.dbObject?.wrapper}
-    public val binder: String?
+     val binder: String?
         get() { return this.dbObject?.binder}
-    public val gauge: Double?
+     val gauge: Double?
         get() { return this.dbObject?.gauge}
-    public val length: String?
+     val length: String?
         get() { return this.dbObject?.length}
-    public val strength: Long?
+     val strength: Long?
         get() { return this.dbObject?.strength}
-    public val rating: Long
+     val rating: Long
         get() { return this.dbObject?.rating ?: 0 }
-    public val myrating: Long
+     val myrating: Long
         get() { return this.dbObject?.myrating ?: 0 }
-    public val notes: String?
+     val notes: String?
         get() { return this.dbObject?.notes}
-    public val filler: String?
+     val filler: String?
         get() { return this.dbObject?.filler}
-    public val link: String?
+     val link: String?
         get() { return this.dbObject?.link}
-    public val shopping: Boolean
+     val shopping: Boolean
         get() { return this.dbObject?.shopping ?: false}
-    public val favorites: Boolean
+     val favorites: Boolean
         get() { return this.dbObject?.favorites ?: false}
+
+    val images: List<CigarImage>
+        get() {
+            return dbQuery.cigarImages(this.id).executeAsList().map {
+                CigarImage(it)
+            }
+        }
 
     constructor(dbID: Long) : super() {
         this.dbObject = this.dbQuery.cigar(dbID).executeAsOne()
@@ -77,13 +81,33 @@ class Cigar : DBObject<CigarsTable> {
                  date: Long = Clock.System.now().toEpochMilliseconds()) : super() {
         runDbQuery {
             //Add humidor
-            this.dbQuery.addCigar(name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
-            val cigarID = this.dbQuery.lastInsertRowId().executeAsOne()
+            val cigarID = this.dbQuery.transactionWithResult {
+                dbQuery.addCigar(
+                    name,
+                    brand,
+                    country,
+                    date,
+                    cigar,
+                    wrapper,
+                    binder,
+                    gauge,
+                    length,
+                    strength,
+                    rating,
+                    myrating,
+                    notes,
+                    filler,
+                    link,
+                    shopping,
+                    favorites
+                )
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
             //Add History item to humidor
-            val history = this.addHistory(count, count, price, 1)
-            this.dbQuery.addHistoryToCigar(cigarID, history.id)
+          //  val history = this.addHistory(count, count, price, 1)
+          //  this.dbQuery.addHistoryToCigar(cigarID, history.id)
             this.dbObject = this.dbQuery.cigar(cigarID).executeAsOne();
-            return@runDbQuery null
+            return@runDbQuery this
         }
     }
 
@@ -91,9 +115,16 @@ class Cigar : DBObject<CigarsTable> {
                             type: Long?, date: Long?): History {
         return runBlocking {
             val history = super.addHistory(count, left, price, type, date)
-            this@Cigar.dbQuery.addHistoryToCigar(this@Cigar.id, history.id)
+            dbQuery.addHistoryToCigar(this@Cigar.id, history.id)
             return@runBlocking history
         }
     }
 
+    fun addImage(image: SharedImage): CigarImage {
+        return runBlocking {
+            val cImage = CigarImage(image.toByteArray()!!, 0)
+            dbQuery.addImageToCigar(this@Cigar.id, cImage.id)
+            return@runBlocking cImage
+        }
+    }
 }

@@ -1,14 +1,14 @@
 package com.akellolcc.cigars.databases.extensions
 
-import com.akellolcc.cigars.databases.CigarsTable
-import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.HumidorsTable
+import com.akellolcc.cigars.logging.Log
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 
+
 class Humidor : DBObject<HumidorsTable>{
     public val id: Long
-        get() { return this.dbObject?.id ?: -1 }
+        get() { return this.dbObject?.rowid ?: -1 }
     public val name: String
         get() { return this.dbObject?.name ?: "" }
     public val brand: String?
@@ -52,14 +52,35 @@ class Humidor : DBObject<HumidorsTable>{
         type: Long = 0) : super() {
         runDbQuery {
             //Add humidor
-            this.dbQuery.addHumidor(name, brand, holds, 0, temperature, humidity, notes, link, autoOpen, sorting, type)
-            val humidorID = this.dbQuery.lastInsertRowId().executeAsOne()
+            Log.debug("Added Demo Humidor")
+            val humidorID = this.dbQuery.transactionWithResult {
+                dbQuery.addHumidor(
+                    name,
+                    brand,
+                    holds,
+                    0,
+                    temperature,
+                    humidity,
+                    notes,
+                    link,
+                    autoOpen,
+                    sorting,
+                    type
+                )
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
+            Log.debug("Added Humidor id $humidorID")
             //Add History item to humidor
-            this.dbQuery.addHistory(0, Clock.System.now().toEpochMilliseconds(), 1, 150.0, 0)
-            val historyID = this.dbQuery.lastInsertRowId().executeAsOne()
+            val historyID = this.dbQuery.transactionWithResult {
+                dbQuery.addHistory(0, Clock.System.now().toEpochMilliseconds(), 1, 150.0, 0)
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
+            Log.debug("Added history to id $historyID")
             this.dbQuery.addHistoryToHumidor(humidorID, historyID)
+            Log.debug("Added history to humidor")
             this.dbObject = this.dbQuery.humidor(humidorID).executeAsOne()
-            return@runDbQuery null
+            Log.debug("Humidor $this.dbObject")
+            return@runDbQuery this
         }
     }
 
@@ -76,8 +97,16 @@ class Humidor : DBObject<HumidorsTable>{
     fun addHistory(cigar: History) {
         runDbQuery {
             this.dbQuery.addCigarToHumidor(this.id, cigar.id)
-            this.dbQuery.addHistory(count, Clock.System.now().toEpochMilliseconds(), count, 150.0, 1)
-            val historyID = this.dbQuery.lastInsertRowId().executeAsOne()
+            val historyID = this.dbQuery.transactionWithResult {
+                dbQuery.addHistory(
+                    count,
+                    Clock.System.now().toEpochMilliseconds(),
+                    count,
+                    150.0,
+                    1
+                )
+                dbQuery.lastInsertRowId().executeAsOne()
+            }
             this.dbQuery.addHistoryToHumidor(this.id, historyID)
             return@runDbQuery null
         }

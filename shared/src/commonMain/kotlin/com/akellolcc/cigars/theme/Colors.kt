@@ -5,9 +5,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import dev.icerock.moko.resources.compose.colorResource
-import dev.icerock.moko.resources.ColorResource
 import com.akellolcc.cigars.MR
+import dev.icerock.moko.resources.ColorResource
+import dev.icerock.moko.resources.compose.colorResource
 
 val LocalCurrentColorTheme = staticCompositionLocalOf { lightColorScheme() }
 

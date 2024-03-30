@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.1"
+agp = "8.3.1"
 kotlin = "1.9.20"
 
 kotlin-dateTime = "0.5.0"
@@ -27,11 +27,14 @@ mvvmCore = "0.16.1"
 moko-mvvm-version = "0.16.0"
 
 multiplatform-settings-version = "1.1.1"
+accompanist = "0.35.0-alpha"
+
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-dateTime" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -69,6 +72,7 @@ sqldelight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings-version" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "compose" }
 ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "compose" }
+accompanist-permissions = { group =  "com.google.accompanist", name =  "accompanist-permissions", version.ref = "accompanist" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
