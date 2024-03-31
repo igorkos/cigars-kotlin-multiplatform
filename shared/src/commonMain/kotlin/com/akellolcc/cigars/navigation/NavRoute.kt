@@ -18,7 +18,8 @@ expect class NavRoute(route: String, title: String, icon: ImageResource?, data: 
     var data: Any?
 }
 
-val CigarsRoute =  NavRoute("photos_screen", Localize.title_cigars, Images.tab_icon_cigars)
-val CigarsDetailsRoute =  NavRoute("photos_screen", Localize.title_cigars, Images.tab_icon_cigars)
-val HumidorsRoute =  NavRoute("albums_screen", Localize.title_humidors, Images.tab_icon_humidors)
-val FavoritesRoute =  NavRoute("camera_screen", Localize.title_favorites, Images.tab_icon_favorites)
+val CigarsRoute =  NavRoute("cigars_screen", Localize.title_cigars, Images.tab_icon_cigars)
+val CigarsDetailsRoute =  NavRoute("cigar_details_screen", Localize.title_cigars, Images.tab_icon_cigars)
+val ImagesViewRoute =  NavRoute("photos_screen", Localize.title_cigars, Images.tab_icon_cigars)
+val HumidorsRoute =  NavRoute("humidors_screen", Localize.title_humidors, Images.tab_icon_humidors)
+val FavoritesRoute =  NavRoute("favorites_screen", Localize.title_favorites, Images.tab_icon_favorites)

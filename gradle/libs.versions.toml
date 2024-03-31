@@ -31,6 +31,10 @@ accompanist = "0.35.0-alpha"
 
 reaktive-version = "2.1.0"
 
+peekaboo = "0.5.1"
+cloudinary = "1.8.0"
+exifinterface = "1.3.6"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-dateTime" }
@@ -80,6 +84,11 @@ reaktive-annotations = { group =  "com.badoo.reaktive", name = "reaktive-annotat
 reaktive-coroutines = { group =  "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
 reaktive-rxjava2 = { group =  "com.badoo.reaktive", name = "rxjava2-interop", version.ref = "reaktive-version" }
 reaktive-rxjava3 = { group =  "com.badoo.reaktive", name = "rxjava3-interop", version.ref = "reaktive-version" }
+
+peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
+peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
+cloudinary = { module = "com.cloudinary:kotlin-url-gen", version.ref = "cloudinary" }
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

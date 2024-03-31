@@ -8,20 +8,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.cloudinary.Cloudinary
+import com.preat.peekaboo.image.picker.FilterOptions
+import com.preat.peekaboo.image.picker.ResizeOptions
 
 
 @Composable
-actual fun rememberCameraManager(onResult: (SharedImage?) -> Unit): CameraManager {
+actual fun rememberCameraManager(
+    resizeOptions: ResizeOptions,
+    filterOptions: FilterOptions,
+    onResult: (SharedImage?) -> Unit): CameraManager {
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val contentResolver: ContentResolver = context.contentResolver
     var tempPhotoUri by remember { mutableStateOf(value = Uri.EMPTY) }
+
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
             if (success) {
-                onResult.invoke(SharedImage(BitmapUtils.getDataFromUri(tempPhotoUri, contentResolver), tempPhotoUri.path!!))
+                PeekabooImageResizer.resizeImageAsync(
+                    contentResolver = contentResolver,
+                    coroutineScope = coroutineScope,
+                    uri = tempPhotoUri,
+                    width = resizeOptions.width,
+                    height = resizeOptions.height,
+                    resizeThresholdBytes = resizeOptions.resizeThresholdBytes,
+                    compressionQuality = resizeOptions.compressionQuality,
+                    filterOptions = filterOptions,
+                ) { resizedImage ->
+                    if (resizedImage != null) {
+                        onResult.invoke(SharedImage(resizedImage , tempPhotoUri.path!!))
+                    }
+                }
+
             }
         }
     )

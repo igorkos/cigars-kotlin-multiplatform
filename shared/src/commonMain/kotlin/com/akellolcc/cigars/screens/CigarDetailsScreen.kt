@@ -11,9 +11,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -43,13 +52,16 @@ import com.akellolcc.cigars.components.ValuesCard
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
+import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.ITabItem
+import com.akellolcc.cigars.navigation.ImagesViewRoute
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.imagePainter
+import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
@@ -77,9 +89,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     override fun Content() {
         val cigar: Cigar = route.data as Cigar
         var isEdit by remember { mutableStateOf(false) }
-        val coroutineScope = rememberCoroutineScope()
-        var launchCamera by remember { mutableStateOf(value = false) }
-        var launchGallery by remember { mutableStateOf(value = false) }
         var notesHeight by remember { mutableStateOf(0) }
 
         val viewModel = getViewModel(
@@ -87,75 +96,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             factory = viewModelFactory { CigarsDetailsScreenViewModel(cigar) })
 
         val images by viewModel.images.collectAsState()
-
-        val permissionsManager = createPermissionsManager(object : PermissionCallback {
-            override fun onPermissionStatus(
-                permissionType: PermissionType,
-                status: PermissionStatus
-            ) {
-                Log.debug("Permission $permissionType -> $status")
-                when (status) {
-                    PermissionStatus.SHOW_RATIONAL -> {
-
-                    }
-
-                    PermissionStatus.DENIED -> {
-                        if (permissionType == PermissionType.GALLERY) {
-                            launchCamera = false
-                        } else {
-                            launchGallery = false
-                        }
-                    }
-
-                    PermissionStatus.GRANTED -> {
-                        if (permissionType == PermissionType.GALLERY) {
-                            launchCamera = true
-                        } else {
-                            launchGallery = true
-                        }
-                    }
-                }
-            }
-
-
-        })
-
-        val cameraManager = rememberCameraManager {
-            coroutineScope.launch {
-                it?.let {
-                    cigar.addImage(it)
-                    viewModel.fetchImages()
-                }
-            }
-        }
-
-        val galleryManager = rememberGalleryManager {
-            coroutineScope.launch {
-                it?.let {
-                    cigar.addImage(it)
-                    viewModel.fetchImages()
-                }
-            }
-        }
-
-
-        if (launchCamera) {
-            if (permissionsManager.isPermissionGranted(PermissionType.CAMERA)) {
-                cameraManager.launch()
-            } else {
-                permissionsManager.askPermission(PermissionType.CAMERA)
-            }
-            launchCamera = false
-        }
-
-        if (launchGallery) {
-            if (permissionsManager.isPermissionGranted(PermissionType.GALLERY)) {
-                galleryManager.launch()
-            } else {
-                permissionsManager.askPermission(PermissionType.GALLERY)
-            }
-            launchGallery = false
-        }
 
         LaunchedEffect(Unit) {
             viewModel.fetchImages()
@@ -184,44 +124,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             }
                         },
                         actions = {
-                            IconButton(onClick = { expanded = !expanded }) {
-                                loadIcon(Images.icon_menu_image, Size(24.0F, 24.0F))
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    DropdownMenuItem(
-                                        leadingIcon = {
-                                            loadIcon(Images.icon_menu_camera, Size(24.0F, 24.0F))
-                                        },
-                                        text = {
-                                            TextStyled(
-                                                Localize.menu_item_camera,
-                                                TextStyles.Subhead
-                                            )
-                                        },
-                                        onClick = {
-                                            expanded = false
-                                            launchCamera = true
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        leadingIcon = {
-                                            loadIcon(Images.icon_menu_image, Size(24.0F, 24.0F))
-                                        },
-                                        text = {
-                                            TextStyled(
-                                                Localize.menu_item_gallery,
-                                                TextStyles.Subhead
-                                            )
-                                        },
-                                        onClick = {
-                                            expanded = false
-                                            launchGallery = true
-                                        }
-                                    )
-                                }
-                            }
                             IconButton(onClick = { isEdit = !isEdit }) {
                                 loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
                             }
@@ -241,7 +143,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             PagedCarousel(
                                 images,
                                 modifier = Modifier.aspectRatio(ratio = 1.8f)
-                            )
+                            ){
+                                navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
+                                    this.data = Pair(viewModel.cigar,it)
+                                }))
+                            }
                         }
                         Column(modifier = with(Modifier) {
                             fillMaxSize()

@@ -76,9 +76,12 @@ kotlin {
                 implementation(libs.reaktive.reaktive)
                 implementation(libs.reaktive.annotations)
                 implementation(libs.reaktive.coroutines)
-               // implementation(libs.reaktive.rxjava2)
-               // implementation(libs.reaktive.rxjava3)
 
+                // peekaboo-ui
+                implementation(libs.peekaboo.ui)
+                implementation(libs.peekaboo.image.picker)
+
+                implementation(libs.cloudinary)
                 implementation(libs.multiplatform.settings)
             }
         }
@@ -147,6 +150,7 @@ android {
 dependencies {
 
     implementation(libs.ui.tooling.preview.android)
+    implementation(libs.androidx.exifinterface)
 }
 
 sqldelight {
