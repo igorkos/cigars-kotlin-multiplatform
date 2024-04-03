@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,8 +20,7 @@ import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.imagePainter
 import com.akellolcc.cigars.ui.BackHandler
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
+import kotlin.jvm.Transient
 
 class HumidorsScreen(override val route: NavRoute,) : ITabItem {
 
@@ -48,13 +46,14 @@ class HumidorsScreen(override val route: NavRoute,) : ITabItem {
 }
 class HumidorsListScreen( val updateTabState: ((Boolean) -> Unit)? = null) : Screen {
 
+    @Transient
+    private val viewModel = HumidorsViewModel()
     @Composable
     override fun Content() {
-        val viewModel = getViewModel(key = "HumidorsListScreen", factory = viewModelFactory { HumidorsViewModel() })
 
         BackHandler {}
 
-        val humidors by viewModel.humidors.collectAsState()
+        val humidors by viewModel.asState()
 
         Log.debug("Humidors: $humidors")
 

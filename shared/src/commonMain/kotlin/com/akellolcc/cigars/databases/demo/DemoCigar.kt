@@ -14,7 +14,7 @@ data class DemoCigar(
     public val cigar: String,
     public val wrapper: String,
     public val binder: String,
-    public val gauge: Double,
+    public val gauge: Long,
     public val length: String,
     public val strength: Long,
     public val rating: Long,

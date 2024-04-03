@@ -6,6 +6,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.navigation.mainScreenModule
 import com.akellolcc.cigars.screens.Home
 
+
 @Composable fun MainView() {
     ScreenRegistry {
         mainScreenModule()

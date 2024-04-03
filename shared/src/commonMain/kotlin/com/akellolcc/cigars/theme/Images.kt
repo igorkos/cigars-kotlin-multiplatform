@@ -55,7 +55,9 @@ class Images {
         val icon_menu_edit = MR.images.pencil
         val icon_menu_image = MR.images.icon_menu_image
         val icon_menu_camera = MR.images.icon_menu_camera
-        val icon_menu_photos = MR.images.icon_menu_photos
+        val icon_star_empty = MR.images.icon_star_empty
+        val icon_star_filled = MR.images.icon_star_full
+
     }
 }
 

@@ -1,31 +1,21 @@
 package com.akellolcc.cigars.databases.extensions
 
-import com.akellolcc.cigars.databases.ImagesTable
-import kotlinx.serialization.Serializable
+class CigarImage(override val rowid: Long,
+                 val image: String? = null,
+                 val data_: ByteArray,
+                 val notes: String? = null,
+                 val type: Long? = null,
+                 val cigarId: Long? = null,
+                 val humidorId: Long? = null) : BaseEntity(rowid) {
 
-@Serializable
-class CigarImage : DBObject<ImagesTable> {
 
-    public val id: Long
-        get() { return this.dbObject?.rowid ?: -1 }
-    public val bytes: ByteArray?
-        get() { return this.dbObject?.data_ }
-    public val image: String
-        get() { return this.dbObject?.image ?: "" }
-    public val notes: String
-        get() { return this.dbObject?.notes ?: "" }
-    public val type: Long
-        get() { return this.dbObject?.type ?: 0 }
-    public val cigarId: Long
-        get() { return this.dbObject?.cigarId ?: -1 }
-    public val humidorId: Long
-        get() { return this.dbObject?.humidorId ?: -1 }
-    constructor(dbID: Long) : super() {
-        this.dbObject = this.dbQuery.image(dbID).executeAsOne()
+
+    /*constructor(dbID: Long) : super() {
+        load(dbID)
     }
 
     constructor(image: ImagesTable) : super() {
-        this.dbObject = image
+        load(image.rowid)
     }
 
     constructor( data: ByteArray,
@@ -38,8 +28,12 @@ class CigarImage : DBObject<ImagesTable> {
                 dbQuery.addImage(data, type, image, notes)
                 dbQuery.lastInsertRowId().executeAsOne()
             }
-            this.dbObject = this.dbQuery.image(imageID).executeAsOne()
+            load(imageID)
             return@runDbQuery this
         }
     }
+
+    override fun query(id: Long): Flow<ImagesTable> {
+        return this.dbQuery.image(id).asFlow().mapToOne(Dispatchers.Default)
+    }*/
 }

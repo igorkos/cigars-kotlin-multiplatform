@@ -1,28 +1,25 @@
 package com.akellolcc.cigars.mvvm
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.extensions.Humidor
-import dev.icerock.moko.mvvm.flow.CFlow
-import dev.icerock.moko.mvvm.flow.CMutableStateFlow
-import dev.icerock.moko.mvvm.flow.cFlow
-import dev.icerock.moko.mvvm.flow.cMutableStateFlow
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorsRepository
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 
 
-class HumidorsViewModel : ViewModel() {
+class HumidorsViewModel : ActionsViewModel<HumidorsViewModel.Action>()  {
+    private val database: SqlDelightHumidorsRepository = SqlDelightHumidorsRepository(Database.getInstance().dbQueries)
+    var loading by mutableStateOf(false)
 
-    private val database: Database = Database.getInstance();
-
-    private val _humidors: CMutableStateFlow<List<Humidor>> = MutableStateFlow(listOf<Humidor>()).cMutableStateFlow()
-    val humidors: StateFlow<List<Humidor>> = _humidors
-
-    private val _actions = Channel<Action>(Channel.BUFFERED)
-    val actions: CFlow<Action> get() = _actions.receiveAsFlow().cFlow()
+    @Composable
+    fun asState() : State<List<Humidor>> {
+        return database.observeAll().collectAsState(listOf())
+    }
 
     sealed interface Action {
         data class RouteToHumidor(val humidor: Humidor) : Action

@@ -1,37 +1,34 @@
 package com.akellolcc.cigars.mvvm
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.akellolcc.cigars.camera.SharedImage
+import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import dev.icerock.moko.mvvm.flow.CFlow
-import dev.icerock.moko.mvvm.flow.CMutableStateFlow
-import dev.icerock.moko.mvvm.flow.cFlow
-import dev.icerock.moko.mvvm.flow.cMutableStateFlow
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarImagesRepository
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 
 
-class ImagesViewScreenViewModel(val cigar: Cigar) : ViewModel() {
-
-    private val _images: CMutableStateFlow<List<CigarImage>> = MutableStateFlow(listOf<CigarImage>()).cMutableStateFlow()
-    val images: StateFlow<List<CigarImage>> = _images
-
-    private val _actions = Channel<Action>(Channel.BUFFERED)
-    val actions: CFlow<Action> get() = _actions.receiveAsFlow().cFlow()
-
-    fun fetchImages() {
-        _images.value = cigar.images
-        viewModelScope.launch {
-            _actions.send(Action.Loding(false))
+class ImagesViewScreenViewModel(val cigar: Cigar) : ActionsViewModel<ImagesViewScreenViewModel.Action>() {
+    private val database: SqlDelightCigarImagesRepository = SqlDelightCigarImagesRepository(cigar.rowid, Database.getInstance().dbQueries)
+    var loading by mutableStateOf(false)
+    fun addImage(image: SharedImage) {
+        image.toByteArray()?.let {
+            database.add(CigarImage(-1, data_ = it))
         }
     }
 
+    @Composable
+    fun asState() : State<List<CigarImage>> {
+        return database.observeAll().collectAsState(listOf())
+    }
+
     sealed interface Action {
-        data class Loding(val isLoading: Boolean) : Action
         data class ShowError(val error: StringDesc) : Action
     }
 }

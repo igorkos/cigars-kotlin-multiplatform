@@ -51,31 +51,9 @@ kotlin {
                 implementation(libs.i18n)
                 implementation(libs.locale)
 
-                implementation(libs.moko.resources)
-                implementation(libs.moko.resources.compose)
-
+                implementation(libs.bundles.moko.common)
                 // Navigator
-                implementation(libs.voyager.navigator)
-                // BottomSheetNavigator
-                implementation(libs.voyager.bottom.sheet.navigator)
-                // TabNavigator
-                implementation(libs.voyager.tab.navigator)
-                // Transitions
-                implementation(libs.voyager.transitions)
-
-                implementation(libs.mvvm.core) // only ViewModel, EventsDispatcher, Dispatchers.UI
-                implementation(libs.mvvm.flow) // api mvvm-core, CFlow for native and binding extensions
-                implementation(libs.mvvm.livedata) // api mvvm-core, LiveData and extensions
-                implementation(libs.mvvm.state) // api mvvm-livedata, ResourceState class and extensions
-                implementation(libs.mvvm.livedata.resources) // api mvvm-core, moko-resources, extensions for LiveData with moko-resources
-                implementation(libs.mvvm.flow.resources) // api mvvm-core, moko-resources, extensions for Flow with moko-resources
-                implementation(libs.mvvm.flow.compose) // api mvvm-flow, binding extensions for Compose Multiplatform
-                implementation(libs.mvvm.livedata.compose) // api mvvm-livedata, binding extensions for Compose Multiplatform
-                implementation(libs.moko.mvvm)
-
-                implementation(libs.reaktive.reaktive)
-                implementation(libs.reaktive.annotations)
-                implementation(libs.reaktive.coroutines)
+                implementation(libs.bundles.voyager.common)
 
                 // peekaboo-ui
                 implementation(libs.peekaboo.ui)
@@ -83,6 +61,12 @@ kotlin {
 
                 implementation(libs.cloudinary)
                 implementation(libs.multiplatform.settings)
+
+                implementation(libs.bundles.sqldelight.common)
+
+                implementation(libs.bundles.ktor.common)
+                //implementation(libs.hyperdrive.multiplatformx.api)
+                //implementation(libs.hyperdrive.multiplatformx.compose)
             }
         }
         val commonTest by getting {

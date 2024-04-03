@@ -1,6 +1,8 @@
 package com.akellolcc.cigars.camera
 
 import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,10 +13,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.cloudinary.Cloudinary
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.ResizeOptions
 
+class TakePictureCrop : ActivityResultContracts.TakePicture() {
+    override fun createIntent(context: Context, input: Uri): Intent {
+        val intent = super.createIntent(context, input)
+        intent.putExtra("crop", "true");
+        intent.putExtra("outputX", 200);
+        intent.putExtra("outputY", 200);
+        intent.putExtra("aspectX", 1);
+        intent.putExtra("aspectY", 1);
+        intent.putExtra("scale", true);
+        return intent
+    }
+}
 
 @Composable
 actual fun rememberCameraManager(

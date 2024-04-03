@@ -1,43 +1,27 @@
 package com.akellolcc.cigars.databases.extensions
 
-import com.akellolcc.cigars.databases.HumidorsTable
-import com.akellolcc.cigars.logging.Log
-import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
 
+class Humidor(
+    public override var rowid: Long,
+    public val name: String? = null,
+    public val brand: String? = null,
+    public val holds: Long? = null,
+    public val count: Long? = null,
+    public val temperature: Long? = null,
+    public val humidity: Double? = null,
+    public val notes: String? = null,
+    public val link: String? = null,
+    public val autoOpen: Boolean? = null,
+    public val sorting: Long? = null,
+    public val type: Long? = null,
+) : BaseEntity(rowid){
 
-class Humidor : DBObject<HumidorsTable>{
-    public val id: Long
-        get() { return this.dbObject?.rowid ?: -1 }
-    public val name: String
-        get() { return this.dbObject?.name ?: "" }
-    public val brand: String?
-        get() { return this.dbObject?.brand }
-    public val holds: Long
-        get() { return this.dbObject?.holds ?: 0 }
-    public val count: Long
-        get() { return this.dbObject?.count ?: 0 }
-    public val humidity: Double?
-        get() { return this.dbObject?.humidity}
-    public val temperature: Long?
-        get() { return this.dbObject?.temperature}
-    public val notes: String?
-        get() { return this.dbObject?.notes }
-    public val link: String?
-        get() { return this.dbObject?.link }
-    public val autoOpen: Boolean
-        get() { return this.dbObject?.autoOpen ?: false }
-    public val sorting: Long
-        get() { return this.dbObject?.sorting ?: 0 }
-    public val type: Long
-        get() { return this.dbObject?.type ?: 0 }
-
-    constructor(dbID: Long) : super() {
-        this.dbObject = this.dbQuery.humidor(dbID).executeAsOne()
+   /* constructor(dbID: Long) : super() {
+        load(dbID)
     }
 
     constructor(humidor: HumidorsTable) : super() {
-        this.dbObject = humidor
+        load(humidor.rowid)
     }
 
     constructor(name: String,
@@ -78,7 +62,7 @@ class Humidor : DBObject<HumidorsTable>{
             Log.debug("Added history to id $historyID")
             this.dbQuery.addHistoryToHumidor(humidorID, historyID)
             Log.debug("Added history to humidor")
-            this.dbObject = this.dbQuery.humidor(humidorID).executeAsOne()
+            load(humidorID)
             Log.debug("Humidor $this.dbObject")
             return@runDbQuery this
         }
@@ -86,7 +70,7 @@ class Humidor : DBObject<HumidorsTable>{
 
     fun addCigar(cigar: Cigar, count: Long) {
         runDbQuery {
-           this.dbQuery.addCigarToHumidor(this.id, cigar.id)
+           this.dbQuery.addCigarToHumidor(this.id, cigar.rowid, count)
             this.dbQuery.addHistory(count, Clock.System.now().toEpochMilliseconds(), count, 150.0, 1)
             val historyID = this.dbQuery.lastInsertRowId().executeAsOne()
             this.dbQuery.addHistoryToHumidor(this.id, historyID)
@@ -121,9 +105,13 @@ class Humidor : DBObject<HumidorsTable>{
         }
     }
 
+    override fun query(id: Long): Flow<HumidorsTable> {
+        return this.dbQuery.humidor(id).asFlow().mapToOne(Dispatchers.Default)
+    }
+
     fun update() {
 
     }
-
+*/
 }
 

@@ -1,63 +1,32 @@
 package com.akellolcc.cigars.databases.extensions
 
-import com.akellolcc.cigars.camera.SharedImage
-import com.akellolcc.cigars.databases.CigarsTable
-import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
-import kotlinx.serialization.Serializable
+val emptyCigar = Cigar(0, "", "", "", 0, "", "", "", 0, "", 0, 0, 0, "", "", "", false, false)
+data class Cigar(
+    override var rowid: Long,
+    val name: String,
+    val brand: String?,
+    val country: String?,
+    val date: Long?,
+    val cigar: String,
+    val wrapper: String,
+    val binder: String,
+    val gauge: Long,
+    val length: String,
+    val strength: Long,
+    val rating: Long?,
+    val myrating: Long?,
+    val notes: String?,
+    val filler: String,
+    val link: String?,
+    val shopping: Boolean,
+    var favorites: Boolean) : BaseEntity(rowid) {
 
-@Serializable
-class Cigar : DBObject<CigarsTable> {
-     val id: Long
-        get() { return this.dbObject?.rowid ?: -1 }
-     val name: String
-        get() { return this.dbObject?.name ?: "" }
-     val brand: String?
-        get() { return this.dbObject?.brand}
-     val country: String?
-        get() { return this.dbObject?.country}
-     val date: Long?
-        get() { return this.dbObject?.date}
-     val cigar: String?
-        get() { return this.dbObject?.cigar}
-     val wrapper: String?
-        get() { return this.dbObject?.wrapper}
-     val binder: String?
-        get() { return this.dbObject?.binder}
-     val gauge: Double?
-        get() { return this.dbObject?.gauge}
-     val length: String?
-        get() { return this.dbObject?.length}
-     val strength: Long?
-        get() { return this.dbObject?.strength}
-     val rating: Long
-        get() { return this.dbObject?.rating ?: 0 }
-     val myrating: Long
-        get() { return this.dbObject?.myrating ?: 0 }
-     val notes: String?
-        get() { return this.dbObject?.notes}
-     val filler: String?
-        get() { return this.dbObject?.filler}
-     val link: String?
-        get() { return this.dbObject?.link}
-     val shopping: Boolean
-        get() { return this.dbObject?.shopping ?: false}
-     val favorites: Boolean
-        get() { return this.dbObject?.favorites ?: false}
-
-    val images: List<CigarImage>
-        get() {
-            return dbQuery.cigarImages(this.id).executeAsList().map {
-                CigarImage(it)
-            }
-        }
-
-    constructor(dbID: Long) : super() {
-        this.dbObject = this.dbQuery.cigar(dbID).executeAsOne()
+  /*  constructor(dbID: Long) {
+        load(dbID)
     }
 
     constructor(cigar: CigarsTable) : super() {
-        this.dbObject = cigar
+        load(cigar.rowid)
     }
 
     constructor( name: String,
@@ -106,9 +75,13 @@ class Cigar : DBObject<CigarsTable> {
             //Add History item to humidor
           //  val history = this.addHistory(count, count, price, 1)
           //  this.dbQuery.addHistoryToCigar(cigarID, history.id)
-            this.dbObject = this.dbQuery.cigar(cigarID).executeAsOne();
+            load(cigarID)
             return@runDbQuery this
         }
+    }
+
+    override fun query(id: Long): Flow<CigarsTable> {
+       return this.dbQuery.cigar(id).asFlow().mapToOne(Dispatchers.Default)
     }
 
     override fun addHistory(count: Long?, left: Long?, price: Double?,
@@ -127,4 +100,12 @@ class Cigar : DBObject<CigarsTable> {
             return@runBlocking cImage
         }
     }
+
+    fun setFavorite(favorite: Boolean) {
+        runBlocking {
+            dbQuery.setFavoriteCigar(favorite, id)
+            entity.value = dbQuery.cigar(id).executeAsOne();
+            Log.debug("Cigar setFavorite: $favorite ${entity.value}")
+        }
+    }*/
 }

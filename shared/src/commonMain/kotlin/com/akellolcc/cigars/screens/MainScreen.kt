@@ -33,17 +33,19 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
+import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarsRoute
 import com.akellolcc.cigars.navigation.FavoritesRoute
 import com.akellolcc.cigars.navigation.HumidorsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
-import com.akellolcc.cigars.navigation.TabBarVisibility
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlin.jvm.Transient
 
 
-class MainScreen : Screen {
+class MainScreen() : Screen {
 
     private var tabs : List<ITabItem> = listOf(
         CigarsScreen(CigarsRoute),
@@ -51,11 +53,24 @@ class MainScreen : Screen {
         FavoritesScreen(FavoritesRoute)
     )
 
-
+    @Transient
+    private val viewModel = MainScreenViewModel()
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        var isTabsVisible by remember { mutableStateOf(viewModel.isTabsVisible) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+        viewModel.observeEvents {
+            when (it) {
+                is MainScreenViewModel.MainScreenActions.ShowError -> TODO()
+                is MainScreenViewModel.MainScreenActions.TabsVisibility -> {
+                    Log.debug("MainScreen received tabs visible ${it.isVisible}")
+                    isTabsVisible = it.isVisible
+                }
+            }
+        }
+        Log.debug("MainScreen tabs visible $isTabsVisible -> $viewModel")
 
         DefaultTheme {
             ModalNavigationDrawer(
@@ -85,7 +100,18 @@ class MainScreen : Screen {
                     }) {
                         Scaffold(
                             bottomBar = {
-                                BottomTabNavigation(tabs)
+                                AnimatedVisibility(visible = isTabsVisible, enter = slideInVertically { height ->
+                                    height
+                                }, exit = slideOutVertically { height ->
+                                    height
+                                }) {
+                                    NavigationBar {
+                                        tabs.forEach {
+                                            it.route.sharedViewModel = viewModel
+                                            TabNavigationItem(it.route, tabs)
+                                        }
+                                    }
+                                }
                             },
                         ) {
                             CurrentTab()
@@ -95,9 +121,6 @@ class MainScreen : Screen {
         }
     }
 }
-
-@Composable
-expect fun BottomTabNavigation(tabs: List<ITabItem>)
 
 @Composable
 fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {

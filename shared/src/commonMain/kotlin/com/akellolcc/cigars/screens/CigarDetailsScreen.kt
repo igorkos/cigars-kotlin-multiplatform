@@ -1,21 +1,27 @@
 package com.akellolcc.cigars.screens
 
 import TextStyled
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,35 +30,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.akellolcc.cigars.camera.PermissionCallback
-import com.akellolcc.cigars.camera.PermissionStatus
-import com.akellolcc.cigars.camera.PermissionType
-import com.akellolcc.cigars.camera.createPermissionsManager
-import com.akellolcc.cigars.camera.rememberCameraManager
-import com.akellolcc.cigars.camera.rememberGalleryManager
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.components.ValueCard
 import com.akellolcc.cigars.components.ValuesCard
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.ImagesViewRoute
 import com.akellolcc.cigars.navigation.NavRoute
@@ -63,12 +61,9 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.imagePainter
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
-import kotlinx.coroutines.launch
+import kotlin.jvm.Transient
 
 class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
-
     override val options: TabOptions
         @Composable
         get() {
@@ -84,21 +79,27 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             }
         }
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+    @Transient
+    private val viewModel = CigarsDetailsScreenViewModel(route.data as Cigar)
+
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val cigar: Cigar = route.data as Cigar
         var isEdit by remember { mutableStateOf(false) }
         var notesHeight by remember { mutableStateOf(0) }
+        var update by remember { mutableStateOf(false) }
 
-        val viewModel = getViewModel(
-            key = "CigarDetailsScreen",
-            factory = viewModelFactory { CigarsDetailsScreenViewModel(cigar) })
+        val images by viewModel.imagesAsState()
+        val humidors by viewModel.humidorsAsState()
 
-        val images by viewModel.images.collectAsState()
-
-        LaunchedEffect(Unit) {
-            viewModel.fetchImages()
+        Log.debug("Images: ${images.size} : ${viewModel.loading}  ")
+        viewModel.observeEvents {
+            when (it) {
+                is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
+                is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> TODO()
+                is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHumidor -> TODO()
+                is CigarsDetailsScreenViewModel.CigarsDetailsAction.RateCigar -> TODO()
+            }
         }
 
         val topColors = centerAlignedTopAppBarColors(containerColor = materialColor(MaterialColors.color_transparent),
@@ -110,7 +111,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     CenterAlignedTopAppBar(
-                       // modifier = Modifier.background(materialColor(MaterialColors.color_error)),
                         colors = topColors,
                         navigationIcon = {
                             IconButton(onClick = {
@@ -138,14 +138,15 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
                         Column(
                             horizontalAlignment = Alignment.Start,
-                            modifier = Modifier.padding(bottom = 10.dp)
+                            modifier = Modifier.padding(bottom = 10.dp).aspectRatio(ratio = 1.8f)
                         ) {
                             PagedCarousel(
                                 images,
-                                modifier = Modifier.aspectRatio(ratio = 1.8f)
+                                loading = viewModel.loading,
                             ){
+                                val data = route.data as Cigar
                                 navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
-                                    this.data = Pair(viewModel.cigar,it)
+                                    this.data = Pair(data,it)
                                 }))
                             }
                         }
@@ -162,7 +163,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                         }) {
                             Column {
                                 TextStyled(
-                                    viewModel.cigar.name,
+                                    viewModel.name,
                                     TextStyles.Headline,
                                     editable = isEdit,
                                     maxLines = 2,
@@ -170,12 +171,12 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     keepHeight = false
                                 )
                                 TextStyled(
-                                    viewModel.cigar.brand,
+                                    viewModel.brand,
                                     TextStyles.Subhead,
                                     editable = isEdit,
                                     modifier = Modifier.padding(end = 4.dp)
                                 )
-                                TextStyled(viewModel.cigar.country, TextStyles.Subhead, editable = isEdit)
+                                TextStyled(viewModel.country, TextStyles.Subhead, editable = isEdit)
                             }
                             Row(modifier = Modifier.padding(top = 10.dp)) {
                                 Column(
@@ -185,9 +186,9 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     ValuesCard(
                                         label = "Cigar"
                                     ) {
-                                        ValueCard("Shape", viewModel.cigar.cigar)
-                                        ValueCard("Length", viewModel.cigar.length)
-                                        ValueCard("Gauge", viewModel.cigar.gauge.toString())
+                                        ValueCard("Shape", viewModel.shape)
+                                        ValueCard("Length", viewModel.length)
+                                        ValueCard("Gauge", viewModel.gauge.toString())
                                     }
                                 }
                             }
@@ -197,7 +198,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     vertical = true
                                 ) {
                                     TextStyled(
-                                        viewModel.cigar.wrapper,
+                                        viewModel.wrapper,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Wrapper",
@@ -205,7 +206,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                     TextStyled(
-                                        viewModel.cigar.binder,
+                                        viewModel.binder,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Binder",
@@ -213,7 +214,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                     TextStyled(
-                                        viewModel.cigar.filler,
+                                        viewModel.filler,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Filler",
@@ -221,7 +222,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                         modifier = Modifier.padding(bottom = 10.dp)
                                     )
                                     TextStyled(
-                                        viewModel.cigar.strength.toString(),
+                                        viewModel.strength.toString(),
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = "Strength",
@@ -232,10 +233,44 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             }
                             Column {
                                 ValuesCard(
+                                    label = "Ratings",
+                                ) {
+                                    ValueCard("Rating", "${viewModel.rating}")
+                                    ValueCard("My Rating", "${viewModel.myrating}"){
+                                        viewModel.rate()
+                                    }
+                                    IconButton(onClick = {
+                                        viewModel.favorite()
+                                        update = !update
+                                    }) {
+                                        val icon = if(viewModel.favorites == true) Images.icon_star_filled else Images.icon_star_empty
+                                        loadIcon(icon, Size(64.0F, 64.0F))
+                                    }
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth().height(((humidors.count() + 1) * 48).dp)
+                            ) {
+                                ValuesCard(
                                     label = "Humidors",
                                     vertical = true
                                 ) {
-                                    
+                                    LazyColumn(
+                                        verticalArrangement = Arrangement.Top,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                    )
+                                    {
+                                        items(humidors, key = { item -> item.rowid }) {
+                                            HumidorListRow(it, viewModel)
+                                            Spacer( modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(4.dp)
+                                                .background(Color.Transparent)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                             Column(
@@ -246,7 +281,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     }
                             ) {
                                     TextStyled(
-                                        viewModel.cigar.notes,
+                                        viewModel.notes,
                                         TextStyles.Subhead,
                                         //label = "Notes",
                                         editable = isEdit,
@@ -258,7 +293,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 modifier = Modifier.padding(bottom = 10.dp)
                             ) {
                                 TextStyled(
-                                    viewModel.cigar.link,
+                                    viewModel.link,
                                     TextStyles.Subhead,
                                     label = "Link",
                                     labelStyle = TextStyles.Subhead,
@@ -269,6 +304,37 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                         }
 
                     }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun HumidorListRow(item: Humidor, viewModel: CigarsDetailsScreenViewModel) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = materialColor(MaterialColors.color_transparent),
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    viewModel.openHumidor(item)
+                })
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp, start = 12.dp, end = 12.dp, bottom = 6.dp)
+
+            ) {
+                TextStyled(
+                    item.name,
+                    TextStyles.Subhead,
+                )
+                ValueCard(null, "${item.count}"){
+                    viewModel.addToHumidor(item)
                 }
             }
         }

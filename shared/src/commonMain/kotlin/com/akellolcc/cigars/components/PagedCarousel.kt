@@ -1,6 +1,5 @@
 package com.akellolcc.cigars.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,30 +19,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.ui.toImageBitmap
-import com.akellolcc.cigars.ui.toIntPx
-import dev.icerock.moko.mvvm.ResourceState
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
 
@@ -56,12 +43,13 @@ private val shape = RoundedCornerShape(topStart = borderRadius, topEnd = borderR
 @Composable
 fun PagedCarousel(images: List<CigarImage>?, modifier: Modifier = Modifier, scale: ContentScale = ContentScale.FillBounds, loading: Boolean = false, select: Int = 0, onClick: ((page: Int) -> Unit)? = null) {
     // Create a pager state
-    //Log.debug(" Loading images: $loading")
     if(loading) return
 
     val pagerState = rememberPagerState(select) {
         if(!images.isNullOrEmpty()) images.size else 1
     }
+
+   //Log.debug("Images: ${images?.size} : $select : $loading")
 
     LaunchedEffect(loading, select) {
         if(!loading) {
@@ -69,14 +57,15 @@ fun PagedCarousel(images: List<CigarImage>?, modifier: Modifier = Modifier, scal
         }
     }
 
-    Box {
+    Box(modifier = modifier.fillMaxSize()) {
         // HorizontalPager composable: Swiping through images
         HorizontalPager(
             state = pagerState,
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
         ) { page ->
+            //Log.debug("Images1: ${images?.size}")
             if(!images.isNullOrEmpty()) {
-                CarouselItem(images[page].bytes, scale ){
+                CarouselItem(images[page].data_, scale ){
                     onClick?.invoke(page)
                 }
             } else {

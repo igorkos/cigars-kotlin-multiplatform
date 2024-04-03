@@ -1,5 +1,6 @@
 package com.akellolcc.cigars.navigation
 
+import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import dev.icerock.moko.resources.ImageResource
@@ -15,6 +16,7 @@ expect class NavRoute(route: String, title: String, icon: ImageResource?, data: 
     val title: String
     var icon: ImageResource?
     var updateTabState: ((Boolean) -> Unit)?
+    var sharedViewModel: MainScreenViewModel?
     var data: Any?
 }
 

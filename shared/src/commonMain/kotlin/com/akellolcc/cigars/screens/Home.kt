@@ -7,7 +7,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.navigation.SharedScreen
 import com.akellolcc.cigars.navigation.setupNavGraph
-
 class Home : Screen {
     init {
         setupNavGraph()

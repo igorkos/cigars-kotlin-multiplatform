@@ -3,6 +3,9 @@ package com.akellolcc.cigars.databases
 import com.akellolcc.cigars.databases.demo.DemoCigar
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarHumidorRepository
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarsRepository
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.Localize
@@ -37,18 +40,21 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
 
     fun createDemoSet() {
         runBlocking {
-            val humidor = Humidor(Localize.demo_humidor_name, "Brand", 50, 72, 71.0)
+            val humidorDatabase = SqlDelightHumidorsRepository(dbQueries)
+            val humidor = Humidor(-1, name = Localize.demo_humidor_name, brand = "Brand", holds = 50, humidity = 72.0, temperature = 71)
+            humidorDatabase.add(humidor)
             Log.debug("Demo humidor: $humidor")
 
             val demoCigarsJson = readTextFile(AssetFiles.demo_cigars)
 
             demoCigarsJson?.let { json ->
+                val cigarsDatabase = SqlDelightCigarsRepository(
+                    getInstance().dbQueries)
                 val cigars = Json.decodeFromString<List<DemoCigar>>(json)
                 for( cigar in cigars) {
-                    val dbCigar = Cigar(cigar.name, cigar.brand,
+                    val dbCigar = Cigar(-1,cigar.name, cigar.brand,
                         cigar.country,
                         10,
-                        15.0,
                         cigar.cigar,
                         cigar.wrapper,
                         cigar.binder,
@@ -62,23 +68,12 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
                         cigar.link,
                         cigar.shopping,
                         cigar.favorites)
-                    humidor.addCigar(dbCigar, 10)
+                    cigarsDatabase.add(dbCigar)
+                    val hcDatabase = SqlDelightCigarHumidorRepository(dbCigar.rowid, dbQueries)
+                    hcDatabase.add(humidor, 10)
                 }
             }
         }
-    }
-    fun humidors() : List<Humidor> {
-        return runBlocking {
-            return@runBlocking dbQueries.allHumidors().executeAsList().map {
-                Humidor(it)
-            }
-        }
-    }
-
-    fun cigars() : List<Cigar> {
-        return dbQueries.allCigars().executeAsList().map {
-                Cigar(it)
-            }
     }
 
     fun reset() {

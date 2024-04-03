@@ -8,12 +8,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.imagePainter
@@ -22,6 +24,14 @@ import kotlin.math.roundToInt
 
 @Composable
 expect fun screenWidth(): Dp
+
+@Stable
+inline val Dp.px: Int
+    @Composable
+    get() {
+        val density = LocalDensity.current
+        return (this * density.density).value.roundToInt()
+    }
 
 @Composable
 expect fun BackHandler(block:() -> Unit)

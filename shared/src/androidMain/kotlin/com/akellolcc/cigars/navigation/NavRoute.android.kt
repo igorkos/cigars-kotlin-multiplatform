@@ -1,5 +1,6 @@
 package com.akellolcc.cigars.navigation
 
+import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import dev.icerock.moko.resources.ImageResource
 import kotlinx.serialization.Transient
 import java.io.Serializable
@@ -31,4 +32,7 @@ actual class NavRoute : Serializable {
     @kotlin.jvm.Transient
     @Transient
     actual var updateTabState: ((Boolean) -> Unit)? = null
+    @kotlin.jvm.Transient
+    @Transient
+    actual var sharedViewModel: MainScreenViewModel? = null
 }

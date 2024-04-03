@@ -2,23 +2,23 @@ import kotlin.Boolean;
 
 CREATE TABLE CigarsTable (
     rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
+    name TEXT NOT NULL,
     brand TEXT,
     country TEXT,
     date INTEGER,
-    cigar TEXT,
-    wrapper TEXT,
-    binder TEXT,
-    gauge REAL,
-    length TEXT,
-    strength INTEGER,
+    cigar TEXT NOT NULL,
+    wrapper TEXT NOT NULL,
+    binder TEXT NOT NULL,
+    gauge INTEGER NOT NULL,
+    length TEXT NOT NULL,
+    strength INTEGER NOT NULL,
     rating INTEGER,
     myrating INTEGER,
     notes TEXT,
-    filler TEXT,
+    filler TEXT NOT NULL,
     link TEXT,
-    shopping INTEGER AS Boolean,
-    favorites INTEGER AS Boolean
+    shopping INTEGER AS Boolean NOT NULL,
+    favorites INTEGER AS Boolean  NOT NULL
 );
 
 CREATE TABLE HumidorsTable (
@@ -37,6 +37,7 @@ CREATE TABLE HumidorsTable (
 );
 
 CREATE TABLE CigarHumidorTable (
+    count INTEGER,
     humidorId INTEGER,
     cigarId INTEGER ,
     PRIMARY KEY (humidorId, cigarId),
@@ -60,7 +61,7 @@ CREATE TABLE HistoryTable (
 CREATE TABLE ImagesTable (
     rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     image TEXT,
-    data BLOB,
+    data BLOB NOT NULL,
     notes TEXT,
     type INTEGER,
     cigarId  INTEGER,
@@ -71,18 +72,20 @@ CREATE TABLE ImagesTable (
 
 
 allCigars:
-SELECT CigarsTable.*
-FROM CigarsTable;
+SELECT * FROM CigarsTable;
 
 cigar:
-SELECT CigarsTable.* FROM CigarsTable WHERE rowid = :id;
+SELECT * FROM CigarsTable WHERE rowid = ?;
 
 addCigar:
-INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO CigarsTable (rowid, name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
+VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 removeAllCigars:
 DELETE FROM CigarsTable;
+
+removeCigar:
+DELETE FROM CigarsTable WHERE rowid = :rowid;
 
 cigarImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
@@ -99,6 +102,15 @@ UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
 cigarHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar;
 
+cigarExists:
+SELECT count(1) FROM CigarsTable WHERE rowid = ?;
+
+setFavoriteCigar:
+UPDATE CigarsTable SET favorites = :favorites WHERE rowid = :id;
+
+
+
+
 
 allHumidors:
 SELECT HumidorsTable.*
@@ -111,27 +123,12 @@ removeAllHumidors:
 DELETE FROM HumidorsTable;
 
 addHumidor:
-INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-
-updateHumidor:
-UPDATE HumidorsTable SET
-    name = :name,
-    brand = :brand,
-    holds = :holds,
-    count = :count,
-    temperature = :temperature,
-    humidity = :humidity,
-    notes = :notes,
-    link = :link,
-    autoOpen = :autoOpen,
-    sorting = :sorting,
-    type = :type
- WHERE rowid = :humidorId;
+INSERT OR REPLACE INTO HumidorsTable (rowid, name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
+VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 addCigarToHumidor:
-INSERT INTO CigarHumidorTable (humidorId, cigarId)
-VALUES (?,?);
+INSERT OR REPLACE INTO CigarHumidorTable (humidorId, cigarId, count)
+VALUES (?,?,?);
 
 humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
@@ -162,9 +159,20 @@ image:
 SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
 
 addImage:
-INSERT INTO ImagesTable (data,  type, image, notes)
-VALUES (?, ?, ?, ?);
+INSERT OR REPLACE INTO ImagesTable (rowid, data,  type, image, notes)
+VALUES (?, ?, ?, ?, ?);
 
+removeImage:
+DELETE FROM ImagesTable WHERE rowid = :rowid;
+
+imageExists:
+SELECT count(1) FROM ImagesTable WHERE rowid = ?;
+
+cigarinHumidorExists:
+SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
+
+removeCigarFromHumidor:
+DELETE FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
 
 lastInsertRowId:
 SELECT last_insert_rowid();

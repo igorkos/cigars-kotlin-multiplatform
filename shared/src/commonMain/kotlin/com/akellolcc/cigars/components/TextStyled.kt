@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.textStyle
 
@@ -46,7 +45,7 @@ public fun TextStyled(text: String?, style: TextStyles = TextStyles.Headline, la
                     modifier = modifier
                         .height(textHeight)
                         .onSizeChanged {
-                            Log.debug("Text size for '$text' -> $it maxHeight $maxHeight")
+                            //Log.debug("Text size for '$text' -> $it maxHeight $maxHeight")
                             textWith = it.width
                             val oneLine = with(density) {
                                 textMeasurer.measure(

@@ -1,5 +1,6 @@
 package com.akellolcc.cigars.navigation
 
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import dev.icerock.moko.resources.ImageResource
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -27,5 +28,7 @@ actual class NavRoute {
     actual var data: Any? = null
     @Transient
     actual var updateTabState: ((Boolean) -> Unit)? = null
+    @Transient
+    actual var sharedViewModel: ViewModel? = null
 
 }

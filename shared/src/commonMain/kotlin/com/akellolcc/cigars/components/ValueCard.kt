@@ -3,6 +3,7 @@ package com.akellolcc.cigars.components
 import TextStyled
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,20 +22,25 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.materialColor
 
 @Composable
-fun ValueCard(label: String, value: String?) {
+fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
     OutlinedCard(colors = CardDefaults.cardColors(materialColor(MaterialColors.color_primaryContainer),materialColor(MaterialColors.color_onPrimaryContainer)),
         shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(0.5.dp, materialColor(MaterialColors.color_onPrimaryContainer)),
+        border = BorderStroke(if (onClick != null) 1.dp else 0.5.dp, materialColor(MaterialColors.color_onPrimaryContainer)),
+        elevation = if (onClick != null) CardDefaults.outlinedCardElevation(8.dp) else CardDefaults.outlinedCardElevation()
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp).clickable(onClick = {
+                onClick?.invoke()
+            }),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TextStyled(
-                label,
-                TextStyles.Subhead,
-                modifier = Modifier.padding(end = 8.dp)
-            )
+            if(label != null) {
+                TextStyled(
+                    label,
+                    TextStyles.Subhead,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
             TextStyled(
                 value,
                 TextStyles.Subhead,
@@ -65,7 +71,8 @@ fun ValuesCard(label: String? = null, vertical: Boolean = false, content: @Compo
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     content()
                 }

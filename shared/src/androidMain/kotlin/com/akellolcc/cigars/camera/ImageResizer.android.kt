@@ -16,7 +16,6 @@
 package com.akellolcc.cigars.camera
 
 import android.content.ContentResolver
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -24,10 +23,10 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
 import android.graphics.Paint
-import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.annotation.FloatRange
+import androidx.exifinterface.media.ExifInterface
 import com.preat.peekaboo.image.picker.FilterOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

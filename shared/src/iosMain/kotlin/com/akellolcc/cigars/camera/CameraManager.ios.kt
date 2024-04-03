@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.preat.peekaboo.image.picker.FilterOptions
 import com.preat.peekaboo.image.picker.ResizeOptions
-import com.preat.peekaboo.image.picker.SelectionMode
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.refTo
@@ -19,8 +18,6 @@ import platform.CoreImage.CIImage
 import platform.CoreImage.createCGImage
 import platform.CoreImage.filterWithName
 import platform.Foundation.setValue
-import platform.PhotosUI.PHPickerViewController
-import platform.PhotosUI.PHPickerViewControllerDelegateProtocol
 import platform.UIKit.UIApplication
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
