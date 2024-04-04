@@ -1,5 +1,7 @@
 package com.akellolcc.cigars.databases.extensions
 
+import com.akellolcc.cigars.databases.HumidorsTable
+
 
 class Humidor(
     public override var rowid: Long,
@@ -16,13 +18,24 @@ class Humidor(
     public val type: Long? = null,
 ) : BaseEntity(rowid){
 
+    constructor(humidor: HumidorsTable) : this(humidor.rowid,
+        humidor.name,
+        humidor.brand,
+        humidor.holds,
+        humidor.count,
+        humidor.temperature,
+        humidor.humidity,
+        humidor.notes,
+        humidor.link,
+        humidor.autoOpen,
+        humidor.sorting,
+        humidor.type)
+
    /* constructor(dbID: Long) : super() {
         load(dbID)
     }
 
-    constructor(humidor: HumidorsTable) : super() {
-        load(humidor.rowid)
-    }
+
 
     constructor(name: String,
         brand: String?,

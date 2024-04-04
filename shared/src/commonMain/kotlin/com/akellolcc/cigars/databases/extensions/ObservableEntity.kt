@@ -15,16 +15,21 @@ import kotlinx.coroutines.launch
 
 class ObservableEntity<D>(private val dbEntity: Flow<D>) {
     private val listeners = mutableListOf<ObservableEntityListener<D, *>>()
-
-    val entity: CMutableStateFlow<D?> = MutableStateFlow<D?>(null).cMutableStateFlow()
+    private val entity: CMutableStateFlow<D?> = MutableStateFlow<D?>(null).cMutableStateFlow()
+    val value: D?
+        get() = entity.value
     init {
         CoroutineScope(Dispatchers.Default).launch {
             dbEntity.collect{ ent ->
                 entity.value = ent
-                listeners.forEach {
-                    it.invoke(ent)
-                }
+                reload()
             }
+        }
+    }
+
+    fun reload() {
+        listeners.forEach {
+            it.invoke(entity.value)
         }
     }
 

@@ -1,111 +1,110 @@
 package com.akellolcc.cigars.databases.extensions
 
-val emptyCigar = Cigar(0, "", "", "", 0, "", "", "", 0, "", 0, 0, 0, "", "", "", false, false)
+import com.akellolcc.cigars.theme.Localize
+
+var emptyCigar = Cigar(0, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", false, false)
 data class Cigar(
     override var rowid: Long,
-    val name: String,
-    val brand: String?,
-    val country: String?,
-    val date: Long?,
-    val cigar: String,
-    val wrapper: String,
-    val binder: String,
-    val gauge: Long,
-    val length: String,
-    val strength: Long,
-    val rating: Long?,
-    val myrating: Long?,
-    val notes: String?,
-    val filler: String,
-    val link: String?,
-    val shopping: Boolean,
-    var favorites: Boolean) : BaseEntity(rowid) {
+    var name: String,
+    var brand: String?,
+    var country: String?,
+    var date: Long?,
+    var cigar: String,
+    var wrapper: String,
+    var binder: String,
+    var gauge: Long,
+    var length: String,
+    var strength: CigarStrength,
+    var rating: Long?,
+    var myrating: Long?,
+    var notes: String?,
+    var filler: String,
+    var link: String?,
+    var shopping: Boolean,
+    var favorites: Boolean) : BaseEntity(rowid)
 
-  /*  constructor(dbID: Long) {
-        load(dbID)
-    }
+enum class CigarShapes{
+    Corona,
+    PetitCorona,
+    Churchill,
+    Robusto,
+    CoronaGorda,
+    DoubleCorona,
+    Panetela,
+    Lonsdale,
+    Grande,
+    Pyramid,
+    Belicoso,
+    Torpedo,
+    Perfecto,
+    Culebra,
+    Diadema;
 
-    constructor(cigar: CigarsTable) : super() {
-        load(cigar.rowid)
-    }
-
-    constructor( name: String,
-                brand: String,
-                country: String,
-                count: Long,
-                price: Double,
-                cigar: String? = null,
-                wrapper: String? = null,
-                binder: String? = null,
-                gauge: Double = 0.0,
-                length: String? = null,
-                strength: Long = 0,
-                rating: Long = 0,
-                myrating: Long = 0,
-                notes: String? = null,
-                filler: String? = null,
-                link: String? = null,
-                shopping: Boolean = false,
-                favorites: Boolean? = false,
-                 date: Long = Clock.System.now().toEpochMilliseconds()) : super() {
-        runDbQuery {
-            //Add humidor
-            val cigarID = this.dbQuery.transactionWithResult {
-                dbQuery.addCigar(
-                    name,
-                    brand,
-                    country,
-                    date,
-                    cigar,
-                    wrapper,
-                    binder,
-                    gauge,
-                    length,
-                    strength,
-                    rating,
-                    myrating,
-                    notes,
-                    filler,
-                    link,
-                    shopping,
-                    favorites
-                )
-                dbQuery.lastInsertRowId().executeAsOne()
+    companion object {
+        fun enumValues(): Array<Pair<CigarShapes, String>> {
+            return CigarShapes.entries.map {
+                it to localized(it)
+            }.toTypedArray()
+        }
+        fun localized(value: CigarShapes): String{
+            return when(value){
+                Corona -> Localize.cigar_shape_corona
+                PetitCorona -> Localize.cigar_shape_petit_corona
+                Churchill -> Localize.cigar_shape_churchill
+                Robusto -> Localize.cigar_shape_robusto
+                CoronaGorda -> Localize.cigar_shape_corona_gorda
+                DoubleCorona -> Localize.cigar_shape_double_corona
+                Panetela -> Localize.cigar_shape_panetela
+                Lonsdale -> Localize.cigar_shape_lonsdale
+                Grande -> Localize.cigar_shape_grande
+                Pyramid -> Localize.cigar_shape_pyramid
+                Belicoso -> Localize.cigar_shape_belicoso
+                Torpedo -> Localize.cigar_shape_torpedo
+                Perfecto -> Localize.cigar_shape_perfecto
+                Culebra -> Localize.cigar_shape_culebra
+                Diadema -> Localize.cigar_shape_diadema
             }
-            //Add History item to humidor
-          //  val history = this.addHistory(count, count, price, 1)
-          //  this.dbQuery.addHistoryToCigar(cigarID, history.id)
-            load(cigarID)
-            return@runDbQuery this
         }
     }
-
-    override fun query(id: Long): Flow<CigarsTable> {
-       return this.dbQuery.cigar(id).asFlow().mapToOne(Dispatchers.Default)
-    }
-
-    override fun addHistory(count: Long?, left: Long?, price: Double?,
-                            type: Long?, date: Long?): History {
-        return runBlocking {
-            val history = super.addHistory(count, left, price, type, date)
-            dbQuery.addHistoryToCigar(this@Cigar.id, history.id)
-            return@runBlocking history
-        }
-    }
-
-    fun addImage(image: SharedImage): CigarImage {
-        return runBlocking {
-            val cImage = CigarImage(image.toByteArray()!!, 0)
-            dbQuery.addImageToCigar(this@Cigar.id, cImage.id)
-            return@runBlocking cImage
-        }
-    }
-
-    fun setFavorite(favorite: Boolean) {
-        runBlocking {
-            dbQuery.setFavoriteCigar(favorite, id)
-            entity.value = dbQuery.cigar(id).executeAsOne();
-            Log.debug("Cigar setFavorite: $favorite ${entity.value}")
-        }
-    }*/
 }
+
+enum class CigarStrength{
+    Mild,
+    MildToMedium,
+    Medium,
+    MediumToFull,
+    Full;
+
+    companion object {
+        fun enumValues(): Array<Pair<CigarStrength, String>> {
+            return CigarStrength.entries.map {
+                it to localized(it)
+            }.toTypedArray()
+        }
+        fun localized(value: CigarStrength): String{
+            return when(value){
+                Mild -> Localize.cigar_strength_mild
+                MildToMedium -> Localize.cigar_strength_mild_medium
+                Medium -> Localize.cigar_strength_medium
+                MediumToFull -> Localize.cigar_strength_medium_full
+                Full -> Localize.cigar_strength_full
+            }
+        }
+        inline fun fromLong(value: Long): CigarStrength = when(value){
+            0L -> Mild
+            1L -> MildToMedium
+            2L -> Medium
+            3L -> MediumToFull
+            4L -> Full
+            else -> Mild
+        }
+        inline fun toLong(value: CigarStrength): Long = when(value){
+            Mild -> 0
+            MildToMedium -> 1
+            Medium -> 2
+            MediumToFull -> 3
+            Full -> 4
+        }
+    }
+}
+

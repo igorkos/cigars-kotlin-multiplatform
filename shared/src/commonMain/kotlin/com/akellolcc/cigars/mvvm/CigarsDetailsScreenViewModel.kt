@@ -9,7 +9,9 @@ import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
+import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.ObservableEntity
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarImagesRepository
@@ -23,27 +25,44 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) : ActionsViewModel<
     private val humidorsDatabase: SqlDelightCigarHumidorRepository = SqlDelightCigarHumidorRepository(cigar.rowid, Database.getInstance().dbQueries)
 
     var loading by mutableStateOf(false)
+    var editing by mutableStateOf(false)
 
     private val observeCigar = ObservableEntity(cigarsDatabase.observe(cigar.rowid))
-    val name by mutableStateOf(cigar.name)
-    val brand by observeCigar.map { it?.brand }
-    val country by observeCigar.map { it?.country }
-    val shape by observeCigar.map { it?.cigar }
-    val length by observeCigar.map { it?.length }
-    val gauge by observeCigar.map { it?.gauge }
-    val wrapper by observeCigar.map { it?.wrapper }
-    val binder by observeCigar.map { it?.binder }
-    val filler by observeCigar.map { it?.filler }
-    val strength by observeCigar.map { it?.strength }
-    val rating by observeCigar.map { it?.rating }
-    val myrating by observeCigar.map { it?.myrating }
-    val favorites by observeCigar.map { it?.favorites }
-    val notes by observeCigar.map { it?.notes }
-    val link by observeCigar.map { it?.link }
+    var name by mutableStateOf(cigar.name)
+    var brand by mutableStateOf(cigar.brand)
+    var country by mutableStateOf(cigar.country)
+    var shape by mutableStateOf(cigar.cigar)
+    var length by mutableStateOf(cigar.length)
+    var gauge by mutableStateOf(cigar.gauge)
+    var wrapper by mutableStateOf(cigar.wrapper)
+    var binder by mutableStateOf(cigar.binder)
+    var filler by mutableStateOf(cigar.filler)
+    var strength by mutableStateOf(cigar.strength)
+    var rating by mutableStateOf(cigar.rating)
+    var myrating by mutableStateOf(cigar.myrating)
+    var favorites by mutableStateOf(cigar.favorites)
+    var notes by mutableStateOf(cigar.notes)
+    var link by mutableStateOf(cigar.link)
 
+    init {
+        observeCigar.map { if (!editing) name = it?.name ?: "" }
+        observeCigar.map { if (!editing) brand = it?.brand }
+        observeCigar.map { if (!editing) country = it?.country }
+        observeCigar.map { if (!editing) shape = it?.cigar ?: "" }
+        observeCigar.map { if (!editing) length = it?.length ?: "" }
+        observeCigar.map { if (!editing) gauge = it?.gauge ?: 0 }
+        observeCigar.map { if (!editing) wrapper = it?.wrapper ?: "" }
+        observeCigar.map { if (!editing) binder = it?.binder ?: "" }
+        observeCigar.map { if (!editing) filler = it?.filler ?: "" }
+        observeCigar.map { if (!editing) strength = it?.strength ?: CigarStrength.Mild }
+        observeCigar.map { if (!editing) rating = it?.rating }
+        observeCigar.map { if (!editing) myrating = it?.myrating }
+        observeCigar.map { if (!editing) favorites = it?.favorites ?: false }
+        observeCigar.map { if (!editing) notes = it?.notes }
+        observeCigar.map { if (!editing) link = it?.link }
+    }
     @Composable
-    fun humidorsAsState()  : State<List<Humidor>> {
-        val a  by observeCigar.asState()
+    fun humidorsAsState()  : State<List<HumidorCigar>> {
         return humidorsDatabase.observeAll().collectAsState(listOf())
     }
     @Composable
@@ -51,12 +70,40 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) : ActionsViewModel<
         return imagesDatabase.observeAll().collectAsState(listOf())
     }
 
+    fun saveEdit(){
+        val updated = Cigar(cigar.rowid,
+            name = name,
+            brand = brand,
+            country=country,
+            date=cigar.date,
+            cigar=shape,
+            wrapper=wrapper,
+            binder=binder,
+            gauge=gauge,
+            length=length,
+            strength=strength,
+            rating= rating,
+            myrating=myrating,
+            notes=notes,
+            filler=filler,
+            link=link,
+            shopping=cigar.shopping,
+            favorites=favorites)
+        cigarsDatabase.update(updated)
+        editing = false
+    }
+
+    fun cancelEdit(){
+        editing = false
+        observeCigar.reload()
+    }
+
     fun rate(){
         sendEvent(CigarsDetailsAction.RateCigar(0))
     }
 
     fun favorite(){
-        observeCigar.entity.value?.let {
+        observeCigar.value?.let {
             val updated = cigar.copy(favorites = !it.favorites)
             cigarsDatabase.update(updated)
             Log.debug("cigar.favorites = ${it.favorites}")

@@ -2,6 +2,7 @@ package com.akellolcc.cigars.databases
 
 import com.akellolcc.cigars.databases.demo.DemoCigar
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarsRepository
@@ -60,7 +61,7 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
                         cigar.binder,
                         cigar.gauge,
                         cigar.length,
-                        cigar.strength,
+                        CigarStrength.fromLong(cigar.strength),
                         cigar.rating,
                         cigar.myrating,
                         cigar.notes,

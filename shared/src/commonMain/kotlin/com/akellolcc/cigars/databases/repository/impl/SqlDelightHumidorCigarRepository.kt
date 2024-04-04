@@ -4,6 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,11 +14,11 @@ import kotlinx.coroutines.launch
 class SqlDelightCigarHumidorRepository(
     private val cigarId: Long,
     private val roomQueries: CigarsDatabaseQueries,
-) : BaseRepository<Humidor>(), CigarHumidorRepository {
+) : BaseRepository<HumidorCigar>(), CigarHumidorRepository {
 
-    fun allSync(): List<Humidor> = roomQueries.cigarHumidors(cigarId, ::factory).executeAsList()
+    fun allSync(): List<HumidorCigar> = roomQueries.cigarHumidors(cigarId, ::factory).executeAsList()
 
-    override fun observeAll(): Flow<List<Humidor>> {
+    override fun observeAll(): Flow<List<HumidorCigar>> {
         return roomQueries.cigarHumidors(cigarId, ::factory).asFlow().mapToList(Dispatchers.Main)
     }
 
@@ -29,7 +30,7 @@ class SqlDelightCigarHumidorRepository(
         }
     }
 
-    override fun doUpsert(entity: Humidor) {
+    override fun doUpsert(entity: HumidorCigar) {
         TODO("Not yet implemented")
     }
 
@@ -39,11 +40,11 @@ class SqlDelightCigarHumidorRepository(
         }
     }
 
-    override fun observe(id: Long): Flow<Humidor> {
+    override fun observe(id: Long): Flow<HumidorCigar> {
         TODO("Not yet implemented")
     }
 
-    override fun observeOrNull(id: Long): Flow<Humidor?> {
+    override fun observeOrNull(id: Long): Flow<HumidorCigar?> {
         TODO("Not yet implemented")
     }
 
@@ -55,21 +56,12 @@ class SqlDelightCigarHumidorRepository(
         count: Long?,
         humidorId: Long?,
         cigarId: Long?,
-    ): Humidor {
+    ): HumidorCigar {
         val humidor = roomQueries.humidor(humidorId!!).executeAsOne()
-        return Humidor(
-            humidor.rowid,
-            humidor.name,
-            humidor.brand,
-            humidor.holds,
-            humidor.count,
-            humidor.temperature,
-            humidor.humidity,
-            humidor.notes,
-            humidor.link,
-            humidor.autoOpen,
-            humidor.sorting,
-            humidor.type,
+        return HumidorCigar(
+            count = count,
+            humidor = Humidor(humidor),
+            cigar = null,
         )
     }
 }

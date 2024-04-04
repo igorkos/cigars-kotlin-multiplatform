@@ -15,12 +15,12 @@ enum class TextStyles {
 }
 
 @Composable
-fun textStyle(style: TextStyles): TextStyle {
+fun textStyle(style: TextStyles, color: Color = Color(LocalContentColor.current.value)): TextStyle {
     return when(style) {
-        TextStyles.Headline -> MaterialTheme.typography.titleLarge.copy(color = Color(LocalContentColor.current.value))
-        TextStyles.Subhead ->  MaterialTheme.typography.titleMedium.copy(color = Color(LocalContentColor.current.value))
-        TextStyles.Description -> MaterialTheme.typography.titleSmall.copy(color = Color(LocalContentColor.current.value))
-        TextStyles.ScreenTitle -> MaterialTheme.typography.titleLarge.copy(color = Color(LocalContentColor.current.value))
-        TextStyles.BarItemTitle -> MaterialTheme.typography.labelMedium.copy(color = Color(LocalContentColor.current.value))
+        TextStyles.Headline -> MaterialTheme.typography.titleLarge.copy(color = color)
+        TextStyles.Subhead ->  MaterialTheme.typography.titleMedium.copy(color = color)
+        TextStyles.Description -> MaterialTheme.typography.titleSmall.copy(color = color)
+        TextStyles.ScreenTitle -> MaterialTheme.typography.titleLarge.copy(color = color)
+        TextStyles.BarItemTitle -> MaterialTheme.typography.labelMedium.copy(color = color)
     }
 }

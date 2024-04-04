@@ -6,6 +6,7 @@ import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,7 @@ class SqlDelightCigarsRepository(
                     entity.binder,
                     entity.gauge,
                     entity.length,
-                    entity.strength,
+                    CigarStrength.toLong(entity.strength),
                     entity.rating,
                     entity.myrating,
                     entity.notes,
@@ -98,7 +99,7 @@ class SqlDelightCigarsRepository(
             binder,
             gauge,
             length,
-            strength,
+            CigarStrength.fromLong(strength),
             rating,
             myrating,
             notes,
