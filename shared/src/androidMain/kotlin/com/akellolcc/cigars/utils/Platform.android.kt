@@ -3,6 +3,7 @@ package com.akellolcc.cigars.utils
 import android.content.Context
 
 var appContext: Context? = null;
+
 class AndroidPlatform : Platform {
     override val name: String = "Android ${android.os.Build.VERSION.SDK_INT}"
 }

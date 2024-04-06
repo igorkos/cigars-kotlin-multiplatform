@@ -1,7 +1,7 @@
 package com.akellolcc.cigars.navigation
 
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -12,23 +12,27 @@ actual class NavRoute {
     actual constructor(
         route: String,
         title: String,
-        icon: ImageResource?,
-        data: Any?
+        icon: ImageResource,
+        data: Any?,
+        isTabsVisible: Boolean
     ) {
         this.route = route
         this.title = title
         this.icon = icon
         this.data = data
+        this.isTabsVisible = isTabsVisible
     }
 
     actual val route: String
     actual val title: String
+
     @Transient
-    actual var icon: ImageResource? = null
+    actual var icon: ImageResource = Images.tab_icon_cigars
+
     @Transient
     actual var data: Any? = null
-    @Transient
-    actual var updateTabState: ((Boolean) -> Unit)? = null
+    actual var isTabsVisible: Boolean = true
+
     @Transient
     actual var sharedViewModel: MainScreenViewModel? = null
 

@@ -107,7 +107,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                 byteArrays.forEach {
                     // Process the selected images' ByteArrays.
                     Log.debug("Image size ${it.size}")
-                    viewModel.addImage(SharedImage( it, null))
+                    viewModel.addImage(SharedImage(it, null))
                 }
             }
         )
@@ -179,10 +179,11 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
         }
 
 
-
-        val topColors = centerAlignedTopAppBarColors(containerColor = materialColor(MaterialColors.color_transparent),
+        val topColors = centerAlignedTopAppBarColors(
+            containerColor = materialColor(MaterialColors.color_transparent),
             navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),)
+            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+        )
         val navigator = LocalNavigator.currentOrThrow
         DefaultTheme {
             Scaffold(
@@ -211,30 +212,34 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                         title = {})
                 },
             ) {
-                    CompositionLocalProvider(
-                        LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
-                    )
-                    {
-                        if (viewModel.loading) {
-                            Box(modifier = Modifier.fillMaxSize().background(materialColor(MaterialColors.color_transparent)), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.width(64.dp),
-                                )
-                            }
-                        } else {
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                PagedCarousel(
-                                    images ,
-                                    loading = viewModel.loading,
-                                    scale = ContentScale.Fit,
-                                    select = select,
-                                )
-                            }
+                CompositionLocalProvider(
+                    LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
+                )
+                {
+                    if (viewModel.loading) {
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                                .background(materialColor(MaterialColors.color_transparent)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.width(64.dp),
+                            )
+                        }
+                    } else {
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            PagedCarousel(
+                                images,
+                                loading = viewModel.loading,
+                                scale = ContentScale.Fit,
+                                select = select,
+                            )
                         }
                     }
+                }
             }
         }
     }

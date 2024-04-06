@@ -1,13 +1,14 @@
 package com.akellolcc.cigars.databases.extensions
 
-class CigarImage(override val rowid: Long,
-                 val image: String? = null,
-                 val data_: ByteArray,
-                 val notes: String? = null,
-                 val type: Long? = null,
-                 val cigarId: Long? = null,
-                 val humidorId: Long? = null) : BaseEntity(rowid) {
-
+class CigarImage(
+    override val rowid: Long,
+    val image: String? = null,
+    val data_: ByteArray,
+    val notes: String? = null,
+    val type: Long? = null,
+    val cigarId: Long? = null,
+    val humidorId: Long? = null
+) : BaseEntity(rowid) {
 
 
     /*constructor(dbID: Long) : super() {

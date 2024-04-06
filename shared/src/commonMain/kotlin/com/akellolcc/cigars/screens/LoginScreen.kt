@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
@@ -21,16 +19,14 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.components.DefaultButton
 import com.akellolcc.cigars.mvvm.LoginViewModel
 import com.akellolcc.cigars.navigation.SharedScreen
-import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.LoginBackground
 import com.akellolcc.cigars.ui.BackHandler
-import com.akellolcc.cigars.ui.rotateImage
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import dev.icerock.moko.mvvm.flow.compose.observeAsActions
 
-class LoginScreen: Screen {
+class LoginScreen : Screen {
 
     private var viewModel: LoginViewModel? = null
 
@@ -68,18 +64,21 @@ class LoginScreen: Screen {
                 }
             ) {
                 DefaultButton(
+                    title = Localize.title_login,
                     enabled = true,
                     modifier = with(Modifier) {
                         fillMaxWidth(0.7f).align(alignment = Alignment.BottomCenter)
                     },
                     onClick = { viewModel!!.onLoginPressed() })
-                {
+                /*{
                     if (!isLoading) {
                         Text(text = Localize.title_login)
                     } else {
                         rotateImage(Images.loading_spinner, Size(20f, 20f))
                     }
                 }
+
+                 */
             }
         }
     }

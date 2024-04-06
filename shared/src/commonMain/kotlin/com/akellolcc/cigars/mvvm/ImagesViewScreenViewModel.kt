@@ -7,15 +7,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.camera.SharedImage
-import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarImagesRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
-class ImagesViewScreenViewModel(val cigar: Cigar) : ActionsViewModel<ImagesViewScreenViewModel.Action>() {
-    private val database: SqlDelightCigarImagesRepository = SqlDelightCigarImagesRepository(cigar.rowid, Database.getInstance().dbQueries)
+class ImagesViewScreenViewModel(val cigar: Cigar) :
+    ActionsViewModel<ImagesViewScreenViewModel.Action>() {
+    private val database: SqlDelightCigarImagesRepository =
+        SqlDelightCigarImagesRepository(cigar.rowid)
     var loading by mutableStateOf(false)
     fun addImage(image: SharedImage) {
         image.toByteArray()?.let {
@@ -24,7 +25,7 @@ class ImagesViewScreenViewModel(val cigar: Cigar) : ActionsViewModel<ImagesViewS
     }
 
     @Composable
-    fun asState() : State<List<CigarImage>> {
+    fun asState(): State<List<CigarImage>> {
         return database.observeAll().collectAsState(listOf())
     }
 

@@ -23,9 +23,16 @@ import com.akellolcc.cigars.theme.materialColor
 
 @Composable
 fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
-    OutlinedCard(colors = CardDefaults.cardColors(materialColor(MaterialColors.color_primaryContainer),materialColor(MaterialColors.color_onPrimaryContainer)),
+    OutlinedCard(
+        colors = CardDefaults.cardColors(
+            materialColor(MaterialColors.color_primaryContainer),
+            materialColor(MaterialColors.color_onPrimaryContainer)
+        ),
         shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(if (onClick != null) 1.dp else 0.5.dp, materialColor(MaterialColors.color_onPrimaryContainer)),
+        border = BorderStroke(
+            if (onClick != null) 1.dp else 0.5.dp,
+            materialColor(MaterialColors.color_onPrimaryContainer)
+        ),
         elevation = if (onClick != null) CardDefaults.outlinedCardElevation(8.dp) else CardDefaults.outlinedCardElevation()
     ) {
         Column(
@@ -34,7 +41,7 @@ fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
             }),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(label != null) {
+            if (label != null) {
                 TextStyled(
                     label,
                     TextStyles.Subhead,
@@ -61,7 +68,7 @@ fun ValuesCard(label: String? = null, vertical: Boolean = false, content: @Compo
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
         ) {
-            if(vertical) {
+            if (vertical) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalAlignment = Alignment.Start
@@ -78,7 +85,7 @@ fun ValuesCard(label: String? = null, vertical: Boolean = false, content: @Compo
                 }
             }
         }
-        if(label != null) {
+        if (label != null) {
             Box(
                 modifier = Modifier.padding(start = 24.dp)
                     .background(materialColor(MaterialColors.color_background))

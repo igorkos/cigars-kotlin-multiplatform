@@ -27,7 +27,7 @@ object BitmapUtils {
         // this dynamically extends to take the bytes you read
         try {
             val byteBuffer = ByteArrayOutputStream()
-            contentResolver.openInputStream(uri)?.let{ inputStream ->
+            contentResolver.openInputStream(uri)?.let { inputStream ->
                 val bufferSize = 1024
                 val buffer = ByteArray(bufferSize)
 

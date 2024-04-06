@@ -12,14 +12,19 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class SharedImage actual constructor(private val imageData: ByteArray?, actual val tempPath: String?) {
+actual class SharedImage actual constructor(
+    private val imageData: ByteArray?,
+    actual val tempPath: String?
+) {
     private var image: UIImage? = null
+
     constructor(image: UIImage?, tempPath: String?) : this(imageData = null, tempPath) {
         this.image = image
     }
+
     @OptIn(ExperimentalForeignApi::class)
     actual fun toByteArray(): ByteArray? {
-        if( imageData!= null) return imageData
+        if (imageData != null) return imageData
 
         return if (image != null) {
             val imageData = UIImageJPEGRepresentation(image!!, COMPRESSION_QUALITY)

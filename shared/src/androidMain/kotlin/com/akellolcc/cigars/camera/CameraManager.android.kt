@@ -33,7 +33,8 @@ class TakePictureCrop : ActivityResultContracts.TakePicture() {
 actual fun rememberCameraManager(
     resizeOptions: ResizeOptions,
     filterOptions: FilterOptions,
-    onResult: (SharedImage?) -> Unit): CameraManager {
+    onResult: (SharedImage?) -> Unit
+): CameraManager {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val contentResolver: ContentResolver = context.contentResolver
@@ -54,7 +55,7 @@ actual fun rememberCameraManager(
                     filterOptions = filterOptions,
                 ) { resizedImage ->
                     if (resizedImage != null) {
-                        onResult.invoke(SharedImage(resizedImage , tempPhotoUri.path!!))
+                        onResult.invoke(SharedImage(resizedImage, tempPhotoUri.path!!))
                     }
                 }
 

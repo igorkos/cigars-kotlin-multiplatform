@@ -3,8 +3,10 @@ package com.akellolcc.cigars.databases.repository
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import kotlinx.coroutines.flow.Flow
 
-interface Repository<ENTITY: BaseEntity> {
+interface Repository<ENTITY : BaseEntity> {
     suspend fun get(id: Long): ENTITY
+
+    fun getSync(id: Long): ENTITY
 
     suspend fun find(id: Long): ENTITY?
 

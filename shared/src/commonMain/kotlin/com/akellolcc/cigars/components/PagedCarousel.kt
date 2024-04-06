@@ -41,18 +41,25 @@ private val shape = RoundedCornerShape(topStart = borderRadius, topEnd = borderR
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagedCarousel(images: List<CigarImage>?, modifier: Modifier = Modifier, scale: ContentScale = ContentScale.FillBounds, loading: Boolean = false, select: Int = 0, onClick: ((page: Int) -> Unit)? = null) {
+fun PagedCarousel(
+    images: List<CigarImage>?,
+    modifier: Modifier = Modifier,
+    scale: ContentScale = ContentScale.FillBounds,
+    loading: Boolean = false,
+    select: Int = 0,
+    onClick: ((page: Int) -> Unit)? = null
+) {
     // Create a pager state
-    if(loading) return
+    if (loading) return
 
     val pagerState = rememberPagerState(select) {
-        if(!images.isNullOrEmpty()) images.size else 1
+        if (!images.isNullOrEmpty()) images.size else 1
     }
 
-   //Log.debug("Images: ${images?.size} : $select : $loading")
+    //Log.debug("Images: ${images?.size} : $select : $loading")
 
     LaunchedEffect(loading, select) {
-        if(!loading) {
+        if (!loading) {
             pagerState.scrollToPage(select)
         }
     }
@@ -64,18 +71,18 @@ fun PagedCarousel(images: List<CigarImage>?, modifier: Modifier = Modifier, scal
             modifier = Modifier.fillMaxWidth(),
         ) { page ->
             //Log.debug("Images1: ${images?.size}")
-            if(!images.isNullOrEmpty()) {
-                CarouselItem(images[page].data_, scale ){
+            if (!images.isNullOrEmpty()) {
+                CarouselItem(images[page].data_, scale) {
                     onClick?.invoke(page)
                 }
             } else {
-                CarouselItem(null, scale, Images.default_cigar_image){
+                CarouselItem(null, scale, Images.default_cigar_image) {
                     onClick?.invoke(page)
                 }
             }
         }
         // Bottom row of indicators
-        if(!images.isNullOrEmpty()) {
+        if (!images.isNullOrEmpty()) {
             Row(
                 Modifier
                     .wrapContentHeight()
@@ -116,17 +123,16 @@ fun CarouselItem(
         toImageBitmap(it)
     }
 
-    if(imageBitmap == null && default == null) return
+    if (imageBitmap == null && default == null) return
     Card(
         modifier = Modifier
             .fillMaxSize().clickable {
-                 onClick()
+                onClick()
             }
-            .shadow(elevation = shadowElevation, shape = shape)
-        ,
+            .shadow(elevation = shadowElevation, shape = shape),
         backgroundColor = materialColor(MaterialColors.color_transparent)
     ) {
-        if(imageBitmap != null) {
+        if (imageBitmap != null) {
             Image(bitmap = imageBitmap, contentDescription = "", contentScale = scale)
         } else {
             val painter: Painter = painterResource(default!!)

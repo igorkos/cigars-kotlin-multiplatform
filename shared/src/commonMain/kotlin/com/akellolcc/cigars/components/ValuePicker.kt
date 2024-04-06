@@ -3,12 +3,8 @@ package com.akellolcc.cigars.components
 import TextStyled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -30,25 +26,35 @@ import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.theme.textStyle
 
 @Composable
-fun <T> ValuePicker(modifier: Modifier = Modifier, label: String?, value: String?, items: Array<Pair<T,String>>, onClick: ((Pair<T,String>) -> Unit)? = null)  {
+fun <T> ValuePicker(
+    modifier: Modifier = Modifier,
+    label: String?,
+    value: String?,
+    items: Array<Pair<T, String>>,
+    onClick: ((Pair<T, String>) -> Unit)? = null
+) {
     var expanded by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf(value) }
     var with by remember { mutableStateOf(0) }
     Column(
         modifier = modifier.fillMaxSize().clickable(onClick = {
             expanded = true
-        }).height(60.dp).background(materialColor(MaterialColors.color_surfaceVariant),TextFieldDefaults.shape),
+        }).height(60.dp).background(
+            materialColor(MaterialColors.color_surfaceVariant),
+            TextFieldDefaults.shape
+        ),
         horizontalAlignment = Alignment.Start
     ) {
-        Column(modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 4.dp).onSizeChanged {
-            with = it.width
-        }) {
+        Column(
+            modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+                .onSizeChanged {
+                    with = it.width
+                }) {
             CompositionLocalProvider(
                 LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)
-            ){
+            ) {
                 TextStyled(
                     label,
                     TextStyles.Description,
@@ -63,7 +69,8 @@ fun <T> ValuePicker(modifier: Modifier = Modifier, label: String?, value: String
         DropdownMenu(
             expanded = expanded,
             offset = DpOffset(16.dp, 0.dp),
-            modifier = Modifier.width(with.dp).background(materialColor(MaterialColors.color_surfaceVariant)),
+            modifier = Modifier.width(with.dp)
+                .background(materialColor(MaterialColors.color_surfaceVariant)),
             onDismissRequest = { expanded = false }
         ) {
             items.forEach {

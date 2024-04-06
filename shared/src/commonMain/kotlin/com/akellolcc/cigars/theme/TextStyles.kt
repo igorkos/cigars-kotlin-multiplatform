@@ -16,9 +16,9 @@ enum class TextStyles {
 
 @Composable
 fun textStyle(style: TextStyles, color: Color = Color(LocalContentColor.current.value)): TextStyle {
-    return when(style) {
+    return when (style) {
         TextStyles.Headline -> MaterialTheme.typography.titleLarge.copy(color = color)
-        TextStyles.Subhead ->  MaterialTheme.typography.titleMedium.copy(color = color)
+        TextStyles.Subhead -> MaterialTheme.typography.titleMedium.copy(color = color)
         TextStyles.Description -> MaterialTheme.typography.titleSmall.copy(color = color)
         TextStyles.ScreenTitle -> MaterialTheme.typography.titleLarge.copy(color = color)
         TextStyles.BarItemTitle -> MaterialTheme.typography.labelMedium.copy(color = color)

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 
-open class ActionsViewModel<E>  : ViewModel() {
+open class ActionsViewModel<E> : ViewModel() {
 
     private val _events = Channel<E>(Channel.BUFFERED)
     private val events: CFlow<E> get() = _events.receiveAsFlow().cFlow()
@@ -22,7 +22,7 @@ open class ActionsViewModel<E>  : ViewModel() {
         events.observeAsActions(onEach = onEach)
     }
 
-    protected fun sendEvent(event: E) {
+    fun sendEvent(event: E) {
         CoroutineScope(Dispatchers.Main).launch {
             _events.send(event)
         }

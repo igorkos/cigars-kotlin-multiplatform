@@ -45,7 +45,7 @@ enum class Backgrounds {
 
 @Composable
 fun createBackgroundTheme(background: Backgrounds): BackgroundTheme {
-    return  when (background) {
+    return when (background) {
         Backgrounds.Default -> {
             BackgroundTheme(materialColor(MaterialColors.color_primaryContainer))
         }
@@ -81,10 +81,10 @@ fun DefaultBackground(
     Box(
         modifier = with(Modifier) {
             fillMaxSize()
-              //  .paint(
-              //      imagePainter(Images.default_background),
-              //      contentScale = ContentScale.FillBounds
-              //  )
+            //  .paint(
+            //      imagePainter(Images.default_background),
+            //      contentScale = ContentScale.FillBounds
+            //  )
 
         }
     ) {
@@ -125,7 +125,7 @@ fun LoginBackground(
                     )
                     .align(alignment = Alignment.Center)
             }
-        ){
+        ) {
             Text(text = Localize.app_name, fontSize = 32.sp, modifier = with(Modifier) {
                 align(Alignment.Center)
             })

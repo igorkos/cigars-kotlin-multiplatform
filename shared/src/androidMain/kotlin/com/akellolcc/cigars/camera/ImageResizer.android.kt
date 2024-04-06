@@ -49,7 +49,14 @@ internal object PeekabooImageResizer {
     ) {
         coroutineScope.launch(Dispatchers.Default) {
             if (getImageSize(contentResolver, uri) > resizeThresholdBytes) {
-                val byteArray = resizeImage(contentResolver, uri, width, height, compressionQuality, filterOptions)
+                val byteArray = resizeImage(
+                    contentResolver,
+                    uri,
+                    width,
+                    height,
+                    compressionQuality,
+                    filterOptions
+                )
                 withContext(Dispatchers.Main) {
                     onResult(byteArray)
                 }
@@ -99,7 +106,7 @@ internal object PeekabooImageResizer {
 
 
         val resizedBitmap =
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 contentResolver.openInputStream(uri)?.use { inputStream ->
                     val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     BitmapFactory.decodeStream(inputStream, null, options)
@@ -124,7 +131,11 @@ internal object PeekabooImageResizer {
 
             ByteArrayOutputStream().use { byteArrayOutputStream ->
                 val validatedCompression = compression.coerceIn(0.0, 1.0)
-                filteredBitmap.compress(Bitmap.CompressFormat.JPEG, (100 * validatedCompression).toInt(), byteArrayOutputStream)
+                filteredBitmap.compress(
+                    Bitmap.CompressFormat.JPEG,
+                    (100 * validatedCompression).toInt(),
+                    byteArrayOutputStream
+                )
                 val byteArray = byteArrayOutputStream.toByteArray()
                 return byteArray
             }
@@ -149,6 +160,7 @@ internal object PeekabooImageResizer {
                     }
                 colorMatrix.postConcat(sepiaMatrix)
             }
+
             FilterOptions.Invert -> {
                 colorMatrix.set(
                     floatArrayOf(
@@ -195,10 +207,12 @@ internal object PeekabooImageResizer {
             ExifInterface.ORIENTATION_FLIP_VERTICAL -> {
                 matrix.preScale(1.0f, -1.0f)
             }
+
             ExifInterface.ORIENTATION_TRANSPOSE -> {
                 matrix.preScale(-1.0f, 1.0f)
                 matrix.postRotate(270f)
             }
+
             ExifInterface.ORIENTATION_TRANSVERSE -> {
                 matrix.preScale(-1.0f, 1.0f)
                 matrix.postRotate(90f)

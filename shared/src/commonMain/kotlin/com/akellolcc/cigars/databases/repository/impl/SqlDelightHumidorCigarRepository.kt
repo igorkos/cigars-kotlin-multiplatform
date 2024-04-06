@@ -2,7 +2,6 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
@@ -11,27 +10,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class SqlDelightCigarHumidorRepository(
+class SqlDelightCigarHumidorsRepository(
     private val cigarId: Long,
-    private val roomQueries: CigarsDatabaseQueries,
 ) : BaseRepository<HumidorCigar>(), CigarHumidorRepository {
 
-    fun allSync(): List<HumidorCigar> = roomQueries.cigarHumidors(cigarId, ::factory).executeAsList()
+    fun allSync(): List<HumidorCigar> =
+        roomQueries.cigarHumidors(cigarId, ::humidorCigarFactory).executeAsList()
 
     override fun observeAll(): Flow<List<HumidorCigar>> {
-        return roomQueries.cigarHumidors(cigarId, ::factory).asFlow().mapToList(Dispatchers.Main)
+        return roomQueries.cigarHumidors(cigarId, ::humidorCigarFactory).asFlow()
+            .mapToList(Dispatchers.Main)
     }
 
     fun add(entity: Humidor, count: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.addCigarToHumidor(entity.rowid,
+            roomQueries.addCigarToHumidor(
+                entity.rowid,
                 cigarId,
-                count)
+                count
+            )
         }
     }
 
     override fun doUpsert(entity: HumidorCigar) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.Main).launch {
+            roomQueries.addCigarToHumidor(
+                entity.humidor!!.rowid,
+                entity.cigar!!.rowid,
+                entity.count
+            )
+        }
     }
 
     override fun doDelete(id: Long) {
@@ -48,20 +56,19 @@ class SqlDelightCigarHumidorRepository(
         TODO("Not yet implemented")
     }
 
-    override fun contains(id: Long): Boolean {
-        TODO("Not yet implemented")
+    override fun update(entity: HumidorCigar) {
+        entity.humidor?.let {
+            if (contains(entity.humidor.rowid)) {
+                doUpsert(entity)
+            } else {
+                // TODO: Throw custom repository exception
+                error("Can't update entity: $entity which doesn't exist in the database.")
+            }
+        }
     }
 
-    private fun factory(
-        count: Long?,
-        humidorId: Long?,
-        cigarId: Long?,
-    ): HumidorCigar {
-        val humidor = roomQueries.humidor(humidorId!!).executeAsOne()
-        return HumidorCigar(
-            count = count,
-            humidor = Humidor(humidor),
-            cigar = null,
-        )
+    override fun contains(id: Long): Boolean {
+        return roomQueries.humidorCigarExists(cigarId, id).executeAsOne() != 0L
     }
+
 }

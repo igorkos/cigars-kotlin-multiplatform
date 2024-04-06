@@ -1,6 +1,15 @@
 package com.akellolcc.cigars.databases.extensions
 
+import com.akellolcc.cigars.ui.randomString
+
 abstract class BaseEntity(open val rowid: Long) {
+    val key: String get() = rowid.toString() + randomString()
+
+    val isStored: Boolean
+        get() {
+            return rowid >= 0
+        }
+
     override fun hashCode(): Int = rowid.hashCode()
 
     override fun equals(other: Any?): Boolean {

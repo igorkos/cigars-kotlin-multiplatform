@@ -47,7 +47,7 @@ import kotlin.jvm.Transient
 
 class MainScreen() : Screen {
 
-    private var tabs : List<ITabItem> = listOf(
+    private var tabs: List<ITabItem> = listOf(
         CigarsScreen(CigarsRoute),
         HumidorsScreen(HumidorsRoute),
         FavoritesScreen(FavoritesRoute)
@@ -55,6 +55,7 @@ class MainScreen() : Screen {
 
     @Transient
     private val viewModel = MainScreenViewModel()
+
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
@@ -92,31 +93,34 @@ class MainScreen() : Screen {
                 },
                 gesturesEnabled = true
             ) {
-                    TabNavigator(tabs[0], tabDisposable = { tabNavigator ->
-                        TabDisposable(
-                            navigator = tabNavigator,
-                            tabs = tabs
-                        )
-                    }) {
-                        Scaffold(
-                            bottomBar = {
-                                AnimatedVisibility(visible = isTabsVisible, enter = slideInVertically { height ->
+                TabNavigator(tabs[0], tabDisposable = { tabNavigator ->
+                    TabDisposable(
+                        navigator = tabNavigator,
+                        tabs = tabs
+                    )
+                }) {
+                    Scaffold(
+                        bottomBar = {
+                            AnimatedVisibility(
+                                visible = isTabsVisible,
+                                enter = slideInVertically { height ->
                                     height
-                                }, exit = slideOutVertically { height ->
+                                },
+                                exit = slideOutVertically { height ->
                                     height
                                 }) {
-                                    NavigationBar {
-                                        tabs.forEach {
-                                            it.route.sharedViewModel = viewModel
-                                            TabNavigationItem(it.route, tabs)
-                                        }
+                                NavigationBar {
+                                    tabs.forEach {
+                                        it.route.sharedViewModel = viewModel
+                                        TabNavigationItem(it.route, tabs)
                                     }
                                 }
-                            },
-                        ) {
-                            CurrentTab()
-                        }
+                            }
+                        },
+                    ) {
+                        CurrentTab()
                     }
+                }
             }
         }
     }
@@ -129,11 +133,11 @@ fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
     NavigationBarItem(
         selected = selected,
         onClick = {
-            tabNavigator.current = tabs.first{
+            tabNavigator.current = tabs.first {
                 it.route.route == tab.route
             }
         },
-        icon = { tab.icon?.let { loadIcon(it, Size(width = 24f, height = 24f))} },
+        icon = { tab.icon?.let { loadIcon(it, Size(width = 24f, height = 24f)) } },
         label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
     )
 }

@@ -69,7 +69,7 @@ fun DefaultTheme(
                 DefaultBackground {
                     content()
                 }
-             },
+            },
         )
     }
 }

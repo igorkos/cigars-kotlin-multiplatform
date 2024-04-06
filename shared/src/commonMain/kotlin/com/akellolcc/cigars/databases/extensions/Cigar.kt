@@ -1,8 +1,11 @@
 package com.akellolcc.cigars.databases.extensions
 
+import com.akellolcc.cigars.databases.CigarsTable
 import com.akellolcc.cigars.theme.Localize
 
-var emptyCigar = Cigar(0, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", false, false)
+var emptyCigar =
+    Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", false, false)
+
 data class Cigar(
     override var rowid: Long,
     var name: String,
@@ -21,9 +24,32 @@ data class Cigar(
     var filler: String,
     var link: String?,
     var shopping: Boolean,
-    var favorites: Boolean) : BaseEntity(rowid)
+    var favorites: Boolean
+) : BaseEntity(rowid) {
 
-enum class CigarShapes{
+    constructor(cigar: CigarsTable) : this(
+        cigar.rowid,
+        cigar.name,
+        cigar.brand,
+        cigar.country,
+        cigar.date,
+        cigar.cigar,
+        cigar.wrapper,
+        cigar.binder,
+        cigar.gauge,
+        cigar.length,
+        CigarStrength.fromLong(cigar.strength),
+        cigar.rating,
+        cigar.myrating,
+        cigar.notes,
+        cigar.filler,
+        cigar.link,
+        cigar.shopping,
+        cigar.favorites
+    )
+}
+
+enum class CigarShapes {
     Corona,
     PetitCorona,
     Churchill,
@@ -46,8 +72,9 @@ enum class CigarShapes{
                 it to localized(it)
             }.toTypedArray()
         }
-        fun localized(value: CigarShapes): String{
-            return when(value){
+
+        fun localized(value: CigarShapes): String {
+            return when (value) {
                 Corona -> Localize.cigar_shape_corona
                 PetitCorona -> Localize.cigar_shape_petit_corona
                 Churchill -> Localize.cigar_shape_churchill
@@ -68,7 +95,7 @@ enum class CigarShapes{
     }
 }
 
-enum class CigarStrength{
+enum class CigarStrength {
     Mild,
     MildToMedium,
     Medium,
@@ -81,8 +108,9 @@ enum class CigarStrength{
                 it to localized(it)
             }.toTypedArray()
         }
-        fun localized(value: CigarStrength): String{
-            return when(value){
+
+        fun localized(value: CigarStrength): String {
+            return when (value) {
                 Mild -> Localize.cigar_strength_mild
                 MildToMedium -> Localize.cigar_strength_mild_medium
                 Medium -> Localize.cigar_strength_medium
@@ -90,7 +118,8 @@ enum class CigarStrength{
                 Full -> Localize.cigar_strength_full
             }
         }
-        inline fun fromLong(value: Long): CigarStrength = when(value){
+
+        inline fun fromLong(value: Long): CigarStrength = when (value) {
             0L -> Mild
             1L -> MildToMedium
             2L -> Medium
@@ -98,7 +127,8 @@ enum class CigarStrength{
             4L -> Full
             else -> Mild
         }
-        inline fun toLong(value: CigarStrength): Long = when(value){
+
+        inline fun toLong(value: CigarStrength): Long = when (value) {
             Mild -> 0
             MildToMedium -> 1
             Medium -> 2

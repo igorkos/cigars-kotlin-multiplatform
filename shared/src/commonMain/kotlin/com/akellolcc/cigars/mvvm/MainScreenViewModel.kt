@@ -12,6 +12,7 @@ class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActio
             Log.debug("Setting tabs visible $value")
             sendEvent(MainScreenActions.TabsVisibility(value))
         }
+
     sealed interface MainScreenActions {
         data class TabsVisibility(val isVisible: Boolean) : MainScreenActions
         data class ShowError(val error: StringDesc) : MainScreenActions

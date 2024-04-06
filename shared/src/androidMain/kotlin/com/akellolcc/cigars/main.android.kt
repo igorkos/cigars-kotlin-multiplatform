@@ -7,7 +7,8 @@ import com.akellolcc.cigars.navigation.mainScreenModule
 import com.akellolcc.cigars.screens.Home
 
 
-@Composable fun MainView() {
+@Composable
+fun MainView() {
     ScreenRegistry {
         mainScreenModule()
     }

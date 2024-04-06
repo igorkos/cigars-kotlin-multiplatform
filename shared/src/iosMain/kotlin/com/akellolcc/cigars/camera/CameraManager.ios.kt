@@ -38,7 +38,8 @@ import platform.posix.memcpy
 actual fun rememberCameraManager(
     resizeOptions: ResizeOptions,
     filterOptions: FilterOptions,
-    onResult: (SharedImage?) -> Unit): CameraManager {
+    onResult: (SharedImage?) -> Unit
+): CameraManager {
     val imagePicker = UIImagePickerController()
     val cameraDelegate = remember {
         object : NSObject(), UIImagePickerControllerDelegateProtocol,
@@ -85,6 +86,7 @@ private fun UIImage.toByteArray(compressionQuality: Double): ByteArray {
         memcpy(this.refTo(0), jpegData.bytes, jpegData.length)
     }
 }
+
 @OptIn(ExperimentalForeignApi::class, ExperimentalForeignApi::class)
 private fun UIImage.fitInto(
     maxWidth: Int,
@@ -152,17 +154,20 @@ private fun applyFilterToUIImage(
                     setValue(ciImage, forKey = "inputImage")
                 }?.outputImage
             }
+
             FilterOptions.Sepia -> {
                 CIFilter.filterWithName("CISepiaTone")?.apply {
                     setValue(ciImage, forKey = "inputImage")
                     setValue(0.8, forKey = "inputIntensity")
                 }?.outputImage
             }
+
             FilterOptions.Invert -> {
                 CIFilter.filterWithName("CIColorInvert")?.apply {
                     setValue(ciImage, forKey = "inputImage")
                 }?.outputImage
             }
+
             FilterOptions.Default -> ciImage
         }
 
@@ -172,6 +177,7 @@ private fun applyFilterToUIImage(
         UIImage.imageWithCGImage(filteredCGImage)
     } ?: image
 }
+
 actual class CameraManager actual constructor(
     private val onLaunch: () -> Unit
 ) {

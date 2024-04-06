@@ -21,7 +21,7 @@ fun loadIcon(id: ImageResource, size: Size, tint: Color? = null) {
         painter = painter,
         contentDescription = "",
         modifier = Modifier.size(size.width.dp, size.height.dp),
-        tint = tint ?:Color(LocalContentColor.current.value)
+        tint = tint ?: Color(LocalContentColor.current.value)
     )
 }
 
@@ -51,13 +51,20 @@ class Images {
         val tab_icon_favorites = MR.images.tab_icon_favorites
 
         val icon_menu = MR.images.icon_menu
+        val icon_menu_delete = MR.images.icon_menu_delete
+        val icon_menu_info = MR.images.icon_menu_info
+        val icon_menu_minus = MR.images.icon_menu_minus
+        val icon_menu_plus = MR.images.icon_menu_plus
         val icon_menu_dots = MR.images.icon_menu_dots
         val icon_menu_edit = MR.images.pencil
         val icon_menu_image = MR.images.icon_menu_image
         val icon_menu_camera = MR.images.icon_menu_camera
         val icon_star_empty = MR.images.icon_star_empty
         val icon_star_filled = MR.images.icon_star_full
+        val icon_menu_history = MR.images.icon_menu_history
 
+        val icon_arrow_left = MR.images.arrow_left
+        val icon_arrow_right = MR.images.arrow_right
     }
 }
 

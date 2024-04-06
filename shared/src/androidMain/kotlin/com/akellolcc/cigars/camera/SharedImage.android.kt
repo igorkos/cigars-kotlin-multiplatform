@@ -5,7 +5,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class SharedImage actual constructor(private val imageData: ByteArray?, actual val tempPath: String?) {
+actual class SharedImage actual constructor(
+    private val imageData: ByteArray?,
+    actual val tempPath: String?
+) {
     actual fun toByteArray(): ByteArray? {
         return imageData
     }

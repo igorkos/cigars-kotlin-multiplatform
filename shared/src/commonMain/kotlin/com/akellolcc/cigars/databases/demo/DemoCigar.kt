@@ -3,8 +3,10 @@ package com.akellolcc.cigars.databases.demo
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Image(  val file: String?,
-                   val type: Long?)
+data class Image(
+    val file: String?,
+    val type: Long?
+)
 
 @Serializable
 data class DemoCigar(

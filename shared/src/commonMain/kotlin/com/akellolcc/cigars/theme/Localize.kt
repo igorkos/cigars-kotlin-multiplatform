@@ -1,6 +1,7 @@
 package com.akellolcc.cigars.theme
 
 import Strings
+import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.vanniktech.locale.Locales
 import de.comahe.i18n4k.Locale
 import de.comahe.i18n4k.config.I18n4kConfigDefault
@@ -24,6 +25,10 @@ object Localize {
     val button_cancel = Strings.button_cancel.toString()
     val button_save = Strings.button_save.toString()
 
+    val cigar_details_name = Strings.cigar_details_name.toString()
+    val cigar_details_company = Strings.cigar_details_company.toString()
+    val cigar_details_country = Strings.cigar_details_country.toString()
+
     val cigar_details_cigars = Strings.cigar_details_cigars.toString()
     val cigar_details_shape = Strings.cigar_details_shape.toString()
     val cigar_details_length = Strings.cigar_details_length.toString()
@@ -40,6 +45,8 @@ object Localize {
     val cigar_details_myrating = Strings.cigar_details_myrating.toString()
     val cigar_details_humidors = Strings.cigar_details_humidors.toString()
     val cigar_details_link = Strings.cigar_details_link.toString()
+    val cigar_details_count_dialog = Strings.cigar_details_count_dialog.toString()
+
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()
     val cigar_shape_petit_corona = Strings.cigar_shape_petit_corona.toString()
@@ -63,10 +70,35 @@ object Localize {
     val cigar_strength_medium_full = Strings.cigar_strength_medium_full.toString()
     val cigar_strength_full = Strings.cigar_strength_full.toString()
 
-    val demo_humidor_name: String = Strings.demo_humidor_name.toString()
+    val demo_humidor_name = Strings.demo_humidor_name.toString()
+
+    val humidor_details_holds = Strings.humidor_details_holds.toString()
+    val humidor_details_count = Strings.humidor_details_count.toString()
+    val humidor_details_temperature = Strings.humidor_details_temperature.toString()
+    val humidor_details_humidity = Strings.humidor_details_humidity.toString()
+    val humidor_details_cigars = Strings.humidor_details_cigars.toString()
+    val humidor_details_humidor = Strings.humidor_details_humidor.toString()
 
     val menu_item_camera: String = Strings.menu_item_camera.toString()
-
     val menu_item_gallery: String = Strings.menu_item_gallery.toString()
+
+    val history_type_addition = Strings.history_type_addition.toString()
+    val history_type_deletion = Strings.history_type_deletion.toString()
+
+    fun humidor_cigars(v: Long, v1: Long): String {
+        return Strings.humidor_cigars.createLocalizedString(v, v1).toString()
+    }
+
+    fun cigar_details_total(v: Long): String {
+        return Strings.cigar_details_total.createLocalizedString(v).toString()
+    }
+
+    fun history_transaction_desc(v: HistoryType, v1: Long): String {
+        return Strings.history_transaction_desc.createLocalizedString(v.toString(), v1).toString()
+    }
+
+    fun history_transaction_price(v: Double): String {
+        return Strings.history_transaction_price.createLocalizedString(v).toString()
+    }
 
 }

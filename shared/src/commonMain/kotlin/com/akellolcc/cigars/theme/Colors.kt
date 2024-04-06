@@ -14,36 +14,36 @@ val LocalCurrentColorTheme = staticCompositionLocalOf { lightColorScheme() }
 @Composable
 fun createColorsTheme(): ColorScheme {
     val theme = lightColorScheme(
-         primary = materialColor(color = MaterialColors.color_primary),
-         onPrimary = materialColor(color = MaterialColors.color_onPrimary),
-         primaryContainer = materialColor(color = MaterialColors.color_primaryContainer),
-         onPrimaryContainer = materialColor(color = MaterialColors.color_onPrimaryContainer),
-         inversePrimary = materialColor(color = MaterialColors.color_inversePrimary),
-         secondary = materialColor(color = MaterialColors.color_secondary),
-         onSecondary = materialColor(color = MaterialColors.color_onSecondary),
-         secondaryContainer = materialColor(color = MaterialColors.color_secondaryContainer),
-         onSecondaryContainer = materialColor(color = MaterialColors.color_onSecondaryContainer),
-         tertiary = materialColor(color = MaterialColors.color_tertiary),
-         onTertiary = materialColor(color = MaterialColors.color_onTertiary),
-         tertiaryContainer = materialColor(color = MaterialColors.color_tertiaryContainer),
-         onTertiaryContainer = materialColor(color = MaterialColors.color_onTertiaryContainer),
-         background = materialColor(color = MaterialColors.color_background),
-         onBackground = materialColor(color = MaterialColors.color_onBackground),
-         surface = materialColor(color = MaterialColors.color_surface),
-         onSurface = materialColor(color = MaterialColors.color_onSurface),
-         surfaceVariant = materialColor(color = MaterialColors.color_surfaceVariant),
-         onSurfaceVariant = materialColor(color = MaterialColors.color_onSurfaceVariant),
-         surfaceTint = materialColor(color = MaterialColors.color_surfaceTint),
-         inverseSurface = materialColor(color = MaterialColors.color_inverseSurface),
-         inverseOnSurface = materialColor(color = MaterialColors.color_inverseOnSurface),
-         error = materialColor(color = MaterialColors.color_error),
-         onError = materialColor(color = MaterialColors.color_onError),
-         errorContainer = materialColor(color = MaterialColors.color_errorContainer),
-         onErrorContainer = materialColor(color = MaterialColors.color_onErrorContainer),
-         outline = materialColor(color = MaterialColors.color_outline),
-         outlineVariant = materialColor(color = MaterialColors.color_outlineVariant),
-         scrim = materialColor(color = MaterialColors.color_scrim),
-     )
+        primary = materialColor(color = MaterialColors.color_primary),
+        onPrimary = materialColor(color = MaterialColors.color_onPrimary),
+        primaryContainer = materialColor(color = MaterialColors.color_primaryContainer),
+        onPrimaryContainer = materialColor(color = MaterialColors.color_onPrimaryContainer),
+        inversePrimary = materialColor(color = MaterialColors.color_inversePrimary),
+        secondary = materialColor(color = MaterialColors.color_secondary),
+        onSecondary = materialColor(color = MaterialColors.color_onSecondary),
+        secondaryContainer = materialColor(color = MaterialColors.color_secondaryContainer),
+        onSecondaryContainer = materialColor(color = MaterialColors.color_onSecondaryContainer),
+        tertiary = materialColor(color = MaterialColors.color_tertiary),
+        onTertiary = materialColor(color = MaterialColors.color_onTertiary),
+        tertiaryContainer = materialColor(color = MaterialColors.color_tertiaryContainer),
+        onTertiaryContainer = materialColor(color = MaterialColors.color_onTertiaryContainer),
+        background = materialColor(color = MaterialColors.color_background),
+        onBackground = materialColor(color = MaterialColors.color_onBackground),
+        surface = materialColor(color = MaterialColors.color_surface),
+        onSurface = materialColor(color = MaterialColors.color_onSurface),
+        surfaceVariant = materialColor(color = MaterialColors.color_surfaceVariant),
+        onSurfaceVariant = materialColor(color = MaterialColors.color_onSurfaceVariant),
+        surfaceTint = materialColor(color = MaterialColors.color_surfaceTint),
+        inverseSurface = materialColor(color = MaterialColors.color_inverseSurface),
+        inverseOnSurface = materialColor(color = MaterialColors.color_inverseOnSurface),
+        error = materialColor(color = MaterialColors.color_error),
+        onError = materialColor(color = MaterialColors.color_onError),
+        errorContainer = materialColor(color = MaterialColors.color_errorContainer),
+        onErrorContainer = materialColor(color = MaterialColors.color_onErrorContainer),
+        outline = materialColor(color = MaterialColors.color_outline),
+        outlineVariant = materialColor(color = MaterialColors.color_outlineVariant),
+        scrim = materialColor(color = MaterialColors.color_scrim),
+    )
     LocalCurrentColorTheme provides theme
     return theme
 }
@@ -51,7 +51,12 @@ fun createColorsTheme(): ColorScheme {
 @Composable
 fun materialColor(color: ColorResource, alpha: Float = 1.0f): Color {
     val resColor = colorResource(color)
-    return if (alpha != 1.0f)  Color(resColor.red, resColor.green, resColor.blue, alpha) else resColor
+    return if (alpha != 1.0f) Color(
+        resColor.red,
+        resColor.green,
+        resColor.blue,
+        alpha
+    ) else resColor
 }
 
 class MaterialColors {

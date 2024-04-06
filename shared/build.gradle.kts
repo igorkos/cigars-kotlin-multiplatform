@@ -34,7 +34,7 @@ kotlin {
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**']"
         extraSpecAttributes["exclude_files"] = "['src/commonMain/resources/MR/**']"
     }
-    
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -140,7 +140,7 @@ dependencies {
 sqldelight {
     databases {
         create("CigarsDatabase") {
-            packageName.set( "com.akellolcc.cigars.databases")
+            packageName.set("com.akellolcc.cigars.databases")
             generateAsync.set(true)
         }
     }

@@ -133,18 +133,18 @@
     </color>
 
     <color name="color_surface">
-        <light>#FFF8F2</light>
-        <dark>#17130B</dark>
+        <light>#fffbff</light>
+        <dark>#1e1b16</dark>
     </color>
 
     <color name="color_onSurface">
-        <light>#1F1B13</light>
-        <dark>#EBE1D4</dark>
+        <light>#1e1b16</light>
+        <dark>#e9e1d8</dark>
     </color>
 
     <color name="color_surfaceVariant">
-        <light>#EDE1CF</light>
-        <dark>#4D4639</dark>
+        <light>#ede1cf</light>
+        <dark>#4d4639</dark>
     </color>
 
     <color name="color_onSurfaceVariant">

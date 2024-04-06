@@ -5,6 +5,6 @@ import dev.icerock.moko.resources.FileResource
 
 actual fun readTextFile(file: FileResource): String? {
     var text: String? = null;
-     appContext?.let { text = file.readText(it) }
+    appContext?.let { text = file.readText(it) }
     return text;
 }

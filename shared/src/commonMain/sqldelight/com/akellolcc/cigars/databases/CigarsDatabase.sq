@@ -23,10 +23,10 @@ CREATE TABLE CigarsTable (
 
 CREATE TABLE HumidorsTable (
     rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    brand TEXT,
-    holds INTEGER,
-    count INTEGER,
+    name TEXT NOT NULL,
+    brand TEXT NOT NULL,
+    holds INTEGER NOT NULL,
+    count INTEGER NOT NULL,
     temperature INTEGER,
     humidity REAL,
     notes TEXT,
@@ -37,9 +37,9 @@ CREATE TABLE HumidorsTable (
 );
 
 CREATE TABLE CigarHumidorTable (
-    count INTEGER,
-    humidorId INTEGER,
-    cigarId INTEGER ,
+    count INTEGER NOT NULL,
+    humidorId INTEGER NOT NULL,
+    cigarId INTEGER  NOT NULL,
     PRIMARY KEY (humidorId, cigarId),
     FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid),
     FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid)
@@ -47,13 +47,13 @@ CREATE TABLE CigarHumidorTable (
 
 CREATE TABLE HistoryTable (
     rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    count INTEGER,
-    date INTEGER,
-    left INTEGER,
-    price REAL,
-    type INTEGER,
-    cigarId  INTEGER,
-    humidorId  INTEGER,
+    count INTEGER NOT NULL,
+    date INTEGER NOT NULL,
+    left INTEGER NOT NULL,
+    price REAL NOT NULL,
+    type INTEGER NOT NULL,
+    cigarId  INTEGER NOT NULL,
+    humidorId  INTEGER NOT NULL,
     FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION ,
     FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
 );
@@ -93,23 +93,17 @@ SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
 cigarHumidors:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE cigarId = :cigar;
 
-addHistoryToCigar:
-UPDATE HistoryTable SET cigarId = :cigar WHERE rowid = :history;
-
 addImageToCigar:
 UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
 
 cigarHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar;
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
 
 cigarExists:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
 
-setFavoriteCigar:
-UPDATE CigarsTable SET favorites = :favorites WHERE rowid = :id;
-
-
-
+favoriteCigars:
+SELECT * FROM CigarsTable WHERE favorites = 1;
 
 
 allHumidors:
@@ -118,6 +112,9 @@ FROM HumidorsTable;
 
 humidor:
 SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;
+
+humidorName:
+SELECT HumidorsTable.name FROM HumidorsTable WHERE rowid = :id;
 
 removeAllHumidors:
 DELETE FROM HumidorsTable;
@@ -142,6 +139,8 @@ SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor;
 humidorImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
 
+addImageToHumidor:
+UPDATE ImagesTable SET humidorId = :humidor WHERE rowid = :image;
 
 allHistory:
 SELECT HistoryTable.*
@@ -151,9 +150,11 @@ history:
 SELECT HistoryTable.* FROM HistoryTable WHERE rowid = :id;
 
 addHistory:
-INSERT INTO HistoryTable (count, date, left, price, type)
-VALUES (?, ?, ?, ?, ?);
+INSERT INTO HistoryTable (count, date, left, price, type, cigarId, humidorId)
+VALUES (?, ?, ?, ?, ?,?,?);
 
+historyExists:
+SELECT count(1) FROM HistoryTable WHERE rowid = ?;
 
 image:
 SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
@@ -173,6 +174,9 @@ SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = 
 
 removeCigarFromHumidor:
 DELETE FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
+
+humidorCigarExists:
+SELECT count(1) FROM CigarHumidorTable WHERE cigarId = :cigar AND humidorId = :humidor;
 
 lastInsertRowId:
 SELECT last_insert_rowid();

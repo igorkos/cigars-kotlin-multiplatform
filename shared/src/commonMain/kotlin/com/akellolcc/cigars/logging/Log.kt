@@ -11,6 +11,7 @@ class Log {
         fun initLog() {
             Napier.base(DebugAntilog())
         }
+
         fun debug(message: String) {
             Napier.d(tag = getTag()) { message }
         }
@@ -46,7 +47,7 @@ class Log {
         private fun getTag(): String? {
             val call = getCallStack()
             return if (call != null) {
-                if(call.file != null) {
+                if (call.file != null) {
                     "cg: " + call.file + " (" + call.line + ")"
                 } else {
                     "cg: " + call.function

@@ -2,7 +2,6 @@ package com.akellolcc.cigars.components
 
 import TextStyled
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -11,6 +10,7 @@ import androidx.compose.material3.ButtonDefaults.buttonElevation
 import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.materialColor
@@ -49,16 +48,19 @@ fun defaultButtonStyle(): ButtonStyle {
 }
 
 @Composable
-fun DialogButton( title: String,
-                  onClick: () -> Unit,
-                  modifier: Modifier = Modifier,
-                  enabled: Boolean = true) {
+fun DefaultButton(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
     val style = defaultButtonStyle()
     ElevatedButton(
         enabled = enabled,
         modifier = modifier.width(150.dp),
         border = BorderStroke(1.dp, materialColor(MaterialColors.color_onPrimaryContainer)),
-        onClick = onClick) {
+        onClick = onClick
+    ) {
         TextStyled(
             title,
             TextStyles.Headline,
@@ -68,17 +70,21 @@ fun DialogButton( title: String,
 
 
 @Composable
-fun DefaultButton(onClick: () -> Unit,
-                  modifier: Modifier = Modifier,
-                  enabled: Boolean = true,
-                  content: @Composable RowScope.() -> Unit) {
-    val style = defaultButtonStyle()
-    ElevatedButton(
+fun DialogButton(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+
+    TextButton(
         enabled = enabled,
-        shape = style.shape,
-        colors = style.colors,
-        elevation = style.elevation,
         modifier = modifier,
-        onClick = onClick,
-        content = content)
+        onClick = onClick
+    ) {
+        TextStyled(
+            title,
+            TextStyles.Headline,
+        )
+    }
 }
