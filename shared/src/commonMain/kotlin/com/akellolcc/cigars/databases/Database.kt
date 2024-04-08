@@ -1,9 +1,20 @@
 package com.akellolcc.cigars.databases
 
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
-import com.akellolcc.cigars.databases.repository.DatabaseType
 import com.akellolcc.cigars.databases.repository.Repository
+import com.akellolcc.cigars.databases.repository.impl.SqlDelightDatabase
 import com.akellolcc.cigars.utils.Pref
+
+enum class DatabaseType {
+    SqlDelight;
+    companion object {
+        fun getDatabase(type: DatabaseType): DatabaseInterface {
+            return when (type) {
+                DatabaseType.SqlDelight -> SqlDelightDatabase()
+            }
+        }
+    }
+}
 
 enum class RepositoryType {
     Cigars,
