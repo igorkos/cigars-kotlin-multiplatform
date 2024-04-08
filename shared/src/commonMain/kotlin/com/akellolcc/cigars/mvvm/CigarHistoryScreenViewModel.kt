@@ -9,7 +9,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) :
     BaseListViewModel<History, CigarHistoryScreenViewModel.CigarsAction>() {
-    override val repository: HistoryRepository = database.getRepository(RepositoryType.CigarHistory)
+    override val repository: HistoryRepository = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
 
     fun humidorName(id: Long): String {
         return repository.humidorName(id)
