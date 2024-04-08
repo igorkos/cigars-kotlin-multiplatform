@@ -2,6 +2,7 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
@@ -12,19 +13,20 @@ import kotlinx.coroutines.launch
 
 class SqlDelightCigarHumidorsRepository(
     private val cigarId: Long,
-) : BaseRepository<HumidorCigar>(), CigarHumidorRepository {
+    queries: CigarsDatabaseQueries
+) : BaseRepository<HumidorCigar>(queries), CigarHumidorRepository {
 
     fun allSync(): List<HumidorCigar> =
-        roomQueries.cigarHumidors(cigarId, ::humidorCigarFactory).executeAsList()
+        queries.cigarHumidors(cigarId, ::humidorCigarFactory).executeAsList()
 
     override fun observeAll(): Flow<List<HumidorCigar>> {
-        return roomQueries.cigarHumidors(cigarId, ::humidorCigarFactory).asFlow()
+        return queries.cigarHumidors(cigarId, ::humidorCigarFactory).asFlow()
             .mapToList(Dispatchers.Main)
     }
 
-    fun add(entity: Humidor, count: Long) {
+    override fun add(entity: Humidor, count: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.addCigarToHumidor(
+            queries.addCigarToHumidor(
                 entity.rowid,
                 cigarId,
                 count
@@ -34,7 +36,7 @@ class SqlDelightCigarHumidorsRepository(
 
     override fun doUpsert(entity: HumidorCigar) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.addCigarToHumidor(
+            queries.addCigarToHumidor(
                 entity.humidor!!.rowid,
                 entity.cigar!!.rowid,
                 entity.count
@@ -44,7 +46,7 @@ class SqlDelightCigarHumidorsRepository(
 
     override fun doDelete(id: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.removeCigarFromHumidor(id, cigarId)
+            queries.removeCigarFromHumidor(id, cigarId)
         }
     }
 
@@ -68,7 +70,7 @@ class SqlDelightCigarHumidorsRepository(
     }
 
     override fun contains(id: Long): Boolean {
-        return roomQueries.humidorCigarExists(cigarId, id).executeAsOne() != 0L
+        return queries.humidorCigarExists(cigarId, id).executeAsOne() != 0L
     }
 
 }

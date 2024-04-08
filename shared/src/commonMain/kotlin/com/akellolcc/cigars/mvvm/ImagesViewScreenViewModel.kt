@@ -1,35 +1,32 @@
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.camera.SharedImage
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarImagesRepository
+import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.ImagesRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
-
-class ImagesViewScreenViewModel(val cigar: Cigar) :
-    ActionsViewModel<ImagesViewScreenViewModel.Action>() {
-    private val database: SqlDelightCigarImagesRepository =
-        SqlDelightCigarImagesRepository(cigar.rowid)
-    var loading by mutableStateOf(false)
+abstract class BaseImagesViewScreenViewModel(val id: Long) :
+    BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>() {
     fun addImage(image: SharedImage) {
         image.toByteArray()?.let {
-            database.add(CigarImage(-1, data_ = it))
+            repository.add(CigarImage(-1, bytes = it))
         }
-    }
-
-    @Composable
-    fun asState(): State<List<CigarImage>> {
-        return database.observeAll().collectAsState(listOf())
     }
 
     sealed interface Action {
         data class ShowError(val error: StringDesc) : Action
     }
+}
+
+class CigarImagesViewScreenViewModel(val cigar: Cigar) :
+    BaseImagesViewScreenViewModel(cigar.rowid) {
+    override val repository: ImagesRepository = database.getRepository(RepositoryType.CigarImages,cigar.rowid)
+}
+
+
+class HumidorImagesViewScreenViewModel(val humidor: Humidor) : BaseImagesViewScreenViewModel(humidor.rowid) {
+    override val repository: ImagesRepository = database.getRepository(RepositoryType.HumidorImages,humidor.rowid)
 }

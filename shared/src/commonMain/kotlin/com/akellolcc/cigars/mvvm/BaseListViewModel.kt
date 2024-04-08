@@ -2,18 +2,16 @@ package com.akellolcc.cigars.mvvm
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
 
 
-abstract class BaseListViewModel<T : BaseEntity, A> : ActionsViewModel<A>() {
-    protected abstract val database: Repository<T>
-    var loading by mutableStateOf(false)
+abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
+    protected abstract val repository: Repository<T>
 
     @Composable
-    abstract fun asState(): State<List<T>>
-
+    fun asState(): State<List<T>> {
+        return repository.observeAll().collectAsState(listOf())
+    }
 }

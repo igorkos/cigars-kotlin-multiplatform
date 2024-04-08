@@ -3,6 +3,7 @@ package com.akellolcc.cigars.databases.repository.impl
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.Humidor
@@ -15,18 +16,19 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SqlDelightCigarHistoryRepository(
-    private val id: Long
-) : BaseRepository<History>(), HistoryRepository {
+    private val id: Long,
+    queries: CigarsDatabaseQueries
+) : BaseRepository<History>(queries), HistoryRepository {
 
-    fun allSync(): List<History> = roomQueries.cigarHistory(id, ::historyFactory).executeAsList()
+    fun allSync(): List<History> = queries.cigarHistory(id, ::historyFactory).executeAsList()
 
     override fun observeAll(): Flow<List<History>> {
-        return roomQueries.cigarHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
+        return queries.cigarHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
     override fun doUpsert(entity: History) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.addHistory(
+            queries.addHistory(
                 entity.count,
                 entity.date,
                 entity.left,
@@ -35,7 +37,7 @@ class SqlDelightCigarHistoryRepository(
                 entity.cigarId,
                 entity.humidorId
             )
-            roomQueries.lastInsertRowId().executeAsOne()
+            queries.lastInsertRowId().executeAsOne()
         }
     }
 
@@ -43,14 +45,14 @@ class SqlDelightCigarHistoryRepository(
 
 
     override suspend fun cigar(id: Long): Cigar {
-        return roomQueries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.Main).first()
+        return queries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.Main).first()
     }
 
     override suspend fun humidor(id: Long): Humidor {
-        return roomQueries.humidor(id, ::humidorFactory).asFlow().mapToOne(Dispatchers.Main).first()
+        return queries.humidor(id, ::humidorFactory).asFlow().mapToOne(Dispatchers.Main).first()
     }
 
-    fun humidorName(id: Long): String = roomQueries.humidorName(id).executeAsOne()
+    override fun humidorName(id: Long): String = queries.humidorName(id).executeAsOne()
     override fun observe(id: Long): Flow<History> {
         TODO("Not yet implemented")
     }
@@ -61,6 +63,6 @@ class SqlDelightCigarHistoryRepository(
 
 
     override fun contains(id: Long): Boolean {
-        return roomQueries.historyExists(id).executeAsOne() != 0L
+        return queries.historyExists(id).executeAsOne() != 0L
     }
 }

@@ -46,7 +46,7 @@ object Localize {
     val cigar_details_humidors = Strings.cigar_details_humidors.toString()
     val cigar_details_link = Strings.cigar_details_link.toString()
     val cigar_details_count_dialog = Strings.cigar_details_count_dialog.toString()
-
+    val cigar_details_count_dialog_price = Strings.cigar_details_count_dialog_price.toString()
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()
     val cigar_shape_petit_corona = Strings.cigar_shape_petit_corona.toString()
@@ -63,6 +63,15 @@ object Localize {
     val cigar_shape_perfecto = Strings.cigar_shape_perfecto.toString()
     val cigar_shape_culebra = Strings.cigar_shape_culebra.toString()
     val cigar_shape_diadema = Strings.cigar_shape_diadema.toString()
+    val cigar_shape_toro_grande = Strings.cigar_shape_toro_grande.toString()
+    val cigar_shape_figurado = Strings.cigar_shape_figurado.toString()
+    val cigar_shape_gordo = Strings.cigar_shape_gordo.toString()
+    val cigar_shape_toro = Strings.cigar_shape_toro.toString()
+    val cigar_shape_compana = Strings.cigar_shape_compana.toString()
+    val cigar_shape_bullet = Strings.cigar_shape_bullet.toString()
+    val cigar_shape_pettit_figurado = Strings.cigar_shape_pettit_figurado.toString()
+    val cigar_shape_pettit = Strings.cigar_shape_pettit.toString()
+    val cigar_shape_cigarillo = Strings.cigar_shape_cigarillo.toString()
 
     val cigar_strength_mild = Strings.cigar_strength_mild.toString()
     val cigar_strength_mild_medium = Strings.cigar_strength_mild_medium.toString()
@@ -94,7 +103,13 @@ object Localize {
     }
 
     fun history_transaction_desc(v: HistoryType, v1: Long): String {
-        return Strings.history_transaction_desc.createLocalizedString(v.toString(), v1).toString()
+        return if (v1 == 0L || v1 > 1) {
+            Strings.history_transaction_desc_more.createLocalizedString(v.toString(), v1)
+                .toString()
+        } else {
+            Strings.history_transaction_desc_one.createLocalizedString(v.toString(), v1)
+                .toString()
+        }
     }
 
     fun history_transaction_price(v: Double): String {

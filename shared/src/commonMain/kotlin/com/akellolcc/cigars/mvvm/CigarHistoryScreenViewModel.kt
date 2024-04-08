@@ -1,26 +1,18 @@
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarHistoryRepository
+import com.akellolcc.cigars.databases.repository.HistoryRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) :
     BaseListViewModel<History, CigarHistoryScreenViewModel.CigarsAction>() {
-    override val database: SqlDelightCigarHistoryRepository =
-        SqlDelightCigarHistoryRepository(cigar.rowid)
-
-    @Composable
-    override fun asState(): State<List<History>> {
-        return database.observeAll().collectAsState(listOf())
-    }
+    override val repository: HistoryRepository = database.getRepository(RepositoryType.CigarHistory)
 
     fun humidorName(id: Long): String {
-        return database.humidorName(id)
+        return repository.humidorName(id)
     }
 
     sealed interface CigarsAction {

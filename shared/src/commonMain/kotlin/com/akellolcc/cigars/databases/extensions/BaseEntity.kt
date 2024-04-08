@@ -1,8 +1,11 @@
 package com.akellolcc.cigars.databases.extensions
 
 import com.akellolcc.cigars.ui.randomString
+import kotlinx.serialization.Serializable
 
-abstract class BaseEntity(open val rowid: Long) {
+@Serializable
+abstract class BaseEntity {
+    abstract var rowid: Long
     val key: String get() = rowid.toString() + randomString()
 
     val isStored: Boolean

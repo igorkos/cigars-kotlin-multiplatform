@@ -13,14 +13,15 @@ import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.MR
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.getImageByFileName
 
 @Composable
-fun loadIcon(id: ImageResource, size: Size, tint: Color? = null) {
+fun loadIcon(id: ImageResource, size: Size, tint: Color? = null, modifier: Modifier = Modifier) {
     val painter: Painter = painterResource(id)
     Icon(
         painter = painter,
         contentDescription = "",
-        modifier = Modifier.size(size.width.dp, size.height.dp),
+        modifier = modifier.size(size.width.dp, size.height.dp),
         tint = tint ?: Color(LocalContentColor.current.value)
     )
 }
@@ -35,6 +36,12 @@ fun loadImage(id: ImageResource) {
 fun imagePainter(id: ImageResource): Painter {
     return painterResource(id)
 }
+
+fun loadImageByName(name: String): ImageResource? {
+    return MR.images.getImageByFileName(name)
+}
+
+expect fun imageData(name: String): ByteArray?
 
 class Images {
     companion object {
@@ -65,6 +72,13 @@ class Images {
 
         val icon_arrow_left = MR.images.arrow_left
         val icon_arrow_right = MR.images.arrow_right
+        val icon_bin = MR.images.icon_bin
+        val icon_question = MR.images.icon_question
+        val icon_tab = MR.images.icon_tab
+
+        val cigar_sizes_info = MR.images.cigar_sizes_info
+        val cigar_tobacco_info = MR.images.cigar_tobacco_info
+        val cigar_ratings_info = MR.images.cigar_ratings_info
     }
 }
 

@@ -1,6 +1,7 @@
 package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.CigarStrength
@@ -8,13 +9,15 @@ import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.repository.CigarsRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 
 public fun historyFactory(
     rowid: Long,
     count: Long,
     date: Long,
     left: Long,
-    price: Double,
+    price: Double?,
     type: Long,
     cigarId: Long,
     humidorId: Long
@@ -43,7 +46,7 @@ fun imageFactory(
     return CigarImage(
         rowid = rowid,
         image = image,
-        data_ = data_,
+        bytes = data_,
         notes = notes,
         type = type,
         cigarId = cigarId,
@@ -68,6 +71,7 @@ fun cigarFactory(
     notes: String?,
     filler: String,
     link: String?,
+    count: Long,
     shopping: Boolean,
     favorites: Boolean,
 ): Cigar {
@@ -88,6 +92,7 @@ fun cigarFactory(
         notes,
         filler,
         link,
+        count,
         shopping,
         favorites
     )
@@ -98,13 +103,13 @@ fun humidorCigarFactory(
     humidorId: Long?,
     cigarId: Long?,
 ): HumidorCigar {
-    val roomQueries = Database.getInstance().dbQueries
-    val humidor = roomQueries.humidor(humidorId!!).executeAsOne()
-    val cigar = roomQueries.cigar(cigarId!!).executeAsOne()
+    val humidor = Database.getInstance().getRepository<HumidorsRepository>(RepositoryType.Humidors).getSync(humidorId!!)
+    val cigar = Database.getInstance().getRepository<CigarsRepository>(RepositoryType.Cigars).getSync(cigarId!!)
     return HumidorCigar(
+        rowid = -1,
         count = count,
-        humidor = Humidor(humidor),
-        cigar = Cigar(cigar),
+        humidor = humidor,
+        cigar = cigar,
     )
 }
 
@@ -118,9 +123,10 @@ fun humidorFactory(
     humidity: Double?,
     notes: String?,
     link: String?,
+    price: Double?,
     autoOpen: Boolean?,
     sorting: Long?,
-    type: Long?,
+    type: Long,
 ): Humidor {
     return Humidor(
         rowid,
@@ -132,6 +138,7 @@ fun humidorFactory(
         humidity,
         notes,
         link,
+        price,
         autoOpen == true,
         sorting,
         type,

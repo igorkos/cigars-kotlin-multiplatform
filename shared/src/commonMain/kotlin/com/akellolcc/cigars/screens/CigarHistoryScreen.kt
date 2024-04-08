@@ -115,10 +115,12 @@ class CigarHistoryScreen(override val route: NavRoute) :
                                 text = Localize.history_transaction_desc(entity.type, entity.count),
                                 style = TextStyles.Subhead
                             )
-                            TextStyled(
-                                text = Localize.history_transaction_price(entity.price),
-                                style = TextStyles.Subhead
-                            )
+                            if(entity.price != null) {
+                                TextStyled(
+                                    text = Localize.history_transaction_price(entity.price!!),
+                                    style = TextStyles.Subhead
+                                )
+                            }
                         }
                     }
                 }

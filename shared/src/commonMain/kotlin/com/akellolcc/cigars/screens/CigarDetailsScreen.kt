@@ -53,6 +53,7 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.components.DefaultButton
 import com.akellolcc.cigars.components.DialogButton
+import com.akellolcc.cigars.components.InfoImageDialog
 import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.components.ValueCard
 import com.akellolcc.cigars.components.ValuePicker
@@ -128,6 +129,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             this.sharedViewModel = mainModel
                         })
                 )
+
+                is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> TODO()
             }
         }
 
@@ -196,6 +199,16 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 {
                     HumidorCigarsDialog {
                         viewModel.cancelEdit()
+                    }
+                    if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
+                        InfoImageDialog(when(viewModel.infoDialog){
+                            CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Images.cigar_sizes_info
+                            CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
+                            CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
+                            else -> TODO()
+                        }) {
+                            viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
+                        }
                     }
                     Column(
                         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -270,7 +283,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             ) {
                                 ValuesCard(
                                     label = Localize.cigar_details_cigars,
-                                    vertical = viewModel.editing
+                                    vertical = viewModel.editing,
+                                    actionIcon = Images.icon_menu_info,
+                                    onAction = {
+                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarSize)
+                                    }
                                 ) {
                                     if (!viewModel.editing) {
                                         ValueCard(Localize.cigar_details_shape, viewModel.shape)
@@ -323,7 +340,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             Column {
                                 ValuesCard(
                                     label = Localize.cigar_details_tobacco,
-                                    vertical = true
+                                    vertical = true,
+                                    actionIcon = Images.icon_menu_info,
+                                    onAction = {
+                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarTobacco)
+                                    }
                                 ) {
                                     TextStyled(
                                         viewModel.wrapper,
@@ -383,7 +404,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             Column(horizontalAlignment = Alignment.Start) {
                                 ValuesCard(
                                     label = Localize.cigar_details_ratings,
-                                    vertical = viewModel.editing
+                                    vertical = viewModel.editing,
+                                    actionIcon = Images.icon_menu_info,
+                                    onAction = {
+                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarRatings)
+                                    }
                                 ) {
                                     if (!viewModel.editing) {
                                         ValueCard(
@@ -442,7 +467,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 ) {
                                     ValuesCard(
                                         label = Localize.cigar_details_humidors,
-                                        vertical = true
+                                        vertical = true,
+                                        actionIcon = if(viewModel.humidors.size > 1) Images.icon_tab else null,
+                                        onAction = {
+                                            viewModel.moveCigar()
+                                        }
                                     ) {
                                         LazyColumn(
                                             verticalArrangement = Arrangement.Top,
@@ -545,6 +574,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     @Composable
     fun HumidorCigarsDialog(onDismissRequest: () -> Unit) {
         val count = remember { mutableStateOf("0") }
+        val price = remember { mutableStateOf("") }
+        val showPrice = remember { mutableStateOf(false) }
         LaunchedEffect(viewModel.humidorCigarsCount) {
             count.value = (viewModel.humidorCigarsCount?.count ?: 0).toString()
         }
@@ -574,6 +605,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             IconButton(onClick = {
+                                if (viewModel.humidorCigarsCount!!.count >= count.value.toLong()) showPrice.value = false
                                 val current = (count.value.ifBlank { "0" }).toInt()
                                 count.value = if (current > 0) current.dec().toString() else "0"
                             }) {
@@ -593,9 +625,29 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 }
                             )
                             IconButton(onClick = {
+                                if (viewModel.humidorCigarsCount!!.count < count.value.toLong()) showPrice.value = true
                                 count.value = (count.value.ifBlank { "0" }).toInt().inc().toString()
                             }) {
                                 loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
+                            }
+                        }
+                        if (showPrice.value) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                            ) {
+                                TextStyled(
+                                    price.value,
+                                    TextStyles.Subhead,
+                                    labelStyle = TextStyles.Subhead,
+                                    label = Localize.cigar_details_count_dialog_price,
+                                    editable = true,
+                                    modifier = Modifier.padding(bottom = 10.dp),
+                                    onValueChange = {
+                                        price.value = it
+                                    },
+                                    inputMode = KeyboardType.Decimal
+                                )
                             }
                         }
                         Row(
@@ -611,7 +663,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 onClick = {
                                     viewModel.updateCigarCount(
                                         viewModel.humidorCigarsCount!!,
-                                        count.value.toLong()
+                                        count.value.toLong(),
+                                        if(price.value.isNotBlank()) price.value.toDouble() else null
                                     )
                                 })
                         }

@@ -4,6 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.emptyCigar
@@ -15,35 +16,35 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class SqlDelightCigarsRepository : BaseRepository<Cigar>(), CigarsRepository {
+open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) : BaseRepository<Cigar>(queries), CigarsRepository {
     override fun getSync(id: Long): Cigar {
-        return roomQueries.cigar(id, ::cigarFactory).executeAsOne()
+        return queries.cigar(id, ::cigarFactory).executeAsOne()
     }
 
     override fun observe(id: Long): Flow<Cigar> {
         if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return roomQueries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.Main)
+        return queries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.Main)
     }
 
     override fun observeOrNull(id: Long): Flow<Cigar?> {
         if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return roomQueries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
+        return queries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
     }
 
     override fun observeAll(): Flow<List<Cigar>> {
-        return roomQueries.allCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+        return queries.allCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
     }
 
     fun observeFavorites(): Flow<List<Cigar>> =
-        roomQueries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
 
     fun observeHumidorCigars(): Flow<List<Cigar>> =
-        roomQueries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
 
     override fun doUpsert(entity: Cigar) {
         CoroutineScope(Dispatchers.Main).launch {
-            val id = roomQueries.transactionWithResult {
-                roomQueries.addCigar(
+            val id = queries.transactionWithResult {
+                queries.addCigar(
                     entity.rowid,
                     entity.name,
                     entity.brand,
@@ -60,10 +61,11 @@ class SqlDelightCigarsRepository : BaseRepository<Cigar>(), CigarsRepository {
                     entity.notes,
                     entity.filler,
                     entity.link,
+                    entity.count,
                     entity.shopping,
                     entity.favorites
                 )
-                roomQueries.lastInsertRowId().executeAsOne()
+                queries.lastInsertRowId().executeAsOne()
             }
             entity.rowid = id
         }
@@ -71,11 +73,11 @@ class SqlDelightCigarsRepository : BaseRepository<Cigar>(), CigarsRepository {
 
     override fun doDelete(id: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.removeCigar(id)
+            queries.removeCigar(id)
         }
     }
 
     override fun contains(id: Long): Boolean {
-        return roomQueries.cigarExists(id).executeAsOne() != 0L
+        return queries.cigarExists(id).executeAsOne() != 0L
     }
 }

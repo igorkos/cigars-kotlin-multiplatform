@@ -3,22 +3,22 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.ObservableEntity
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorImagesRepository
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorsRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.databases.repository.ImagesRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
-    ActionsViewModel<HumidorDetailsScreenViewModel.Action>() {
-    private var imagesDatabase: SqlDelightHumidorImagesRepository? = null
-    private var humidorsDatabase: SqlDelightHumidorsRepository? = null
+    DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
+    private var imagesDatabase: ImagesRepository? = null
+    private var humidorsDatabase: HumidorsRepository? = null
     private var observeHumidor: ObservableEntity<Humidor>? = null
     private var _images: ObservableEntity<List<CigarImage>>? = null
 
-    var loading by mutableStateOf(false)
     var editing by mutableStateOf(humidor.rowid < 0)
     var name by mutableStateOf(humidor.name)
     var brand by mutableStateOf(humidor.brand)
@@ -40,8 +40,8 @@ class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
     }
 
     private fun observeCigar() {
-        imagesDatabase = SqlDelightHumidorImagesRepository(humidor.rowid)
-        humidorsDatabase = SqlDelightHumidorsRepository()
+        imagesDatabase = database.getRepository(RepositoryType.HumidorImages)
+        humidorsDatabase = database.getRepository(RepositoryType.Humidors)
         observeHumidor = ObservableEntity(humidorsDatabase!!.observe(humidor.rowid))
 
         observeHumidor?.map { if (!editing) name = it?.name ?: "" }
@@ -52,7 +52,7 @@ class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
         observeHumidor?.map { if (!editing) humidity = it?.humidity ?: 0.0 }
         observeHumidor?.map { if (!editing) notes = it?.notes }
         observeHumidor?.map { if (!editing) link = it?.link }
-        observeHumidor?.map { if (!editing) type = it?.type }
+        observeHumidor?.map { if (!editing) type = it?.type ?:0 }
 
         _images = ObservableEntity(imagesDatabase!!.observeAll())
         _images?.map {

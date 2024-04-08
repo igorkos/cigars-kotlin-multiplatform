@@ -72,7 +72,7 @@ fun PagedCarousel(
         ) { page ->
             //Log.debug("Images1: ${images?.size}")
             if (!images.isNullOrEmpty()) {
-                CarouselItem(images[page].data_, scale) {
+                CarouselItem(images[page].bytes, scale) {
                     onClick?.invoke(page)
                 }
             } else {

@@ -2,6 +2,7 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import kotlinx.coroutines.CoroutineScope
@@ -11,36 +12,39 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class SqlDelightHumidorImagesRepository(
-    private val humidorId: Long
-) : BaseRepository<CigarImage>(), ImagesRepository {
+    private val humidorId: Long,
+    queries: CigarsDatabaseQueries
+) : BaseRepository<CigarImage>(queries), ImagesRepository {
 
     fun allSync(): List<CigarImage> =
-        roomQueries.humidorImages(humidorId, ::imageFactory).executeAsList()
+        queries.humidorImages(humidorId, ::imageFactory).executeAsList()
 
     override fun observeAll(): Flow<List<CigarImage>> {
-        return roomQueries.humidorImages(humidorId, ::imageFactory).asFlow()
+        return queries.humidorImages(humidorId, ::imageFactory).asFlow()
             .mapToList(Dispatchers.IO)
     }
 
     override fun doUpsert(entity: CigarImage) {
         CoroutineScope(Dispatchers.Main).launch {
-            val imageID = roomQueries.transactionWithResult {
-                roomQueries.addImage(
+            val imageID = queries.transactionWithResult {
+                queries.addImage(
                     entity.rowid,
-                    entity.data_,
+                    entity.bytes,
                     entity.type,
                     entity.image,
-                    entity.notes
+                    entity.notes,
+                    entity.cigarId,
+                    entity.humidorId
                 )
-                roomQueries.lastInsertRowId().executeAsOne()
+                queries.lastInsertRowId().executeAsOne()
             }
-            roomQueries.addImageToHumidor(humidorId, imageID)
+            queries.addImageToHumidor(humidorId, imageID)
         }
     }
 
     override fun doDelete(id: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.removeImage(id)
+            queries.removeImage(id)
         }
     }
 
@@ -54,7 +58,7 @@ class SqlDelightHumidorImagesRepository(
 
 
     override fun contains(id: Long): Boolean {
-        return roomQueries.imageExists(id).executeAsOne() != 0L
+        return queries.imageExists(id).executeAsOne() != 0L
     }
 
 }

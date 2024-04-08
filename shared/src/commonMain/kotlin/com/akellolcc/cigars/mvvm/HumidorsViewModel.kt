@@ -1,20 +1,13 @@
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorsRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 class HumidorsViewModel : BaseListViewModel<Humidor, HumidorsViewModel.Action>() {
-    override val database: SqlDelightHumidorsRepository = SqlDelightHumidorsRepository()
-
-    @Composable
-    override fun asState(): State<List<Humidor>> {
-        return database.observeAll().collectAsState(listOf())
-    }
+    override val repository: HumidorsRepository = database.getRepository(RepositoryType.Humidors)
 
     fun humidorSelected(humidor: Humidor) {
         sendEvent(Action.RouteToHumidor(humidor))

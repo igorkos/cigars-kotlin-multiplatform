@@ -1,9 +1,10 @@
 package com.akellolcc.cigars.databases.extensions
 
 import com.akellolcc.cigars.databases.HumidorsTable
+import kotlinx.serialization.Serializable
 
 var emptyHumidor = Humidor(-1, "", "", 0, 0)
-
+@Serializable
 class Humidor(
     override var rowid: Long,
     var name: String,
@@ -14,10 +15,11 @@ class Humidor(
     var humidity: Double? = null,
     var notes: String? = null,
     var link: String? = null,
+    var price: Double? = null,
     var autoOpen: Boolean = false,
     var sorting: Long? = null,
-    var type: Long? = null,
-) : BaseEntity(rowid) {
+    var type: Long = 0,
+) : BaseEntity() {
 
     constructor(humidor: HumidorsTable) : this(
         humidor.rowid,
@@ -29,6 +31,7 @@ class Humidor(
         humidor.humidity,
         humidor.notes,
         humidor.link,
+        humidor.price,
         humidor.autoOpen == true,
         humidor.sorting,
         humidor.type

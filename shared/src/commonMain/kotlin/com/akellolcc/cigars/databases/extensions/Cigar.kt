@@ -2,10 +2,12 @@ package com.akellolcc.cigars.databases.extensions
 
 import com.akellolcc.cigars.databases.CigarsTable
 import com.akellolcc.cigars.theme.Localize
+import kotlinx.serialization.Serializable
+
 
 var emptyCigar =
-    Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", false, false)
-
+    Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", 0, false, false)
+@Serializable
 data class Cigar(
     override var rowid: Long,
     var name: String,
@@ -23,9 +25,10 @@ data class Cigar(
     var notes: String?,
     var filler: String,
     var link: String?,
+    var count: Long,
     var shopping: Boolean,
     var favorites: Boolean
-) : BaseEntity(rowid) {
+) : BaseEntity() {
 
     constructor(cigar: CigarsTable) : this(
         cigar.rowid,
@@ -44,26 +47,36 @@ data class Cigar(
         cigar.notes,
         cigar.filler,
         cigar.link,
+        cigar.count,
         cigar.shopping,
         cigar.favorites
     )
 }
 
 enum class CigarShapes {
-    Corona,
-    PetitCorona,
+    ToroGrande,
+    Pyramide,
     Churchill,
+    Figurado,
+    Panetela,
+    Torpedo,
+    Culebra,
+    Corona,
+    Perfecto,
+    Gordo,
+    Toro,
+    Campana,
     Robusto,
+    Bullet,
+    PetitCorona,
+    PetitFigurado,
+    Pettit,
+    Cigarillo,
     CoronaGorda,
     DoubleCorona,
-    Panetela,
     Lonsdale,
     Grande,
-    Pyramid,
     Belicoso,
-    Torpedo,
-    Perfecto,
-    Culebra,
     Diadema;
 
     companion object {
@@ -84,17 +97,27 @@ enum class CigarShapes {
                 Panetela -> Localize.cigar_shape_panetela
                 Lonsdale -> Localize.cigar_shape_lonsdale
                 Grande -> Localize.cigar_shape_grande
-                Pyramid -> Localize.cigar_shape_pyramid
+                Pyramide -> Localize.cigar_shape_pyramid
                 Belicoso -> Localize.cigar_shape_belicoso
                 Torpedo -> Localize.cigar_shape_torpedo
                 Perfecto -> Localize.cigar_shape_perfecto
                 Culebra -> Localize.cigar_shape_culebra
                 Diadema -> Localize.cigar_shape_diadema
+                ToroGrande -> Localize.cigar_shape_toro_grande
+                Figurado -> Localize.cigar_shape_figurado
+                Gordo -> Localize.cigar_shape_gordo
+                Toro -> Localize.cigar_shape_toro
+                Campana -> Localize.cigar_shape_compana
+                Bullet -> Localize.cigar_shape_bullet
+                PetitFigurado -> Localize.cigar_shape_pettit_figurado
+                Pettit -> Localize.cigar_shape_pettit
+                Cigarillo -> Localize.cigar_shape_cigarillo
             }
         }
     }
 }
 
+@Serializable
 enum class CigarStrength {
     Mild,
     MildToMedium,

@@ -9,8 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.akellolcc.cigars.MainView
-import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.DatabaseDriverFactory
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.utils.setAppContext
 
@@ -19,7 +17,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setAppContext(this.applicationContext)
         Log.initLog()
-        Database.createInstance(DatabaseDriverFactory(this.applicationContext))
         super.onCreate(savedInstanceState)
 
         try {

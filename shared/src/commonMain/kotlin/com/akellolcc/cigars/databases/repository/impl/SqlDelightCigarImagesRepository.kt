@@ -2,6 +2,7 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import kotlinx.coroutines.CoroutineScope
@@ -12,34 +13,37 @@ import kotlinx.coroutines.launch
 
 class SqlDelightCigarImagesRepository(
     private val cigarId: Long,
-) : BaseRepository<CigarImage>(), ImagesRepository {
+    queries: CigarsDatabaseQueries
+) : BaseRepository<CigarImage>(queries), ImagesRepository {
 
     fun allSync(): List<CigarImage> =
-        roomQueries.cigarImages(cigarId, ::imageFactory).executeAsList()
+        queries.cigarImages(cigarId, ::imageFactory).executeAsList()
 
     override fun observeAll(): Flow<List<CigarImage>> {
-        return roomQueries.cigarImages(cigarId, ::imageFactory).asFlow().mapToList(Dispatchers.IO)
+        return queries.cigarImages(cigarId, ::imageFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
     override fun doUpsert(entity: CigarImage) {
         CoroutineScope(Dispatchers.Main).launch {
-            val imageID = roomQueries.transactionWithResult {
-                roomQueries.addImage(
+            val imageID = queries.transactionWithResult {
+                queries.addImage(
                     entity.rowid,
-                    entity.data_,
+                    entity.bytes,
                     entity.type,
                     entity.image,
-                    entity.notes
+                    entity.notes,
+                    entity.cigarId,
+                    entity.humidorId
                 )
-                roomQueries.lastInsertRowId().executeAsOne()
+                queries.lastInsertRowId().executeAsOne()
             }
-            roomQueries.addImageToCigar(cigarId, imageID)
+            queries.addImageToCigar(cigarId, imageID)
         }
     }
 
     override fun doDelete(id: Long) {
         CoroutineScope(Dispatchers.Main).launch {
-            roomQueries.removeImage(id)
+            queries.removeImage(id)
         }
     }
 
@@ -53,6 +57,6 @@ class SqlDelightCigarImagesRepository(
 
 
     override fun contains(id: Long): Boolean {
-        return roomQueries.imageExists(id).executeAsOne() != 0L
+        return queries.imageExists(id).executeAsOne() != 0L
     }
 }

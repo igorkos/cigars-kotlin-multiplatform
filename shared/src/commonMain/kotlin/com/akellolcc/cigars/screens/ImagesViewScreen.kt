@@ -1,6 +1,5 @@
 package com.akellolcc.cigars.screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,8 +39,11 @@ import com.akellolcc.cigars.camera.rememberCameraManager
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.ImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
@@ -77,9 +79,17 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
         }
 
     @Transient
-    private val viewModel = ImagesViewScreenViewModel((route.data as Pair<Cigar, Int>).first)
+    private var viewModel: BaseImagesViewScreenViewModel
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+    init {
+        val params = route.data as Pair<*,*>
+        viewModel = if (params.first is Cigar) {
+            CigarImagesViewScreenViewModel((route.data as Pair<Cigar, Int>).first)
+        } else {
+            HumidorImagesViewScreenViewModel((route.data as Pair<Humidor, Int>).first)
+        }
+    }
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         var select by remember { mutableStateOf((route.data as Pair<Cigar, Int>).second) }
@@ -113,9 +123,6 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
         )
 
         viewModel.observeEvents {
-            when (it) {
-                is ImagesViewScreenViewModel.Action.ShowError -> TODO()
-            }
         }
 
         val permissionsManager = createPermissionsManager(object : PermissionCallback {

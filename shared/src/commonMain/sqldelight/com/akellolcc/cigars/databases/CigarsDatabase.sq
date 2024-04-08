@@ -17,6 +17,7 @@ CREATE TABLE CigarsTable (
     notes TEXT,
     filler TEXT NOT NULL,
     link TEXT,
+    count INTEGER NOT NULL,
     shopping INTEGER AS Boolean NOT NULL,
     favorites INTEGER AS Boolean  NOT NULL
 );
@@ -31,9 +32,10 @@ CREATE TABLE HumidorsTable (
     humidity REAL,
     notes TEXT,
     link TEXT,
+    price REAL,
     autoOpen INTEGER AS Boolean,
     sorting INTEGER,
-    type INTEGER
+    type INTEGER NOT NULL
 );
 
 CREATE TABLE CigarHumidorTable (
@@ -50,7 +52,7 @@ CREATE TABLE HistoryTable (
     count INTEGER NOT NULL,
     date INTEGER NOT NULL,
     left INTEGER NOT NULL,
-    price REAL NOT NULL,
+    price REAL,
     type INTEGER NOT NULL,
     cigarId  INTEGER NOT NULL,
     humidorId  INTEGER NOT NULL,
@@ -78,8 +80,8 @@ cigar:
 SELECT * FROM CigarsTable WHERE rowid = ?;
 
 addCigar:
-INSERT OR REPLACE INTO CigarsTable (rowid, name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, shopping, favorites)
-VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO CigarsTable (rowid, name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites)
+VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 removeAllCigars:
 DELETE FROM CigarsTable;
@@ -98,6 +100,12 @@ UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
 
 cigarHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
+
+cigarCount:
+SELECT CigarsTable.count FROM CigarsTable WHERE rowid = :id;
+
+updateCigarCount:
+UPDATE CigarsTable SET count = :count WHERE rowid = :id;
 
 cigarExists:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
@@ -130,9 +138,6 @@ VALUES (?,?,?);
 humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
 
-addHistoryToHumidor:
-UPDATE HistoryTable SET humidorId = :humidor WHERE rowid = :history;
-
 humidorHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor;
 
@@ -160,8 +165,8 @@ image:
 SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
 
 addImage:
-INSERT OR REPLACE INTO ImagesTable (rowid, data,  type, image, notes)
-VALUES (?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO ImagesTable (rowid, data,  type, image, notes,cigarId,humidorId)
+VALUES (?, ?, ?, ?, ?,?,?);
 
 removeImage:
 DELETE FROM ImagesTable WHERE rowid = :rowid;

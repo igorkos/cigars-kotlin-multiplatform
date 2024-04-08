@@ -7,4 +7,6 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 interface HistoryRepository : Repository<History> {
     suspend fun cigar(id: Long): Cigar?
     suspend fun humidor(id: Long): Humidor?
+
+    fun humidorName(id: Long): String
 }

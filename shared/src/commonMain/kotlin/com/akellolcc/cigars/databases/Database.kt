@@ -1,31 +1,30 @@
 package com.akellolcc.cigars.databases
 
-import com.akellolcc.cigars.databases.demo.DemoCigar
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarStrength
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarHumidorsRepository
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightCigarsRepository
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorsRepository
-import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.theme.AssetFiles
-import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.theme.readTextFile
+import com.akellolcc.cigars.databases.repository.DatabaseInterface
+import com.akellolcc.cigars.databases.repository.DatabaseType
+import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.utils.Pref
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 
-
-class Database(databaseDriverFactory: DatabaseDriverFactory) {
-    private val database = CigarsDatabase(databaseDriverFactory.createDriver())
-    val dbQueries = database.cigarsDatabaseQueries
+enum class RepositoryType {
+    Cigars,
+    Humidors,
+    Favorites,
+    CigarImages,
+    HumidorImages,
+    CigarHumidors,
+    HumidorCigars,
+    CigarHistory,
+    HumidorHistory
+}
+class Database() : DatabaseInterface {
+    private val database = DatabaseType.getDatabase(DatabaseType.SqlDelight)
 
     companion object {
         private var instance: Database? = null
 
-        fun createInstance(databaseDriverFactory: DatabaseDriverFactory): Database {
+        private fun createInstance(): Database {
             if (instance == null)
-                instance = Database(databaseDriverFactory)
+                instance = Database()
             if (Pref.isFirstStart) {
                 Pref.isFirstStart = false
                 instance?.createDemoSet()
@@ -34,63 +33,20 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
         }
 
         fun getInstance(): Database {
-            if (instance == null) throw IllegalStateException()
+            if (instance == null) createInstance()
             return instance!!
         }
     }
 
-    fun createDemoSet() {
-        runBlocking {
-            val humidorDatabase = SqlDelightHumidorsRepository()
-            val humidor = Humidor(
-                -1,
-                Localize.demo_humidor_name,
-                "Brand",
-                50,
-                50,
-                humidity = 72.0,
-                temperature = 71
-            )
-            humidorDatabase.add(humidor)
-            Log.debug("Demo humidor: $humidor")
-
-            val demoCigarsJson = readTextFile(AssetFiles.demo_cigars)
-
-            demoCigarsJson?.let { json ->
-                val cigarsDatabase = SqlDelightCigarsRepository()
-                val cigars = Json.decodeFromString<List<DemoCigar>>(json)
-                for (cigar in cigars) {
-                    val dbCigar = Cigar(
-                        -1, cigar.name, cigar.brand,
-                        cigar.country,
-                        10,
-                        cigar.cigar,
-                        cigar.wrapper,
-                        cigar.binder,
-                        cigar.gauge,
-                        cigar.length,
-                        CigarStrength.fromLong(cigar.strength),
-                        cigar.rating,
-                        cigar.myrating,
-                        cigar.notes,
-                        cigar.filler,
-                        cigar.link,
-                        cigar.shopping,
-                        cigar.favorites
-                    )
-                    cigarsDatabase.add(dbCigar)
-                    val hcDatabase = SqlDelightCigarHumidorsRepository(dbCigar.rowid)
-                    hcDatabase.add(humidor, 10)
-                }
-            }
-        }
+    override fun <R : Repository<*>> getRepository(type: RepositoryType, args: Any?): R {
+        return database.getRepository(type, args)
     }
 
-    fun reset() {
-        runBlocking {
-            dbQueries.removeAllCigars()
-            dbQueries.removeAllHumidors()
-        }
+    override fun createDemoSet() {
+        database.createDemoSet()
     }
 
+    override fun reset() {
+        database.reset()
+    }
 }

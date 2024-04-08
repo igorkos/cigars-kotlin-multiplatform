@@ -1,13 +1,13 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
-abstract class BaseRepository<ENTITY : BaseEntity> : Repository<ENTITY> {
-    protected val roomQueries = Database.getInstance().dbQueries
+abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: CigarsDatabaseQueries) : Repository<ENTITY> {
+
     override suspend fun get(id: Long): ENTITY {
         return observe(id).first()
     }

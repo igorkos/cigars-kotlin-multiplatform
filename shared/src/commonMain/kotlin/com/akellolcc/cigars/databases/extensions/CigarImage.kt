@@ -1,14 +1,17 @@
 package com.akellolcc.cigars.databases.extensions
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class CigarImage(
-    override val rowid: Long,
+    override var rowid: Long,
     val image: String? = null,
-    val data_: ByteArray,
+    var bytes: ByteArray,
     val notes: String? = null,
     val type: Long? = null,
     val cigarId: Long? = null,
     val humidorId: Long? = null
-) : BaseEntity(rowid) {
+) : BaseEntity() {
 
 
     /*constructor(dbID: Long) : super() {

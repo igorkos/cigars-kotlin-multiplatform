@@ -40,7 +40,6 @@ import com.akellolcc.cigars.components.DialogButton
 import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.components.ValueCard
 import com.akellolcc.cigars.components.ValuesCard
-import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.emptyHumidor
 import com.akellolcc.cigars.logging.Log
@@ -165,7 +164,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                     viewModel.images,
                                     loading = viewModel.loading,
                                 ) {
-                                    val data = route.data as Cigar
+                                    val data = route.data as Humidor
                                     navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
                                         this.data = Pair(data, it)
                                     }))

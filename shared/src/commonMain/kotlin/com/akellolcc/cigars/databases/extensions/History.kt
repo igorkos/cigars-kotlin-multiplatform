@@ -2,17 +2,19 @@ package com.akellolcc.cigars.databases.extensions
 
 import com.akellolcc.cigars.databases.HistoryTable
 import com.akellolcc.cigars.theme.Localize
+import kotlinx.serialization.Serializable
 
+@Serializable
 class History(
     override var rowid: Long,
     var count: Long,
     var date: Long,
     var left: Long,
-    var price: Double,
+    var price: Double?,
     var type: HistoryType,
     var cigarId: Long,
     var humidorId: Long
-) : BaseEntity(rowid) {
+) : BaseEntity() {
 
     constructor(history: HistoryTable) : this(
         history.rowid,

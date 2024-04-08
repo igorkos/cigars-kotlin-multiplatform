@@ -149,6 +149,7 @@ public fun TextStyled(
                     )
                 }
                 Text(
+                    modifier =modifier,
                     text = text ?: "",
                     color = textStyle.color,
                     fontSize = textStyle.fontSize,

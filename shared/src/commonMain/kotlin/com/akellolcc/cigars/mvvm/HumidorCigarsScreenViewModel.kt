@@ -1,19 +1,16 @@
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightHumidorCigarsRepository
+import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 class HumidorCigarsScreenViewModel(val humidor: Humidor) :
     BaseListViewModel<HumidorCigar, HumidorCigarsScreenViewModel.CigarsAction>() {
-    override val database: SqlDelightHumidorCigarsRepository =
-        SqlDelightHumidorCigarsRepository(humidor.rowid)
+    override val repository: CigarHumidorRepository = database.getRepository(RepositoryType.HumidorCigars, humidor.rowid)
 
     fun cigarSelected(cigar: Cigar) {
         sendEvent(CigarsAction.RouteToCigar(cigar))
@@ -25,11 +22,6 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) :
 
     fun addCigar() {
         sendEvent(CigarsAction.AddCigar())
-    }
-
-    @Composable
-    override fun asState(): State<List<HumidorCigar>> {
-        return database.observeAll().collectAsState(listOf())
     }
 
     sealed interface CigarsAction {

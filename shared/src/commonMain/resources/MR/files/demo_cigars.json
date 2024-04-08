@@ -1,142 +1,107 @@
 [
   {
-    "binder": "Honduras",
+    "rowid": 0,
+    "name": "#1 Fuente Fuente OpusX Reserva d’Chateau",
     "brand": "Fabrica de Tabacos Raices Cubanas S. de R.L.",
+    "country": "Dominican",
+    "date": 1703980800000,
     "cigar": "Churchill",
-    "country": "Honduras",
-    "favorites": "true",
-    "filler": "Honduras, Nicaragua",
+    "wrapper": "Dominican",
+    "binder": "Dominican",
+    "filler": "Dominican",
     "gauge": 48,
-    "images": [
-      {
-        "file": "cigar_01.png",
-        "type": 1
-      },
-      {
-        "file": "cigar_01_binder.png",
-        "type": 0
-      }
-    ],
-    "length": "7",
-    "link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/1",
-    "myrating": 4,
-    "name": "Alec Bradley Prensado Churchill",
-    "notes": "The Alec Bradley Prensado Churchill, made at the superb Raices Cubanas factory in Danlí, Honduras, is as gorgeous a cigar as you’ll ever see, with a picture-perfect head and a stunning wrapper. But it is the flavor that makes it a classic smoke. The Honduran and Nicaraguan tobaccos come together to create leather, chocolate and spice notes, and a long, lush finish. ",
-    "rating": 96,
-    "shopping": "false",
-    "strength": 4,
-    "wrapper": "Honduras"
-  },
-  {
-    "binder": "Nicaragua",
-    "brand": "My Father Cigars S.A.",
-    "cigar": "Belicoso",
-    "country": "Nicaragua",
-    "favorites": "false",
-    "filler": "Nicaragua",
-    "gauge": 54,
-    "images": [
-      {
-        "file": "cigar_02.png",
-        "type": 1
-      },
-      {
-        "file": "cigar_02_binder.png",
-        "type": 0
-      }
-    ],
-    "length": "5 1/2",
-    "link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/2",
-    "myrating": 3,
-    "name": "La Aroma de Cuba Mi Amor Belicoso",
-    "notes": "La Aroma de Cuba Mi Amor is rolled for Ashton in Nicaragua at My Father Cigars, the massive factory run by the talented Garcia family. Originally from Cuba, José Garcia, his son Jaime and daughter Janny now make millions of cigars at My Father, perhaps none finer than the La Aroma de Cuba Mi Amor Belicoso. They combine Nicaraguan tobacco they grow themselves—using two binder leaves, as is their custom—with this dark, Mexican wrapper, and the combination is sublime. The tidy Belicoso is a box-pressed smoke that burns beautifully and has a lovely woody component balanced by notes of sweet nougat and copious amounts of nuts on the palate. ",
-    "rating": 95,
-    "shopping": "false",
-    "strength": 2,
-    "wrapper": "Mexico"
-  },
-  {
-    "binder": "Nicaragua",
-    "brand": "Tabacalera Villa Cuba (Tavicusa)",
-    "cigar": "Torpedo",
-    "country": "Nicaragua",
-    "favorites": "false",
-    "filler": "Nicaragua",
-    "gauge": 52,
-    "images": [
-      {
-        "file": "cigar_03.png",
-        "type": 1
-      },
-      {
-        "file": "cigar_03_binder.png",
-        "type": 0
-      }
-    ],
-    "length": "6 1/8",
-    "link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/6",
-    "myrating": 2,
-    "name": "Rocky Patel Fifteenth Anniversary Torpedo",
-    "notes": "The Rocky Patel Fifteenth Anniversary Torpedo is dark and box-pressed, with superb construction. Its lush draw is laden with coffee bean, cocoa and earthy flavors that grow in power as the cigar is puffed. ",
-    "rating": 93,
-    "shopping": "false",
-    "strength": 2,
-    "wrapper": "Ecuador"
-  },
-  {
-    "binder": "Cuba",
-    "brand": "Habanos S.A.",
-    "cigar": "Pyramid",
-    "country": "Cuba",
-    "favorites": "false",
-    "filler": "Cuba",
-    "gauge": 52,
-    "images": [
-      {
-        "file": "cigar_04.png",
-        "type": 1
-      },
-      {
-        "file": "cigar_04_binder.png",
-        "type": 0
-      }
-    ],
-    "length": "6 1/8",
-    "link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/4",
+    "length": "7“",
+    "strength": "MediumToFull",
+    "rating": 97,
     "myrating": 1,
-    "name": "Partagás Serie P No. 2",
-    "notes": "Brimming with black pepper, coffee bean, leather and sweet cappuccino notes, the cigars are powerful and complex, loaded with bold Cuban flavors. This Partagás smoke shows true evolution: it has been transformed into something incredible, a perfect example of the level of top-quality smokes that are being made in Cuba today. ",
-    "rating": 94,
+    "notes": "“You’re not a cigarmaker. You just assemble tobaccos,” quipped a Parisian retailer in the 1980s. He was talking to Carlos “Carlito” Fuente Jr., now owner and patriarch of Arturo Fuente Cigar Co. Back then, the company was owned by his father and the Fuentes were producing cigars with tobacco from different origins. The snide remark stuck with the younger Fuente, and he knew the problem was wrapper. Dominican wrapper was nearly nonexistent, and this became the young Fuente’s obsession. \n\nIf that derisive comment was the prologue to the OpusX story, chapter one began in the early 1990s with the ambitions of Fuente Jr. and his plan to grow quality wrapper leaf in the Dominican Republic. Conventional wisdom dictated that Dominican soils were unsuitable for growing good cover leaf. And this was for the most part true. But Fuente was on a mission, and when he finally planted the right Corojo seeds in the right plot of land in 1991, the result was a unique wrapper with a gorgeous reddish hue, enviable elasticity, big aroma and even bigger flavor. What is now known as Chateau de la Fuente is a farm located in Bonao, where the soil differs from other growing regions in the Dominican Republic. It’s lighter and loamier with a higher clay content.\n\nFast forward to a chilly November evening in New York City in 1995. A line of people hoping to enter a Manhattan cigar shop extended all the way around the block. It was premiere night and cigar fans of all professional stripes waited in the cold for their chance to try an OpusX. On that night, a cult classic and cigar phenomenon was born. \n\nWhen OpusX was released, it was a strong cigar in a mostly mild market. Today, it has a lot more competition in the full-bodied segment, yet OpusX remains relevant—and coveted. It’s leathery and assertively spicy without being harsh. Every puff is inlaid with an opulent sweetness of baking spices, nutmeg and vanilla. The balance of power and elegance is astounding and precisely why it’s our Cigar of the Year. Because the ring gauge of the Reserva d’Chateau is somewhat slim, the wrapper plays a major role in the smoking experience. Ultimately, the story of OpusX was about a wrapper that was thought to be unfeasible. In the end, Fuente proved everyone wrong and created a stunning, all-Dominican cigar that’s much more than the sum of its parts.",
+    "link": "https://www.cigaraficionado.com/top25cigar/fuente-fuente-opusx-reserva-d-chateau-2023",
+    "favorites": "false",
     "shopping": "false",
-    "strength": 2,
-    "wrapper": "Cuba"
+    "count": 10
   },
   {
-    "binder": "Nicaragua",
-    "brand": "Tabacos Cubanica S.A.",
-    "cigar": "Corona gorda",
+    "rowid": 1,
+    "name": "#2 Padrón Serie 1926 No. 48 Maduro",
+    "brand": "Padrón Cigars Inc.",
     "country": "Nicaragua",
-    "favorites": "false",
+    "date":1703980800000,
+    "cigar": "Robusto",
+    "wrapper": "Nicaragua",
+    "binder": "Nicaragua",
     "filler": "Nicaragua",
-    "gauge": 50,
-    "images": [
-      {
-        "file": "cigar_05.png",
-        "type": 1
-      },
-      {
-        "file": "cigar_05_binder.png",
-        "type": 0
-      }
-    ],
-    "length": "5 1/2",
-    "link": "http://www.cigaraficionado.com/cigars/top25detail/year/2011/rank/5",
-    "myrating": 0,
-    "name": "Padrón 1964 Anniversary Series Exclusivo Maduro",
-    "notes": "The Exclusivo size is a bit thinner than the typical corona gorda, and longer than the typical robusto. The smokes are packed with Nicaraguan tobaccos from Jalapa, Condega and Estelí, all of it grown in the open sunlight. Then they are sharply pressed in a distinctive style.In maduro wrapper, the cigar is dark, with that trademark rich Padrón cocoa flavor. ",
-    "rating": 94,
+    "gauge": 60,
+    "length": "5 1/2“",
+    "strength": "Medium",
+    "rating": 96,
+    "myrating": 96,
+    "notes": "Say the word “Padrón” to most cigar smokers, and the response is usually universal. Their heads nod knowingly and their eyes light up. This predictable reaction is a testament to the company’s consistency year in and year out. Because all of Padrón’s tobaccos are grown in the open sunlight, they are bold and rich. Because the tobaccos are properly aged, they impart an elegance without being overpowering. Balance like this is uncommon and the reason why Padrón makes it to the Top 25 list every year. This cigar in particular celebrates two anniversaries. The brand came out in 2002 to celebrate founder José O. Padrón’s 75th birthday. In 2016, Padrón released the No. 48 size to celebrate the 48th anniversary of the Tobacconists’ Association of America. At first, the cigar was sold exclusively through TAA retailers. Today, it’s officially part of the Serie 1926 line. One might expect the thick 60 ring gauge to result in some dilution of the blend, but that didn’t happen. With its rich smoke of cocoa, almond, honey and cinnamon, the No. 48 is proof that Padrón could successfully scale up the blend and preserve all the desirable qualities that make the Serie 1926 so distinct.",
+    "link": "https://www.cigaraficionado.com/top25cigar/padron-serie-1926-no-48-maduro-2023",
+    "favorites": "false",
     "shopping": "false",
-    "strength": 2,
-    "wrapper": "Nicaragua"
+    "count": 10
+  },
+  {
+    "rowid": 2,
+    "name": "#3 Oliva Serie V Melanio Toro",
+    "brand": "Tabacalera Oliva S.A. (Tabolisa)",
+    "country": "Nicaragua",
+    "date":1703980800000,
+    "cigar": "Toro",
+    "wrapper": "Nicaragua",
+    "binder": "Nicaragua",
+    "filler": "Ecuador",
+    "gauge": 52,
+    "length": "6“",
+    "strength": "MediumToFull",
+    "rating": 96,
+    "myrating": 96,
+    "notes": "A considerably complex cigar from a company that appears to be improving each year. The Oliva Serie V Melanio Toro is emblematic of Oliva’s serious commitment to quality. After Oliva Cigar Co. was acquired by Vandermarliere Cigar Family in 2016 (then known as J. Cortés), Fred Vandermarliere vowed to maintain the tradition of excellence established by the Oliva family. It was no empty promise. The company recently opened a massive new facility in Nicaragua dedicated to the proper fermentation, aging and processing of tobacco. Oliva has also doubled its rolling capacity and expanded its agricultural operations. All this growth would mean nothing if the quality of the product suffered as a result—which it didn’t. In fact, just the opposite happened. Throughout the year, Oliva has turned in one high score after the next, but none quite as impressive as the Serie V Melanio Toro. With its Sumatra-seed wrapper grown in Ecuador and blend of Nicaraguan tobacco, the smoke brims with earth and spice, offering everything from cumin and cardamom to ground clove and allspice. An underlying thread of cedar brings balance and structure.",
+    "link": "https://www.cigaraficionado.com/top25cigar/oliva-serie-v-melanio-toro-2023",
+    "favorites": "false",
+    "shopping": "false",
+    "count": 10
+  },
+  {
+    "rowid": 3,
+    "name": "#4 Rocky Patel A.L.R. Second Edition Toro",
+    "brand": "Tabacalera Villa Cuba S.A. (Tavicusa)",
+    "country": "Nicaragua",
+    "date":1703980800000,
+    "cigar": "Toro",
+    "wrapper": "Mexico",
+    "binder": "Nicaragua",
+    "filler": "Nicaragua",
+    "gauge": 52,
+    "length": "6 1/2“",
+    "strength": "MediumToFull",
+    "rating": 96,
+    "myrating": 96,
+    "notes": "This isn’t the first time this exact cigar has been on our Top 25 list. It first appeared in 2019, but back then it was the No. 5. For 2023, it’s moved up a spot, showing us that Rocky Patel continues to improve quality and consistency at his Tavicusa factory in Nicaragua where this cigar is made. The “A.L.R.” in the brand name stands for “Aged, Limited and Rare.” According to Patel, he makes these cigars in very small amounts each year. He also says they’re all aged for two years after rolling. Some might think that this long step is unnecessary, but in the case of the A.L.R. Second Edition Toro, it’s the cigar’s defining factor. The cigar is made with a Mexican wrapper and Nicaraguan tobacco that Patel grew on his farms in Condega and Estelí. It seems that the extra age allowed the tobaccos to marry for an exceptionally harmonious smoke that fully saturates the palate in a luxurious fashion. Rich layers of nutmeg, German chocolate cake and shredded coconut become weightier and more sophisticated with each puff. If you missed this cigar in 2019, we suggest you try it now.",
+    "link": "https://www.cigaraficionado.com/top25cigar/rocky-patel-a-l-r-second-edition-toro-2023",
+    "favorites": "false",
+    "shopping": "false",
+    "count": 10
+  },
+  {
+    "rowid": 4,
+    "name": "#5 E.P. Carrillo Allegiance Confidant",
+    "brand": "Tabacalera Oliva S.A. (Tabolisa)",
+    "country": "Nicaragua",
+    "date":1703980800000,
+    "cigar": "Toro",
+    "wrapper": "Ecuador",
+    "binder": "Dominican",
+    "filler": "Dominican",
+    "gauge": 52,
+    "length": "6“",
+    "strength": "MediumToFull",
+    "rating": 95,
+    "myrating": 95,
+    "notes": "“Usually, cigar brand owners go to Ernesto Perez-Carrillo to make their cigars. If they’re lucky, he says yes. In this case, Perez-Carrillo went to Oliva Cigar Co. to make Allegiance, which is the fourth line in the Perez-Carrillo series—and the series has been nothing less than stellar. La Historia (which was Part I in the series) has made it to the Top 25 list on more than one occasion. Encore (Part II) was named Cigar of the Year in 2018. Pledge (Part III) was named Cigar of the Year in 2020. And now, Part IV has landed the No. 5 spot. The bands across the series are all the same pattern and design for continuity, but the colors are different in order to distinguish one blend from another. The green band of Allegiance is meant to symbolize nature and tobacco. Other than the Ecuador Sumatra wrapper, the tobacco in this cigar is all Nicaraguan. So, does this taste more like an Oliva cigar or an E.P. Carrillo cigar? We haven’t decided. What we do know is that it comes together brilliantly setting a sweet-and-spicy tone with a woody undercurrent, snappy bursts of gingerbread and charming accents of nutmeg and cinnamon before the peppery finish.",
+    "link": "https://www.cigaraficionado.com/top25cigar/e-p-carrillo-allegiance-confidant-2023",
+    "favorites": "false",
+    "shopping": "false",
+    "count": 10
   }
 ]
