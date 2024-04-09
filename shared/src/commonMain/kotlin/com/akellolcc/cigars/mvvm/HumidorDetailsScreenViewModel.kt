@@ -35,11 +35,11 @@ class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
 
     init {
         if (humidor.rowid >= 0) {
-            observeCigar()
+            observeHumidor()
         }
     }
 
-    private fun observeCigar() {
+    private fun observeHumidor() {
         imagesDatabase = database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
         humidorsDatabase = database.getRepository(RepositoryType.Humidors)
         observeHumidor = ObservableEntity(humidorsDatabase!!.observe(humidor.rowid))

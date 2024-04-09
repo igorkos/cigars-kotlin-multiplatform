@@ -20,7 +20,7 @@ interface Repository<ENTITY : BaseEntity> {
 
     fun observeAll(): Flow<List<ENTITY>>
 
-    fun add(entity: ENTITY)
+    fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)? = null)
 
     fun remove(entity: ENTITY): Boolean
 

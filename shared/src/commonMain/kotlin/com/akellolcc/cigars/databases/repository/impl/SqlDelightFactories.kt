@@ -12,7 +12,7 @@ import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 
-public fun historyFactory(
+fun historyFactory(
     rowid: Long,
     count: Long,
     date: Long,

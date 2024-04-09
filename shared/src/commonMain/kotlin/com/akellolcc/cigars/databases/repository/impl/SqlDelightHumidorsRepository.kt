@@ -33,13 +33,12 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseReposit
         return queries.allHumidors(::humidorFactory).asFlow().mapToList(Dispatchers.Main)
     }
 
-    override fun add(entity: Humidor) {
-        super.add(entity)
-        CoroutineScope(Dispatchers.Main).launch {
+    override fun add(entity: Humidor, callback: (suspend (Long) -> Unit)?) {
+        super.add(entity) {
             queries.addHistory(1,  Clock.System.now().toEpochMilliseconds(), 1, entity.price, 0, -1, entity.rowid)
         }
     }
-    override fun doUpsert(entity: Humidor) {
+    override suspend fun doUpsert(entity: Humidor) {
         CoroutineScope(Dispatchers.Main).launch {
             val id = queries.transactionWithResult {
                 queries.addHumidor(

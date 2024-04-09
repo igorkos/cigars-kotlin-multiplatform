@@ -45,11 +45,7 @@ expect fun imageData(name: String): ByteArray?
 
 class Images {
     companion object {
-        val splash_background = MR.images.humidor_image_bg
-        val splash_plate = MR.images.plate
 
-        val default_background = MR.images.wood_background
-        val default_background_borders = MR.images.wood_background_borders
         val default_cigar_image = MR.images.default_sigars
 
         val loading_spinner = MR.images.loading_spinner

@@ -41,7 +41,7 @@ open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) : BaseRepo
     fun observeHumidorCigars(): Flow<List<Cigar>> =
         queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
 
-    override fun doUpsert(entity: Cigar) {
+    override suspend fun doUpsert(entity: Cigar) {
         CoroutineScope(Dispatchers.Main).launch {
             val id = queries.transactionWithResult {
                 queries.addCigar(

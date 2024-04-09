@@ -4,7 +4,6 @@ import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.HistoryRepository
-import dev.icerock.moko.resources.desc.StringDesc
 
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {

@@ -12,7 +12,7 @@ abstract class BaseImagesViewScreenViewModel(val id: Long) :
     BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>() {
     fun addImage(image: SharedImage) {
         image.toByteArray()?.let {
-            repository.add(CigarImage(-1, bytes = it))
+            repository.add(CigarImage(-1, bytes = it), null)
         }
     }
 

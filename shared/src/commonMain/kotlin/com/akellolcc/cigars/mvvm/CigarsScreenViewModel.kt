@@ -6,7 +6,7 @@ import com.akellolcc.cigars.databases.repository.CigarsRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
-class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
+open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
     override val repository: CigarsRepository =  database.getRepository(RepositoryType.Cigars)
 
     fun cigarSelected(cigar: Cigar) {

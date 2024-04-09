@@ -22,7 +22,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -31,7 +30,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.mvvm.BaseListViewModel
@@ -40,26 +38,10 @@ import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.imagePainter
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 
 abstract class BaseTabListScree<A, E : BaseEntity>(override val route: NavRoute) : ITabItem {
-    override val options: TabOptions
-        @Composable
-        get() {
-            val title = route.title
-            val icon = imagePainter(route.icon)
-
-            return remember {
-                TabOptions(
-                    index = 0u,
-                    title = title,
-                    icon = icon
-                )
-            }
-        }
-
 
     abstract fun handleAction(event: A, navigator: Navigator?)
 
@@ -68,7 +50,7 @@ abstract class BaseTabListScree<A, E : BaseEntity>(override val route: NavRoute)
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator? = null) {
+    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
         CenterAlignedTopAppBar(
             navigationIcon = { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) },
             actions = { loadIcon(Images.icon_menu, Size(24.0F, 24.0F)) },

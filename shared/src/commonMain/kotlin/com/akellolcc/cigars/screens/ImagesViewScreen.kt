@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.akellolcc.cigars.camera.PermissionCallback
 import com.akellolcc.cigars.camera.PermissionStatus
 import com.akellolcc.cigars.camera.PermissionType
@@ -47,9 +46,7 @@ import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
-import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
-import com.akellolcc.cigars.theme.imagePainter
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.ui.px
@@ -63,36 +60,21 @@ import kotlin.math.roundToInt
 
 class ImagesViewScreen(override val route: NavRoute) : ITabItem {
 
-    override val options: TabOptions
-        @Composable
-        get() {
-            val title = Localize.title_cigars
-            val icon = imagePainter(Images.tab_icon_cigars)
-
-            return remember {
-                TabOptions(
-                    index = 0u,
-                    title = title,
-                    icon = icon
-                )
-            }
-        }
-
     @Transient
-    private var viewModel: BaseImagesViewScreenViewModel
+    private val viewModel: BaseImagesViewScreenViewModel
 
     init {
         val params = route.data as Pair<*,*>
         viewModel = if (params.first is Cigar) {
-            CigarImagesViewScreenViewModel((route.data as Pair<Cigar, Int>).first)
+            CigarImagesViewScreenViewModel((route.data as Pair<*, *>).first as Cigar)
         } else {
-            HumidorImagesViewScreenViewModel((route.data as Pair<Humidor, Int>).first)
+            HumidorImagesViewScreenViewModel((route.data as Pair<*, *>).first as Humidor)
         }
     }
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        var select by remember { mutableStateOf((route.data as Pair<Cigar, Int>).second) }
+        val select by remember { mutableStateOf((route.data as Pair<*, *>).second as Int) }
         var lastSelect by remember { mutableStateOf(select) }
         val coroutineScope = rememberCoroutineScope()
         var launchCamera by remember { mutableStateOf(value = false) }
@@ -203,7 +185,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                                 navigator.pop()
                             }) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowBack,
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = null
                                 )
                             }

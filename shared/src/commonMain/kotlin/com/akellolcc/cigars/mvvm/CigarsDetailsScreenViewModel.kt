@@ -182,7 +182,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                     type,
                     cigar.rowid,
                     entity.humidor!!.rowid
-                )
+                ),
+                null
             )
             humidorCigarsCount = null
         }

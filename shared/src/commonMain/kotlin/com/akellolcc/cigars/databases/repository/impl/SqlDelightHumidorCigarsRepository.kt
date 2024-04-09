@@ -31,7 +31,7 @@ class SqlDelightHumidorCigarsRepository(
         }
     }
 
-    override fun doUpsert(entity: HumidorCigar) {
+    override suspend fun doUpsert(entity: HumidorCigar) {
         TODO("Not yet implemented")
     }
 

@@ -109,20 +109,20 @@ fun LoginBackground(
     Box(
         modifier = with(Modifier) {
             fillMaxSize()
-                .paint(
-                    imagePainter(Images.splash_background),
-                    contentScale = ContentScale.FillBounds
-                )
+          //      .paint(
+         //           imagePainter(Images.splash_background),
+         //           contentScale = ContentScale.FillBounds
+          //      )
 
         }
     ) {
         Box(
             modifier = with(Modifier) {
                 fillMaxSize(0.7f)
-                    .paint(
-                        imagePainter(Images.splash_plate),
-                        contentScale = ContentScale.FillWidth
-                    )
+                 //   .paint(
+                //        imagePainter(Images.splash_plate),
+                 //       contentScale = ContentScale.FillWidth
+                 //   )
                     .align(alignment = Alignment.Center)
             }
         ) {

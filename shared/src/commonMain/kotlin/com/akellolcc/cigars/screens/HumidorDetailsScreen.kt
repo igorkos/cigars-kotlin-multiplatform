@@ -34,7 +34,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.components.DialogButton
 import com.akellolcc.cigars.components.PagedCarousel
@@ -52,26 +51,11 @@ import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.imagePainter
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
-    override val options: TabOptions
-        @Composable
-        get() {
-            val title = Localize.title_humidors
-            val icon = imagePainter(Images.tab_icon_humidors)
-
-            return remember {
-                TabOptions(
-                    index = 0u,
-                    title = title,
-                    icon = icon
-                )
-            }
-        }
 
     @Transient
     private val viewModel = HumidorDetailsScreenViewModel((route.data ?: emptyHumidor) as Humidor)

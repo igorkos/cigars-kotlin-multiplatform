@@ -3,8 +3,11 @@ package com.akellolcc.cigars.databases.repository.impl
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: CigarsDatabaseQueries) : Repository<ENTITY> {
 
@@ -28,9 +31,17 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return observeAll().first()
     }
 
-    override fun add(entity: ENTITY) {
+    override fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)?) {
         if (!contains(entity.rowid)) {
-            doUpsert(entity)
+            CoroutineScope(Dispatchers.Main).launch {
+                queries.transactionWithResult {
+                    doUpsert(entity)
+                    callback?.let {
+                        val id = queries.lastInsertRowId().executeAsOne()
+                        it(id)
+                    }
+                }
+            }
         } else {
             error("Can't insert entity: $entity which already exist in the database.")
         }
@@ -48,16 +59,22 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
 
     override fun update(entity: ENTITY) {
         if (contains(entity.rowid)) {
-            doUpsert(entity)
+            CoroutineScope(Dispatchers.Main).launch {
+                doUpsert(entity)
+            }
         } else {
             // TODO: Throw custom repository exception
             error("Can't update entity: $entity which doesn't exist in the database.")
         }
     }
 
-    override fun addOrUpdate(entity: ENTITY) = doUpsert(entity)
+    override fun addOrUpdate(entity: ENTITY) {
+        CoroutineScope(Dispatchers.Main).launch {
+            doUpsert(entity)
+        }
+    }
 
-    protected open fun doUpsert(entity: ENTITY) {}
+    protected open suspend fun doUpsert(entity: ENTITY) {}
 
     protected abstract fun doDelete(id: Long)
 
