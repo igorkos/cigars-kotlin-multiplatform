@@ -74,6 +74,7 @@ fun cigarFactory(
     count: Long,
     shopping: Boolean,
     favorites: Boolean,
+    price: Double?,
 ): Cigar {
     return Cigar(
         rowid,
@@ -94,7 +95,8 @@ fun cigarFactory(
         link,
         count,
         shopping,
-        favorites
+        favorites,
+        price
     )
 }
 

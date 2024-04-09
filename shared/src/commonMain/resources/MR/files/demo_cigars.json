@@ -18,7 +18,8 @@
     "link": "https://www.cigaraficionado.com/top25cigar/fuente-fuente-opusx-reserva-d-chateau-2023",
     "favorites": "false",
     "shopping": "false",
-    "count": 10
+    "count": 10,
+    "price": 19.15
   },
   {
     "rowid": 1,
@@ -39,7 +40,8 @@
     "link": "https://www.cigaraficionado.com/top25cigar/padron-serie-1926-no-48-maduro-2023",
     "favorites": "false",
     "shopping": "false",
-    "count": 10
+    "count": 10,
+    "price": 24.90
   },
   {
     "rowid": 2,
@@ -60,7 +62,8 @@
     "link": "https://www.cigaraficionado.com/top25cigar/oliva-serie-v-melanio-toro-2023",
     "favorites": "false",
     "shopping": "false",
-    "count": 10
+    "count": 10,
+    "price": 15.75
   },
   {
     "rowid": 3,
@@ -81,7 +84,8 @@
     "link": "https://www.cigaraficionado.com/top25cigar/rocky-patel-a-l-r-second-edition-toro-2023",
     "favorites": "false",
     "shopping": "false",
-    "count": 10
+    "count": 10,
+    "price": 16.25
   },
   {
     "rowid": 4,
@@ -102,6 +106,7 @@
     "link": "https://www.cigaraficionado.com/top25cigar/e-p-carrillo-allegiance-confidant-2023",
     "favorites": "false",
     "shopping": "false",
-    "count": 10
+    "count": 10,
+    "price": 13.10
   }
 ]

@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class SqlDelightCigarHistoryRepository(
+class SqlDelightHumidorHistoryRepository(
     id: Long,
     queries: CigarsDatabaseQueries
-) : SqlDelightHistoryRepository(id, queries){
+) : SqlDelightHistoryRepository(id, queries) {
 
     override fun observeAll(): Flow<List<History>> {
-        return queries.cigarHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
+        return queries.humidorHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
     }
 }

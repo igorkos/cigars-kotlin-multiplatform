@@ -19,7 +19,8 @@ CREATE TABLE CigarsTable (
     link TEXT,
     count INTEGER NOT NULL,
     shopping INTEGER AS Boolean NOT NULL,
-    favorites INTEGER AS Boolean  NOT NULL
+    favorites INTEGER AS Boolean  NOT NULL,
+    price REAL
 );
 
 CREATE TABLE HumidorsTable (
@@ -78,6 +79,9 @@ SELECT * FROM CigarsTable;
 
 cigar:
 SELECT * FROM CigarsTable WHERE rowid = ?;
+
+cigarName:
+SELECT CigarsTable.name FROM CigarsTable WHERE rowid = :id;
 
 addCigar:
 INSERT OR REPLACE INTO CigarsTable (rowid, name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites)
@@ -139,7 +143,7 @@ humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
 
 humidorHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor;
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor ORDER BY date DESC;
 
 humidorImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;

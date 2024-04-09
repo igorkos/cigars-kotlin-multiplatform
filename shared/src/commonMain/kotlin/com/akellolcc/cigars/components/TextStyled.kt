@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,7 +20,9 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
+import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.theme.textStyle
 
 
@@ -73,6 +76,7 @@ public fun TextStyled(
             LazyColumn(
                 modifier = modifier
                     .height(textHeight)
+                    //.background(materialColor(MaterialColors.color_error))
                     .onSizeChanged {
                         //Log.debug("Text size for '$text' -> $it maxHeight $maxHeight")
                         textWith = it.width

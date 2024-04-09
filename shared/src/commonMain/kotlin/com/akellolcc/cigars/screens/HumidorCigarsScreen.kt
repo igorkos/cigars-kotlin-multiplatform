@@ -30,6 +30,7 @@ import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.HumidorDetailsRoute
+import com.akellolcc.cigars.navigation.HumidorHistoryRoute
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
@@ -79,6 +80,17 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                         })
                 )
             }
+
+            is HumidorCigarsScreenViewModel.CigarsAction.OpenHistory -> {
+                mainModel.isTabsVisible = false
+                navigator?.push(
+                    HumidorHistoryScreen(HumidorHistoryRoute
+                        .apply {
+                            this.data = viewModel.humidor
+                            sharedViewModel = mainModel
+                        })
+                )
+            }
         }
     }
 
@@ -114,6 +126,9 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                 }
             },
             actions = {
+                IconButton(onClick = { viewModel.openHistory() }) {
+                    loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
+                }
                 IconButton(onClick = { viewModel.humidorDetails() }) {
                     loadIcon(Images.icon_menu_info, Size(24.0F, 24.0F))
                 }

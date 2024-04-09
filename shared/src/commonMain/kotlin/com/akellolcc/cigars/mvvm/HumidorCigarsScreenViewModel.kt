@@ -23,11 +23,15 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) :
     fun addCigar() {
         sendEvent(CigarsAction.AddCigar())
     }
+    fun openHistory() {
+        sendEvent(CigarsAction.OpenHistory(1))
+    }
 
     sealed interface CigarsAction {
         data class RouteToHumidorDetails(val humidor: Humidor) : CigarsAction
         data class RouteToCigar(val cigar: Cigar) : CigarsAction
         data class AddCigar(val cigar: Cigar? = null) : CigarsAction
+        data class OpenHistory(val dummy: Int) : CigarsAction
         data class ShowError(val error: StringDesc) : CigarsAction
     }
 }

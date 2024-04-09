@@ -4,17 +4,22 @@ import com.akellolcc.cigars.databases.CigarsDatabase
 import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
+import com.akellolcc.cigars.databases.extensions.History
+import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
+import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
 import com.akellolcc.cigars.theme.readTextFile
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
+import kotlin.math.absoluteValue
 
 class SqlDelightDatabase : DatabaseInterface {
     private val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver())
@@ -28,7 +33,7 @@ class SqlDelightDatabase : DatabaseInterface {
             RepositoryType.CigarHumidors -> SqlDelightCigarHumidorsRepository(args as Long, database.cigarsDatabaseQueries) as R
             RepositoryType.HumidorCigars -> SqlDelightHumidorCigarsRepository(args as Long, database.cigarsDatabaseQueries) as R
             RepositoryType.CigarHistory -> SqlDelightCigarHistoryRepository(args as Long, database.cigarsDatabaseQueries) as R
-            RepositoryType.HumidorHistory -> TODO()
+            RepositoryType.HumidorHistory -> SqlDelightHumidorHistoryRepository(args as Long, database.cigarsDatabaseQueries) as R
         }
     }
 
@@ -44,8 +49,21 @@ class SqlDelightDatabase : DatabaseInterface {
                     val cigars = Json.decodeFromString<List<Cigar>>(cjson)
                     for (cigar in cigars) {
                         cigarsDatabase.add(cigar)
-                        val hcDatabase: CigarHumidorRepository = getRepository(RepositoryType.CigarHumidors)
+                        val hcDatabase: CigarHumidorRepository = getRepository(RepositoryType.CigarHumidors, cigar.rowid)
                         hcDatabase.add(humidor, 10)
+                        val hisDatabase: HistoryRepository = getRepository(RepositoryType.CigarHistory, cigar.rowid)
+                        hisDatabase.add(
+                            History(
+                            -1,
+                                cigar.count,
+                                Clock.System.now().toEpochMilliseconds(),
+                                cigar.count,
+                                cigar.price,
+                                HistoryType.Addition,
+                                cigar.rowid,
+                                humidor.rowid
+                        )
+                        )
                     }
                     readTextFile(AssetFiles.demo_cigars_images)?.let { json ->
                         val images = Json.decodeFromString<List<CigarImage>>(json)

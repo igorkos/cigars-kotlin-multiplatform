@@ -40,6 +40,12 @@ val HumidorDetailsRoute = NavRoute(
     Images.tab_icon_humidors,
     isTabsVisible = false
 )
+val HumidorHistoryRoute = NavRoute(
+    "humidor_history_screen",
+    Localize.title_humidors,
+    Images.tab_icon_humidors,
+    isTabsVisible = false
+)
 val ImagesViewRoute =
     NavRoute("photos_screen", Localize.title_cigars, Images.tab_icon_cigars, isTabsVisible = false)
 val HumidorsRoute = NavRoute("humidors_screen", Localize.title_humidors, Images.tab_icon_humidors)

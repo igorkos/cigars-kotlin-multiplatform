@@ -127,7 +127,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             link = link,
             count = count,
             shopping = cigar.shopping,
-            favorites = favorites
+            favorites = favorites,
+            price = cigar.price,
         )
         cigarsDatabase?.update(updated)
         editing = false

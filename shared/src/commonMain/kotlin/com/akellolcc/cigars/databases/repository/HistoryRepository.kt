@@ -9,4 +9,6 @@ interface HistoryRepository : Repository<History> {
     suspend fun humidor(id: Long): Humidor?
 
     fun humidorName(id: Long): String
+
+    fun cigarName(id: Long): String
 }

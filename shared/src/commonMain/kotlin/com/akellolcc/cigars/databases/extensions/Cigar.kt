@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 
 var emptyCigar =
-    Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", 0, false, false)
+    Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", 0, false, false, 0.0)
 @Serializable
 data class Cigar(
     override var rowid: Long,
@@ -27,7 +27,8 @@ data class Cigar(
     var link: String?,
     var count: Long,
     var shopping: Boolean,
-    var favorites: Boolean
+    var favorites: Boolean,
+    var price: Double?
 ) : BaseEntity() {
 
     constructor(cigar: CigarsTable) : this(
@@ -49,7 +50,8 @@ data class Cigar(
         cigar.link,
         cigar.count,
         cigar.shopping,
-        cigar.favorites
+        cigar.favorites,
+        cigar.price
     )
 }
 

@@ -116,4 +116,8 @@ object Localize {
         return Strings.history_transaction_price.createLocalizedString(v).toString()
     }
 
+    fun history_humidor_added(v: HistoryType): String {
+        return Strings.history_humidor_added.createLocalizedString(v.toString()).toString()
+    }
+
 }
