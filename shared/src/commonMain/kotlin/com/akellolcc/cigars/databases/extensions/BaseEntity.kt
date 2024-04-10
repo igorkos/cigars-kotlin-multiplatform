@@ -1,17 +1,13 @@
 package com.akellolcc.cigars.databases.extensions
 
+import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.ui.randomString
 import kotlinx.serialization.Serializable
-
+@Stable
 @Serializable
 abstract class BaseEntity {
     abstract var rowid: Long
-    val key: String get() = rowid.toString() + randomString()
-
-    val isStored: Boolean
-        get() {
-            return rowid >= 0
-        }
+    val key: String = randomString()
 
     override fun hashCode(): Int = rowid.hashCode()
 
@@ -21,8 +17,6 @@ abstract class BaseEntity {
 
         other as BaseEntity
 
-        if (rowid != other.rowid) return false
-
-        return true
+        return key == other.key
     }
 }

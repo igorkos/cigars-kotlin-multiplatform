@@ -1,7 +1,8 @@
 package com.akellolcc.cigars.databases.extensions
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-
+@Stable
 @Serializable
 class CigarImage(
     override var rowid: Long,
@@ -11,33 +12,4 @@ class CigarImage(
     val type: Long? = null,
     val cigarId: Long? = null,
     val humidorId: Long? = null
-) : BaseEntity() {
-
-
-    /*constructor(dbID: Long) : super() {
-        load(dbID)
-    }
-
-    constructor(image: ImagesTable) : super() {
-        load(image.rowid)
-    }
-
-    constructor( data: ByteArray,
-                 type: Long,
-                 image: String? = null,
-                 notes: String? = null
-    ) : super() {
-        runDbQuery {
-            val imageID = this.dbQuery.transactionWithResult {
-                dbQuery.addImage(data, type, image, notes)
-                dbQuery.lastInsertRowId().executeAsOne()
-            }
-            load(imageID)
-            return@runDbQuery this
-        }
-    }
-
-    override fun query(id: Long): Flow<ImagesTable> {
-        return this.dbQuery.image(id).asFlow().mapToOne(Dispatchers.Default)
-    }*/
-}
+) : BaseEntity()

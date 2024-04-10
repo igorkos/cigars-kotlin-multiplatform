@@ -15,13 +15,15 @@ actual class NavRoute : Serializable {
         title: String,
         icon: ImageResource,
         data: Any?,
-        isTabsVisible: Boolean
+        isTabsVisible: Boolean,
+        isDrawerVisible: Boolean
     ) {
         this.route = route
         this.title = title
         this.icon = icon
         this.data = data
         this.isTabsVisible = isTabsVisible
+        this.isDrawerVisible = isDrawerVisible
     }
 
     actual val route: String
@@ -35,7 +37,7 @@ actual class NavRoute : Serializable {
     @Transient
     actual var data: Any? = null
     actual var isTabsVisible: Boolean = true
-
+    actual var isDrawerVisible: Boolean = false
     @kotlin.jvm.Transient
     @Transient
     actual var sharedViewModel: MainScreenViewModel? = null

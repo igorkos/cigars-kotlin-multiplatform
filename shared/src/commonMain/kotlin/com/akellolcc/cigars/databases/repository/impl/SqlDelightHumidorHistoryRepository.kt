@@ -13,7 +13,7 @@ class SqlDelightHumidorHistoryRepository(
     queries: CigarsDatabaseQueries
 ) : SqlDelightHistoryRepository(id, queries) {
 
-    override fun observeAll(): Flow<List<History>> {
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<History>> {
         return queries.humidorHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
     }
 }

@@ -19,7 +19,7 @@ class SqlDelightCigarHumidorsRepository(
     fun allSync(): List<HumidorCigar> =
         queries.cigarHumidors(cigarId, ::humidorCigarFactory).executeAsList()
 
-    override fun observeAll(): Flow<List<HumidorCigar>> {
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<HumidorCigar>> {
         return queries.cigarHumidors(cigarId, ::humidorCigarFactory).asFlow()
             .mapToList(Dispatchers.Main)
     }

@@ -13,7 +13,15 @@ class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActio
             sendEvent(MainScreenActions.TabsVisibility(value))
         }
 
+    var isDrawerVisible: Boolean = false
+        set(value) {
+            field = value
+            Log.debug("Setting drawer visible $value")
+            sendEvent(MainScreenActions.OpenDrawer(value))
+        }
+
     sealed interface MainScreenActions {
+        data class OpenDrawer(val isVisible: Boolean = false) : MainScreenActions
         data class TabsVisibility(val isVisible: Boolean) : MainScreenActions
         data class ShowError(val error: StringDesc) : MainScreenActions
     }

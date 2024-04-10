@@ -8,9 +8,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -19,38 +24,52 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorsViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.HumidorCigarsRoute
+import com.akellolcc.cigars.navigation.HumidorDetailsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
+import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
+import kotlin.jvm.Transient
 
 class HumidorsScreen(override val route: NavRoute) : ITabItem {
+    private val screen = HumidorsListScreen(route)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current
-        navigator?.push(HumidorsListScreen(route))
-        //Navigator(HumidorsListScreen(route.updateTabState))
+        Navigator(screen)
     }
 }
 
 class HumidorsListScreen(route: NavRoute) :
-    BaseTabListScree<HumidorsViewModel.Action, Humidor>(route) {
+    BaseTabListScreen<HumidorsViewModel.Action, Humidor>(route) {
 
+    @Transient
     override val viewModel = HumidorsViewModel()
 
+    @ExperimentalMaterial3Api
     @Composable
-    override fun EntityListRow(entity: Humidor) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
+        CenterAlignedTopAppBar(
+            navigationIcon = { IconButton(onClick = { route.sharedViewModel?.isDrawerVisible = true }) {loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F))} },
+            actions = { IconButton(onClick = { viewModel.addHumidor() }) {
+                loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
+            }},
+            title = { TextStyled(text = route.title, style = TextStyles.ScreenTitle) },
+            scrollBehavior = scrollBehavior
+        )
+    }
+
+    @Composable
+    override fun EntityListRow(entity: Humidor, modifier: Modifier) {
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = materialColor(MaterialColors.color_primaryContainer),
             ),
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .clickable(onClick = {
-                    viewModel.humidorSelected(entity)
-                })
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -98,6 +117,15 @@ class HumidorsListScreen(route: NavRoute) :
             }
 
             is HumidorsViewModel.Action.ShowError -> TODO()
+            is HumidorsViewModel.Action.AddHumidor -> {
+                mainModel.isTabsVisible = false
+                navigator?.push(HumidorDetailsScreen(
+                    HumidorDetailsRoute
+                    .apply {
+                        this.data = null
+                        sharedViewModel = mainModel
+                    }))
+            }
         }
     }
 

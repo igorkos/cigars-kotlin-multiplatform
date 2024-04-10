@@ -11,9 +11,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 class HumidorCigarsScreenViewModel(val humidor: Humidor) :
     BaseListViewModel<HumidorCigar, HumidorCigarsScreenViewModel.CigarsAction>() {
     override val repository: CigarHumidorRepository = database.getRepository(RepositoryType.HumidorCigars, humidor.rowid)
-
-    fun cigarSelected(cigar: Cigar) {
-        sendEvent(CigarsAction.RouteToCigar(cigar))
+    override fun entitySelected(entity: HumidorCigar) {
+        sendEvent(CigarsAction.RouteToCigar(entity.cigar!!))
     }
 
     fun humidorDetails() {

@@ -14,7 +14,8 @@ actual class NavRoute {
         title: String,
         icon: ImageResource,
         data: Any?,
-        isTabsVisible: Boolean
+        isTabsVisible: Boolean,
+        isDrawerVisible: Boolean
     ) {
         this.route = route
         this.title = title
@@ -35,5 +36,6 @@ actual class NavRoute {
 
     @Transient
     actual var sharedViewModel: MainScreenViewModel? = null
+    actual var isDrawerVisible: Boolean = false
 
 }

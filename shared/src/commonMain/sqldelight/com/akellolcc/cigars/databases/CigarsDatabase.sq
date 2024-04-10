@@ -74,8 +74,36 @@ CREATE TABLE ImagesTable (
   );
 
 
-allCigars:
-SELECT * FROM CigarsTable;
+allCigarsAsc:
+    SELECT * FROM CigarsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC;
+
+allCigarsDesc:
+    SELECT * FROM CigarsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC;
+
 
 cigar:
 SELECT * FROM CigarsTable WHERE rowid = ?;

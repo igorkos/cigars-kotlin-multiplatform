@@ -1,9 +1,10 @@
 package com.akellolcc.cigars.databases.extensions
 
+import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.databases.HistoryTable
 import com.akellolcc.cigars.theme.Localize
 import kotlinx.serialization.Serializable
-
+@Stable
 @Serializable
 class History(
     override var rowid: Long,

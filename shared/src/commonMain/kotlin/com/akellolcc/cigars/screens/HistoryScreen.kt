@@ -35,7 +35,7 @@ import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.ui.formatDate
 
 abstract class HistoryScreen(override val route: NavRoute) :
-    BaseTabListScree<HistoryScreenViewModel.CigarsAction, History>(route) {
+    BaseTabListScreen<HistoryScreenViewModel.CigarsAction, History>(route) {
 
     override lateinit var viewModel: HistoryScreenViewModel
     override fun handleAction(
@@ -72,7 +72,7 @@ abstract class HistoryScreen(override val route: NavRoute) :
     }
 
     @Composable
-    override fun EntityListRow(entity: History) {
+    override fun EntityListRow(entity: History, modifier: Modifier) {
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = materialColor(MaterialColors.color_primaryContainer),

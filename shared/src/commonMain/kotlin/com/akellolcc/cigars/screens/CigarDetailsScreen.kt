@@ -32,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.components.DefaultButton
@@ -64,8 +66,10 @@ import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
+import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarHistoryRoute
+import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.HumidorCigarsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.ImagesViewRoute
@@ -83,138 +87,30 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     @Transient
     private val viewModel = CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar)
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
-        val mainModel = route.sharedViewModel as MainScreenViewModel
-        Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
+       // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
         viewModel.observeEvents {
-            when (it) {
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> viewModel.humidorCigarsCount =
-                    it.humidor
-
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHumidor -> navigator.push(
-                    HumidorCigarsScreen(
-                        HumidorCigarsRoute.apply {
-                            this.data = it.humidor
-                            this.sharedViewModel = mainModel
-                        })
-                )
-
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.RateCigar -> TODO()
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction -> navigator.pop()
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHistory -> navigator.push(
-                    CigarHistoryScreen(
-                        CigarHistoryRoute.apply {
-                            this.data = it.cigar
-                            this.sharedViewModel = mainModel
-                        })
-                )
-
-                is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> TODO()
-            }
+            handleAction(it, navigator)
         }
-
-        val topColors = centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
 
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        colors = topColors,
-                        navigationIcon = {
-                            if (!viewModel.editing) {
-                                IconButton(onClick = {
-                                    viewModel.sendEvent(
-                                        CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction(
-                                            0
-                                        )
-                                    )
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null
-                                    )
-                                }
-                            }
-                        },
-                        actions = {
-                            if (!viewModel.editing) {
-                                IconButton(onClick = { viewModel.historyOpen() }) {
-                                    loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
-                                }
-                                IconButton(onClick = { viewModel.editing = !viewModel.editing }) {
-                                    loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
-                                }
-                            }
-                        },
-                        title = {})
-                },
-                bottomBar = {
-                    if (viewModel.editing) {
-                        BottomAppBar(
-                            actions = {
-                                Box(modifier = Modifier.weight(1f))
-                                DefaultButton(
-                                    title = Localize.button_cancel,
-                                    modifier = Modifier.padding(end = 10.dp).weight(2f),
-                                    onClick = { viewModel.cancelEdit() })
-                                DefaultButton(
-                                    modifier = Modifier.weight(2f),
-                                    enabled = viewModel.verifyFields(),
-                                    title = Localize.button_save,
-                                    onClick = { viewModel.saveEdit() })
-                            }
-                        )
-                    }
-                }
+                topBar = { topTabBar() },
+                bottomBar = { bottomTabBar() }
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
                 )
                 {
-                    HumidorCigarsDialog {
-                        viewModel.cancelEdit()
-                    }
-                    if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
-                        InfoImageDialog(when(viewModel.infoDialog){
-                            CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Images.cigar_sizes_info
-                            CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
-                            CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
-                            else -> TODO()
-                        }) {
-                            viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
-                        }
-                    }
+                    dialogs()
                     Column(
                         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
                     ) {
                         //Top Images view
-                        if (!viewModel.editing) {
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.padding(bottom = 10.dp)
-                                    .aspectRatio(ratio = 1.8f)
-                            ) {
-                                PagedCarousel(
-                                    viewModel.images,
-                                    loading = viewModel.loading,
-                                ) {
-                                    val data = route.data as Cigar
-                                    navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
-                                        this.data = Pair(data, it)
-                                    }))
-                                }
-                            }
-                        }
+                        imagesView()
                         //Cigar details
                         Column(modifier = with(Modifier) {
                             fillMaxSize()
@@ -227,300 +123,457 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     )
                                 )
                         }) {
-                            //Cigar Name,  Company and Country
-                            Column {
-                                TextStyled(
-                                    viewModel.name,
-                                    TextStyles.Headline,
-                                    label = if (viewModel.editing) Localize.cigar_details_name else null,
-                                    editable = viewModel.editing,
-                                    maxLines = 2,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                    keepHeight = false,
-                                    onValueChange = {
-                                        viewModel.name = it
-                                    }
-                                )
-                                TextStyled(
-                                    viewModel.brand,
-                                    TextStyles.Subhead,
-                                    label = if (viewModel.editing) Localize.cigar_details_company else null,
-                                    editable = viewModel.editing,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                    onValueChange = {
-                                        viewModel.brand = it
-                                    }
-                                )
-                                TextStyled(
-                                    viewModel.country,
-                                    TextStyles.Subhead,
-                                    label = if (viewModel.editing) Localize.cigar_details_country else null,
-                                    editable = viewModel.editing,
-                                    onValueChange = {
-                                        viewModel.country = it
-                                    })
-                            }
+                            cigarOrigin()
                             //Cigar Shape Length and Gauge
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
-                            ) {
-                                ValuesCard(
-                                    label = Localize.cigar_details_cigars,
-                                    vertical = viewModel.editing,
-                                    actionIcon = Images.icon_menu_info,
-                                    onAction = {
-                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarSize)
-                                    }
-                                ) {
-                                    if (!viewModel.editing) {
-                                        ValueCard(Localize.cigar_details_shape, viewModel.shape)
-                                        ValueCard(
-                                            Localize.cigar_details_length,
-                                            viewModel.length
-                                        )
-                                        ValueCard(
-                                            Localize.cigar_details_gauge,
-                                            viewModel.gauge.toString()
-                                        )
-                                    } else {
-                                        ValuePicker(
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            value = viewModel.shape,
-                                            label = Localize.cigar_details_shape,
-                                            items = CigarShapes.enumValues(),
-                                            onClick = {
-                                                viewModel.shape = it.second
-                                            }
-                                        )
-                                        TextStyled(
-                                            viewModel.length,
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            label = Localize.cigar_details_length,
-                                            editable = viewModel.editing,
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            onValueChange = {
-                                                viewModel.length = it
-                                            }
-                                        )
-                                        TextStyled(
-                                            if (viewModel.gauge == 0L) "" else viewModel.gauge.toString(),
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            label = Localize.cigar_details_gauge,
-                                            editable = viewModel.editing,
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            onValueChange = {
-                                                viewModel.gauge =
-                                                    if (it.isNotBlank()) it.toLong() else 0
-                                            },
-                                            inputMode = KeyboardType.Number
-                                        )
-                                    }
-                                }
-                            }
+                            cigarSize()
                             //Cigar tobacco
-                            Column {
-                                ValuesCard(
-                                    label = Localize.cigar_details_tobacco,
-                                    vertical = true,
-                                    actionIcon = Images.icon_menu_info,
-                                    onAction = {
-                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarTobacco)
-                                    }
-                                ) {
-                                    TextStyled(
-                                        viewModel.wrapper,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        label = Localize.cigar_details_wrapper,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.wrapper = it
-                                        }
-                                    )
-                                    TextStyled(
-                                        viewModel.binder,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        label = Localize.cigar_details_binder,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.binder = it
-                                        }
-                                    )
-                                    TextStyled(
-                                        viewModel.filler,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        label = Localize.cigar_details_filler,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.filler = it
-                                        }
-                                    )
-                                    if (!viewModel.editing) {
-                                        TextStyled(
-                                            CigarStrength.localized(viewModel.strength),
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            label = Localize.cigar_details_strength,
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                        )
-                                    } else {
-                                        ValuePicker(
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            value = CigarStrength.localized(viewModel.strength),
-                                            label = Localize.cigar_details_strength,
-                                            items = CigarStrength.enumValues(),
-                                            onClick = {
-                                                viewModel.strength = it.first
-                                            }
-                                        )
-                                    }
-                                }
-                            }
+                            cigarTobacco()
                             //Cigar ratings
-                            Column(horizontalAlignment = Alignment.Start) {
-                                ValuesCard(
-                                    label = Localize.cigar_details_ratings,
-                                    vertical = viewModel.editing,
-                                    actionIcon = Images.icon_menu_info,
-                                    onAction = {
-                                        viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarRatings)
-                                    }
-                                ) {
-                                    if (!viewModel.editing) {
-                                        ValueCard(
-                                            Localize.cigar_details_rating,
-                                            "${viewModel.rating}"
-                                        )
-                                        ValueCard(
-                                            Localize.cigar_details_myrating,
-                                            "${viewModel.myrating}"
-                                        ) {
-                                            viewModel.rate()
-                                        }
-                                        IconButton(onClick = {
-                                            viewModel.favorite()
-                                        }) {
-                                            val icon =
-                                                if (viewModel.favorites) Images.icon_star_filled else Images.icon_star_empty
-                                            loadIcon(icon, Size(64.0F, 64.0F))
-                                        }
-                                    } else {
-                                        TextStyled(
-                                            if (viewModel.rating == 0L) "" else viewModel.rating.toString(),
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            label = Localize.cigar_details_rating,
-                                            editable = viewModel.editing,
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            onValueChange = {
-                                                viewModel.rating =
-                                                    if (it.isNotBlank()) it.toLong() else 0
-                                            },
-                                            inputMode = KeyboardType.Number
-                                        )
-                                        TextStyled(
-                                            if (viewModel.myrating == 0L) "" else viewModel.myrating.toString(),
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            label = Localize.cigar_details_myrating,
-                                            editable = viewModel.editing,
-                                            modifier = Modifier.padding(bottom = 10.dp),
-                                            onValueChange = {
-                                                viewModel.myrating =
-                                                    if (it.isNotBlank()) it.toLong() else 0
-                                            },
-                                            inputMode = KeyboardType.Number
-                                        )
-                                    }
-                                }
-                            }
+                            cigarRatings()
                             //Cigar humidors
-                            if (!viewModel.editing) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(((viewModel.humidors.count() + 2) * 48).dp)
-                                ) {
-                                    ValuesCard(
-                                        label = Localize.cigar_details_humidors,
-                                        vertical = true,
-                                        actionIcon = if(viewModel.humidors.size > 1) Images.icon_tab else null,
-                                        onAction = {
-                                            viewModel.moveCigar()
-                                        }
-                                    ) {
-                                        LazyColumn(
-                                            verticalArrangement = Arrangement.Top,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                        )
-                                        {
-                                            item {
-                                                TextStyled(
-                                                    Localize.cigar_details_total(viewModel.count),
-                                                    TextStyles.Subhead,
-                                                    modifier = Modifier.padding(bottom = 10.dp),
-                                                )
-                                            }
-                                            items(viewModel.humidors, key = { item -> item.key }) {
-                                                HumidorListRow(it, viewModel)
-                                                Spacer(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .height(4.dp)
-                                                        .background(Color.Transparent)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            cigarHumidors()
                             //Cigar Notes and Link
-                            Column(
-                                modifier = Modifier
-                                    .padding(bottom = 10.dp, top = 10.dp)
-                                    .onSizeChanged {
-                                        notesHeight = it.height
-                                    }
-                            ) {
-                                TextStyled(
-                                    viewModel.notes,
-                                    TextStyles.Subhead,
-                                    //label = "Notes",
-                                    editable = viewModel.editing,
-                                    onValueChange = {
-                                        viewModel.notes = it
-                                    }
-                                )
-                            }
-                            Column(
-                                modifier = Modifier.padding(bottom = 10.dp)
-                            ) {
-                                TextStyled(
-                                    viewModel.link,
-                                    TextStyles.Subhead,
-                                    label = Localize.cigar_details_link,
-                                    labelStyle = TextStyles.Subhead,
-                                    editable = viewModel.editing,
-                                    maxLines = 1,
-                                    onValueChange = {
-                                        viewModel.link = it
-                                    }
-                                )
-                            }
+                            cigarNotes()
                         }
-
                     }
                 }
             }
+        }
+    }
+    private fun handleAction(event: CigarsDetailsScreenViewModel.CigarsDetailsAction, navigator: Navigator) {
+        val mainModel = route.sharedViewModel as MainScreenViewModel
+        when (event) {
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> viewModel.humidorCigarsCount =
+                event.humidor
+
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHumidor -> navigator.push(
+                HumidorCigarsScreen(
+                    HumidorCigarsRoute.apply {
+                        this.data = event.humidor
+                        this.sharedViewModel = mainModel
+                    })
+            )
+
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.RateCigar -> TODO()
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction -> navigator.pop()
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHistory -> navigator.push(
+                CigarHistoryScreen(
+                    CigarHistoryRoute.apply {
+                        this.data = event.cigar
+                        this.sharedViewModel = mainModel
+                    })
+            )
+
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> TODO()
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowImages -> {
+                val data = route.data as Cigar
+                navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
+                    this.data = Pair(data, event.selected)
+                }))
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun topTabBar() {
+        val topColors = centerAlignedTopAppBarColors(
+            containerColor = materialColor(MaterialColors.color_transparent),
+            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+        )
+
+        CenterAlignedTopAppBar(
+            colors = topColors,
+            navigationIcon = {
+                if (!viewModel.editing) {
+                    IconButton(onClick = {
+                        viewModel.sendEvent(
+                            CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction(
+                                0
+                            )
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                }
+            },
+            actions = {
+                if (!viewModel.editing) {
+                    IconButton(onClick = { viewModel.historyOpen() }) {
+                        loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
+                    }
+                    IconButton(onClick = { viewModel.editing = !viewModel.editing }) {
+                        loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
+                    }
+                }
+            },
+            title = {})
+    }
+
+    @Composable
+    private fun bottomTabBar() {
+        if (viewModel.editing) {
+            BottomAppBar(
+                actions = {
+                    Box(modifier = Modifier.weight(1f))
+                    DefaultButton(
+                        title = Localize.button_cancel,
+                        modifier = Modifier.padding(end = 10.dp).weight(2f),
+                        onClick = { viewModel.cancelEdit() })
+                    DefaultButton(
+                        modifier = Modifier.weight(2f),
+                        enabled = viewModel.verifyFields(),
+                        title = Localize.button_save,
+                        onClick = { viewModel.saveEdit() })
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun dialogs() {
+        HumidorCigarsDialog {
+            viewModel.cancelEdit()
+        }
+        if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
+            InfoImageDialog(when(viewModel.infoDialog){
+                CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Images.cigar_sizes_info
+                CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
+                CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
+                else -> TODO()
+            }) {
+                viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
+            }
+        }
+    }
+    @Composable
+    private fun imagesView() {
+        if (!viewModel.editing) {
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.padding(bottom = 10.dp)
+                    .aspectRatio(ratio = 1.8f)
+            ) {
+                PagedCarousel(
+                    viewModel.images,
+                    loading = viewModel.loading,
+                ) {
+                    viewModel.showImages(it)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun cigarOrigin() {
+        //Cigar Name,  Company and Country
+        Column {
+            TextStyled(
+                viewModel.name,
+                TextStyles.Headline,
+                label = if (viewModel.editing) Localize.cigar_details_name else null,
+                editable = viewModel.editing,
+                maxLines = 2,
+                modifier = Modifier.padding(bottom = 4.dp),
+                keepHeight = false,
+                onValueChange = {
+                    viewModel.name = it
+                }
+            )
+            TextStyled(
+                viewModel.brand,
+                TextStyles.Subhead,
+                label = if (viewModel.editing) Localize.cigar_details_company else null,
+                editable = viewModel.editing,
+                modifier = Modifier.padding(bottom = 4.dp),
+                onValueChange = {
+                    viewModel.brand = it
+                }
+            )
+            TextStyled(
+                viewModel.country,
+                TextStyles.Subhead,
+                label = if (viewModel.editing) Localize.cigar_details_country else null,
+                editable = viewModel.editing,
+                onValueChange = {
+                    viewModel.country = it
+                })
+        }
+    }
+
+    @Composable
+    private fun cigarSize() {
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+        ) {
+            ValuesCard(
+                label = Localize.cigar_details_cigars,
+                vertical = viewModel.editing,
+                actionIcon = Images.icon_menu_info,
+                onAction = {
+                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarSize)
+                }
+            ) {
+                if (!viewModel.editing) {
+                    ValueCard(Localize.cigar_details_shape, viewModel.shape)
+                    ValueCard(
+                        Localize.cigar_details_length,
+                        viewModel.length
+                    )
+                    ValueCard(
+                        Localize.cigar_details_gauge,
+                        viewModel.gauge.toString()
+                    )
+                } else {
+                    ValuePicker(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        value = viewModel.shape,
+                        label = Localize.cigar_details_shape,
+                        items = CigarShapes.enumValues(),
+                        onClick = {
+                            viewModel.shape = it.second
+                        }
+                    )
+                    TextStyled(
+                        viewModel.length,
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        label = Localize.cigar_details_length,
+                        editable = viewModel.editing,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        onValueChange = {
+                            viewModel.length = it
+                        }
+                    )
+                    TextStyled(
+                        if (viewModel.gauge == 0L) "" else viewModel.gauge.toString(),
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        label = Localize.cigar_details_gauge,
+                        editable = viewModel.editing,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        onValueChange = {
+                            viewModel.gauge =
+                                if (it.isNotBlank()) it.toLong() else 0
+                        },
+                        inputMode = KeyboardType.Number
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun cigarTobacco() {
+        Column {
+            ValuesCard(
+                label = Localize.cigar_details_tobacco,
+                vertical = true,
+                actionIcon = Images.icon_menu_info,
+                onAction = {
+                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarTobacco)
+                }
+            ) {
+                TextStyled(
+                    viewModel.wrapper,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.Subhead,
+                    label = Localize.cigar_details_wrapper,
+                    editable = viewModel.editing,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    onValueChange = {
+                        viewModel.wrapper = it
+                    }
+                )
+                TextStyled(
+                    viewModel.binder,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.Subhead,
+                    label = Localize.cigar_details_binder,
+                    editable = viewModel.editing,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    onValueChange = {
+                        viewModel.binder = it
+                    }
+                )
+                TextStyled(
+                    viewModel.filler,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.Subhead,
+                    label = Localize.cigar_details_filler,
+                    editable = viewModel.editing,
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    onValueChange = {
+                        viewModel.filler = it
+                    }
+                )
+                if (!viewModel.editing) {
+                    TextStyled(
+                        CigarStrength.localized(viewModel.strength),
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        label = Localize.cigar_details_strength,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                    )
+                } else {
+                    ValuePicker(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        value = CigarStrength.localized(viewModel.strength),
+                        label = Localize.cigar_details_strength,
+                        items = CigarStrength.enumValues(),
+                        onClick = {
+                            viewModel.strength = it.first
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun cigarRatings() {
+        Column(horizontalAlignment = Alignment.Start) {
+            ValuesCard(
+                label = Localize.cigar_details_ratings,
+                vertical = viewModel.editing,
+                actionIcon = Images.icon_menu_info,
+                onAction = {
+                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarRatings)
+                }
+            ) {
+                if (!viewModel.editing) {
+                    ValueCard(
+                        Localize.cigar_details_rating,
+                        "${viewModel.rating}"
+                    )
+                    ValueCard(
+                        Localize.cigar_details_myrating,
+                        "${viewModel.myrating}"
+                    ) {
+                        viewModel.rate()
+                    }
+                    IconButton(onClick = {
+                        viewModel.favorite()
+                    }) {
+                        val icon =
+                            if (viewModel.favorites) Images.icon_star_filled else Images.icon_star_empty
+                        loadIcon(icon, Size(64.0F, 64.0F))
+                    }
+                } else {
+                    TextStyled(
+                        if (viewModel.rating == 0L) "" else viewModel.rating.toString(),
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        label = Localize.cigar_details_rating,
+                        editable = viewModel.editing,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        onValueChange = {
+                            viewModel.rating =
+                                if (it.isNotBlank()) it.toLong() else 0
+                        },
+                        inputMode = KeyboardType.Number
+                    )
+                    TextStyled(
+                        if (viewModel.myrating == 0L) "" else viewModel.myrating.toString(),
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        label = Localize.cigar_details_myrating,
+                        editable = viewModel.editing,
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        onValueChange = {
+                            viewModel.myrating =
+                                if (it.isNotBlank()) it.toLong() else 0
+                        },
+                        inputMode = KeyboardType.Number
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun cigarHumidors() {
+        if (!viewModel.editing) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(((viewModel.humidors.count() + 2) * 48).dp)
+            ) {
+                ValuesCard(
+                    label = Localize.cigar_details_humidors,
+                    vertical = true,
+                    actionIcon = if(viewModel.humidors.size > 1) Images.icon_tab else null,
+                    onAction = {
+                        viewModel.moveCigar()
+                    }
+                ) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                    {
+                        item {
+                            TextStyled(
+                                Localize.cigar_details_total(viewModel.count),
+                                TextStyles.Subhead,
+                                modifier = Modifier.padding(bottom = 10.dp),
+                            )
+                        }
+                        items(viewModel.humidors, key = { item -> item.key }) {
+                            HumidorListRow(it, viewModel)
+                            Spacer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(4.dp)
+                                    .background(Color.Transparent)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    @Composable
+    fun cigarNotes() {
+        var notesHeight by remember { mutableStateOf(0) }
+        Column(
+            modifier = Modifier
+                .padding(bottom = 10.dp, top = 10.dp)
+                .onSizeChanged {
+                    notesHeight = it.height
+                }
+        ) {
+            TextStyled(
+                viewModel.notes,
+                TextStyles.Subhead,
+                //label = "Notes",
+                editable = viewModel.editing,
+                onValueChange = {
+                    viewModel.notes = it
+                }
+            )
+        }
+        Column(
+            modifier = Modifier.padding(bottom = 10.dp)
+        ) {
+            TextStyled(
+                viewModel.link,
+                TextStyles.Subhead,
+                label = Localize.cigar_details_link,
+                labelStyle = TextStyles.Subhead,
+                editable = viewModel.editing,
+                maxLines = 1,
+                onValueChange = {
+                    viewModel.link = it
+                }
+            )
         }
     }
 

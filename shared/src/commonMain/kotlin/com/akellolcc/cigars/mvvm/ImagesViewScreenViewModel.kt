@@ -16,6 +16,8 @@ abstract class BaseImagesViewScreenViewModel(val id: Long) :
         }
     }
 
+    override fun entitySelected(entity: CigarImage) {}
+
     sealed interface Action {
         data class ShowError(val error: StringDesc) : Action
     }

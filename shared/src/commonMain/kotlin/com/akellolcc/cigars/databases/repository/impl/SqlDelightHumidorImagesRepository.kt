@@ -13,7 +13,7 @@ class SqlDelightHumidorImagesRepository(
     queries: CigarsDatabaseQueries
 ) : SqlDelightImagesRepository(queries) {
 
-    override fun observeAll(): Flow<List<CigarImage>> {
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<CigarImage>> {
         return queries.humidorImages(humidorId, ::imageFactory).asFlow()
             .mapToList(Dispatchers.IO)
     }

@@ -31,8 +31,13 @@ open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) : BaseRepo
         return queries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
     }
 
-    override fun observeAll(): Flow<List<Cigar>> {
-        return queries.allCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
+        return (
+                if(accenting)
+                    queries.allCigarsAsc(sortField ?:"name",::cigarFactory)
+                else
+                    queries.allCigarsDesc(sortField ?:"name",::cigarFactory)
+                ).asFlow().mapToList(Dispatchers.Main)
     }
 
     fun observeFavorites(): Flow<List<Cigar>> =

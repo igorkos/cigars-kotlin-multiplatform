@@ -29,7 +29,7 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseReposit
         return queries.humidor(id, ::humidorFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
     }
 
-    override fun observeAll(): Flow<List<Humidor>> {
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Humidor>> {
         return queries.allHumidors(::humidorFactory).asFlow().mapToList(Dispatchers.Main)
     }
 

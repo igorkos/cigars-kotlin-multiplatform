@@ -16,9 +16,9 @@ interface Repository<ENTITY : BaseEntity> {
 
     fun observe(entity: ENTITY): Flow<ENTITY>
 
-    suspend fun all(): List<ENTITY>
+    suspend fun all(sortField: String? = null, accenting: Boolean = true): List<ENTITY>
 
-    fun observeAll(): Flow<List<ENTITY>>
+    fun observeAll(sortField: String? = null, accenting: Boolean = true): Flow<List<ENTITY>>
 
     fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)? = null)
 

@@ -11,12 +11,14 @@ expect class NavRoute(
     title: String,
     icon: ImageResource,
     data: Any? = null,
-    isTabsVisible: Boolean = true
+    isTabsVisible: Boolean = true,
+    isDrawerVisible: Boolean = false
 ) {
     val route: String
     val title: String
     var icon: ImageResource
     var isTabsVisible: Boolean
+    var isDrawerVisible: Boolean
     var sharedViewModel: MainScreenViewModel?
     var data: Any?
 }
@@ -28,6 +30,7 @@ val CigarsDetailsRoute = NavRoute(
     Images.tab_icon_cigars,
     isTabsVisible = false
 )
+
 val CigarHistoryRoute = NavRoute(
     "cigar_history_screen",
     Localize.title_cigars,

@@ -75,6 +75,14 @@ class Images {
         val cigar_sizes_info = MR.images.cigar_sizes_info
         val cigar_tobacco_info = MR.images.cigar_tobacco_info
         val cigar_ratings_info = MR.images.cigar_ratings_info
+
+        val icon_menu_sort_alpha_asc = MR.images.icon_menu_sort_alpha_asc
+        val icon_menu_sort_alpha_desc = MR.images.icon_menu_sort_alpha_desc
+        val icon_menu_sort_amount_asc = MR.images.icon_menu_sort_amount_asc
+        val icon_menu_sort_amount_desc = MR.images.icon_menu_sort_amount_desc
+        val icon_menu_sort_numberic_desc = MR.images.icon_menu_sort_numberic_desc
+        val icon_menu_sort_numeric_asc = MR.images.icon_menu_sort_numeric_asc
+        val icon_menu_sort = MR.images.icon_menu_sort
     }
 }
 

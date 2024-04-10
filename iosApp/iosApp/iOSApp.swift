@@ -11,7 +11,5 @@ struct iOSApp: App {
 
 	init() {
            Log.companion.doInitLog()
-           var driver = DatabaseDriverFactory()
-           Database.companion.createInstance(databaseDriverFactory: driver)
         }
 }

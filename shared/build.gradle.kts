@@ -130,12 +130,13 @@ android {
     kotlin {
         jvmToolchain(11)
     }
-}
-dependencies {
+    dependencies {
+        implementation(libs.ui.tooling.preview.android)
+        implementation(libs.androidx.exifinterface)
+    }
 
-    implementation(libs.ui.tooling.preview.android)
-    implementation(libs.androidx.exifinterface)
 }
+
 
 sqldelight {
     databases {

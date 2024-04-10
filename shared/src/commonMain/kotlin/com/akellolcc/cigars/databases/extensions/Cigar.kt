@@ -1,5 +1,6 @@
 package com.akellolcc.cigars.databases.extensions
 
+import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.databases.CigarsTable
 import com.akellolcc.cigars.theme.Localize
 import kotlinx.serialization.Serializable
@@ -7,6 +8,7 @@ import kotlinx.serialization.Serializable
 
 var emptyCigar =
     Cigar(-1, "", "", "", 0, "", "", "", 0, "", CigarStrength.Mild, 0, 0, "", "", "", 0, false, false, 0.0)
+@Stable
 @Serializable
 data class Cigar(
     override var rowid: Long,
@@ -159,6 +161,43 @@ enum class CigarStrength {
             Medium -> 2
             MediumToFull -> 3
             Full -> 4
+        }
+    }
+}
+
+@Serializable
+enum class CigarSortingFields(val value: String) {
+    Name("name"),
+  //  Brand("brand"),
+ //   Country("country"),
+ //   Date("date"),
+    Shape("cigar"),
+    Gauge("gauge"),
+    Length("length");
+   // Strength("strength"),
+  //  Rating("rating"),
+  //  Myrating("myrating");
+
+    companion object {
+        fun enumValues(): Array<Pair<CigarSortingFields, String>> {
+            return CigarSortingFields.entries.map {
+                it to localized(it)
+            }.toTypedArray()
+        }
+
+        fun localized(value: CigarSortingFields): String {
+            return when (value) {
+                Name -> Localize.cigar_details_name
+            //    Brand -> Localize.cigar_details_company
+            //    Country -> Localize.cigar_details_country
+            //    Date -> Localize.cigar_details_name
+                Shape -> Localize.cigar_details_shape
+                Gauge -> Localize.cigar_details_gauge
+                Length -> Localize.cigar_details_length
+            //    Strength -> Localize.cigar_details_strength
+            //    Rating -> Localize.cigar_details_rating
+            //    Myrating -> Localize.cigar_details_myrating
+            }
         }
     }
 }

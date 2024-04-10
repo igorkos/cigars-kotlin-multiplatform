@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 
 class SqlDelightFavoriteCigarsRepository(queries: CigarsDatabaseQueries) : SqlDelightCigarsRepository(queries), FavoriteCigarsRepository {
-    override fun observeAll(): Flow<List<Cigar>> {
+    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
         return queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
     }
 

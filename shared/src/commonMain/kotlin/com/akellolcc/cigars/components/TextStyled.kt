@@ -1,3 +1,4 @@
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -28,7 +30,8 @@ public fun TextStyled(
     text: String?,
     style: TextStyles = TextStyles.Headline,
     label: String? = null,
-    labelStyle: TextStyles = TextStyles.Headline,
+    labelSuffix: String = ":",
+    labelStyle: TextStyles = TextStyles.Subhead,
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
     editable: Boolean = false,
@@ -37,14 +40,15 @@ public fun TextStyled(
     keepHeight: Boolean = true,
     onValueChange: ((String) -> Unit)? = null,
     inputMode: KeyboardType = KeyboardType.Text,
-    center: Boolean = false
+    center: Boolean = false,
+    vertical: Boolean = false
 ) {
     val textStyle =
         textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
     val styleLabel = textStyle(labelStyle)
-    val textMeasurer = rememberTextMeasurer()
-    var textWith by remember { mutableStateOf(0) }
-    var textHeight by remember { mutableStateOf(maxHeight.dp) }
+ //   val textMeasurer = rememberTextMeasurer()
+ //   var textWith by remember { mutableStateOf(0) }
+ //   var textHeight by remember { mutableStateOf(maxHeight.dp) }
 
     if (editable) {
         TextField(
@@ -68,7 +72,46 @@ public fun TextStyled(
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = inputMode),
         )
     } else {
-        val density = LocalDensity.current
+        @Composable
+        fun context() {
+            label?.let {
+                Text(
+                    modifier = Modifier.padding(end = 8.dp),
+                    text = "$it$labelSuffix",
+                    color = styleLabel.color,
+                    fontSize = styleLabel.fontSize,
+                    fontStyle = styleLabel.fontStyle,
+                    fontFamily = styleLabel.fontFamily,
+                    textAlign = styleLabel.textAlign,
+                    maxLines = 1,
+                    minLines = 1
+                )
+            }
+            Text(
+                modifier =modifier,
+                text = text ?: "",
+                color = textStyle.color,
+                fontSize = textStyle.fontSize,
+                fontStyle = textStyle.fontStyle,
+                fontFamily = textStyle.fontFamily,
+                textAlign = textStyle.textAlign,
+                maxLines = maxLines,
+            )
+        }
+        if (vertical) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                context()
+            }
+        } else{
+            Row{
+                context()
+            }
+        }
+    }
+}
+
+/*
+val density = LocalDensity.current
         if (maxLines != Int.MAX_VALUE) {
             LazyColumn(
                 modifier = modifier
@@ -111,7 +154,7 @@ public fun TextStyled(
                 label?.let {
                     item {
                         Text(
-                            text = "$it:",
+                            text = "$it$labelSuffix",
                             color = styleLabel.color,
                             fontSize = styleLabel.fontSize,
                             fontStyle = styleLabel.fontStyle,
@@ -135,32 +178,5 @@ public fun TextStyled(
                 }
             }
         } else {
-            Row {
-                label?.let {
-                    Text(
-                        modifier = Modifier.padding(end = 8.dp),
-                        text = "$it:",
-                        color = styleLabel.color,
-                        fontSize = styleLabel.fontSize,
-                        fontStyle = styleLabel.fontStyle,
-                        fontFamily = styleLabel.fontFamily,
-                        textAlign = styleLabel.textAlign,
-                        maxLines = 1,
-                        minLines = 1
-                    )
-                }
-                Text(
-                    modifier =modifier,
-                    text = text ?: "",
-                    color = textStyle.color,
-                    fontSize = textStyle.fontSize,
-                    fontStyle = textStyle.fontStyle,
-                    fontFamily = textStyle.fontFamily,
-                    textAlign = textStyle.textAlign,
-                    maxLines = maxLines,
-                )
-            }
-        }
-    }
-}
 
+ */

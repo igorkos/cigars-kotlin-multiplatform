@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -19,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,16 +44,17 @@ import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 
-
+private var tabs: List<ITabItem> = listOf(
+    CigarsScreen(CigarsRoute),
+    HumidorsScreen(HumidorsRoute),
+    FavoritesScreen(FavoritesRoute)
+)
 class MainScreen() : Screen {
-
-    private var tabs: List<ITabItem> = listOf(
-        CigarsScreen(CigarsRoute),
-        HumidorsScreen(HumidorsRoute),
-        FavoritesScreen(FavoritesRoute)
-    )
 
     @Transient
     private val viewModel = MainScreenViewModel()
@@ -60,7 +63,11 @@ class MainScreen() : Screen {
     @Composable
     override fun Content() {
         var isTabsVisible by remember { mutableStateOf(viewModel.isTabsVisible) }
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        var isDrawerVisible by remember { mutableStateOf(false) }
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed){
+            isDrawerVisible = it == DrawerValue.Open
+            true
+        }
 
         viewModel.observeEvents {
             when (it) {
@@ -69,8 +76,21 @@ class MainScreen() : Screen {
                     Log.debug("MainScreen received tabs visible ${it.isVisible}")
                     isTabsVisible = it.isVisible
                 }
+
+                is MainScreenViewModel.MainScreenActions.OpenDrawer -> {
+                    isDrawerVisible = it.isVisible
+                }
             }
         }
+
+        LaunchedEffect(isDrawerVisible) {
+            if (isDrawerVisible) {
+                drawerState.open()
+            } else {
+                drawerState.close()
+            }
+        }
+
         Log.debug("MainScreen tabs visible $isTabsVisible -> $viewModel")
 
         DefaultTheme {
@@ -83,7 +103,7 @@ class MainScreen() : Screen {
                         },
                     ) {
                         Text("Drawer title", modifier = Modifier.padding(16.dp))
-                        Divider()
+                        HorizontalDivider()
                         NavigationDrawerItem(
                             label = { Text(text = "Drawer Item") },
                             selected = false,
@@ -91,14 +111,15 @@ class MainScreen() : Screen {
                         )
                     }
                 },
-                gesturesEnabled = true
+                gesturesEnabled = isTabsVisible,
             ) {
-                TabNavigator(tabs[0], tabDisposable = { tabNavigator ->
+                TabNavigator(tabs[0]
+                /*, tabDisposable = { tabNavigator ->
                     TabDisposable(
                         navigator = tabNavigator,
                         tabs = tabs
-                    )
-                }) {
+                    )}*/
+                ) {
                     Scaffold(
                         bottomBar = {
                             AnimatedVisibility(
@@ -137,7 +158,7 @@ fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
                 it.route.route == tab.route
             }
         },
-        icon = { tab.icon?.let { loadIcon(it, Size(width = 24f, height = 24f)) } },
+        icon = { loadIcon(tab.icon, Size(width = 24f, height = 24f)) },
         label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
     )
 }

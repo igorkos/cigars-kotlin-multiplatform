@@ -204,6 +204,10 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         sendEvent(CigarsDetailsAction.MoveCigar(0))
     }
 
+    fun showImages(selected: Int) {
+        sendEvent(CigarsDetailsAction.ShowImages(cigar, selected))
+    }
+
     sealed interface CigarsDetailsAction {
         data class OnBackAction(val dummy: Int) : CigarsDetailsAction
         data class RateCigar(val dummy: Int) : CigarsDetailsAction
@@ -211,6 +215,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         data class OpenHumidor(val humidor: Humidor) : CigarsDetailsAction
         data class OpenHistory(val cigar: Cigar) : CigarsDetailsAction
         data class MoveCigar(val dummy: Int) : CigarsDetailsAction
+        data class ShowImages(val cigar: Cigar, val selected: Int) : CigarsDetailsAction
         data class ShowError(val error: StringDesc) : CigarsDetailsAction
     }
 }

@@ -27,8 +27,8 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return observe(entity.rowid)
     }
 
-    override suspend fun all(): List<ENTITY> {
-        return observeAll().first()
+    override suspend fun all(sortField: String?, accenting: Boolean): List<ENTITY> {
+        return observeAll(sortField, accenting).first()
     }
 
     override fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)?) {

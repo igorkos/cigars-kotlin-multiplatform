@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.components.CigarListRow
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.logging.Log
@@ -41,7 +42,7 @@ import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class HumidorCigarsScreen(override val route: NavRoute) :
-    BaseTabListScree<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar>(route) {
+    BaseTabListScreen<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar>(route) {
 
     @Transient
     override val viewModel = HumidorCigarsScreenViewModel(route.data as Humidor)
@@ -139,52 +140,9 @@ class HumidorCigarsScreen(override val route: NavRoute) :
     }
 
     @Composable
-    override fun EntityListRow(entity: HumidorCigar) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = materialColor(MaterialColors.color_primaryContainer),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    viewModel.cigarSelected(entity.cigar!!)
-                })
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 0.dp)
-
-            ) {
-                TextStyled(
-                    maxLines = 2,
-                    minLines = 2,
-                    text = entity.cigar?.name,
-                    style = TextStyles.Headline,
-                    keepHeight = true
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-            ) {
-                TextStyled(
-                    text = entity.cigar?.cigar,
-                    style = TextStyles.Subhead
-                )
-                TextStyled(
-                    text = entity.cigar?.length,
-                    style = TextStyles.Subhead
-                )
-                TextStyled(
-                    text = "10",
-                    style = TextStyles.Subhead
-                )
-            }
+    override fun EntityListRow(entity: HumidorCigar, modifier: Modifier) {
+        entity.cigar?.let {
+            CigarListRow(it, modifier)
         }
     }
 

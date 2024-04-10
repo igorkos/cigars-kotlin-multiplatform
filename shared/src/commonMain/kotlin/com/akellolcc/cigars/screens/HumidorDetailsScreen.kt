@@ -251,7 +251,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                     }
                                 } else if (viewModel.editing) {
                                     TextStyled(
-                                        if (viewModel.temperature == 0L) "" else viewModel.temperature.toString(),
+                                        if (viewModel.temperature == null || viewModel.temperature == 0L) "" else viewModel.temperature.toString(),
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = Localize.humidor_details_temperature,
@@ -264,7 +264,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                         inputMode = KeyboardType.Number
                                     )
                                     TextStyled(
-                                        if (viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
+                                        if (viewModel.humidity == null || viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
                                         label = Localize.humidor_details_humidity,
