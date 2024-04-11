@@ -62,7 +62,7 @@ class MainScreen() : Screen {
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        var isTabsVisible by remember { mutableStateOf(viewModel.isTabsVisible) }
+        var isTabsVisible by remember { mutableStateOf(true) }
         var isDrawerVisible by remember { mutableStateOf(false) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed){
             isDrawerVisible = it == DrawerValue.Open

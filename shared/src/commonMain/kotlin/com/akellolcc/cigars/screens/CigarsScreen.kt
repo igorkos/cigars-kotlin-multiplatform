@@ -76,7 +76,6 @@ open class CigarsListScreen(override val route: NavRoute) :
             is CigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
-                //route.updateTabState?.invoke(false)
                 navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
                     sharedViewModel = mainModel

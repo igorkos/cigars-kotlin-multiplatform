@@ -16,7 +16,6 @@ class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActio
     var isDrawerVisible: Boolean = false
         set(value) {
             field = value
-            Log.debug("Setting drawer visible $value")
             sendEvent(MainScreenActions.OpenDrawer(value))
         }
 
