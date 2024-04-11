@@ -34,7 +34,7 @@ class Humidor(
         humidor.notes,
         humidor.link,
         humidor.price,
-        humidor.autoOpen == true,
+        humidor.autoOpen ?:false,
         humidor.sorting,
         humidor.type
     )

@@ -20,7 +20,7 @@ import com.akellolcc.cigars.theme.materialColor
 
 @Composable
 fun CigarListRow(entity: Cigar, modifier: Modifier) {
-    Log.debug("CigarsListRow ${entity.rowid} ${entity.key}")
+    //Log.debug("CigarsListRow ${entity.rowid} ${entity.key}")
     Card(
         colors = CardDefaults.cardColors(
             containerColor = materialColor(MaterialColors.color_primaryContainer),

@@ -125,7 +125,7 @@ cigarImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
 
 cigarHumidors:
-SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE cigarId = :cigar;
+SELECT *  FROM CigarHumidorTable WHERE cigarId = :cigar;
 
 addImageToCigar:
 UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
@@ -146,9 +146,21 @@ favoriteCigars:
 SELECT * FROM CigarsTable WHERE favorites = 1;
 
 
-allHumidors:
-SELECT HumidorsTable.*
-FROM HumidorsTable;
+allHumidorsAsc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END ASC;
+
+allHumidorsDesc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END DESC;
 
 humidor:
 SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;

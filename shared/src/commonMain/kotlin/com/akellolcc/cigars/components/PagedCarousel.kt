@@ -44,7 +44,7 @@ private val shape = RoundedCornerShape(topStart = borderRadius, topEnd = borderR
 fun PagedCarousel(
     images: List<CigarImage>?,
     modifier: Modifier = Modifier,
-    scale: ContentScale = ContentScale.FillBounds,
+    scale: ContentScale = ContentScale.FillHeight,
     loading: Boolean = false,
     select: Int = 0,
     onClick: ((page: Int) -> Unit)? = null

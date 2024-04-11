@@ -100,21 +100,6 @@ fun cigarFactory(
     )
 }
 
-fun humidorCigarFactory(
-    count: Long,
-    humidorId: Long?,
-    cigarId: Long?,
-): HumidorCigar {
-    val humidor = Database.getInstance().getRepository<HumidorsRepository>(RepositoryType.Humidors).getSync(humidorId!!)
-    val cigar = Database.getInstance().getRepository<CigarsRepository>(RepositoryType.Cigars).getSync(cigarId!!)
-    return HumidorCigar(
-        rowid = -1,
-        count = count,
-        humidor = humidor,
-        cigar = cigar,
-    )
-}
-
 fun humidorFactory(
     rowid: Long,
     name: String,

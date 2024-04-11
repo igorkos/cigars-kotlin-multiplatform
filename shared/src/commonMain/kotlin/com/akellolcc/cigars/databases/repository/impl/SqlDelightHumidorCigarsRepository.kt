@@ -3,13 +3,19 @@ package com.akellolcc.cigars.databases.repository.impl
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
+import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
+import com.akellolcc.cigars.databases.repository.CigarsRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SqlDelightHumidorCigarsRepository(
@@ -17,12 +23,17 @@ class SqlDelightHumidorCigarsRepository(
     queries: CigarsDatabaseQueries
 ) : BaseRepository<HumidorCigar>(queries), CigarHumidorRepository {
 
-    fun allSync(): List<HumidorCigar> =
-        queries.humidorCigars(humidorId, ::humidorCigarFactory).executeAsList()
-
     override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<HumidorCigar>> {
-        return queries.humidorCigars(humidorId, ::humidorCigarFactory).asFlow()
-            .mapToList(Dispatchers.Main)
+        val hRepo = Database.getInstance().getRepository<HumidorsRepository>(RepositoryType.Humidors)
+        val cRepo = Database.getInstance().getRepository<CigarsRepository>(RepositoryType.Cigars)
+        return queries.humidorCigars(humidorId).asFlow()
+            .mapToList(Dispatchers.Main).map {
+                it.map { humidorCigar ->
+                    val humidor = hRepo.getSync(humidorCigar.humidorId)
+                    val cigar = cRepo.getSync(humidorCigar.cigarId)
+                    HumidorCigar(humidorCigar.count, humidor, cigar )
+                }
+            }
     }
 
     fun add(entity: Cigar, count: Long) {

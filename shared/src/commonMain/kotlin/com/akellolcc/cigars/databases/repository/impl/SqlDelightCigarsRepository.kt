@@ -12,6 +12,7 @@ import com.akellolcc.cigars.databases.repository.CigarsRepository
 import dev.icerock.moko.mvvm.flow.cMutableStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -23,12 +24,12 @@ open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) : BaseRepo
 
     override fun observe(id: Long): Flow<Cigar> {
         if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return queries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.Main)
+        return queries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.IO)
     }
 
     override fun observeOrNull(id: Long): Flow<Cigar?> {
         if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return queries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
+        return queries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.IO)
     }
 
     override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
@@ -37,14 +38,14 @@ open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) : BaseRepo
                     queries.allCigarsAsc(sortField ?:"name",::cigarFactory)
                 else
                     queries.allCigarsDesc(sortField ?:"name",::cigarFactory)
-                ).asFlow().mapToList(Dispatchers.Main)
+                ).asFlow().mapToList(Dispatchers.IO)
     }
 
     fun observeFavorites(): Flow<List<Cigar>> =
-        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.IO)
 
     fun observeHumidorCigars(): Flow<List<Cigar>> =
-        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
+        queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.IO)
 
     override suspend fun doUpsert(entity: Cigar) {
         CoroutineScope(Dispatchers.Main).launch {

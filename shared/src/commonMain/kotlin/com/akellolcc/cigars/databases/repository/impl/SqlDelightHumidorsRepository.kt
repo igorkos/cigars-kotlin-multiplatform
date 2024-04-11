@@ -9,28 +9,32 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
 class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseRepository<Humidor>(queries), HumidorsRepository {
 
-    fun allSync(): List<Humidor> = queries.allHumidors(::humidorFactory).executeAsList()
-
     override fun getSync(id: Long): Humidor {
         return queries.humidor(id, ::humidorFactory).executeAsOne()
     }
 
     override fun observe(id: Long): Flow<Humidor> {
-        return queries.humidor(id, ::humidorFactory).asFlow().mapToOne(Dispatchers.Main)
+        return queries.humidor(id, ::humidorFactory).asFlow().mapToOne(Dispatchers.IO)
     }
 
     override fun observeOrNull(id: Long): Flow<Humidor?> {
-        return queries.humidor(id, ::humidorFactory).asFlow().mapToOneOrNull(Dispatchers.Main)
+        return queries.humidor(id, ::humidorFactory).asFlow().mapToOneOrNull(Dispatchers.IO)
     }
 
     override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Humidor>> {
-        return queries.allHumidors(::humidorFactory).asFlow().mapToList(Dispatchers.Main)
+        return (
+                if(accenting)
+                    queries.allHumidorsAsc(sortField ?:"name",::humidorFactory)
+                else
+                    queries.allHumidorsDesc(sortField ?:"name",::humidorFactory)
+                ).asFlow().mapToList(Dispatchers.IO)
     }
 
     override fun add(entity: Humidor, callback: (suspend (Long) -> Unit)?) {

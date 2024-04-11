@@ -508,7 +508,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 ValuesCard(
                     label = Localize.cigar_details_humidors,
                     vertical = true,
-                    actionIcon = if(viewModel.humidors.size > 1) Images.icon_tab else null,
+                    actionIcon = Images.icon_tab,
                     onAction = {
                         viewModel.moveCigar()
                     }

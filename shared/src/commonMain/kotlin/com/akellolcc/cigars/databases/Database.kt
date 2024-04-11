@@ -13,6 +13,7 @@ import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightDatabase
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
 import com.akellolcc.cigars.theme.readTextFile
@@ -77,17 +78,22 @@ class Database() : DatabaseInterface {
         runBlocking {
             var humidor: Humidor
             readTextFile(AssetFiles.demo_humidors)?.let { hjson ->
+                Log.debug("Add demo Humidor")
                 val humidorDatabase: HumidorsRepository = getRepository(RepositoryType.Humidors)
                 humidor = Json.decodeFromString<List<Humidor>>(hjson).first()
                 humidorDatabase.add(humidor, null)
                 readTextFile(AssetFiles.demo_cigars)?.let { cjson ->
+                    Log.debug("Add demo Cigars")
                     val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
                     val cigars = Json.decodeFromString<List<Cigar>>(cjson)
                     for (cigar in cigars) {
+                        Log.debug("Add demo Cigar ${cigar.rowid}")
                         cigarsDatabase.add(cigar, null)
                         val hcDatabase: CigarHumidorRepository = getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+                        Log.debug("Add demo Cigar ${cigar.rowid} to Humidor ${humidor.rowid}")
                         hcDatabase.add(humidor, 10)
                         val hisDatabase: HistoryRepository = getRepository(RepositoryType.CigarHistory, cigar.rowid)
+                        Log.debug("Add demo Cigar history ${cigar.rowid}")
                         hisDatabase.add(
                             History(
                                 -1,
@@ -103,6 +109,7 @@ class Database() : DatabaseInterface {
                         )
                     }
                     readTextFile(AssetFiles.demo_cigars_images)?.let { json ->
+                        Log.debug("Add demo images")
                         val imagesDatabase: ImagesRepository = getRepository(RepositoryType.CigarImages, humidor.rowid)
                         val images = Json.decodeFromString<List<CigarImage>>(json)
                         for (image in images) {

@@ -5,8 +5,9 @@ import kotlinx.serialization.Serializable
 @Stable
 @Serializable
 data class HumidorCigar(
-    override var rowid: Long,
     var count: Long,
     val humidor: Humidor?,
     val cigar: Cigar?,
-) : BaseEntity()
+) : BaseEntity() {
+    override var rowid: Long = -1
+}
