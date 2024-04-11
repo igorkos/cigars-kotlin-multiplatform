@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,7 +33,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -62,14 +62,12 @@ import com.akellolcc.cigars.components.ValuesCard
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarShapes
 import com.akellolcc.cigars.databases.extensions.CigarStrength
+import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarHistoryRoute
-import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.HumidorCigarsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.ImagesViewRoute
@@ -155,7 +153,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                     })
             )
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.RateCigar -> TODO()
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction -> navigator.pop()
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHistory -> navigator.push(
                 CigarHistoryScreen(
@@ -165,7 +162,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                     })
             )
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> TODO()
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> viewModel.moveCigarDialog = true
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowImages -> {
                 val data = route.data as Cigar
                 navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
@@ -237,7 +234,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
 
     @Composable
     private fun dialogs() {
-        HumidorCigarsDialog {
+        HumidorCigarsCountDialog {
             viewModel.cancelEdit()
         }
         if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
@@ -249,6 +246,12 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             }) {
                 viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
             }
+        }
+        CigarsRatingDialog(){
+            viewModel.cigarRating = false
+        }
+        MoveCigarsDialog{
+            viewModel.moveCigarDialog = false
         }
     }
     @Composable
@@ -498,7 +501,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun cigarHumidors() {
+    private fun cigarHumidors() {
         if (!viewModel.editing) {
             Column(
                 modifier = Modifier
@@ -508,7 +511,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 ValuesCard(
                     label = Localize.cigar_details_humidors,
                     vertical = true,
-                    actionIcon = Images.icon_tab,
+                    actionIcon = if (viewModel.humidorsCount() > 1) Images.icon_tab else null,
                     onAction = {
                         viewModel.moveCigar()
                     }
@@ -540,6 +543,38 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             }
         }
     }
+
+    @Composable
+    private fun HumidorListRow(item: HumidorCigar, viewModel: CigarsDetailsScreenViewModel) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = materialColor(MaterialColors.color_transparent),
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    if (item.humidor != null) viewModel.openHumidor(item.humidor)
+                })
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp, start = 12.dp, end = 12.dp, bottom = 6.dp)
+
+            ) {
+                TextStyled(
+                    item.humidor?.name,
+                    TextStyles.Subhead,
+                )
+                ValueCard(null, "${item.count}") {
+                    if (item.humidor != null) viewModel.addToHumidor(item)
+                }
+            }
+        }
+    }
+
     @Composable
     fun cigarNotes() {
         var notesHeight by remember { mutableStateOf(0) }
@@ -578,38 +613,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun HumidorListRow(item: HumidorCigar, viewModel: CigarsDetailsScreenViewModel) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = materialColor(MaterialColors.color_transparent),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = {
-                    if (item.humidor != null) viewModel.openHumidor(item.humidor)
-                })
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp, start = 12.dp, end = 12.dp, bottom = 6.dp)
-
-            ) {
-                TextStyled(
-                    item.humidor?.name,
-                    TextStyles.Subhead,
-                )
-                ValueCard(null, "${item.count}") {
-                    if (item.humidor != null) viewModel.addToHumidor(item)
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun HumidorCigarsDialog(onDismissRequest: () -> Unit) {
+    fun HumidorCigarsCountDialog(onDismissRequest: () -> Unit) {
         val count = remember { mutableStateOf("0") }
         val price = remember { mutableStateOf("") }
         val showPrice = remember { mutableStateOf(false) }
@@ -703,6 +707,142 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                         count.value.toLong(),
                                         if(price.value.isNotBlank()) price.value.toDouble() else null
                                     )
+                                })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun CigarsRatingDialog(onDismissRequest: () -> Unit) {
+        val rating = remember { mutableStateOf("0") }
+        LaunchedEffect(viewModel.myrating) {
+            rating.value = (viewModel.myrating ?: 0).toString()
+        }
+        if (viewModel.cigarRating) {
+            Dialog(onDismissRequest = { onDismissRequest() }) {
+                Card(
+                    modifier = Modifier.wrapContentSize(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = materialColor(MaterialColors.color_surfaceVariant),
+                        contentColor = materialColor(MaterialColors.color_primary),
+                    ),
+                ) {
+                    Column(
+                        modifier = Modifier.wrapContentSize().padding(24.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        TextStyled(
+                            Localize.cigar_details_rating_dialog,
+                            TextStyles.Headline,
+                        )
+                        Row(
+                            modifier = Modifier.width(100.dp).padding(top = 24.dp, bottom = 24.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            TextStyled(
+                                rating.value,
+                                TextStyles.Headline,
+                                modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                                editable = true,
+                                maxLines = 1,
+                                inputMode = KeyboardType.Number,
+                                center = true,
+                                onValueChange = {
+                                    rating.value = it
+                                }
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            DialogButton(
+                                title = Localize.button_cancel,
+                                onClick = { onDismissRequest() })
+                            DialogButton(
+                                enabled = viewModel.verifyFields(),
+                                title = Localize.button_save,
+                                onClick = {
+                                    viewModel.updateCigarRating(rating.value.toLong())
+                                    onDismissRequest()
+                                })
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun MoveCigarsDialog(onDismissRequest: () -> Unit) {
+        val humidors = remember { viewModel.humidors() }
+        val from = remember { mutableStateOf<Humidor?>(null) }
+        val to = remember { mutableStateOf<Humidor?>(null) }
+
+        if (viewModel.moveCigarDialog) {
+            Dialog(onDismissRequest = { onDismissRequest() }) {
+                Card(
+                    modifier = Modifier.wrapContentSize(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = materialColor(MaterialColors.color_surfaceVariant),
+                        contentColor = materialColor(MaterialColors.color_primary),
+                    ),
+                ) {
+                    Column(
+                        modifier = Modifier.wrapContentSize().padding(24.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        TextStyled(
+                            Localize.cigar_details_move_dialog,
+                            TextStyles.Headline,
+                        )
+
+                        Column(
+                            modifier = Modifier.wrapContentSize().padding(24.dp),
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            ValuePicker(
+                                modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
+                                backgroundColor = MaterialColors.color_outline,
+                                value = from.value?.name ?: Localize.cigar_details_move_select,
+                                label = Localize.cigar_details_move_from,
+                                items = humidors.map { it to it.name },
+                                onClick = {
+                                    from.value = it.first
+                                }
+                            )
+                            ValuePicker(
+                                modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
+                                backgroundColor = MaterialColors.color_outline,
+                                value = to.value?.name ?: Localize.cigar_details_move_select,
+                                label = Localize.cigar_details_move_to,
+                                items = humidors.map { it to it.name },
+                                onClick = {
+                                    to.value = it.first
+                                }
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            DialogButton(
+                                title = Localize.button_cancel,
+                                onClick = { onDismissRequest() })
+                            DialogButton(
+                                enabled = from.value != null && to.value != null && from.value != to.value,
+                                title = Localize.button_save,
+                                onClick = {
+                                    onDismissRequest()
                                 })
                         }
                     }

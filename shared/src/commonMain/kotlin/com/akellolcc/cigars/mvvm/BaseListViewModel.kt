@@ -22,9 +22,6 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
 
     protected abstract val repository: Repository<T>
 
-    init {
-        Log.debug("BaseListViewModel init ${this::class.simpleName}")
-    }
     abstract fun entitySelected(entity: T)
     fun sorting(sorting: String) {
         sortField = sorting

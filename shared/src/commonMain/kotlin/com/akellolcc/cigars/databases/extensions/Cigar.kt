@@ -84,10 +84,10 @@ enum class CigarShapes {
     Diadema;
 
     companion object {
-        fun enumValues(): Array<Pair<CigarShapes, String>> {
+        fun enumValues(): List<Pair<CigarShapes, String>> {
             return CigarShapes.entries.map {
                 it to localized(it)
-            }.toTypedArray()
+            }
         }
 
         fun localized(value: CigarShapes): String {
@@ -130,10 +130,10 @@ enum class CigarStrength {
     Full;
 
     companion object {
-        fun enumValues(): Array<Pair<CigarStrength, String>> {
+        fun enumValues(): List<Pair<CigarStrength, String>> {
             return CigarStrength.entries.map {
                 it to localized(it)
-            }.toTypedArray()
+            }
         }
 
         fun localized(value: CigarStrength): String {

@@ -18,6 +18,8 @@ interface Repository<ENTITY : BaseEntity> {
 
     suspend fun all(sortField: String? = null, accenting: Boolean = true): List<ENTITY>
 
+    fun allSync(sortField: String?, accenting: Boolean = false): List<ENTITY>
+
     fun observeAll(sortField: String? = null, accenting: Boolean = true): Flow<List<ENTITY>>
 
     fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)? = null)
@@ -31,4 +33,6 @@ interface Repository<ENTITY : BaseEntity> {
     fun addOrUpdate(entity: ENTITY)
 
     fun contains(id: Long): Boolean
+
+    fun count(): Long
 }

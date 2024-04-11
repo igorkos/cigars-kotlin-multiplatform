@@ -47,7 +47,11 @@ object Localize {
     val cigar_details_link = Strings.cigar_details_link.toString()
     val cigar_details_count_dialog = Strings.cigar_details_count_dialog.toString()
     val cigar_details_count_dialog_price = Strings.cigar_details_count_dialog_price.toString()
-
+    val cigar_details_rating_dialog = Strings.cigar_details_rating_dialog.toString()
+    val cigar_details_move_dialog = Strings.cigar_details_move_dialog.toString()
+    val cigar_details_move_from = Strings.cigar_details_move_from.toString()
+    val cigar_details_move_to = Strings.cigar_details_move_to.toString()
+    val cigar_details_move_select = Strings.cigar_details_move_select.toString()
     val cigar_details_count=Strings.cigar_details_count.toString()
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()

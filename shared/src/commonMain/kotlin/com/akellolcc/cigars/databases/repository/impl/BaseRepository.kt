@@ -2,9 +2,11 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.Repository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -31,9 +33,13 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return observeAll(sortField, accenting).first()
     }
 
+    override fun allSync(sortField: String?, accenting: Boolean): List<ENTITY> {
+        return listOf()
+    }
+
     override fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)?) {
         if (!contains(entity.rowid)) {
-            CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 queries.transactionWithResult {
                     doUpsert(entity)
                     callback?.let {
@@ -59,7 +65,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
 
     override fun update(entity: ENTITY) {
         if (contains(entity.rowid)) {
-            CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 doUpsert(entity)
             }
         } else {
@@ -69,9 +75,13 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
     }
 
     override fun addOrUpdate(entity: ENTITY) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             doUpsert(entity)
         }
+    }
+
+    override fun count(): Long {
+        return 0L
     }
 
     protected open suspend fun doUpsert(entity: ENTITY) {}

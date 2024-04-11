@@ -162,6 +162,9 @@ allHumidorsDesc:
         ELSE NULL
     END DESC;
 
+humidorsCount:
+SELECT COUNT(*) FROM HumidorsTable;
+
 humidor:
 SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;
 
@@ -172,11 +175,16 @@ removeAllHumidors:
 DELETE FROM HumidorsTable;
 
 addHumidor:
-INSERT OR REPLACE INTO HumidorsTable (rowid, name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
-VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateHumidor:
+UPDATE HumidorsTable SET name = :name, brand = :brand, holds = :holds, count = :count, temperature = :temperature, humidity = :humidity, notes = :notes, link = :link, autoOpen = :autoOpen, sorting = :sorting, type = :type
+WHERE rowid = :id;
+
 
 addCigarToHumidor:
-INSERT OR REPLACE INTO CigarHumidorTable (humidorId, cigarId, count)
+INSERT INTO CigarHumidorTable (humidorId, cigarId, count)
 VALUES (?,?,?);
 
 humidorCigars:

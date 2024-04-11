@@ -15,6 +15,7 @@ import com.akellolcc.cigars.databases.extensions.ObservableEntity
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.logging.Log
 import dev.icerock.moko.resources.desc.StringDesc
@@ -24,9 +25,10 @@ import kotlin.math.absoluteValue
 
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     DatabaseViewModel<Cigar, CigarsDetailsScreenViewModel.CigarsDetailsAction>() {
-    private var cigarsDatabase: CigarsRepository? = null
+    private var cigarsDatabase: CigarsRepository = database.getRepository(RepositoryType.Cigars)
+    private var humidorsRepository: HumidorsRepository = database.getRepository(RepositoryType.Humidors)
     private var imagesDatabase: ImagesRepository? = null
-    private var humidorsDatabase: CigarHumidorRepository? = null
+    private var cigarHumidorRepository: CigarHumidorRepository? = null
     private var cigarsHistoryDatabase: HistoryRepository? = null
     private var observeCigar: ObservableEntity<Cigar>? = null
     private var _images: ObservableEntity<List<CigarImage>>? = null
@@ -56,6 +58,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
 
     var humidorCigarsCount by mutableStateOf<HumidorCigar?>(null)
     var infoDialog by mutableStateOf(InfoActions.None)
+    var cigarRating by mutableStateOf(false)
+    var moveCigarDialog by mutableStateOf(false)
 
     init {
         if (cigar.rowid >= 0) {
@@ -64,12 +68,11 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     private fun observeCigar() {
-        cigarsDatabase = database.getRepository(RepositoryType.Cigars)
         imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
-        humidorsDatabase = database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+        cigarHumidorRepository = database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
         cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
 
-        observeCigar = ObservableEntity(cigarsDatabase!!.observe(cigar.rowid))
+        observeCigar = ObservableEntity(cigarsDatabase.observe(cigar.rowid))
         observeCigar?.map { if (!editing) name = it?.name ?: "" }
         observeCigar?.map { if (!editing) brand = it?.brand }
         observeCigar?.map { if (!editing) country = it?.country }
@@ -91,10 +94,18 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         _images?.map {
             images = it ?: listOf()
         }
-        _humidors = ObservableEntity(humidorsDatabase!!.observeAll())
+        _humidors = ObservableEntity(cigarHumidorRepository!!.observeAll())
         _humidors?.map {
             humidors = it ?: listOf()
         }
+    }
+
+    fun humidorsCount() : Long {
+        return database.numberOfEntriesIn(RepositoryType.Humidors)
+    }
+
+    fun humidors() : List<Humidor> {
+        return humidorsRepository.allSync(null, true)
     }
 
     fun verifyFields(): Boolean {
@@ -130,27 +141,27 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             favorites = favorites,
             price = cigar.price,
         )
-        cigarsDatabase?.update(updated)
+        cigarsDatabase.update(updated)
         editing = false
     }
 
     fun cancelEdit() {
-        editing = false
-        if (cigarsDatabase != null) {
+        if (observeCigar != null) {
             observeCigar?.reload()
         } else {
             sendEvent(CigarsDetailsAction.OnBackAction(0))
         }
+        editing = false
     }
 
     fun rate() {
-        sendEvent(CigarsDetailsAction.RateCigar(0))
+        cigarRating = true
     }
 
     fun favorite() {
         observeCigar?.value?.let {
             val updated = cigar.copy(favorites = !it.favorites)
-            cigarsDatabase?.update(updated)
+            cigarsDatabase.update(updated)
             Log.debug("cigar.favorites = ${it.favorites}")
         }
     }
@@ -170,7 +181,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     fun updateCigarCount(entity: HumidorCigar, count: Long, price: Double? = null) {
         val c = entity.count - count
         if (c != 0L) {
-            humidorsDatabase?.update(entity.copy(count = count))
+            cigarHumidorRepository?.update(entity.copy(count = count))
             val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
             cigarsHistoryDatabase?.add(
                 History(
@@ -186,6 +197,13 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 null
             )
             humidorCigarsCount = null
+        }
+    }
+
+    fun updateCigarRating(rating: Long) {
+        observeCigar?.value?.let {
+            val updated = cigar.copy(myrating = rating)
+            cigarsDatabase.update(updated)
         }
     }
 
@@ -210,7 +228,6 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
 
     sealed interface CigarsDetailsAction {
         data class OnBackAction(val dummy: Int) : CigarsDetailsAction
-        data class RateCigar(val dummy: Int) : CigarsDetailsAction
         data class AddToHumidor(val humidor: HumidorCigar) : CigarsDetailsAction
         data class OpenHumidor(val humidor: Humidor) : CigarsDetailsAction
         data class OpenHistory(val cigar: Cigar) : CigarsDetailsAction

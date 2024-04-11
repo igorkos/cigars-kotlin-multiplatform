@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -26,23 +27,25 @@ import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.materialColor
+import dev.icerock.moko.resources.ColorResource
 
 @Composable
 fun <T> ValuePicker(
     modifier: Modifier = Modifier,
     label: String?,
     value: String?,
-    items: Array<Pair<T, String>>,
-    onClick: ((Pair<T, String>) -> Unit)? = null
+    items: List<Pair<T, String>>,
+    onClick: ((Pair<T, String>) -> Unit)? = null,
+    backgroundColor: ColorResource? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf(value) }
     var with by remember { mutableStateOf(0) }
     Column(
-        modifier = modifier.fillMaxSize().clickable(onClick = {
+        modifier = modifier.fillMaxWidth().clickable(onClick = {
             expanded = true
         }).height(60.dp).background(
-            materialColor(MaterialColors.color_surfaceVariant),
+            materialColor(backgroundColor ?:MaterialColors.color_surfaceVariant),
             TextFieldDefaults.shape
         ),
         horizontalAlignment = Alignment.Start

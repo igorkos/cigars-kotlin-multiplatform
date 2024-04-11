@@ -12,10 +12,10 @@ import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
-class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
+class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
     private var imagesDatabase: ImagesRepository? = null
-    private var humidorsDatabase: HumidorsRepository? = null
+    private var humidorsDatabase: HumidorsRepository? = database.getRepository(RepositoryType.Humidors)
     private var observeHumidor: ObservableEntity<Humidor>? = null
     private var _images: ObservableEntity<List<CigarImage>>? = null
 
@@ -41,7 +41,6 @@ class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
 
     private fun observeHumidor() {
         imagesDatabase = database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
-        humidorsDatabase = database.getRepository(RepositoryType.Humidors)
         observeHumidor = ObservableEntity(humidorsDatabase!!.observe(humidor.rowid))
 
         observeHumidor?.map { if (!editing) name = it?.name ?: "" }
@@ -76,7 +75,16 @@ class HumidorDetailsScreenViewModel(private val humidor: Humidor) :
             notes = notes,
             link = link
         )
-        humidorsDatabase?.update(updated)
+        if (humidor.rowid < 0) {
+            humidorsDatabase?.add(updated) {
+                humidor = humidorsDatabase?.get(it)!!
+                observeHumidor()
+            }
+
+        } else {
+            humidorsDatabase?.update(updated)
+        }
+
         editing = false
     }
 

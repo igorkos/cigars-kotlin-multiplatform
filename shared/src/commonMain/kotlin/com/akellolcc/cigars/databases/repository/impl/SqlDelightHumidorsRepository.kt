@@ -16,6 +16,11 @@ import kotlinx.datetime.Clock
 
 class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseRepository<Humidor>(queries), HumidorsRepository {
 
+    override fun allSync(sortField: String?, accenting: Boolean): List<Humidor> = if(accenting)
+            queries.allHumidorsAsc(sortField ?:"name",::humidorFactory).executeAsList()
+        else
+            queries.allHumidorsDesc(sortField ?:"name",::humidorFactory).executeAsList()
+
     override fun getSync(id: Long): Humidor {
         return queries.humidor(id, ::humidorFactory).executeAsOne()
     }
@@ -39,29 +44,40 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseReposit
 
     override fun add(entity: Humidor, callback: (suspend (Long) -> Unit)?) {
         super.add(entity) {
-            queries.addHistory(1,  Clock.System.now().toEpochMilliseconds(), 1, entity.price, 0, -1, entity.rowid)
+            queries.addHistory(1,  Clock.System.now().toEpochMilliseconds(), 1, entity.price, 0, -1, it)
+            callback?.invoke(it)
         }
     }
     override suspend fun doUpsert(entity: Humidor) {
-        CoroutineScope(Dispatchers.Main).launch {
-            val id = queries.transactionWithResult {
-                queries.addHumidor(
-                    entity.rowid,
-                    entity.name,
-                    entity.brand,
-                    entity.holds,
-                    entity.count,
-                    entity.temperature,
-                    entity.humidity,
-                    entity.notes,
-                    entity.link,
-                    entity.autoOpen,
-                    entity.sorting,
-                    entity.type
-                )
-                queries.lastInsertRowId().executeAsOne()
-            }
-            entity.rowid = id
+        if(!contains(entity.rowid)) {
+            queries.addHumidor(
+                entity.name,
+                entity.brand,
+                entity.holds,
+                entity.count,
+                entity.temperature,
+                entity.humidity,
+                entity.notes,
+                entity.link,
+                entity.autoOpen,
+                entity.sorting,
+                entity.type
+            )
+        } else {
+            queries.updateHumidor(
+                entity.name,
+                entity.brand,
+                entity.holds,
+                entity.count,
+                entity.temperature,
+                entity.humidity,
+                entity.notes,
+                entity.link,
+                entity.autoOpen,
+                entity.sorting,
+                entity.type,
+                entity.rowid
+            )
         }
     }
 
@@ -69,6 +85,10 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseReposit
         CoroutineScope(Dispatchers.Main).launch {
             queries.removeCigar(id)
         }
+    }
+
+    override fun count(): Long {
+        return queries.humidorsCount().executeAsOne()
     }
 
     override fun contains(id: Long): Boolean {

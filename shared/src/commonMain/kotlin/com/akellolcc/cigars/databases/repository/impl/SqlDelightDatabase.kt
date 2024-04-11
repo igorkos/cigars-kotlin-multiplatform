@@ -43,4 +43,8 @@ class SqlDelightDatabase : DatabaseInterface {
             database.cigarsDatabaseQueries.removeAllHumidors()
         }
     }
+
+    override fun numberOfEntriesIn(type: RepositoryType): Long {
+        return getRepository<Repository<*>>(type).count()
+    }
 }

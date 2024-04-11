@@ -55,6 +55,9 @@ abstract class SqlDelightHistoryRepository(
         TODO("Not yet implemented")
     }
 
+    override fun count(): Long {
+        TODO("Not yet implemented")
+    }
 
     override fun contains(id: Long): Boolean {
         return queries.historyExists(id).executeAsOne() != 0L

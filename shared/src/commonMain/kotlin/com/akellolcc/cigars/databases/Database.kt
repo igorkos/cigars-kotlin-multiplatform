@@ -74,6 +74,10 @@ class Database() : DatabaseInterface {
         database.reset()
     }
 
+    override fun numberOfEntriesIn(type: RepositoryType): Long {
+        return database.numberOfEntriesIn(type)
+    }
+
     private fun createDemoSet() {
         runBlocking {
             var humidor: Humidor
@@ -81,41 +85,46 @@ class Database() : DatabaseInterface {
                 Log.debug("Add demo Humidor")
                 val humidorDatabase: HumidorsRepository = getRepository(RepositoryType.Humidors)
                 humidor = Json.decodeFromString<List<Humidor>>(hjson).first()
-                humidorDatabase.add(humidor, null)
-                readTextFile(AssetFiles.demo_cigars)?.let { cjson ->
-                    Log.debug("Add demo Cigars")
-                    val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
-                    val cigars = Json.decodeFromString<List<Cigar>>(cjson)
-                    for (cigar in cigars) {
-                        Log.debug("Add demo Cigar ${cigar.rowid}")
-                        cigarsDatabase.add(cigar, null)
-                        val hcDatabase: CigarHumidorRepository = getRepository(RepositoryType.CigarHumidors, cigar.rowid)
-                        Log.debug("Add demo Cigar ${cigar.rowid} to Humidor ${humidor.rowid}")
-                        hcDatabase.add(humidor, 10)
-                        val hisDatabase: HistoryRepository = getRepository(RepositoryType.CigarHistory, cigar.rowid)
-                        Log.debug("Add demo Cigar history ${cigar.rowid}")
-                        hisDatabase.add(
-                            History(
-                                -1,
-                                cigar.count,
-                                Clock.System.now().toEpochMilliseconds(),
-                                cigar.count,
-                                cigar.price,
-                                HistoryType.Addition,
-                                cigar.rowid,
-                                humidor.rowid
-                            ),
-                            null
-                        )
-                    }
-                    readTextFile(AssetFiles.demo_cigars_images)?.let { json ->
-                        Log.debug("Add demo images")
-                        val imagesDatabase: ImagesRepository = getRepository(RepositoryType.CigarImages, humidor.rowid)
-                        val images = Json.decodeFromString<List<CigarImage>>(json)
-                        for (image in images) {
-                            imageData(image.notes!!)?.let {
-                                image.bytes = it
-                                imagesDatabase.addOrUpdate(image)
+                humidorDatabase.add(humidor) { hID ->
+                    humidor.rowid = hID
+                    readTextFile(AssetFiles.demo_cigars)?.let { cjson ->
+                        Log.debug("Add demo Cigars")
+                        val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
+                        val cigars = Json.decodeFromString<List<Cigar>>(cjson)
+                        for (cigar in cigars) {
+                            Log.debug("Add demo Cigar ${cigar.rowid}")
+                            cigarsDatabase.add(cigar, null)
+                            val hcDatabase: CigarHumidorRepository =
+                                getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+                            Log.debug("Add demo Cigar ${cigar.rowid} to Humidor ${humidor.rowid}")
+                            hcDatabase.add(humidor, 10)
+                            val hisDatabase: HistoryRepository =
+                                getRepository(RepositoryType.CigarHistory, cigar.rowid)
+                            Log.debug("Add demo Cigar history ${cigar.rowid}")
+                            hisDatabase.add(
+                                History(
+                                    -1,
+                                    cigar.count,
+                                    Clock.System.now().toEpochMilliseconds(),
+                                    cigar.count,
+                                    cigar.price,
+                                    HistoryType.Addition,
+                                    cigar.rowid,
+                                    humidor.rowid
+                                ),
+                                null
+                            )
+                        }
+                        readTextFile(AssetFiles.demo_cigars_images)?.let { json ->
+                            Log.debug("Add demo images")
+                            val imagesDatabase: ImagesRepository =
+                                getRepository(RepositoryType.CigarImages, humidor.rowid)
+                            val images = Json.decodeFromString<List<CigarImage>>(json)
+                            for (image in images) {
+                                imageData(image.notes!!)?.let {
+                                    image.bytes = it
+                                    imagesDatabase.addOrUpdate(image)
+                                }
                             }
                         }
                     }

@@ -7,4 +7,7 @@ interface DatabaseInterface {
     fun <R: Repository<*>>getRepository(type: RepositoryType, args: Any? = null): R
 
     fun reset()
+
+    fun numberOfEntriesIn(type: RepositoryType) : Long
+
 }
