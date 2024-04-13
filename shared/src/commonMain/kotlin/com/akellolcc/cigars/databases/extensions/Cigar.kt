@@ -58,35 +58,40 @@ data class Cigar(
 }
 
 enum class CigarShapes {
-    ToroGrande,
-    Pyramide,
-    Churchill,
-    Figurado,
-    Panetela,
-    Torpedo,
-    Culebra,
-    Corona,
-    Perfecto,
-    Gordo,
-    Toro,
-    Campana,
-    Robusto,
+    Belicoso,
     Bullet,
+    Campana,
+    Churchill,
+    Cigarillo,
+    Corona,
+    CoronaGorda,
+    Culebra,
+    Diadema,
+    DoubleCorona,
+    Figurado,
+    Gordo,
+    Grande,
+    Lonsdale,
+    Panetela,
+    Perfecto,
     PetitCorona,
     PetitFigurado,
-    Pettit,
-    Cigarillo,
-    CoronaGorda,
-    DoubleCorona,
-    Lonsdale,
-    Grande,
-    Belicoso,
-    Diadema;
+    Petit,
+    Pyramide,
+    Robusto,
+    Toro,
+    ToroGrande,
+    Torpedo;
 
     companion object {
         fun enumValues(): List<Pair<CigarShapes, String>> {
             return CigarShapes.entries.map {
                 it to localized(it)
+            }
+        }
+        fun fromString(value: String): CigarShapes {
+            return CigarShapes.entries.first {
+                it.name == value
             }
         }
 
@@ -114,7 +119,7 @@ enum class CigarShapes {
                 Campana -> Localize.cigar_shape_compana
                 Bullet -> Localize.cigar_shape_bullet
                 PetitFigurado -> Localize.cigar_shape_pettit_figurado
-                Pettit -> Localize.cigar_shape_pettit
+                Petit -> Localize.cigar_shape_pettit
                 Cigarillo -> Localize.cigar_shape_cigarillo
             }
         }
@@ -133,6 +138,12 @@ enum class CigarStrength {
         fun enumValues(): List<Pair<CigarStrength, String>> {
             return CigarStrength.entries.map {
                 it to localized(it)
+            }
+        }
+
+        fun fromString(value: String): CigarShapes {
+            return CigarShapes.entries.first {
+                it.name == value
             }
         }
 

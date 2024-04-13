@@ -3,6 +3,7 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.akellolcc.cigars.components.ValuePickerItem
 import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
@@ -18,6 +19,7 @@ import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.datetime.Clock
 import kotlin.math.absoluteValue
@@ -61,42 +63,40 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     var cigarRating by mutableStateOf(false)
     var moveCigarDialog by mutableStateOf(false)
 
-    init {
-        if (cigar.rowid >= 0) {
-            observeCigar()
-        }
-    }
 
-    private fun observeCigar() {
-        imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
-        cigarHumidorRepository = database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
-        cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
+    fun observeCigar() {
+        if (cigar.rowid >= 0 && observeCigar == null) {
+            imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
+            cigarHumidorRepository =
+                database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+            cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
 
-        observeCigar = ObservableEntity(cigarsDatabase.observe(cigar.rowid))
-        observeCigar?.map { if (!editing) name = it?.name ?: "" }
-        observeCigar?.map { if (!editing) brand = it?.brand }
-        observeCigar?.map { if (!editing) country = it?.country }
-        observeCigar?.map { if (!editing) shape = it?.cigar ?: "" }
-        observeCigar?.map { if (!editing) length = it?.length ?: "" }
-        observeCigar?.map { if (!editing) gauge = it?.gauge ?: 0 }
-        observeCigar?.map { if (!editing) wrapper = it?.wrapper ?: "" }
-        observeCigar?.map { if (!editing) binder = it?.binder ?: "" }
-        observeCigar?.map { if (!editing) filler = it?.filler ?: "" }
-        observeCigar?.map { if (!editing) strength = it?.strength ?: CigarStrength.Mild }
-        observeCigar?.map { if (!editing) rating = it?.rating }
-        observeCigar?.map { if (!editing) myrating = it?.myrating }
-        observeCigar?.map { if (!editing) favorites = it?.favorites ?: false }
-        observeCigar?.map { if (!editing) notes = it?.notes }
-        observeCigar?.map { if (!editing) link = it?.link }
-        observeCigar?.map { if (!editing) count = it?.count ?:0 }
+            observeCigar = ObservableEntity(cigarsDatabase.observe(cigar.rowid))
+            observeCigar?.map { if (!editing) name = it?.name ?: "" }
+            observeCigar?.map { if (!editing) brand = it?.brand }
+            observeCigar?.map { if (!editing) country = it?.country }
+            observeCigar?.map { if (!editing) shape = it?.cigar ?: "" }
+            observeCigar?.map { if (!editing) length = it?.length ?: "" }
+            observeCigar?.map { if (!editing) gauge = it?.gauge ?: 0 }
+            observeCigar?.map { if (!editing) wrapper = it?.wrapper ?: "" }
+            observeCigar?.map { if (!editing) binder = it?.binder ?: "" }
+            observeCigar?.map { if (!editing) filler = it?.filler ?: "" }
+            observeCigar?.map { if (!editing) strength = it?.strength ?: CigarStrength.Mild }
+            observeCigar?.map { if (!editing) rating = it?.rating }
+            observeCigar?.map { if (!editing) myrating = it?.myrating }
+            observeCigar?.map { if (!editing) favorites = it?.favorites ?: false }
+            observeCigar?.map { if (!editing) notes = it?.notes }
+            observeCigar?.map { if (!editing) link = it?.link }
+            observeCigar?.map { if (!editing) count = it?.count ?: 0 }
 
-        _images = ObservableEntity(imagesDatabase!!.observeAll())
-        _images?.map {
-            images = it ?: listOf()
-        }
-        _humidors = ObservableEntity(cigarHumidorRepository!!.observeAll())
-        _humidors?.map {
-            humidors = it ?: listOf()
+            _images = ObservableEntity(imagesDatabase!!.observeAll())
+            _images?.map {
+                images = it ?: listOf()
+            }
+            _humidors = ObservableEntity(cigarHumidorRepository!!.observeAll())
+            _humidors?.map {
+                humidors = it ?: listOf()
+            }
         }
     }
 
@@ -207,6 +207,70 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
+    fun moveFromHumidors(selected: Humidor?): List<ValuePickerItem<HumidorCigar>> {
+        return humidors.map {
+            ValuePickerItem(it, it.humidor!!.name, Images.tab_icon_humidors)
+        }
+    }
+
+    fun moveToHumidors(selected: Humidor?): List<ValuePickerItem<Humidor>> {
+        return humidorsRepository.allSync(null, true).map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
+    }
+
+    fun moveCigar(from:HumidorCigar, to:Humidor, count: Long) {
+
+        //From update
+        if (from.count < count) {
+            cigarHumidorRepository?.update(from.copy(count = from.count - count))
+        } else {
+            cigarHumidorRepository?.remove(from)
+        }
+        //To update
+        val toCH = cigarHumidorRepository?.find(cigar, to)
+        if (toCH != null) {
+            cigarHumidorRepository?.update(toCH.copy(count = toCH.count + count))
+        } else {
+            cigarHumidorRepository?.add(from.copy( count = count, humidor = to))
+        }
+        //Cigar History
+        cigarsHistoryDatabase?.add(
+            History(
+                -1L,
+                count,
+                Clock.System.now().toEpochMilliseconds(),
+                count,
+                price = cigar.price,
+                type = HistoryType.Move,
+                cigarId = cigar.rowid,
+                humidorId = from.humidor!!.rowid)
+        )
+
+        //Humidor History
+        var humidorHistoryRepository: HistoryRepository = database.getRepository(RepositoryType.HumidorHistory, from.humidor!!.rowid)
+        humidorHistoryRepository.add(
+            History(
+                -1L,
+                count,
+                Clock.System.now().toEpochMilliseconds(),
+                count,
+                price = cigar.price,
+                type = HistoryType.MoveFrom,
+                cigarId = cigar.rowid,
+                humidorId = from.humidor.rowid)
+        )
+        humidorHistoryRepository= database.getRepository(RepositoryType.HumidorHistory, to.rowid)
+        humidorHistoryRepository.add(
+            History(
+                -1L,
+                count,
+                Clock.System.now().toEpochMilliseconds(),
+                count,
+                price = cigar.price,
+                type = HistoryType.MoveTo,
+                cigarId = cigar.rowid,
+                humidorId = to.rowid)
+        )
+    }
     enum class InfoActions {
         None,
         CigarSize,

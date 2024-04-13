@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
@@ -44,6 +45,12 @@ class SqlDelightCigarHumidorsRepository(
                 cigarId,
                 count
             )
+        }
+    }
+
+    override fun find(cigar: Cigar, humidor: Humidor): HumidorCigar? {
+       return queries.findHumidorCigar(cigar.rowid, humidor.rowid).executeAsOneOrNull()?.let {
+            HumidorCigar(it.count, humidor, cigar)
         }
     }
 

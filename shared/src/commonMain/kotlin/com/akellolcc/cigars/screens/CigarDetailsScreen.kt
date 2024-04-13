@@ -58,6 +58,7 @@ import com.akellolcc.cigars.components.InfoImageDialog
 import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.components.ValueCard
 import com.akellolcc.cigars.components.ValuePicker
+import com.akellolcc.cigars.components.ValuePickerItem
 import com.akellolcc.cigars.components.ValuesCard
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarShapes
@@ -88,9 +89,14 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-       // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
+        // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
+
         viewModel.observeEvents {
             handleAction(it, navigator)
+        }
+
+        LaunchedEffect(viewModel.editing) {
+            viewModel.observeCigar()
         }
 
         DefaultTheme {
@@ -138,7 +144,11 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             }
         }
     }
-    private fun handleAction(event: CigarsDetailsScreenViewModel.CigarsDetailsAction, navigator: Navigator) {
+
+    private fun handleAction(
+        event: CigarsDetailsScreenViewModel.CigarsDetailsAction,
+        navigator: Navigator
+    ) {
         val mainModel = route.sharedViewModel as MainScreenViewModel
         when (event) {
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
@@ -162,7 +172,9 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                     })
             )
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> viewModel.moveCigarDialog = true
+            is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> viewModel.moveCigarDialog =
+                true
+
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowImages -> {
                 val data = route.data as Cigar
                 navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
@@ -238,22 +250,25 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             viewModel.cancelEdit()
         }
         if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
-            InfoImageDialog(when(viewModel.infoDialog){
-                CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Images.cigar_sizes_info
-                CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
-                CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
-                else -> TODO()
-            }) {
+            InfoImageDialog(
+                when (viewModel.infoDialog) {
+                    CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Images.cigar_sizes_info
+                    CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
+                    CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
+                    else -> TODO()
+                }
+            ) {
                 viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
             }
         }
-        CigarsRatingDialog(){
+        CigarsRatingDialog {
             viewModel.cigarRating = false
         }
-        MoveCigarsDialog{
+        MoveCigarsDialog {
             viewModel.moveCigarDialog = false
         }
     }
+
     @Composable
     private fun imagesView() {
         if (!viewModel.editing) {
@@ -336,11 +351,16 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 } else {
                     ValuePicker(
                         modifier = Modifier.padding(bottom = 10.dp),
-                        value = viewModel.shape,
+                        value = ValuePickerItem(
+                            CigarShapes.fromString(viewModel.shape),
+                            viewModel.shape,
+                            null
+                        ),
                         label = Localize.cigar_details_shape,
-                        items = CigarShapes.enumValues(),
+                        items = CigarShapes.enumValues()
+                            .map { ValuePickerItem(it.first, it.second, Images.tab_icon_cigars) },
                         onClick = {
-                            viewModel.shape = it.second
+                            viewModel.shape = it.label
                         }
                     )
                     TextStyled(
@@ -373,7 +393,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun cigarTobacco() {
+    private fun cigarTobacco() {
         Column {
             ValuesCard(
                 label = Localize.cigar_details_tobacco,
@@ -427,11 +447,16 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                 } else {
                     ValuePicker(
                         modifier = Modifier.padding(bottom = 10.dp),
-                        value = CigarStrength.localized(viewModel.strength),
+                        value = ValuePickerItem(
+                            viewModel.strength,
+                            CigarStrength.localized(viewModel.strength),
+                            null
+                        ),
                         label = Localize.cigar_details_strength,
-                        items = CigarStrength.enumValues(),
+                        items = CigarStrength.enumValues()
+                            .map { ValuePickerItem(it.first, it.second, null) },
                         onClick = {
-                            viewModel.strength = it.first
+                            viewModel.strength = it.value!!
                         }
                     )
                 }
@@ -440,7 +465,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun cigarRatings() {
+    private fun cigarRatings() {
         Column(horizontalAlignment = Alignment.Start) {
             ValuesCard(
                 label = Localize.cigar_details_ratings,
@@ -576,7 +601,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun cigarNotes() {
+    private fun cigarNotes() {
         var notesHeight by remember { mutableStateOf(0) }
         Column(
             modifier = Modifier
@@ -613,7 +638,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun HumidorCigarsCountDialog(onDismissRequest: () -> Unit) {
+    private fun HumidorCigarsCountDialog(onDismissRequest: () -> Unit) {
         val count = remember { mutableStateOf("0") }
         val price = remember { mutableStateOf("") }
         val showPrice = remember { mutableStateOf(false) }
@@ -646,7 +671,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             IconButton(onClick = {
-                                if (viewModel.humidorCigarsCount!!.count >= count.value.toLong()) showPrice.value = false
+                                if (viewModel.humidorCigarsCount!!.count >= count.value.toLong()) showPrice.value =
+                                    false
                                 val current = (count.value.ifBlank { "0" }).toInt()
                                 count.value = if (current > 0) current.dec().toString() else "0"
                             }) {
@@ -666,7 +692,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 }
                             )
                             IconButton(onClick = {
-                                if (viewModel.humidorCigarsCount!!.count < count.value.toLong()) showPrice.value = true
+                                if (viewModel.humidorCigarsCount!!.count < count.value.toLong()) showPrice.value =
+                                    true
                                 count.value = (count.value.ifBlank { "0" }).toInt().inc().toString()
                             }) {
                                 loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
@@ -705,7 +732,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     viewModel.updateCigarCount(
                                         viewModel.humidorCigarsCount!!,
                                         count.value.toLong(),
-                                        if(price.value.isNotBlank()) price.value.toDouble() else null
+                                        if (price.value.isNotBlank()) price.value.toDouble() else null
                                     )
                                 })
                         }
@@ -716,7 +743,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun CigarsRatingDialog(onDismissRequest: () -> Unit) {
+    private fun CigarsRatingDialog(onDismissRequest: () -> Unit) {
         val rating = remember { mutableStateOf("0") }
         LaunchedEffect(viewModel.myrating) {
             rating.value = (viewModel.myrating ?: 0).toString()
@@ -780,12 +807,30 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
     }
 
     @Composable
-    fun MoveCigarsDialog(onDismissRequest: () -> Unit) {
-        val humidors = remember { viewModel.humidors() }
-        val from = remember { mutableStateOf<Humidor?>(null) }
+    private fun MoveCigarsDialog(onDismissRequest: () -> Unit) {
+        val count = remember { mutableStateOf(1L) }
+        val from = remember { mutableStateOf<HumidorCigar?>(null) }
         val to = remember { mutableStateOf<Humidor?>(null) }
+        val fromList = remember { mutableStateOf<List<ValuePickerItem<HumidorCigar>>>(listOf()) }
+        val toList = remember { mutableStateOf<List<ValuePickerItem<Humidor>>>(listOf()) }
 
+        fun isValid(from: HumidorCigar?, to: Humidor?, count: Long): Boolean {
+            return from?.let { fromCH ->
+                fromCH.humidor?.let { fromH ->
+                    to?.let { to ->
+                        from.count < count && to.compareTo(fromH) != 0
+                    }
+                }
+            } ?:false
+        }
         if (viewModel.moveCigarDialog) {
+
+            LaunchedEffect(from.value, to.value) {
+                fromList.value = viewModel.moveFromHumidors(from.value?.humidor)
+                toList.value = viewModel.moveToHumidors(from.value?.humidor)
+                count.value = from.value?.count ?: 1L
+            }
+
             Dialog(onDismissRequest = { onDismissRequest() }) {
                 Card(
                     modifier = Modifier.wrapContentSize(),
@@ -806,42 +851,72 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                         )
 
                         Column(
-                            modifier = Modifier.wrapContentSize().padding(24.dp),
+                            modifier = Modifier.wrapContentSize().padding(top = 24.dp),
                             verticalArrangement = Arrangement.SpaceBetween,
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             ValuePicker(
                                 modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
                                 backgroundColor = MaterialColors.color_outline,
-                                value = from.value?.name ?: Localize.cigar_details_move_select,
+                                value = ValuePickerItem(
+                                    null,
+                                    Localize.cigar_details_move_select,
+                                    null
+                                ),
                                 label = Localize.cigar_details_move_from,
-                                items = humidors.map { it to it.name },
+                                items = fromList.value,
                                 onClick = {
-                                    from.value = it.first
+                                    from.value = it.value
                                 }
                             )
                             ValuePicker(
-                                modifier = Modifier.padding(bottom = 10.dp).fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 backgroundColor = MaterialColors.color_outline,
-                                value = to.value?.name ?: Localize.cigar_details_move_select,
+                                value = ValuePickerItem(
+                                    null,
+                                    Localize.cigar_details_move_select,
+                                    null
+                                ),
                                 label = Localize.cigar_details_move_to,
-                                items = humidors.map { it to it.name },
+                                items = toList.value,
                                 onClick = {
-                                    to.value = it.first
+                                    to.value = it.value
                                 }
                             )
+                            Row(
+                                modifier = Modifier.width(100.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                TextStyled(
+                                    if(count.value > 0) "${count.value}" else "",
+                                    TextStyles.Headline,
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                        .wrapContentSize(),
+                                    editable = true,
+                                    maxLines = 1,
+                                    inputMode = KeyboardType.Number,
+                                    center = true,
+                                    onValueChange = {
+                                        count.value = if (it.isNotBlank()) it.toLong() else 0
+                                    }
+                                )
+                            }
                         }
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
                             horizontalArrangement = Arrangement.End,
                         ) {
                             DialogButton(
                                 title = Localize.button_cancel,
                                 onClick = { onDismissRequest() })
                             DialogButton(
-                                enabled = from.value != null && to.value != null && from.value != to.value,
+                                enabled = isValid(from.value, to.value, count.value),
                                 title = Localize.button_save,
                                 onClick = {
+                                    viewModel.moveCigar(from.value!!, to.value!!, count.value)
+                                    from.value = null
+                                    to.value = null
                                     onDismissRequest()
                                 })
                         }

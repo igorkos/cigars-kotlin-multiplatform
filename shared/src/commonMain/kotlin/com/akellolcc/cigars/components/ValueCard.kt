@@ -65,7 +65,13 @@ fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
 }
 
 @Composable
-fun ValuesCard(label: String? = null, vertical: Boolean = false, actionIcon: ImageResource? = null, onAction: (() -> Unit)? = null, content: @Composable () -> Unit) {
+fun ValuesCard(
+    label: String? = null,
+    vertical: Boolean = false,
+    actionIcon: ImageResource? = null,
+    onAction: (() -> Unit)? = null,
+    content: @Composable () -> Unit
+) {
     Box {
         OutlinedCard(
             colors = CardDefaults.cardColors(
@@ -94,13 +100,16 @@ fun ValuesCard(label: String? = null, vertical: Boolean = false, actionIcon: Ima
             }
         }
         if (label != null) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween,
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)
-                    .background(materialColor(MaterialColors.color_transparent))) {
+                    .background(materialColor(MaterialColors.color_transparent))
+            ) {
                 TextStyled(
                     label,
                     TextStyles.Subhead,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp).background(materialColor(MaterialColors.color_background))
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+                        .background(materialColor(MaterialColors.color_background))
                 )
                 if (actionIcon != null) {
                     Box(contentAlignment = Alignment.Center) {
@@ -113,7 +122,7 @@ fun ValuesCard(label: String? = null, vertical: Boolean = false, actionIcon: Ima
                         IconButton(
                             modifier = Modifier.size(24.dp)
                                 .background(materialColor(MaterialColors.color_transparent)),
-                            onClick = {onAction?.invoke()}) {
+                            onClick = { onAction?.invoke() }) {
                             loadIcon(
                                 actionIcon,
                                 Size(24f, 24f),

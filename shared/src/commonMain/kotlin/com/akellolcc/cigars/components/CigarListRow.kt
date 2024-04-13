@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
@@ -51,28 +50,28 @@ fun CigarListRow(entity: Cigar, modifier: Modifier) {
         ) {
             TextStyled(
                 label = Localize.cigar_details_shape,
-                labelSuffix="",
+                labelSuffix = "",
                 text = entity.cigar,
                 style = TextStyles.Subhead,
                 vertical = true
             )
             TextStyled(
                 label = Localize.cigar_details_length,
-                labelSuffix="",
+                labelSuffix = "",
                 text = entity.length,
                 style = TextStyles.Subhead,
                 vertical = true
             )
             TextStyled(
                 label = Localize.cigar_details_gauge,
-                labelSuffix="",
+                labelSuffix = "",
                 text = "${entity.gauge}",
                 style = TextStyles.Subhead,
                 vertical = true
             )
             TextStyled(
                 label = Localize.cigar_details_count,
-                labelSuffix="",
+                labelSuffix = "",
                 text = Localize.cigar_list_total(entity.count),
                 style = TextStyles.Subhead,
                 vertical = true

@@ -7,6 +7,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import dev.icerock.moko.mvvm.flow.CMutableStateFlow
 import dev.icerock.moko.mvvm.flow.cMutableStateFlow
+import kotlinx.atomicfu.locks.reentrantLock
+import kotlinx.atomicfu.locks.withLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class ObservableEntity<D>(private val dbEntity: Flow<D>) {
+    private val lock = reentrantLock()
     private val listeners = mutableListOf<ObservableEntityListener<D, *>>()
     private val entity: CMutableStateFlow<D?> = MutableStateFlow<D?>(null).cMutableStateFlow()
     val value: D?
@@ -30,15 +33,19 @@ class ObservableEntity<D>(private val dbEntity: Flow<D>) {
     }
 
     fun reload() {
-        listeners.forEach {
-            it.invoke(entity.value)
+        lock.withLock {
+            listeners.forEach {
+                it.invoke(entity.value)
+            }
         }
     }
 
     fun <T> map(transform: (D?) -> T?): MutableState<T?> {
-        val listener = ObservableEntityListener<D, T>(transform(entity.value), transform)
-        listeners.add(listener)
-        return listener.value
+        lock.withLock {
+            val listener = ObservableEntityListener<D, T>(transform(entity.value), transform)
+            listeners.add(listener)
+            return listener.value
+        }
     }
 
     @Composable
@@ -47,6 +54,7 @@ class ObservableEntity<D>(private val dbEntity: Flow<D>) {
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 private class ObservableEntityListener<D, T>(
     initialValue: T?,
     private val transform: (D?) -> Any?

@@ -1,32 +1,22 @@
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.textStyle
 
 
 @Composable
-public fun TextStyled(
+fun TextStyled(
     text: String?,
     style: TextStyles = TextStyles.Headline,
     label: String? = null,
@@ -46,9 +36,9 @@ public fun TextStyled(
     val textStyle =
         textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
     val styleLabel = textStyle(labelStyle)
- //   val textMeasurer = rememberTextMeasurer()
- //   var textWith by remember { mutableStateOf(0) }
- //   var textHeight by remember { mutableStateOf(maxHeight.dp) }
+    //   val textMeasurer = rememberTextMeasurer()
+    //   var textWith by remember { mutableStateOf(0) }
+    //   var textHeight by remember { mutableStateOf(maxHeight.dp) }
 
     if (editable) {
         TextField(
@@ -88,7 +78,7 @@ public fun TextStyled(
                 )
             }
             Text(
-                modifier =modifier,
+                modifier = modifier,
                 text = text ?: "",
                 color = textStyle.color,
                 fontSize = textStyle.fontSize,
@@ -102,8 +92,8 @@ public fun TextStyled(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 context()
             }
-        } else{
-            Row{
+        } else {
+            Row {
                 context()
             }
         }

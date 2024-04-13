@@ -49,7 +49,7 @@ import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.ui.px
+import com.akellolcc.cigars.ui.dpToPx
 import com.akellolcc.cigars.ui.screenWidth
 import com.preat.peekaboo.image.picker.ResizeOptions
 import com.preat.peekaboo.image.picker.SelectionMode
@@ -81,8 +81,8 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
         var launchGallery by remember { mutableStateOf(value = false) }
         val images by viewModel.asState()
         val resizeOptions = ResizeOptions(
-            width = screenWidth().px, // Custom width
-            height = (screenWidth().px * 0.8).roundToInt(), // Custom height
+            width = screenWidth().dpToPx(), // Custom width
+            height = (screenWidth().dpToPx() * 0.8).roundToInt(), // Custom height
             resizeThresholdBytes = 2 * 1024 * 1024L, // Custom threshold for 2MB,
         )
 

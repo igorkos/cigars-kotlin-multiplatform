@@ -31,7 +31,10 @@ class History(
 
 enum class HistoryType(val type: Long) {
     Addition(0L),
-    Deletion(1L);
+    Deletion(1L),
+    Move(2L),
+    MoveFrom(3L),
+    MoveTo(4L);
 
     override fun toString(): String {
         return localized(this)
@@ -42,6 +45,9 @@ enum class HistoryType(val type: Long) {
             return when (value) {
                 Addition -> Localize.history_type_addition
                 Deletion -> Localize.history_type_deletion
+                Move -> Localize.history_type_move
+                MoveFrom -> Localize.history_type_move
+                MoveTo -> Localize.history_type_move
             }
         }
 

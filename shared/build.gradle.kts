@@ -65,7 +65,7 @@ kotlin {
                 implementation(libs.bundles.sqldelight.common)
 
                 implementation(libs.bundles.ktor.common)
-                //implementation(libs.hyperdrive.multiplatformx.api)
+                implementation(libs.atomicfu)
                 //implementation(libs.hyperdrive.multiplatformx.compose)
             }
         }

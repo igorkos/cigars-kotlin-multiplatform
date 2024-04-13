@@ -56,6 +56,12 @@ class SqlDelightHumidorCigarsRepository(
         TODO("Not yet implemented")
     }
 
+    override fun find(cigar: Cigar, humidor: Humidor): HumidorCigar? {
+        return queries.findHumidorCigar(cigar.rowid, humidor.rowid).executeAsOneOrNull()?.let {
+            HumidorCigar(it.count, humidor, cigar)
+        }
+    }
+
     override fun observe(id: Long): Flow<HumidorCigar> {
         TODO("Not yet implemented")
     }

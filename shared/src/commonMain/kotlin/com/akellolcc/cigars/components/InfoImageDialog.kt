@@ -16,9 +16,10 @@ import dev.icerock.moko.resources.ImageResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun InfoImageDialog(image: ImageResource, onDismissRequest: () -> Unit) {
-    Dialog(onDismissRequest = onDismissRequest,
+    Dialog(
+        onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false)
-        ) {
+    ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             loadImage(image)
             IconButton(

@@ -190,6 +190,10 @@ VALUES (?,?,?);
 humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
 
+findHumidorCigar:
+SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
+
+
 humidorHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor ORDER BY date DESC;
 

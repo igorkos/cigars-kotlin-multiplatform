@@ -99,6 +99,7 @@ object Localize {
 
     val history_type_addition = Strings.history_type_addition.toString()
     val history_type_deletion = Strings.history_type_deletion.toString()
+    val history_type_move = Strings.history_type_move.toString()
 
     fun humidor_cigars(v: Long, v1: Long): String {
         return Strings.humidor_cigars.createLocalizedString(v, v1).toString()

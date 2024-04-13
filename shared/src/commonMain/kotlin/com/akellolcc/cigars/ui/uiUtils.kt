@@ -27,13 +27,13 @@ import kotlin.random.Random
 @Composable
 expect fun screenWidth(): Dp
 
-@Stable
-inline val Dp.px: Int
-    @Composable
-    get() {
-        val density = LocalDensity.current
-        return (this * density.density).value.roundToInt()
-    }
+@Composable
+fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx().roundToInt() }
+
+
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+
 
 @Composable
 expect fun BackHandler(block: () -> Unit)

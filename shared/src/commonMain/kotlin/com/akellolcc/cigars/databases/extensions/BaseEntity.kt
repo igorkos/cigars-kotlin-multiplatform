@@ -5,7 +5,7 @@ import com.akellolcc.cigars.ui.randomString
 import kotlinx.serialization.Serializable
 @Stable
 @Serializable
-abstract class BaseEntity {
+abstract class BaseEntity: Comparable<BaseEntity> {
     abstract var rowid: Long
     val key: String = randomString()
 
@@ -18,5 +18,8 @@ abstract class BaseEntity {
         other as BaseEntity
 
         return key == other.key
+    }
+    override operator fun compareTo(other: BaseEntity): Int {
+        return rowid.compareTo(other.rowid)
     }
 }
