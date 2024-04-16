@@ -15,7 +15,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
     private var imagesDatabase: ImagesRepository? = null
-    private var humidorsDatabase: HumidorsRepository? = database.getRepository(RepositoryType.Humidors)
+    private var humidorsDatabase: HumidorsRepository? =
+        database.getRepository(RepositoryType.Humidors)
     private var observeHumidor: ObservableEntity<Humidor>? = null
     private var _images: ObservableEntity<List<CigarImage>>? = null
 
@@ -51,7 +52,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
         observeHumidor?.map { if (!editing) humidity = it?.humidity ?: 0.0 }
         observeHumidor?.map { if (!editing) notes = it?.notes }
         observeHumidor?.map { if (!editing) link = it?.link }
-        observeHumidor?.map { if (!editing) type = it?.type ?:0 }
+        observeHumidor?.map { if (!editing) type = it?.type ?: 0 }
 
         _images = ObservableEntity(imagesDatabase!!.observeAll())
         _images?.map {
@@ -76,10 +77,10 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
             link = link
         )
         if (humidor.rowid < 0) {
-            humidorsDatabase?.add(updated) {
-                humidor = humidorsDatabase?.get(it)!!
-                observeHumidor()
-            }
+            /*  humidorsDatabase?.add(updated) {
+                  humidor = humidorsDatabase?.get(it)!!
+                  observeHumidor()
+              }*/
 
         } else {
             humidorsDatabase?.update(updated)

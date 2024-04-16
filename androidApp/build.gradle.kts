@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -36,6 +37,7 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -45,4 +47,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.bundles.android.firebase)
+    implementation(libs.google.gms.services)
+
 }

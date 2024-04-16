@@ -16,6 +16,7 @@ class HumidorsViewModel : BaseListViewModel<Humidor, HumidorsViewModel.Action>()
     fun addHumidor() {
         sendEvent(Action.AddHumidor(null))
     }
+
     sealed interface Action {
         data class RouteToHumidor(val humidor: Humidor) : Action
         data class AddHumidor(val dummy: Any?) : Action

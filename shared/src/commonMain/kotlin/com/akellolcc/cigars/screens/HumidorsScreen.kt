@@ -1,7 +1,6 @@
 package com.akellolcc.cigars.screens
 
 import TextStyled
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
@@ -37,6 +35,7 @@ import kotlin.jvm.Transient
 
 class HumidorsScreen(override val route: NavRoute) : ITabItem {
     private val screen = HumidorsListScreen(route)
+
     @Composable
     override fun Content() {
         Navigator(screen)
@@ -53,10 +52,16 @@ class HumidorsListScreen(route: NavRoute) :
     @Composable
     override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
         CenterAlignedTopAppBar(
-            navigationIcon = { IconButton(onClick = { route.sharedViewModel?.isDrawerVisible = true }) {loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F))} },
-            actions = { IconButton(onClick = { viewModel.addHumidor() }) {
-                loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
-            }},
+            navigationIcon = {
+                IconButton(onClick = {
+                    route.sharedViewModel?.isDrawerVisible = true
+                }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
+            },
+            actions = {
+                IconButton(onClick = { viewModel.addHumidor() }) {
+                    loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
+                }
+            },
             title = { TextStyled(text = route.title, style = TextStyles.ScreenTitle) },
             scrollBehavior = scrollBehavior
         )
@@ -119,12 +124,14 @@ class HumidorsListScreen(route: NavRoute) :
             is HumidorsViewModel.Action.ShowError -> TODO()
             is HumidorsViewModel.Action.AddHumidor -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(HumidorDetailsScreen(
-                    HumidorDetailsRoute
-                    .apply {
-                        this.data = null
-                        sharedViewModel = mainModel
-                    }))
+                navigator?.push(
+                    HumidorDetailsScreen(
+                        HumidorDetailsRoute
+                            .apply {
+                                this.data = null
+                                sharedViewModel = mainModel
+                            })
+                )
             }
         }
     }

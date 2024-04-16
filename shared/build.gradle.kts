@@ -66,7 +66,11 @@ kotlin {
 
                 implementation(libs.bundles.ktor.common)
                 implementation(libs.atomicfu)
-                //implementation(libs.hyperdrive.multiplatformx.compose)
+
+                implementation(libs.bundles.multiplatform.firebase)
+
+                implementation(libs.bundles.reaktive)
+
             }
         }
         val commonTest by getting {
@@ -122,11 +126,14 @@ android {
     compileSdk = 34
     defaultConfig {
         minSdk = 31
+        targetSdk = 34
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildToolsVersion = "34.0.0"
+    ndkVersion = "26.1.10909125"
     kotlin {
         jvmToolchain(11)
     }

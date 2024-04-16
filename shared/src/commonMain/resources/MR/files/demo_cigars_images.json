@@ -2,73 +2,73 @@
   {
     "rowid": 0,
     "image": "#1 Fuente Fuente OpusX Reserva d’Chateau",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_1_cigar",
     "type": 0,
-    "cigarId":0,
+    "cigarId": 0,
     "humidorId": -1
   },
   {
     "rowid": 1,
     "image": "#2 Padrón Serie 1926 No. 48 Maduro",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_2_cigar",
     "type": 0,
-    "cigarId":1,
+    "cigarId": 1,
     "humidorId": -1
   },
   {
     "rowid": 2,
     "image": "#3 Oliva Serie V Melanio Toro",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_3_cigar",
     "type": 0,
-    "cigarId":2,
+    "cigarId": 2,
     "humidorId": -1
   },
   {
     "rowid": 3,
     "image": "#4 Rocky Patel A.L.R. Second Edition Toro",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_4_cigar",
     "type": 0,
-    "cigarId":3,
+    "cigarId": 3,
     "humidorId": -1
   },
   {
     "rowid": 4,
     "image": "#5 E.P. Carrillo Allegiance Confidant",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_5_cigar",
     "type": 0,
-    "cigarId":4,
+    "cigarId": 4,
     "humidorId": -1
   },
   {
     "rowid": 5,
     "image": "Case Elegance Renzo Humidor",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_1_humidor",
     "type": 0,
-    "cigarId":-1,
+    "cigarId": -1,
     "humidorId": 0
   },
   {
     "rowid": 6,
     "image": "Case Elegance Renzo Humidor",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_2_humidor",
     "type": 0,
-    "cigarId":-1,
+    "cigarId": -1,
     "humidorId": 0
   },
   {
     "rowid": 7,
     "image": "Case Elegance Renzo Humidor",
-    "bytes":[],
+    "bytes": [],
     "notes": "top_3_humidor",
     "type": 0,
-    "cigarId":-1,
+    "cigarId": -1,
     "humidorId": 0
   }
 ]

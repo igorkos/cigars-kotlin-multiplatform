@@ -7,11 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.ObservableEntity
 import com.akellolcc.cigars.databases.repository.Repository
-import com.akellolcc.cigars.logging.Log
 
 
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
@@ -36,9 +33,10 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
             _entities = ObservableEntity(repository.observeAll(sortField, accenting))
-            _entities?.map { entities = it ?:listOf() }
+            _entities?.map { entities = it ?: listOf() }
         }
     }
+
     @Composable
     fun asState(): State<List<T>> {
 

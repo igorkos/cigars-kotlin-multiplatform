@@ -1,6 +1,6 @@
 [
   {
-    "rowid": 0,
+    "rowid": -1,
     "name": "Case Elegance Renzo Humidor",
     "brand": "Klaro",
     "holds": 50,
@@ -9,6 +9,21 @@
     "humidity": "72",
     "notes": "This humidor is the staple humidor by Klaro and has undergone years of research and extensive testing to solve every shortcoming we experienced with other humidors. We have thoroughly examined this humidor in wet, temperate, and dry environments to assure the best levels of humidity for your cigars. This premium humidor features a handsome dark walnut finish, glass top, front digital hygrometer, accessory storage drawer, Spanish cedar, magnetic enclosure, and the patent-pending Hydro System™. This is the most complete cigar humidor out there.",
     "link": "https://caseelegance.com/products/glass-top-cedar-humidor-with-front-digital-hygrometer",
+    "autoOpen": false,
+    "sorting": 0,
+    "type": 0,
+    "price": 99.99
+  },
+  {
+    "rowid": -1,
+    "name": "Second",
+    "brand": "Klaro",
+    "holds": 150,
+    "count": 0,
+    "temperature": "72",
+    "humidity": "72",
+    "notes": null,
+    "link": null,
     "autoOpen": false,
     "sorting": 0,
     "type": 0,

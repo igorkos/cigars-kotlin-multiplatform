@@ -24,14 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.ui.dpToPx
 import com.akellolcc.cigars.ui.pxToDp
 import com.akellolcc.cigars.ui.screenWidth
 import dev.icerock.moko.resources.ColorResource
@@ -70,15 +68,16 @@ fun <T : Comparable<T>> ValuePicker(
             TextFieldDefaults.shape
         ).onSizeChanged {
             with = it.width
-           Log.debug("width ${it.width.dp} $screenWidth")
+            Log.debug("width ${it.width.dp} $screenWidth")
         },
         horizontalAlignment = Alignment.Start
     ) {
         Column(
-            modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 4.dp).wrapContentWidth()
+            modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
+                .wrapContentWidth()
                 .onSizeChanged {
                     Log.debug("1 width ${it.width.dp}")
-                   // with = it.width.dp
+                    // with = it.width.dp
                 }) {
             CompositionLocalProvider(
                 LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)

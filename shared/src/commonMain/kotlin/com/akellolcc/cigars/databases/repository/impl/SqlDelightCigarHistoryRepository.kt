@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 class SqlDelightCigarHistoryRepository(
     id: Long,
     queries: CigarsDatabaseQueries
-) : SqlDelightHistoryRepository(id, queries){
+) : SqlDelightHistoryRepository(id, queries) {
 
     override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<History>> {
         return queries.cigarHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)

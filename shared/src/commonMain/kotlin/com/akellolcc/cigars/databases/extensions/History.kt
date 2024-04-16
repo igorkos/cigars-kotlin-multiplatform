@@ -2,8 +2,11 @@ package com.akellolcc.cigars.databases.extensions
 
 import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.databases.HistoryTable
+import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
+import dev.icerock.moko.resources.ImageResource
 import kotlinx.serialization.Serializable
+
 @Stable
 @Serializable
 class History(
@@ -51,9 +54,27 @@ enum class HistoryType(val type: Long) {
             }
         }
 
+        fun icon(value: Long): ImageResource {
+            return icon(fromLong(value))
+        }
+
+        fun icon(value: HistoryType): ImageResource {
+            return when (value) {
+                Addition -> Images.icon_arrow_right
+                Deletion -> Images.icon_arrow_left
+                Move -> Images.icon_tab
+                MoveFrom -> Images.icon_tab
+                MoveTo -> Images.icon_tab
+            }
+        }
+
         inline fun fromLong(value: Long): HistoryType = when (value) {
             0L -> Addition
-            else -> Deletion
+            1L -> Deletion
+            2L -> Move
+            3L -> MoveFrom
+            4L -> MoveTo
+            else -> Addition
         }
     }
 }

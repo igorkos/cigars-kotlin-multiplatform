@@ -1,5 +1,6 @@
 [versions]
 agp = "8.4.0-rc02"
+firebaseBom = "32.8.1"
 kotlin = "1.9.20"
 
 kotlin-dateTime = "0.5.0"
@@ -38,6 +39,9 @@ hyperdrive = "0.1.148"
 
 ktor = "2.3.9"
 atomicfu-version="0.23.2"
+firebase-version="1.12.0"
+firebase-plugin-version="2.9.9"
+google-gms-services-version="4.4.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -85,12 +89,6 @@ androidx-foundation-android = { group = "androidx.compose.foundation", name = "f
 ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "compose" }
 accompanist-permissions = { group =  "com.google.accompanist", name =  "accompanist-permissions", version.ref = "accompanist" }
 
-reaktive-reaktive = { group =  "com.badoo.reaktive", name = "reaktive", version.ref = "reaktive-version" }
-reaktive-annotations = { group =  "com.badoo.reaktive", name = "reaktive-annotations", version.ref = "reaktive-version" }
-reaktive-coroutines = { group =  "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
-reaktive-rxjava2 = { group =  "com.badoo.reaktive", name = "rxjava2-interop", version.ref = "reaktive-version" }
-reaktive-rxjava3 = { group =  "com.badoo.reaktive", name = "rxjava3-interop", version.ref = "reaktive-version" }
-
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekaboo" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
 cloudinary = { module = "com.cloudinary:kotlin-url-gen", version.ref = "cloudinary" }
@@ -100,6 +98,26 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu-version" }
+
+firebase-authentication = { module = "dev.gitlive:firebase-auth", version.ref = "firebase-version" }
+firebase-realtime-database = { module = "dev.gitlive:firebase-database", version.ref = "firebase-version" }
+firebase-cloud-messaging = { module = "dev.gitlive:firebase-messaging", version.ref = "firebase-version" }
+firebase-installations = { module = "dev.gitlive:firebase-installations", version.ref = "firebase-version" }
+firebase-performance	= { module = "dev.gitlive:firebase-perf", version.ref = "firebase-version" }
+firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "firebase-version" }
+
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+google-gms-services = { module = "com.google.gms:google-services", version.ref = "google-gms-services-version"  }
+
+
+reaktive-reaktive = { group =  "com.badoo.reaktive", name = "reaktive", version.ref = "reaktive-version" }
+reaktive-annotations = { group =  "com.badoo.reaktive", name = "reaktive-annotations", version.ref = "reaktive-version" }
+reaktive-coroutines = { group =  "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
+reaktive-rxjava2 = { group =  "com.badoo.reaktive", name = "rxjava2-interop", version.ref = "reaktive-version" }
+reaktive-rxjava3 = { group =  "com.badoo.reaktive", name = "rxjava3-interop", version.ref = "reaktive-version" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -112,9 +130,14 @@ jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "jetbrains-comp
 i18n = { id = "de.comahe.i18n4k", version.ref = "i18n-version" }
 mokoCompose = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko-compose-version" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight-version" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-plugin-version" }
+google-gms-services = { id = "com.google.gms.google-services", version.ref = "google-gms-services-version"  }
 
 [bundles]
 ktor-common = ["ktor-client-core",  "ktor-client-serialization"]
 moko-common = ["moko-resources-compose", "moko-resources", "mvvm-core", "mvvm-flow", "mvvm-flow-compose", "mvvm-flow-resources", "mvvm-livedata", "mvvm-livedata-compose", "mvvm-livedata-resources", "mvvm-state", "moko-mvvm"]
 voyager-common = ["voyager-bottom-sheet-navigator", "voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
 sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines"]
+android-firebase = ["firebase-analytics", "firebase-bom", "google-firebase-crashlytics"]
+multiplatform-firebase = ["firebase-realtime-database", "firebase-installations", "firebase-performance", "firebase-crashlytics"]
+reaktive = ["reaktive-reaktive", "reaktive-annotations", "reaktive-coroutines"]

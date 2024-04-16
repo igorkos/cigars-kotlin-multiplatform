@@ -5,9 +5,10 @@ import com.akellolcc.cigars.databases.HumidorsTable
 import kotlinx.serialization.Serializable
 
 var emptyHumidor = Humidor(-1, "", "", 0, 0)
+
 @Stable
 @Serializable
-class Humidor(
+data class Humidor(
     override var rowid: Long,
     var name: String,
     var brand: String,
@@ -34,7 +35,7 @@ class Humidor(
         humidor.notes,
         humidor.link,
         humidor.price,
-        humidor.autoOpen ?:false,
+        humidor.autoOpen ?: false,
         humidor.sorting,
         humidor.type
     )

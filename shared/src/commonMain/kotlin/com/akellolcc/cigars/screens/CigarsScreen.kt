@@ -1,21 +1,10 @@
 package com.akellolcc.cigars.screens
 
 import TextStyled
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.components.CigarListRow
 import com.akellolcc.cigars.databases.extensions.Cigar
@@ -27,17 +16,15 @@ import com.akellolcc.cigars.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
-import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class CigarsScreen(
     override val route: NavRoute
 ) : ITabItem {
     private val screen = CigarsListScreen(route)
+
     @Composable
     override fun Content() {
         Navigator(screen)
@@ -70,6 +57,7 @@ open class CigarsListScreen(override val route: NavRoute) :
             )
         }
     }
+
     override fun handleAction(event: CigarsScreenViewModel.CigarsAction, navigator: Navigator?) {
         val mainModel = route.sharedViewModel as MainScreenViewModel
         when (event) {

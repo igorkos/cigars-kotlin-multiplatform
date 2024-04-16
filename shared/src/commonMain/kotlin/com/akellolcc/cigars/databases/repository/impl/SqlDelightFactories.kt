@@ -1,16 +1,11 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.databases.repository.CigarsRepository
-import com.akellolcc.cigars.databases.repository.HumidorsRepository
 
 fun historyFactory(
     rowid: Long,

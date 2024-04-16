@@ -9,6 +9,7 @@ import kotlin.jvm.Transient
 class CigarHistoryScreen(route: NavRoute) : HistoryScreen(route) {
 
     @Transient
-    override var viewModel = CigarHistoryScreenViewModel(route.data as Cigar) as HistoryScreenViewModel
+    override var viewModel =
+        CigarHistoryScreenViewModel(route.data as Cigar) as HistoryScreenViewModel
 
 }

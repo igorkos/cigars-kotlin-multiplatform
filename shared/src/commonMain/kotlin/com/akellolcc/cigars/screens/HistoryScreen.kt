@@ -26,7 +26,6 @@ import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.mvvm.HistoryScreenViewModel
 import com.akellolcc.cigars.navigation.NavRoute
-import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
@@ -57,7 +56,8 @@ abstract class HistoryScreen(override val route: NavRoute) :
                 TextStyled(
                     viewModel.name,
                     TextStyles.ScreenTitle,
-                )},
+                )
+            },
             colors = topColors,
             navigationIcon = {
                 IconButton(onClick = {
@@ -83,10 +83,7 @@ abstract class HistoryScreen(override val route: NavRoute) :
                 modifier = Modifier.fillMaxWidth().padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                loadIcon(
-                    if (entity.type == HistoryType.Addition) Images.icon_arrow_right else Images.icon_arrow_left,
-                    Size(32.dp.value, 32.dp.value)
-                )
+                loadIcon(HistoryType.icon(entity.type), Size(32.dp.value, 32.dp.value))
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -110,10 +107,13 @@ abstract class HistoryScreen(override val route: NavRoute) :
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             TextStyled(
-                                text = if(entity.cigarId < 0) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(entity.type, entity.count),
+                                text = if (entity.cigarId < 0) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
+                                    entity.type,
+                                    entity.count
+                                ),
                                 style = TextStyles.Subhead
                             )
-                            if(entity.price != null) {
+                            if (entity.price != null) {
                                 TextStyled(
                                     text = Localize.history_transaction_price(entity.price!!),
                                     style = TextStyles.Subhead

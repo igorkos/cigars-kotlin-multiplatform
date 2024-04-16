@@ -2,8 +2,11 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.Repository
+import com.badoo.reaktive.observable.Observable
+import com.badoo.reaktive.observable.ObservableWrapper
+import com.badoo.reaktive.observable.observable
+import com.badoo.reaktive.observable.wrap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -11,7 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: CigarsDatabaseQueries) : Repository<ENTITY> {
+abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: CigarsDatabaseQueries) :
+    Repository<ENTITY> {
 
     override suspend fun get(id: Long): ENTITY {
         return observe(id).first()
@@ -19,6 +23,10 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
 
     override fun getSync(id: Long): ENTITY {
         TODO("Not yet implemented")
+    }
+
+    override fun allSync(sortField: String?, accenting: Boolean): List<ENTITY> {
+        return listOf()
     }
 
     override suspend fun find(id: Long): ENTITY? {
@@ -29,28 +37,33 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return observe(entity.rowid)
     }
 
-    override suspend fun all(sortField: String?, accenting: Boolean): List<ENTITY> {
-        return observeAll(sortField, accenting).first()
-    }
-
-    override fun allSync(sortField: String?, accenting: Boolean): List<ENTITY> {
-        return listOf()
-    }
-
-    override fun add(entity: ENTITY, callback: (suspend (Long) -> Unit)?) {
-        if (!contains(entity.rowid)) {
+    override fun all(sortField: String?, accenting: Boolean): Observable<List<ENTITY>> {
+        return observable { emitter ->
             CoroutineScope(Dispatchers.IO).launch {
-                queries.transactionWithResult {
-                    doUpsert(entity)
-                    callback?.let {
-                        val id = queries.lastInsertRowId().executeAsOne()
-                        it(id)
-                    }
+                observeAll(sortField, accenting).collect {
+                    emitter.onNext(it)
+                    emitter.onComplete()
                 }
             }
-        } else {
-            error("Can't insert entity: $entity which already exist in the database.")
         }
+    }
+
+    override fun add(entity: ENTITY): ObservableWrapper<ENTITY> {
+        return observable { emitter ->
+            CoroutineScope(Dispatchers.IO).launch {
+                if (!contains(entity.rowid)) {
+                    queries.transactionWithResult {
+                        doUpsert(entity)
+                        val id = queries.lastInsertRowId().executeAsOne()
+                        entity.rowid = id
+                        emitter.onNext(entity)
+                        emitter.onComplete()
+                    }
+                } else {
+                    emitter.onError(Exception("Can't insert entity: $entity which already exist in the database."))
+                }
+            }
+        }.wrap()
     }
 
     override fun remove(entity: ENTITY) = remove(entity.rowid)
@@ -63,14 +76,16 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return idExists
     }
 
-    override fun update(entity: ENTITY) {
-        if (contains(entity.rowid)) {
-            CoroutineScope(Dispatchers.IO).launch {
-                doUpsert(entity)
+    override fun update(entity: ENTITY): Observable<ENTITY> {
+        return observable { emitter ->
+            if (contains(entity.rowid)) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    doUpsert(entity, false)
+                    emitter.onNext(entity)
+                }
+            } else {
+                emitter.onError(Exception("Can't update entity: $entity which doesn't exist in the database."))
             }
-        } else {
-            // TODO: Throw custom repository exception
-            error("Can't update entity: $entity which doesn't exist in the database.")
         }
     }
 
@@ -84,7 +99,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         return 0L
     }
 
-    protected open suspend fun doUpsert(entity: ENTITY) {}
+    protected open suspend fun doUpsert(entity: ENTITY, add: Boolean = true) {}
 
     protected abstract fun doDelete(id: Long)
 

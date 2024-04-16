@@ -56,7 +56,8 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     abstract fun handleAction(event: A, navigator: Navigator?)
 
     @Composable
-    open fun RightActionMenu(onDismiss: () -> Unit) {}
+    open fun RightActionMenu(onDismiss: () -> Unit) {
+    }
 
     @Composable
     abstract fun EntityListRow(entity: E, modifier: Modifier)
@@ -70,7 +71,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
         LaunchedEffect(navigator) {
             Log.debug("LaunchedEffect")
             viewModel.loadEntities()
-            if(route.sharedViewModel?.isTabsVisible != route.isTabsVisible)
+            if (route.sharedViewModel?.isTabsVisible != route.isTabsVisible)
                 route.sharedViewModel?.isTabsVisible = route.isTabsVisible
         }
 
@@ -110,6 +111,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
             )
         }
     }
+
     @Composable
     private fun entitiesList(entities: List<E>, padding: Pair<Dp, Dp>) {
         val listState = rememberLazyListState()
@@ -153,22 +155,28 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     }
 
 
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
         var expanded by remember { mutableStateOf(false) }
 
         CenterAlignedTopAppBar(
-            navigationIcon = { IconButton(onClick = { route.sharedViewModel?.isDrawerVisible = true }) {loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F))} },
+            navigationIcon = {
+                IconButton(onClick = {
+                    route.sharedViewModel?.isDrawerVisible = true
+                }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
+            },
             actions = {
-                IconButton(onClick = { viewModel.sortingOrder(!viewModel.accenting) }){
-                    loadIcon(if(viewModel.accenting) Images.icon_menu_sort_alpha_asc else Images.icon_menu_sort_alpha_desc, Size(24.0F, 24.0F))
+                IconButton(onClick = { viewModel.sortingOrder(!viewModel.accenting) }) {
+                    loadIcon(
+                        if (viewModel.accenting) Images.icon_menu_sort_alpha_asc else Images.icon_menu_sort_alpha_desc,
+                        Size(24.0F, 24.0F)
+                    )
                 }
-                IconButton(onClick = { expanded = !expanded }){
+                IconButton(onClick = { expanded = !expanded }) {
                     loadIcon(Images.icon_menu, Size(24.0F, 24.0F))
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        RightActionMenu{
+                        RightActionMenu {
                             expanded = false
                         }
                     }

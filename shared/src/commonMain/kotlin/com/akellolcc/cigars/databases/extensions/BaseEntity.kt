@@ -3,9 +3,10 @@ package com.akellolcc.cigars.databases.extensions
 import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.ui.randomString
 import kotlinx.serialization.Serializable
+
 @Stable
 @Serializable
-abstract class BaseEntity: Comparable<BaseEntity> {
+abstract class BaseEntity : Comparable<BaseEntity> {
     abstract var rowid: Long
     val key: String = randomString()
 
@@ -19,6 +20,7 @@ abstract class BaseEntity: Comparable<BaseEntity> {
 
         return key == other.key
     }
+
     override operator fun compareTo(other: BaseEntity): Int {
         return rowid.compareTo(other.rowid)
     }

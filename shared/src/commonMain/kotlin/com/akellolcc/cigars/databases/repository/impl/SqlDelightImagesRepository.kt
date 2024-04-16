@@ -1,14 +1,10 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -16,7 +12,7 @@ abstract class SqlDelightImagesRepository(
     queries: CigarsDatabaseQueries
 ) : BaseRepository<CigarImage>(queries), ImagesRepository {
 
-    override suspend fun doUpsert(entity: CigarImage) {
+    override suspend fun doUpsert(entity: CigarImage, add: Boolean) {
         queries.addImage(
             entity.rowid,
             entity.bytes,
@@ -25,7 +21,7 @@ abstract class SqlDelightImagesRepository(
             entity.notes,
             entity.cigarId,
             entity.humidorId
-            )
+        )
     }
 
     override fun doDelete(id: Long) {

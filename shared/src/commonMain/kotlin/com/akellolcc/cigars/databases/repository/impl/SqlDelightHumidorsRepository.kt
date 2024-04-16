@@ -7,6 +7,9 @@ import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.badoo.reaktive.observable.ObservableWrapper
+import com.badoo.reaktive.observable.map
+import com.badoo.reaktive.observable.wrap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -14,12 +17,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
-class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseRepository<Humidor>(queries), HumidorsRepository {
+class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) :
+    BaseRepository<Humidor>(queries), HumidorsRepository {
 
-    override fun allSync(sortField: String?, accenting: Boolean): List<Humidor> = if(accenting)
-            queries.allHumidorsAsc(sortField ?:"name",::humidorFactory).executeAsList()
-        else
-            queries.allHumidorsDesc(sortField ?:"name",::humidorFactory).executeAsList()
+    override fun allSync(sortField: String?, accenting: Boolean): List<Humidor> = if (accenting)
+        queries.allHumidorsAsc(sortField ?: "name", ::humidorFactory).executeAsList()
+    else
+        queries.allHumidorsDesc(sortField ?: "name", ::humidorFactory).executeAsList()
 
     override fun getSync(id: Long): Humidor {
         return queries.humidor(id, ::humidorFactory).executeAsOne()
@@ -35,21 +39,32 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) : BaseReposit
 
     override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Humidor>> {
         return (
-                if(accenting)
-                    queries.allHumidorsAsc(sortField ?:"name",::humidorFactory)
+                if (accenting)
+                    queries.allHumidorsAsc(sortField ?: "name", ::humidorFactory)
                 else
-                    queries.allHumidorsDesc(sortField ?:"name",::humidorFactory)
+                    queries.allHumidorsDesc(sortField ?: "name", ::humidorFactory)
                 ).asFlow().mapToList(Dispatchers.IO)
     }
 
-    override fun add(entity: Humidor, callback: (suspend (Long) -> Unit)?) {
-        super.add(entity) {
-            queries.addHistory(1,  Clock.System.now().toEpochMilliseconds(), 1, entity.price, 0, -1, it)
-            callback?.invoke(it)
-        }
+    override fun add(entity: Humidor): ObservableWrapper<Humidor> {
+        return super.add(entity).map {
+            CoroutineScope(Dispatchers.IO).launch {
+                queries.addHistory(
+                    1,
+                    Clock.System.now().toEpochMilliseconds(),
+                    1,
+                    entity.price,
+                    0,
+                    -1,
+                    it.rowid
+                )
+            }
+            it
+        }.wrap()
     }
-    override suspend fun doUpsert(entity: Humidor) {
-        if(!contains(entity.rowid)) {
+
+    override suspend fun doUpsert(entity: Humidor, add: Boolean) {
+        if (add) {
             queries.addHumidor(
                 entity.name,
                 entity.brand,

@@ -28,7 +28,8 @@ import kotlin.math.absoluteValue
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     DatabaseViewModel<Cigar, CigarsDetailsScreenViewModel.CigarsDetailsAction>() {
     private var cigarsDatabase: CigarsRepository = database.getRepository(RepositoryType.Cigars)
-    private var humidorsRepository: HumidorsRepository = database.getRepository(RepositoryType.Humidors)
+    private var humidorsRepository: HumidorsRepository =
+        database.getRepository(RepositoryType.Humidors)
     private var imagesDatabase: ImagesRepository? = null
     private var cigarHumidorRepository: CigarHumidorRepository? = null
     private var cigarsHistoryDatabase: HistoryRepository? = null
@@ -100,11 +101,11 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
-    fun humidorsCount() : Long {
+    fun humidorsCount(): Long {
         return database.numberOfEntriesIn(RepositoryType.Humidors)
     }
 
-    fun humidors() : List<Humidor> {
+    fun humidors(): List<Humidor> {
         return humidorsRepository.allSync(null, true)
     }
 
@@ -181,7 +182,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     fun updateCigarCount(entity: HumidorCigar, count: Long, price: Double? = null) {
         val c = entity.count - count
         if (c != 0L) {
-            cigarHumidorRepository?.update(entity.copy(count = count))
+            cigarHumidorRepository?.updateCount(cigar, entity.humidor, count)
             val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
             cigarsHistoryDatabase?.add(
                 History(
@@ -193,8 +194,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                     type,
                     cigar.rowid,
                     entity.humidor!!.rowid
-                ),
-                null
+                )
             )
             humidorCigarsCount = null
         }
@@ -214,24 +214,28 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun moveToHumidors(selected: Humidor?): List<ValuePickerItem<Humidor>> {
-        return humidorsRepository.allSync(null, true).map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
+        return humidorsRepository.allSync(null, true)
+            .map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
     }
 
-    fun moveCigar(from:HumidorCigar, to:Humidor, count: Long) {
+    fun moveCigar(from: HumidorCigar, to: Humidor, count: Long) {
 
         //From update
-        if (from.count < count) {
-            cigarHumidorRepository?.update(from.copy(count = from.count - count))
+        if (from.count > count) {
+            cigarHumidorRepository?.updateCount(cigar, from.humidor, count)
         } else {
-            cigarHumidorRepository?.remove(from)
+            cigarHumidorRepository?.remove(cigar, from.humidor)
         }
+        humidorsRepository.update(from.humidor.copy(count = from.humidor.count - count))
         //To update
         val toCH = cigarHumidorRepository?.find(cigar, to)
         if (toCH != null) {
-            cigarHumidorRepository?.update(toCH.copy(count = toCH.count + count))
+            cigarHumidorRepository?.updateCount(cigar, toCH.humidor, count)
         } else {
-            cigarHumidorRepository?.add(from.copy( count = count, humidor = to))
+            cigarHumidorRepository?.add(cigar, to, count)
         }
+        humidorsRepository.update(to.copy(count = to.count + count))
+
         //Cigar History
         cigarsHistoryDatabase?.add(
             History(
@@ -242,11 +246,13 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 price = cigar.price,
                 type = HistoryType.Move,
                 cigarId = cigar.rowid,
-                humidorId = from.humidor!!.rowid)
+                humidorId = from.humidor!!.rowid
+            )
         )
 
         //Humidor History
-        var humidorHistoryRepository: HistoryRepository = database.getRepository(RepositoryType.HumidorHistory, from.humidor!!.rowid)
+        var humidorHistoryRepository: HistoryRepository =
+            database.getRepository(RepositoryType.HumidorHistory, from.humidor!!.rowid)
         humidorHistoryRepository.add(
             History(
                 -1L,
@@ -256,9 +262,10 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 price = cigar.price,
                 type = HistoryType.MoveFrom,
                 cigarId = cigar.rowid,
-                humidorId = from.humidor.rowid)
+                humidorId = from.humidor.rowid
+            )
         )
-        humidorHistoryRepository= database.getRepository(RepositoryType.HumidorHistory, to.rowid)
+        humidorHistoryRepository = database.getRepository(RepositoryType.HumidorHistory, to.rowid)
         humidorHistoryRepository.add(
             History(
                 -1L,
@@ -268,9 +275,11 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 price = cigar.price,
                 type = HistoryType.MoveTo,
                 cigarId = cigar.rowid,
-                humidorId = to.rowid)
+                humidorId = to.rowid
+            )
         )
     }
+
     enum class InfoActions {
         None,
         CigarSize,

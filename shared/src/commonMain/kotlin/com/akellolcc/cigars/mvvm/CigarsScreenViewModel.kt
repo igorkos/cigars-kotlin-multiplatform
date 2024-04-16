@@ -7,7 +7,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 
 open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
-    override val repository: CigarsRepository =  database.getRepository(RepositoryType.Cigars)
+    override val repository: CigarsRepository = database.getRepository(RepositoryType.Cigars)
 
     override fun entitySelected(cigar: Cigar) {
         sendEvent(CigarsAction.RouteToCigar(cigar))

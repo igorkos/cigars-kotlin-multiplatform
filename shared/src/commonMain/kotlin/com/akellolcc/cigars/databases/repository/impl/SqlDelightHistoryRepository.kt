@@ -7,30 +7,25 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.HistoryRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 abstract class SqlDelightHistoryRepository(
     protected open val id: Long,
     queries: CigarsDatabaseQueries
 ) : BaseRepository<History>(queries), HistoryRepository {
 
-    override suspend fun doUpsert(entity: History) {
-        CoroutineScope(Dispatchers.Main).launch {
-            queries.addHistory(
-                entity.count,
-                entity.date,
-                entity.left,
-                entity.price,
-                entity.type.type,
-                entity.cigarId,
-                entity.humidorId
-            )
-            queries.lastInsertRowId().executeAsOne()
-        }
+    override suspend fun doUpsert(entity: History, add: Boolean) {
+        queries.addHistory(
+            entity.count,
+            entity.date,
+            entity.left,
+            entity.price,
+            entity.type.type,
+            entity.cigarId,
+            entity.humidorId
+        )
     }
 
     override fun doDelete(id: Long) {}

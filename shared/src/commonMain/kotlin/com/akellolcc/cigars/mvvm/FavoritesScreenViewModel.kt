@@ -5,5 +5,6 @@ import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
 
 
 class FavoritesScreenViewModel : CigarsScreenViewModel() {
-    override val repository: FavoriteCigarsRepository = database.getRepository(RepositoryType.Favorites)
+    override val repository: FavoriteCigarsRepository =
+        database.getRepository(RepositoryType.Favorites)
 }

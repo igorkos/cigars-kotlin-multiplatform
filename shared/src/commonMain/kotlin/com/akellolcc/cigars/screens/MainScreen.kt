@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
@@ -32,7 +31,6 @@ import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.logging.Log
@@ -44,9 +42,6 @@ import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 
 private var tabs: List<ITabItem> = listOf(
@@ -54,6 +49,7 @@ private var tabs: List<ITabItem> = listOf(
     HumidorsScreen(HumidorsRoute),
     FavoritesScreen(FavoritesRoute)
 )
+
 class MainScreen() : Screen {
 
     @Transient
@@ -64,7 +60,7 @@ class MainScreen() : Screen {
     override fun Content() {
         var isTabsVisible by remember { mutableStateOf(true) }
         var isDrawerVisible by remember { mutableStateOf(false) }
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed){
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) {
             isDrawerVisible = it == DrawerValue.Open
             true
         }
@@ -78,6 +74,7 @@ class MainScreen() : Screen {
                 }
 
                 is MainScreenViewModel.MainScreenActions.OpenDrawer -> {
+                    throw RuntimeException("Test Crash")
                     isDrawerVisible = it.isVisible
                 }
             }
@@ -113,12 +110,13 @@ class MainScreen() : Screen {
                 },
                 gesturesEnabled = isTabsVisible,
             ) {
-                TabNavigator(tabs[0]
-                /*, tabDisposable = { tabNavigator ->
-                    TabDisposable(
-                        navigator = tabNavigator,
-                        tabs = tabs
-                    )}*/
+                TabNavigator(
+                    tabs[0]
+                    /*, tabDisposable = { tabNavigator ->
+                        TabDisposable(
+                            navigator = tabNavigator,
+                            tabs = tabs
+                        )}*/
                 ) {
                     Scaffold(
                         bottomBar = {

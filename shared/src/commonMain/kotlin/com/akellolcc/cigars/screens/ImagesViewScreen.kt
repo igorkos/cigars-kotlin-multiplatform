@@ -64,13 +64,14 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
     private val viewModel: BaseImagesViewScreenViewModel
 
     init {
-        val params = route.data as Pair<*,*>
+        val params = route.data as Pair<*, *>
         viewModel = if (params.first is Cigar) {
             CigarImagesViewScreenViewModel((route.data as Pair<*, *>).first as Cigar)
         } else {
             HumidorImagesViewScreenViewModel((route.data as Pair<*, *>).first as Humidor)
         }
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {

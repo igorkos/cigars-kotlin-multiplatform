@@ -17,9 +17,4 @@ class SqlDelightCigarImagesRepository(
         return queries.cigarImages(cigarId, ::imageFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
-    override fun add(entity: CigarImage, callback: (suspend (Long) -> Unit)?) {
-        super.add(entity) {
-            queries.addImageToCigar(cigarId, it)
-        }
-    }
 }

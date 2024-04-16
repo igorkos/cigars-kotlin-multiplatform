@@ -12,7 +12,7 @@ abstract class BaseImagesViewScreenViewModel(val id: Long) :
     BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>() {
     fun addImage(image: SharedImage) {
         image.toByteArray()?.let {
-            repository.add(CigarImage(-1, bytes = it), null)
+            repository.add(CigarImage(-1, bytes = it))
         }
     }
 
@@ -25,10 +25,13 @@ abstract class BaseImagesViewScreenViewModel(val id: Long) :
 
 class CigarImagesViewScreenViewModel(val cigar: Cigar) :
     BaseImagesViewScreenViewModel(cigar.rowid) {
-    override val repository: ImagesRepository = database.getRepository(RepositoryType.CigarImages,cigar.rowid)
+    override val repository: ImagesRepository =
+        database.getRepository(RepositoryType.CigarImages, cigar.rowid)
 }
 
 
-class HumidorImagesViewScreenViewModel(val humidor: Humidor) : BaseImagesViewScreenViewModel(humidor.rowid) {
-    override val repository: ImagesRepository = database.getRepository(RepositoryType.HumidorImages,humidor.rowid)
+class HumidorImagesViewScreenViewModel(val humidor: Humidor) :
+    BaseImagesViewScreenViewModel(humidor.rowid) {
+    override val repository: ImagesRepository =
+        database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
 }

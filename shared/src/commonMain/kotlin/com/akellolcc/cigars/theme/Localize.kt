@@ -52,7 +52,7 @@ object Localize {
     val cigar_details_move_from = Strings.cigar_details_move_from.toString()
     val cigar_details_move_to = Strings.cigar_details_move_to.toString()
     val cigar_details_move_select = Strings.cigar_details_move_select.toString()
-    val cigar_details_count=Strings.cigar_details_count.toString()
+    val cigar_details_count = Strings.cigar_details_count.toString()
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()
     val cigar_shape_petit_corona = Strings.cigar_shape_petit_corona.toString()
@@ -118,6 +118,7 @@ object Localize {
                 .toString()
         }
     }
+
     fun history_transaction_desc(v: HistoryType, v1: Long): String {
         return if (v1 == 0L || v1 > 1) {
             Strings.history_transaction_desc_more.createLocalizedString(v.toString(), v1)

@@ -24,9 +24,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 
@@ -109,20 +107,20 @@ fun LoginBackground(
     Box(
         modifier = with(Modifier) {
             fillMaxSize()
-          //      .paint(
-         //           imagePainter(Images.splash_background),
-         //           contentScale = ContentScale.FillBounds
-          //      )
+            //      .paint(
+            //           imagePainter(Images.splash_background),
+            //           contentScale = ContentScale.FillBounds
+            //      )
 
         }
     ) {
         Box(
             modifier = with(Modifier) {
                 fillMaxSize(0.7f)
-                 //   .paint(
-                //        imagePainter(Images.splash_plate),
-                 //       contentScale = ContentScale.FillWidth
-                 //   )
+                    //   .paint(
+                    //        imagePainter(Images.splash_plate),
+                    //       contentScale = ContentScale.FillWidth
+                    //   )
                     .align(alignment = Alignment.Center)
             }
         ) {

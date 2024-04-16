@@ -806,31 +806,32 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
         }
     }
 
+    private fun isValid(from: HumidorCigar?, to: Humidor?, count: Long): Boolean {
+        return from?.let { fromCH ->
+            fromCH.humidor?.let { fromH ->
+                to?.let { to ->
+                    from.count >= count && to.compareTo(fromH) != 0
+                }
+            }
+        } ?: false
+    }
+
     @Composable
     private fun MoveCigarsDialog(onDismissRequest: () -> Unit) {
-        val count = remember { mutableStateOf(1L) }
-        val from = remember { mutableStateOf<HumidorCigar?>(null) }
-        val to = remember { mutableStateOf<Humidor?>(null) }
-        val fromList = remember { mutableStateOf<List<ValuePickerItem<HumidorCigar>>>(listOf()) }
-        val toList = remember { mutableStateOf<List<ValuePickerItem<Humidor>>>(listOf()) }
 
-        fun isValid(from: HumidorCigar?, to: Humidor?, count: Long): Boolean {
-            return from?.let { fromCH ->
-                fromCH.humidor?.let { fromH ->
-                    to?.let { to ->
-                        from.count < count && to.compareTo(fromH) != 0
-                    }
-                }
-            } ?:false
-        }
         if (viewModel.moveCigarDialog) {
+            val count = remember { mutableStateOf(1L) }
+            val from = remember { mutableStateOf<HumidorCigar?>(null) }
+            val to = remember { mutableStateOf<Humidor?>(null) }
+            val fromList =
+                remember { mutableStateOf<List<ValuePickerItem<HumidorCigar>>>(listOf()) }
+            val toList = remember { mutableStateOf<List<ValuePickerItem<Humidor>>>(listOf()) }
 
             LaunchedEffect(from.value, to.value) {
                 fromList.value = viewModel.moveFromHumidors(from.value?.humidor)
                 toList.value = viewModel.moveToHumidors(from.value?.humidor)
                 count.value = from.value?.count ?: 1L
             }
-
             Dialog(onDismissRequest = { onDismissRequest() }) {
                 Card(
                     modifier = Modifier.wrapContentSize(),
@@ -889,7 +890,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 TextStyled(
-                                    if(count.value > 0) "${count.value}" else "",
+                                    if (count.value > 0) "${count.value}" else "",
                                     TextStyles.Headline,
                                     modifier = Modifier.padding(horizontal = 10.dp)
                                         .wrapContentSize(),

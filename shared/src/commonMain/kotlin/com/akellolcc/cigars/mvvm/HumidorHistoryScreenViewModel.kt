@@ -7,12 +7,15 @@ import com.akellolcc.cigars.databases.repository.HistoryRepository
 
 
 class HumidorHistoryScreenViewModel(val humidor: Humidor) : HistoryScreenViewModel() {
-    override val repository: HistoryRepository = database.getRepository(RepositoryType.HumidorHistory, humidor.rowid)
+    override val repository: HistoryRepository =
+        database.getRepository(RepositoryType.HumidorHistory, humidor.rowid)
+
     override fun entitySelected(cigar: History) {}
 
     init {
         name = humidor.name
     }
+
     override fun entityName(history: History): String {
         if (history.cigarId < 0) return humidor.name
         return repository.cigarName(history.cigarId)

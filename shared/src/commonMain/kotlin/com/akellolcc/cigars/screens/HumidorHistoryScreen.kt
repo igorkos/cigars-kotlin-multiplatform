@@ -6,8 +6,9 @@ import com.akellolcc.cigars.mvvm.HumidorHistoryScreenViewModel
 import com.akellolcc.cigars.navigation.NavRoute
 import kotlin.jvm.Transient
 
-class HumidorHistoryScreen(route: NavRoute) : HistoryScreen(route)  {
+class HumidorHistoryScreen(route: NavRoute) : HistoryScreen(route) {
 
     @Transient
-    override var viewModel = HumidorHistoryScreenViewModel(route.data as Humidor) as HistoryScreenViewModel
+    override var viewModel =
+        HumidorHistoryScreenViewModel(route.data as Humidor) as HistoryScreenViewModel
 }

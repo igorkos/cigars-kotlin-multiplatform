@@ -7,6 +7,6 @@ import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 
 open class DatabaseViewModel<T : BaseEntity, A> : ActionsViewModel<A>() {
-    protected val database: Database = Database.getInstance()
+    protected val database: Database = Database.instance
     var loading by mutableStateOf(false)
 }

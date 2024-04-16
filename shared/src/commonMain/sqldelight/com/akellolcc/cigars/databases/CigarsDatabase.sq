@@ -131,13 +131,7 @@ addImageToCigar:
 UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
 
 cigarHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
-
-cigarCount:
-SELECT CigarsTable.count FROM CigarsTable WHERE rowid = :id;
-
-updateCigarCount:
-UPDATE CigarsTable SET count = :count WHERE rowid = :id;
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar AND type < 3 ORDER BY date DESC;
 
 cigarExists:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
@@ -187,6 +181,9 @@ addCigarToHumidor:
 INSERT INTO CigarHumidorTable (humidorId, cigarId, count)
 VALUES (?,?,?);
 
+updateCigarToHumidorCount:
+UPDATE CigarHumidorTable SET count = :count WHERE humidorId = :humidor AND cigarId = :cigar;
+
 humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
 
@@ -195,7 +192,7 @@ SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor AN
 
 
 humidorHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor ORDER BY date DESC;
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor AND type != 2 ORDER BY date DESC;
 
 humidorImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
@@ -204,8 +201,7 @@ addImageToHumidor:
 UPDATE ImagesTable SET humidorId = :humidor WHERE rowid = :image;
 
 allHistory:
-SELECT HistoryTable.*
-FROM HistoryTable;
+SELECT HistoryTable.* FROM HistoryTable;
 
 history:
 SELECT HistoryTable.* FROM HistoryTable WHERE rowid = :id;

@@ -2,13 +2,10 @@ package com.akellolcc.cigars.databases
 
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
-import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.databases.repository.Repository
@@ -17,13 +14,16 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
 import com.akellolcc.cigars.theme.readTextFile
-import com.akellolcc.cigars.utils.Pref
-import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Clock
+import com.badoo.reaktive.observable.ObservableWrapper
+import com.badoo.reaktive.observable.flatMap
+import com.badoo.reaktive.observable.flatMapIterable
+import com.badoo.reaktive.observable.take
+import com.badoo.reaktive.observable.wrap
 import kotlinx.serialization.json.Json
 
 enum class DatabaseType {
     SqlDelight;
+
     companion object {
         fun getDatabase(type: DatabaseType): DatabaseInterface {
             return when (type) {
@@ -44,26 +44,23 @@ enum class RepositoryType {
     CigarHistory,
     HumidorHistory
 }
+
 class Database() : DatabaseInterface {
     private val database = DatabaseType.getDatabase(DatabaseType.SqlDelight)
 
     companion object {
-        private var instance: Database? = null
+        private var _instance: Database? = null
+        val instance: Database
+            get() {
+                return createInstance()
+            }
 
         private fun createInstance(): Database {
-            if (instance == null)
-                instance = Database()
-            if (Pref.isFirstStart) {
-                Pref.isFirstStart = false
-                instance?.createDemoSet()
-            }
-            return instance!!
+            if (_instance == null)
+                _instance = Database()
+            return _instance!!
         }
 
-        fun getInstance(): Database {
-            if (instance == null) createInstance()
-            return instance!!
-        }
     }
 
     override fun <R : Repository<*>> getRepository(type: RepositoryType, args: Any?): R {
@@ -78,58 +75,47 @@ class Database() : DatabaseInterface {
         return database.numberOfEntriesIn(type)
     }
 
-    private fun createDemoSet() {
-        runBlocking {
-            var humidor: Humidor
-            readTextFile(AssetFiles.demo_humidors)?.let { hjson ->
-                Log.debug("Add demo Humidor")
-                val humidorDatabase: HumidorsRepository = getRepository(RepositoryType.Humidors)
-                humidor = Json.decodeFromString<List<Humidor>>(hjson).first()
-                humidorDatabase.add(humidor) { hID ->
-                    humidor.rowid = hID
-                    readTextFile(AssetFiles.demo_cigars)?.let { cjson ->
-                        Log.debug("Add demo Cigars")
-                        val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
-                        val cigars = Json.decodeFromString<List<Cigar>>(cjson)
-                        for (cigar in cigars) {
-                            Log.debug("Add demo Cigar ${cigar.rowid}")
-                            cigarsDatabase.add(cigar, null)
-                            val hcDatabase: CigarHumidorRepository =
-                                getRepository(RepositoryType.CigarHumidors, cigar.rowid)
-                            Log.debug("Add demo Cigar ${cigar.rowid} to Humidor ${humidor.rowid}")
-                            hcDatabase.add(humidor, 10)
-                            val hisDatabase: HistoryRepository =
-                                getRepository(RepositoryType.CigarHistory, cigar.rowid)
-                            Log.debug("Add demo Cigar history ${cigar.rowid}")
-                            hisDatabase.add(
-                                History(
-                                    -1,
-                                    cigar.count,
-                                    Clock.System.now().toEpochMilliseconds(),
-                                    cigar.count,
-                                    cigar.price,
-                                    HistoryType.Addition,
-                                    cigar.rowid,
-                                    humidor.rowid
-                                ),
-                                null
-                            )
-                        }
-                        readTextFile(AssetFiles.demo_cigars_images)?.let { json ->
-                            Log.debug("Add demo images")
-                            val imagesDatabase: ImagesRepository =
-                                getRepository(RepositoryType.CigarImages, humidor.rowid)
-                            val images = Json.decodeFromString<List<CigarImage>>(json)
-                            for (image in images) {
-                                imageData(image.notes!!)?.let {
-                                    image.bytes = it
-                                    imagesDatabase.addOrUpdate(image)
-                                }
-                            }
-                        }
-                    }
-                }
+    fun createDemoSet(): ObservableWrapper<Any> {
+        val demoHumidors =
+            Json.decodeFromString<List<Humidor>>(readTextFile(AssetFiles.demo_humidors) ?: "")
+        var humidor: Humidor = demoHumidors[0]
+        val demoCigars =
+            Json.decodeFromString<List<Cigar>>(readTextFile(AssetFiles.demo_cigars) ?: "")
+        val demoCigarsImages = Json.decodeFromString<List<CigarImage>>(
+            readTextFile(AssetFiles.demo_cigars_images) ?: ""
+        )
+        val humidorDatabase: HumidorsRepository = getRepository(RepositoryType.Humidors)
+        val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
+        val imagesDatabase: ImagesRepository =
+            getRepository(RepositoryType.CigarImages, humidor.rowid)
+        val hcDatabase: CigarHumidorRepository =
+            getRepository(RepositoryType.CigarHumidors, humidor.rowid)
+        Log.debug("Added demo database")
+        return humidorDatabase.add(demoHumidors[0]).flatMapIterable { h ->
+            Log.debug("Added demo Humidor ${h.rowid}")
+            humidor = h
+            demoCigarsImages.filter { it.humidorId == 0L }
+        }.flatMap { image ->
+            Log.debug("Added image to Humidor ${image.rowid}")
+            image.humidorId = humidor.rowid
+            image.bytes = imageData(image.notes!!)!!
+            imagesDatabase.add(image)
+        }.take(1).flatMapIterable {
+            Log.debug("Add cigars")
+            demoCigars
+        }.flatMap { cigar ->
+            Log.debug("Add demo Cigar ${cigar.rowid}")
+            cigarsDatabase.add(cigar, humidor)
+        }.flatMap { cigar ->
+            Log.debug("Add Image to Cigar ${cigar.rowid}")
+            val image = demoCigarsImages.first {
+                it.cigarId == cigar.rowid
             }
-        }
+            image.cigarId = cigar.rowid
+            image.bytes = imageData(image.notes!!)!!
+            imagesDatabase.add(image)
+        }.take(1).flatMap {
+            humidorDatabase.add(demoHumidors[1])
+        }.wrap()
     }
 }

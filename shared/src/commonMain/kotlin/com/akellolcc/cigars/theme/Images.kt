@@ -16,7 +16,12 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.getImageByFileName
 
 @Composable
-fun loadIcon(id: ImageResource, size: Size = Size(24f, 24f), tint: Color? = null, modifier: Modifier = Modifier) {
+fun loadIcon(
+    id: ImageResource,
+    size: Size = Size(24f, 24f),
+    tint: Color? = null,
+    modifier: Modifier = Modifier
+) {
     val painter: Painter = painterResource(id)
     Icon(
         painter = painter,
