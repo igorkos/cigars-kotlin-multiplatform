@@ -32,10 +32,12 @@ class Home : Screen {
 
     @Composable
     override fun Content() {
-        val initialized = remember { mutableStateOf(false) }
+        val initialized = remember { mutableStateOf(true) }
         val navigator = LocalNavigator.currentOrThrow
 
-        if (!initialized.value && Pref.isFirstStart) {
+        // && Pref.isFirstStart
+        if (!initialized.value) {
+            database.reset()
             database.createDemoSet().subscribe(
                 onError = {
                      Log.error("Error creating demo set $it")

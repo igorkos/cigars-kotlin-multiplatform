@@ -12,10 +12,13 @@ import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
+import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
+import com.badoo.reaktive.single.SingleWrapper
+import com.badoo.reaktive.single.wrap
 import kotlinx.datetime.Clock
 
 open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
@@ -58,50 +61,53 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
     }
 
     //BaseRepository
-    override suspend fun doUpsert(entity: Cigar, add: Boolean) {
-        if (add) {
-            queries.add(
-                entity.name,
-                entity.brand,
-                entity.country,
-                entity.date,
-                entity.cigar,
-                entity.wrapper,
-                entity.binder,
-                entity.gauge,
-                entity.length,
-                CigarStrength.toLong(entity.strength),
-                entity.rating,
-                entity.myrating,
-                entity.notes,
-                entity.filler,
-                entity.link,
-                entity.count,
-                entity.shopping,
-                entity.favorites
-            )
-        } else {
-            queries.update(
-                entity.name,
-                entity.brand,
-                entity.country,
-                entity.date,
-                entity.cigar,
-                entity.wrapper,
-                entity.binder,
-                entity.gauge,
-                entity.length,
-                CigarStrength.toLong(entity.strength),
-                entity.rating,
-                entity.myrating,
-                entity.notes,
-                entity.filler,
-                entity.link,
-                entity.count,
-                entity.shopping,
-                entity.favorites,
-                entity.rowid
-            )
-        }
+    override fun doUpsert(entity: Cigar, add: Boolean): SingleWrapper<Cigar> {
+        return singleFromCoroutine {
+            if (add) {
+                queries.add(
+                    entity.name,
+                    entity.brand,
+                    entity.country,
+                    entity.date,
+                    entity.cigar,
+                    entity.wrapper,
+                    entity.binder,
+                    entity.gauge,
+                    entity.length,
+                    CigarStrength.toLong(entity.strength),
+                    entity.rating,
+                    entity.myrating,
+                    entity.notes,
+                    entity.filler,
+                    entity.link,
+                    entity.count,
+                    entity.shopping,
+                    entity.favorites
+                )
+            } else {
+                queries.update(
+                    entity.name,
+                    entity.brand,
+                    entity.country,
+                    entity.date,
+                    entity.cigar,
+                    entity.wrapper,
+                    entity.binder,
+                    entity.gauge,
+                    entity.length,
+                    CigarStrength.toLong(entity.strength),
+                    entity.rating,
+                    entity.myrating,
+                    entity.notes,
+                    entity.filler,
+                    entity.link,
+                    entity.count,
+                    entity.shopping,
+                    entity.favorites,
+                    entity.rowid
+                )
+            }
+            entity
+        }.wrap()
     }
 }

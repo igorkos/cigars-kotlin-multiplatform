@@ -26,7 +26,7 @@ interface Repository<ENTITY : BaseEntity> {
 
     fun update(entity: ENTITY): ObservableWrapper<ENTITY>
 
-    fun remove(id: Long, where: Long? = null)
+    fun remove(id: Long, where: Long? = null): ObservableWrapper<Boolean>
 
     fun removeAll()
 

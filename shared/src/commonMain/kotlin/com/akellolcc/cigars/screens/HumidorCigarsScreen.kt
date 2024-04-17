@@ -132,9 +132,7 @@ class HumidorCigarsScreen(override val route: NavRoute) :
 
     @Composable
     override fun EntityListRow(entity: HumidorCigar, modifier: Modifier) {
-        entity.cigar.let {
-            CigarListRow(it, modifier)
-        }
+        CigarListRow(entity, modifier)
     }
 
 }

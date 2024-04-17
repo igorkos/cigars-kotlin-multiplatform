@@ -68,8 +68,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     fun observeCigar() {
         if (cigar.rowid >= 0 && observeCigar == null) {
             imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
-            cigarHumidorRepository =
-                database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+            cigarHumidorRepository = database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
             cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
             observeCigar = cigarsDatabase.observe(cigar.rowid)
             observeCigar?.map {
@@ -183,22 +182,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun updateCigarCount(entity: HumidorCigar, count: Long, price: Double? = null) {
-        val c = entity.count - count
-        if (c != 0L) {
-            cigarHumidorRepository?.updateCount(cigar, entity.humidor, count)
-            val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
-            cigarsHistoryDatabase?.add(
-                History(
-                    -1,
-                    c.absoluteValue,
-                    Clock.System.now().toEpochMilliseconds(),
-                    count,
-                    price,
-                    type,
-                    cigar.rowid,
-                    entity.humidor.rowid
-                )
-            )
+        if (entity.count != count) {
+            cigarHumidorRepository?.updateCount(entity, count, price)
             humidorCigarsCount = null
         }
     }
@@ -219,65 +204,9 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long) {
-
-        //From update
-        if (from.count > count) {
-            cigarHumidorRepository?.updateCount(cigar, from.humidor, count)
-        } else {
-            cigarHumidorRepository?.remove(cigar, from.humidor)
+        cigarHumidorRepository?.moveCigar(from, to, count)?.subscribe{
+            moveCigarDialog = false
         }
-        humidorsRepository.update(from.humidor.copy(count = from.humidor.count - count))
-        //To update
-        val toCH = cigarHumidorRepository?.find(cigar, to)
-        if (toCH != null) {
-            cigarHumidorRepository?.updateCount(cigar, toCH.humidor, count)
-        } else {
-            cigarHumidorRepository?.add(cigar, to, count)
-        }
-        humidorsRepository.update(to.copy(count = to.count + count))
-
-        //Cigar History
-        cigarsHistoryDatabase?.add(
-            History(
-                -1L,
-                count,
-                Clock.System.now().toEpochMilliseconds(),
-                count,
-                price = cigar.price,
-                type = HistoryType.Move,
-                cigarId = cigar.rowid,
-                humidorId = from.humidor.rowid
-            )
-        )
-
-        //Humidor History
-        var humidorHistoryRepository: HistoryRepository =
-            database.getRepository(RepositoryType.HumidorHistory, from.humidor.rowid)
-        humidorHistoryRepository.add(
-            History(
-                -1L,
-                count,
-                Clock.System.now().toEpochMilliseconds(),
-                count,
-                price = cigar.price,
-                type = HistoryType.MoveFrom,
-                cigarId = cigar.rowid,
-                humidorId = from.humidor.rowid
-            )
-        )
-        humidorHistoryRepository = database.getRepository(RepositoryType.HumidorHistory, to.rowid)
-        humidorHistoryRepository.add(
-            History(
-                -1L,
-                count,
-                Clock.System.now().toEpochMilliseconds(),
-                count,
-                price = cigar.price,
-                type = HistoryType.MoveTo,
-                cigarId = cigar.rowid,
-                humidorId = to.rowid
-            )
-        )
     }
 
     enum class InfoActions {

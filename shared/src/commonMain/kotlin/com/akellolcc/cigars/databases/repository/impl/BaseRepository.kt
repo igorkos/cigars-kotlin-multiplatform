@@ -8,9 +8,13 @@ import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.DatabaseQueries
 import com.akellolcc.cigars.databases.repository.Repository
 import com.badoo.reaktive.coroutinesinterop.asObservable
+import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.observable
+import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.observable.wrap
+import com.badoo.reaktive.single.SingleWrapper
+import com.badoo.reaktive.single.wrap
 import dev.icerock.moko.mvvm.flow.cMutableStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,10 +58,11 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
             CoroutineScope(Dispatchers.IO).launch {
                 if (!contains(entity)) {
                     wrapper.transactionWithResult {
-                        doUpsert(entity)
-                        val id = lastInsertRowId()
-                        entity.rowid = id
-                        emitter.onNext(entity)
+                        doUpsert(entity).subscribe {
+                            val id = lastInsertRowId()
+                            entity.rowid = id
+                            emitter.onNext(entity)
+                        }
                     }
                 } else {
                     emitter.onError(Exception("Can't insert entity: $entity which already exist in the database."))
@@ -69,8 +74,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     override fun update(entity: ENTITY): ObservableWrapper<ENTITY> {
         return observable { emitter ->
             if (contains(entity)) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    doUpsert(entity, false)
+                doUpsert(entity, false).subscribe {
                     emitter.onNext(entity)
                 }
             } else {
@@ -91,11 +95,17 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     }
 
 
-    override fun remove(id: Long, where: Long?) {
-        val idExists = contains(id, where)
-        if (idExists) {
-            doDelete(id, where)
-        }
+    override fun remove(id: Long, where: Long?): ObservableWrapper<Boolean> {
+        return observable { emitter ->
+            val idExists = contains(id, where)
+            if (idExists) {
+                doDelete(id, where).subscribe {
+                    emitter.onNext(true)
+                }
+            } else {
+                emitter.onError(Exception("Can't remove entity with id: $id which doesn't exist in the database."))
+            }
+        }.wrap()
     }
 
     fun contains(entity: ENTITY): Boolean {
@@ -118,12 +128,12 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     }
 
 
-    protected open suspend fun doUpsert(entity: ENTITY, add: Boolean = true) {}
+    protected abstract fun doUpsert(entity: ENTITY, add: Boolean = true): SingleWrapper<ENTITY>
 
-    protected open fun doDelete(id: Long, where: Long? = null) {
-        CoroutineScope(Dispatchers.Main).launch {
+    protected open fun doDelete(id: Long, where: Long? = null): SingleWrapper<Unit> {
+        return singleFromCoroutine {
             wrapper.remove(id, where)
-        }
+        }.wrap()
     }
 
     protected fun Long.toBoolean(): Boolean = this != 0L

@@ -918,7 +918,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                                     viewModel.moveCigar(from.value!!, to.value!!, count.value)
                                     from.value = null
                                     to.value = null
-                                    onDismissRequest()
                                 })
                         }
                     }
