@@ -16,6 +16,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.navigation.SharedScreen
 import com.akellolcc.cigars.navigation.setupNavGraph
 import com.akellolcc.cigars.theme.MaterialColors
@@ -35,10 +36,19 @@ class Home : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
         if (!initialized.value && Pref.isFirstStart) {
-            database.createDemoSet().subscribe {
-                Pref.isFirstStart = false
-                initialized.value = true
-            }
+            database.createDemoSet().subscribe(
+                onError = {
+                     Log.error("Error creating demo set $it")
+                },
+                onComplete = {
+                    Pref.isFirstStart = false
+                    initialized.value = true },
+                onNext ={
+                    Pref.isFirstStart = false
+                    initialized.value = true
+                }
+            )
+
             Box(
                 modifier = Modifier.fillMaxSize().background(
                     materialColor(

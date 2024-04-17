@@ -10,14 +10,14 @@ class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
     override val repository: HistoryRepository =
         database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
 
-    override fun entitySelected(cigar: History) {
+    override fun entitySelected(entity: History) {
     }
 
     init {
         name = cigar.name
     }
 
-    override fun entityName(history: History): String {
-        return repository.humidorName(history.humidorId)
+    override fun entityName(id: History): String {
+        return repository.humidorName(id.humidorId)
     }
 }

@@ -15,6 +15,7 @@ import com.akellolcc.cigars.theme.readTextFile
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.flatMapIterable
+import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.observable.wrap
 import kotlinx.serialization.json.Json
@@ -87,31 +88,36 @@ class Database : DatabaseInterface {
         val imagesDatabase: ImagesRepository =
             getRepository(RepositoryType.CigarImages, humidor.rowid)
         Log.debug("Added demo database")
-        return humidorDatabase.add(demoHumidors[0]).flatMapIterable { h ->
-            Log.debug("Added demo Humidor ${h.rowid}")
-            humidor = h
-            demoCigarsImages.filter { it.humidorId == 0L }
-        }.flatMap { image ->
-            Log.debug("Added image to Humidor ${image.rowid}")
-            image.humidorId = humidor.rowid
-            image.bytes = imageData(image.notes!!)!!
-            imagesDatabase.add(image)
-        }.take(1).flatMapIterable {
-            Log.debug("Add cigars")
-            demoCigars
-        }.flatMap { cigar ->
-            Log.debug("Add demo Cigar ${cigar.rowid}")
-            cigarsDatabase.add(cigar, humidor)
-        }.flatMap { cigar ->
-            Log.debug("Add Image to Cigar ${cigar.rowid}")
-            val image = demoCigarsImages.first {
-                it.cigarId == cigar.rowid
-            }
-            image.cigarId = cigar.rowid
-            image.bytes = imageData(image.notes!!)!!
-            imagesDatabase.add(image)
-        }.take(1).flatMap {
-            humidorDatabase.add(demoHumidors[1])
-        }.wrap()
+        return humidorDatabase.add(demoHumidors[1]).flatMap {
+                humidorDatabase.add(demoHumidors[0])
+            }.flatMapIterable { h ->
+                Log.debug("Added demo Humidor ${h.rowid}")
+                humidor = h
+                demoCigarsImages.filter { it.humidorId == 0L }
+            }.flatMap { image ->
+                Log.debug("Added image to Humidor ${image.rowid}")
+                image.humidorId = humidor.rowid
+                image.bytes = imageData(image.notes!!)!!
+                imagesDatabase.add(image)
+            }.take(1).flatMapIterable {
+                Log.debug("Add cigars")
+                demoCigars
+            }.flatMap { cigar ->
+                Log.debug("Add demo Cigar ${cigar.rowid}")
+                cigarsDatabase.add(cigar, humidor)
+            }.flatMap { cigar ->
+                val image = demoCigarsImages.first {
+                    it.rowid == cigar.myrating
+                }
+                Log.debug("Add image $image to Cigar ${cigar.rowid} : ${cigar.myrating}")
+                image.rowid = -1
+                image.cigarId = cigar.rowid
+                try {
+                    image.bytes = imageData(image.notes!!)!!
+                } catch (e: Exception) {
+                    Log.error("Get image data failed $e")
+                }
+                imagesDatabase.add(image)
+            }.wrap()
     }
 }
