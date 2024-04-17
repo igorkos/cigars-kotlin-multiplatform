@@ -1,9 +1,5 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
-import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.RepositoryType
@@ -12,25 +8,20 @@ import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
+import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
-import dev.icerock.moko.mvvm.flow.cMutableStateFlow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
-open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) :
-    BaseRepository<Cigar>(queries), CigarsRepository {
+open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
+    BaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
+
+    //CigarsRepository
     override fun add(cigar: Cigar, humidor: Humidor): ObservableWrapper<Cigar> {
         return super.add(cigar).flatMap {
             val hcDatabase: CigarHumidorRepository =
@@ -58,61 +49,59 @@ open class SqlDelightCigarsRepository(queries: CigarsDatabaseQueries) :
         }.wrap()
     }
 
-    override fun getSync(id: Long): Cigar {
-        return queries.cigar(id, ::cigarFactory).executeAsOne()
+    override fun updateFavorite(value: Boolean, cigar: Cigar): ObservableWrapper<Cigar> {
+        return update(cigar.copy(favorites = value))
     }
 
-    override fun observe(id: Long): Flow<Cigar> {
-        if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return queries.cigar(id, ::cigarFactory).asFlow().mapToOne(Dispatchers.IO)
+    override fun updateRating(value: Long, cigar: Cigar): ObservableWrapper<Cigar> {
+        return update(cigar.copy(myrating = value))
     }
 
-    override fun observeOrNull(id: Long): Flow<Cigar?> {
-        if (id < 0) return MutableStateFlow(emptyCigar.copy()).cMutableStateFlow()
-        return queries.cigar(id, ::cigarFactory).asFlow().mapToOneOrNull(Dispatchers.IO)
-    }
-
-    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
-        return (
-                if (accenting)
-                    queries.allCigarsAsc(sortField ?: "name", ::cigarFactory)
-                else
-                    queries.allCigarsDesc(sortField ?: "name", ::cigarFactory)
-                ).asFlow().mapToList(Dispatchers.IO)
-    }
-
-
+    //BaseRepository
     override suspend fun doUpsert(entity: Cigar, add: Boolean) {
-        queries.addCigar(
-            entity.rowid,
-            entity.name,
-            entity.brand,
-            entity.country,
-            entity.date,
-            entity.cigar,
-            entity.wrapper,
-            entity.binder,
-            entity.gauge,
-            entity.length,
-            CigarStrength.toLong(entity.strength),
-            entity.rating,
-            entity.myrating,
-            entity.notes,
-            entity.filler,
-            entity.link,
-            entity.count,
-            entity.shopping,
-            entity.favorites
-        )
-    }
-
-    override fun doDelete(id: Long) {
-        CoroutineScope(Dispatchers.Main).launch {
-            queries.removeCigar(id)
+        if (add) {
+            queries.add(
+                entity.name,
+                entity.brand,
+                entity.country,
+                entity.date,
+                entity.cigar,
+                entity.wrapper,
+                entity.binder,
+                entity.gauge,
+                entity.length,
+                CigarStrength.toLong(entity.strength),
+                entity.rating,
+                entity.myrating,
+                entity.notes,
+                entity.filler,
+                entity.link,
+                entity.count,
+                entity.shopping,
+                entity.favorites
+            )
+        } else {
+            queries.update(
+                entity.name,
+                entity.brand,
+                entity.country,
+                entity.date,
+                entity.cigar,
+                entity.wrapper,
+                entity.binder,
+                entity.gauge,
+                entity.length,
+                CigarStrength.toLong(entity.strength),
+                entity.rating,
+                entity.myrating,
+                entity.notes,
+                entity.filler,
+                entity.link,
+                entity.count,
+                entity.shopping,
+                entity.favorites,
+                entity.rowid
+            )
         }
-    }
-
-    override fun contains(id: Long): Boolean {
-        return queries.cigarExists(id).executeAsOne() != 0L
     }
 }

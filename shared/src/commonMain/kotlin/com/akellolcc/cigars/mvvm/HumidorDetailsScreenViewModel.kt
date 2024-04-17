@@ -7,9 +7,11 @@ import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.databases.extensions.ObservableEntity
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
+import com.badoo.reaktive.observable.ObservableWrapper
+import com.badoo.reaktive.observable.map
+import com.badoo.reaktive.observable.subscribe
 import dev.icerock.moko.resources.desc.StringDesc
 
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
@@ -17,8 +19,8 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     private var imagesDatabase: ImagesRepository? = null
     private var humidorsDatabase: HumidorsRepository? =
         database.getRepository(RepositoryType.Humidors)
-    private var observeHumidor: ObservableEntity<Humidor>? = null
-    private var _images: ObservableEntity<List<CigarImage>>? = null
+    private var observeHumidor: ObservableWrapper<Humidor>? = null
+    private var _images: ObservableWrapper<List<CigarImage>>? = null
 
     var editing by mutableStateOf(humidor.rowid < 0)
     var name by mutableStateOf(humidor.name)
@@ -42,22 +44,25 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
 
     private fun observeHumidor() {
         imagesDatabase = database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
-        observeHumidor = ObservableEntity(humidorsDatabase!!.observe(humidor.rowid))
+        observeHumidor = humidorsDatabase!!.observe(humidor.rowid)
+        observeHumidor?.map {
+            if (!editing) {
+                name = it.name
+                brand = it.brand
+                holds = it.holds
+                count = it.count
+                temperature = it.temperature
+                humidity = it.humidity
+                notes = it.notes
+                link = it.link
+                type = it.type
+            }
+        }?.subscribe()
 
-        observeHumidor?.map { if (!editing) name = it?.name ?: "" }
-        observeHumidor?.map { if (!editing) brand = it?.brand ?: "" }
-        observeHumidor?.map { if (!editing) holds = it?.holds ?: 0 }
-        observeHumidor?.map { if (!editing) count = it?.count ?: 0 }
-        observeHumidor?.map { if (!editing) temperature = it?.temperature ?: 0 }
-        observeHumidor?.map { if (!editing) humidity = it?.humidity ?: 0.0 }
-        observeHumidor?.map { if (!editing) notes = it?.notes }
-        observeHumidor?.map { if (!editing) link = it?.link }
-        observeHumidor?.map { if (!editing) type = it?.type ?: 0 }
-
-        _images = ObservableEntity(imagesDatabase!!.observeAll())
+        _images = imagesDatabase!!.all()
         _images?.map {
-            images = it ?: listOf()
-        }
+            images = it
+        }?.subscribe()
     }
 
     fun verifyFields(): Boolean {
@@ -91,9 +96,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
 
     fun cancelEdit() {
         editing = false
-        if (humidorsDatabase != null) {
-            observeHumidor?.reload()
-        } else {
+        if (humidorsDatabase == null) {
             sendEvent(Action.OnBackAction(0))
         }
     }

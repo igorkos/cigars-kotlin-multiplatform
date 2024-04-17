@@ -1,0 +1,58 @@
+
+CREATE TABLE ImagesTable (
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    image TEXT,
+    data BLOB NOT NULL,
+    notes TEXT,
+    type INTEGER,
+    cigarId  INTEGER,
+    humidorId  INTEGER,
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION,
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
+  );
+
+
+get:
+SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
+
+allAsc:
+SELECT * FROM ImagesTable;
+
+allDesc:
+SELECT * FROM ImagesTable;
+
+add:
+INSERT INTO ImagesTable (data,  type, image, notes,cigarId,humidorId)
+VALUES (?, ?, ?, ?,?,?);
+
+update:
+UPDATE ImagesTable SET data = :data, type = :type, image = :image, notes = :notes WHERE rowid = :id;
+
+remove:
+DELETE FROM ImagesTable WHERE rowid = :rowid;
+
+removeAll:
+DELETE FROM ImagesTable;
+
+find:
+SELECT * FROM ImagesTable WHERE rowid = :rowid;
+
+count:
+SELECT COUNT(*) FROM ImagesTable;
+
+contains:
+SELECT count(1) FROM ImagesTable WHERE rowid = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+cigarImages:
+SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
+
+humidorImages:
+SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
+
+
+
+
+

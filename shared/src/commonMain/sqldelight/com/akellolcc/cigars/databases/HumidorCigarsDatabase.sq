@@ -1,0 +1,50 @@
+
+CREATE TABLE CigarHumidorTable (
+    count INTEGER NOT NULL,
+    humidorId INTEGER NOT NULL,
+    cigarId INTEGER  NOT NULL,
+    PRIMARY KEY (humidorId, cigarId),
+    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid),
+    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid)
+);
+
+
+get:
+SELECT CigarHumidorTable.* FROM CigarHumidorTable WHERE humidorId = :humidorId AND cigarId = :cigarId;
+
+allAsc:
+SELECT * FROM CigarHumidorTable;
+
+allDesc:
+SELECT * FROM CigarHumidorTable;
+
+add:
+INSERT INTO CigarHumidorTable (count, humidorId, cigarId)
+VALUES (?, ?, ?);
+
+update:
+UPDATE CigarHumidorTable SET count = :count WHERE humidorId = :humidorId AND cigarId = :cigarId;
+
+remove:
+DELETE FROM CigarHumidorTable WHERE humidorId = :humidorId AND cigarId = :cigarId;
+
+removeAll:
+DELETE FROM CigarHumidorTable;
+
+find:
+SELECT * FROM CigarHumidorTable WHERE humidorId = :rowid AND cigarId = :cigarId;
+
+count:
+SELECT COUNT(*) FROM CigarHumidorTable;
+
+contains:
+SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :rowid AND cigarId = :cigarId;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+cigarHumidors:
+SELECT *  FROM CigarHumidorTable WHERE cigarId = :cigar;
+
+humidorCigars:
+SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;

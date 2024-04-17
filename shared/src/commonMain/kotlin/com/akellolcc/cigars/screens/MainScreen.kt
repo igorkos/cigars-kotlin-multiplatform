@@ -50,7 +50,7 @@ private var tabs: List<ITabItem> = listOf(
     FavoritesScreen(FavoritesRoute)
 )
 
-class MainScreen() : Screen {
+class MainScreen : Screen {
 
     @Transient
     private val viewModel = MainScreenViewModel()

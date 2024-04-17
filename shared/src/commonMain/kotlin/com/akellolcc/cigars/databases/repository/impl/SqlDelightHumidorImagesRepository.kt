@@ -2,30 +2,22 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import com.akellolcc.cigars.databases.CigarsDatabaseQueries
+import com.akellolcc.cigars.databases.ImagesDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
+import com.akellolcc.cigars.databases.repository.impl.queries.imageFactory
+import com.badoo.reaktive.coroutinesinterop.asObservable
 import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.wrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
 
 class SqlDelightHumidorImagesRepository(
     private val humidorId: Long,
-    queries: CigarsDatabaseQueries
+    queries: ImagesDatabaseQueries
 ) : SqlDelightImagesRepository(queries) {
 
-    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<CigarImage>> {
+    override fun all(sortField: String?, accenting: Boolean): ObservableWrapper<List<CigarImage>> {
         return queries.humidorImages(humidorId, ::imageFactory).asFlow()
-            .mapToList(Dispatchers.IO)
+            .mapToList(Dispatchers.IO).asObservable().wrap()
     }
-
-    override fun add(entity: CigarImage): ObservableWrapper<CigarImage> {
-        return super.add(entity).map {
-            //queries.addImageToHumidor(humidorId, it)
-            it
-        }.wrap()
-    }
-
 }

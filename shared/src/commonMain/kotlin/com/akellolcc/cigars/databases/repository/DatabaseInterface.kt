@@ -4,7 +4,7 @@ import com.akellolcc.cigars.databases.RepositoryType
 
 interface DatabaseInterface {
 
-    fun <R : Repository<*>> getRepository(type: RepositoryType, args: Any? = null): R
+    fun <R> getRepository(type: RepositoryType, args: Any? = null): R
 
     fun reset()
 

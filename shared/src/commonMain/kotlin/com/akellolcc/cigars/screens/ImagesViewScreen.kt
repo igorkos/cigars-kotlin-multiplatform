@@ -80,7 +80,6 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
         val coroutineScope = rememberCoroutineScope()
         var launchCamera by remember { mutableStateOf(value = false) }
         var launchGallery by remember { mutableStateOf(value = false) }
-        val images by viewModel.asState()
         val resizeOptions = ResizeOptions(
             width = screenWidth().dpToPx(), // Custom width
             height = (screenWidth().dpToPx() * 0.8).roundToInt(), // Custom height
@@ -96,7 +95,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
             scope = coroutineScope,
             resizeOptions = resizeOptions,
             onResult = { byteArrays ->
-                lastSelect = images.size
+                lastSelect = viewModel.entities.size
                 byteArrays.forEach {
                     // Process the selected images' ByteArrays.
                     Log.debug("Image size ${it.size}")
@@ -142,7 +141,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
 
         val cameraManager = rememberCameraManager {
             coroutineScope.launch {
-                lastSelect = images.size
+                lastSelect = viewModel.entities.size
                 it?.let {
                     Log.debug("Image size ${it.toByteArray()?.size}")
                     viewModel.addImage(it)
@@ -222,7 +221,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             PagedCarousel(
-                                images,
+                                viewModel.entities,
                                 loading = viewModel.loading,
                                 scale = ContentScale.Fit,
                                 select = select,

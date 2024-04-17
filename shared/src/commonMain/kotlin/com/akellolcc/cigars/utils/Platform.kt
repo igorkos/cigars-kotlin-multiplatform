@@ -8,6 +8,6 @@ interface Platform {
 
 expect fun getPlatform(): Platform
 
-expect fun setAppContext(context: Any);
+expect fun setAppContext(context: Any)
 
 expect fun initFirebase(): FirebaseApp?

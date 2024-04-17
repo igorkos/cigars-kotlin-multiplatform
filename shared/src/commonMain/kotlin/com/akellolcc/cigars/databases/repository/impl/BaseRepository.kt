@@ -1,63 +1,63 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import com.akellolcc.cigars.databases.CigarsDatabaseQueries
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.repository.DatabaseQueries
 import com.akellolcc.cigars.databases.repository.Repository
-import com.badoo.reaktive.observable.Observable
+import com.badoo.reaktive.coroutinesinterop.asObservable
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
+import dev.icerock.moko.mvvm.flow.cMutableStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: CigarsDatabaseQueries) :
+abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
     Repository<ENTITY> {
 
-    override suspend fun get(id: Long): ENTITY {
-        return observe(id).first()
-    }
-
-    override fun getSync(id: Long): ENTITY {
-        TODO("Not yet implemented")
+    override fun getSync(id: Long, where: Long?): ENTITY {
+        return wrapper.get(id, where).executeAsOne()
     }
 
     override fun allSync(sortField: String?, accenting: Boolean): List<ENTITY> {
-        return listOf()
+        return (if (accenting)
+            wrapper.allAsc(sortField ?: "name")
+        else
+            wrapper.allDesc(sortField ?: "name")
+                ).executeAsList()
     }
 
-    override suspend fun find(id: Long): ENTITY? {
-        return observeOrNull(id).first()
+    fun observe(entity: ENTITY): ObservableWrapper<ENTITY> = observe(entity.rowid)
+    override fun observe(id: Long): ObservableWrapper<ENTITY> {
+        if (id < 0) return MutableStateFlow(wrapper.empty()).cMutableStateFlow().asObservable()
+            .wrap()
+        return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO).asObservable().wrap()
     }
 
-    override fun observe(entity: ENTITY): Flow<ENTITY> {
-        return observe(entity.rowid)
-    }
-
-    override fun all(sortField: String?, accenting: Boolean): Observable<List<ENTITY>> {
-        return observable { emitter ->
-            CoroutineScope(Dispatchers.IO).launch {
-                observeAll(sortField, accenting).collect {
-                    emitter.onNext(it)
-                    emitter.onComplete()
-                }
-            }
-        }
+    override fun all(sortField: String?, accenting: Boolean): ObservableWrapper<List<ENTITY>> {
+        return (
+                if (accenting)
+                    wrapper.allAsc(sortField ?: "name")
+                else
+                    wrapper.allDesc(sortField ?: "name")
+                ).asFlow().mapToList(Dispatchers.IO).asObservable().wrap()
     }
 
     override fun add(entity: ENTITY): ObservableWrapper<ENTITY> {
         return observable { emitter ->
             CoroutineScope(Dispatchers.IO).launch {
-                if (!contains(entity.rowid)) {
-                    queries.transactionWithResult {
+                if (!contains(entity)) {
+                    wrapper.transactionWithResult {
                         doUpsert(entity)
-                        val id = queries.lastInsertRowId().executeAsOne()
+                        val id = lastInsertRowId()
                         entity.rowid = id
                         emitter.onNext(entity)
-                        emitter.onComplete()
                     }
                 } else {
                     emitter.onError(Exception("Can't insert entity: $entity which already exist in the database."))
@@ -66,19 +66,9 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
         }.wrap()
     }
 
-    override fun remove(entity: ENTITY) = remove(entity.rowid)
-
-    override fun remove(id: Long): Boolean {
-        val idExists = contains(id)
-        if (idExists) {
-            doDelete(id)
-        }
-        return idExists
-    }
-
-    override fun update(entity: ENTITY): Observable<ENTITY> {
+    override fun update(entity: ENTITY): ObservableWrapper<ENTITY> {
         return observable { emitter ->
-            if (contains(entity.rowid)) {
+            if (contains(entity)) {
                 CoroutineScope(Dispatchers.IO).launch {
                     doUpsert(entity, false)
                     emitter.onNext(entity)
@@ -86,22 +76,55 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected val queries: Cigars
             } else {
                 emitter.onError(Exception("Can't update entity: $entity which doesn't exist in the database."))
             }
+        }.wrap()
+    }
+
+    fun remove(entity: ENTITY) = remove(entity.rowid)
+    override fun removeAll() {
+        CoroutineScope(Dispatchers.IO).launch {
+            wrapper.removeAll()
         }
     }
 
-    override fun addOrUpdate(entity: ENTITY) {
-        CoroutineScope(Dispatchers.IO).launch {
-            doUpsert(entity)
+    override fun find(id: Long, where: Long?): ENTITY? {
+        return wrapper.find(id, where).executeAsOneOrNull()
+    }
+
+
+    override fun remove(id: Long, where: Long?) {
+        val idExists = contains(id, where)
+        if (idExists) {
+            doDelete(id, where)
         }
+    }
+
+    fun contains(entity: ENTITY): Boolean {
+        return when (entity) {
+            is HumidorCigar -> contains(entity.humidor.rowid, entity.cigar.rowid)
+            else -> return wrapper.contains(entity.rowid).executeAsOne() != 0L
+        }
+    }
+
+    override fun contains(id: Long, where: Long?): Boolean {
+        return wrapper.contains(id, where).executeAsOne() != 0L
     }
 
     override fun count(): Long {
-        return 0L
+        return wrapper.count().executeAsOne()
     }
+
+    override fun lastInsertRowId(): Long {
+        return wrapper.lastInsertRowId().executeAsOne()
+    }
+
 
     protected open suspend fun doUpsert(entity: ENTITY, add: Boolean = true) {}
 
-    protected abstract fun doDelete(id: Long)
+    protected open fun doDelete(id: Long, where: Long? = null) {
+        CoroutineScope(Dispatchers.Main).launch {
+            wrapper.remove(id, where)
+        }
+    }
 
     protected fun Long.toBoolean(): Boolean = this != 0L
 

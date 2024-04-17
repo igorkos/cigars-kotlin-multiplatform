@@ -1,71 +1,45 @@
 package com.akellolcc.cigars.databases.repository.impl
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
-import app.cash.sqldelight.coroutines.mapToOneOrNull
-import com.akellolcc.cigars.databases.CigarsDatabaseQueries
+import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.HumidorsDatabaseQueries
+import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.extensions.History
+import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.databases.repository.impl.queries.HumidorsTableQueries
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.wrap
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
-class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) :
-    BaseRepository<Humidor>(queries), HumidorsRepository {
-
-    override fun allSync(sortField: String?, accenting: Boolean): List<Humidor> = if (accenting)
-        queries.allHumidorsAsc(sortField ?: "name", ::humidorFactory).executeAsList()
-    else
-        queries.allHumidorsDesc(sortField ?: "name", ::humidorFactory).executeAsList()
-
-    override fun getSync(id: Long): Humidor {
-        return queries.humidor(id, ::humidorFactory).executeAsOne()
-    }
-
-    override fun observe(id: Long): Flow<Humidor> {
-        return queries.humidor(id, ::humidorFactory).asFlow().mapToOne(Dispatchers.IO)
-    }
-
-    override fun observeOrNull(id: Long): Flow<Humidor?> {
-        return queries.humidor(id, ::humidorFactory).asFlow().mapToOneOrNull(Dispatchers.IO)
-    }
-
-    override fun observeAll(sortField: String?, accenting: Boolean): Flow<List<Humidor>> {
-        return (
-                if (accenting)
-                    queries.allHumidorsAsc(sortField ?: "name", ::humidorFactory)
-                else
-                    queries.allHumidorsDesc(sortField ?: "name", ::humidorFactory)
-                ).asFlow().mapToList(Dispatchers.IO)
-    }
+class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
+    BaseRepository<Humidor>(HumidorsTableQueries(queries)), HumidorsRepository {
 
     override fun add(entity: Humidor): ObservableWrapper<Humidor> {
         return super.add(entity).map {
-            CoroutineScope(Dispatchers.IO).launch {
-                queries.addHistory(
+            val hisDatabase: HistoryRepository =
+                Database.instance.getRepository(RepositoryType.HumidorHistory, entity.rowid)
+            hisDatabase.add(
+                History(
+                    -1,
                     1,
                     Clock.System.now().toEpochMilliseconds(),
                     1,
                     entity.price,
-                    0,
+                    HistoryType.Addition,
                     -1,
                     it.rowid
                 )
-            }
+            )
             it
         }.wrap()
     }
 
     override suspend fun doUpsert(entity: Humidor, add: Boolean) {
         if (add) {
-            queries.addHumidor(
+            queries.add(
                 entity.name,
                 entity.brand,
                 entity.holds,
@@ -79,7 +53,7 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) :
                 entity.type
             )
         } else {
-            queries.updateHumidor(
+            queries.update(
                 entity.name,
                 entity.brand,
                 entity.holds,
@@ -95,19 +69,4 @@ class SqlDelightHumidorsRepository(queries: CigarsDatabaseQueries) :
             )
         }
     }
-
-    override fun doDelete(id: Long) {
-        CoroutineScope(Dispatchers.Main).launch {
-            queries.removeCigar(id)
-        }
-    }
-
-    override fun count(): Long {
-        return queries.humidorsCount().executeAsOne()
-    }
-
-    override fun contains(id: Long): Boolean {
-        return queries.cigarExists(id).executeAsOne() != 0L
-    }
-
 }

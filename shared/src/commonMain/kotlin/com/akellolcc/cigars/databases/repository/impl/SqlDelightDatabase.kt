@@ -8,48 +8,59 @@ import kotlinx.coroutines.runBlocking
 
 class SqlDelightDatabase : DatabaseInterface {
     private val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver())
-    override fun <R : Repository<*>> getRepository(type: RepositoryType, args: Any?): R {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <R> getRepository(type: RepositoryType, args: Any?): R {
         return when (type) {
-            RepositoryType.Cigars -> SqlDelightCigarsRepository(database.cigarsDatabaseQueries) as R
-            RepositoryType.Humidors -> SqlDelightHumidorsRepository(database.cigarsDatabaseQueries) as R
-            RepositoryType.Favorites -> SqlDelightFavoriteCigarsRepository(database.cigarsDatabaseQueries) as R
-            RepositoryType.CigarImages -> SqlDelightCigarImagesRepository(
-                args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+            RepositoryType.Cigars -> (SqlDelightCigarsRepository(database.cigarsDatabaseQueries) as? R)
+                ?: error("Invalid repository type")
 
-            RepositoryType.HumidorImages -> SqlDelightHumidorImagesRepository(
-                args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+            RepositoryType.Humidors -> (SqlDelightHumidorsRepository(database.humidorsDatabaseQueries) as? R)
+                ?: error("Invalid repository type")
 
-            RepositoryType.CigarHumidors -> SqlDelightCigarHumidorsRepository(
-                args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+            RepositoryType.Favorites -> (SqlDelightFavoriteCigarsRepository(database.cigarsDatabaseQueries) as? R)
+                ?: error("Invalid repository type")
 
-            RepositoryType.HumidorCigars -> SqlDelightHumidorCigarsRepository(
+            RepositoryType.CigarImages -> (SqlDelightCigarImagesRepository(
                 args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+                database.imagesDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
 
-            RepositoryType.CigarHistory -> SqlDelightCigarHistoryRepository(
+            RepositoryType.HumidorImages -> (SqlDelightHumidorImagesRepository(
                 args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+                database.imagesDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
 
-            RepositoryType.HumidorHistory -> SqlDelightHumidorHistoryRepository(
+            RepositoryType.CigarHumidors -> (SqlDelightCigarHumidorsRepository(
                 args as Long,
-                database.cigarsDatabaseQueries
-            ) as R
+                database.humidorCigarsDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
+
+            RepositoryType.HumidorCigars -> (SqlDelightHumidorCigarsRepository(
+                args as Long,
+                database.humidorCigarsDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
+
+            RepositoryType.CigarHistory -> (SqlDelightCigarHistoryRepository(
+                args as Long,
+                database.historyDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
+
+            RepositoryType.HumidorHistory -> (SqlDelightHumidorHistoryRepository(
+                args as Long,
+                database.historyDatabaseQueries
+            ) as? R) ?: error("Invalid repository type")
         }
     }
 
 
     override fun reset() {
         runBlocking {
-            database.cigarsDatabaseQueries.removeAllCigars()
-            database.cigarsDatabaseQueries.removeAllHumidors()
+            database.cigarsDatabaseQueries.removeAll()
+            database.humidorsDatabaseQueries.removeAll()
+            database.imagesDatabaseQueries.removeAll()
+            database.humidorCigarsDatabaseQueries.removeAll()
+            database.historyDatabaseQueries.removeAll()
         }
     }
 

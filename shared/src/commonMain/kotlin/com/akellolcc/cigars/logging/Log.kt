@@ -3,7 +3,7 @@ package com.akellolcc.cigars.logging
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
-public data class CallStackEntry(val file: String?, val line: Int?, val function: String?)
+data class CallStackEntry(val file: String?, val line: Int?, val function: String?)
 
 
 class Log {

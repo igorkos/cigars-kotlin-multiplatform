@@ -590,7 +590,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
 
             ) {
                 TextStyled(
-                    item.humidor?.name,
+                    item.humidor.name,
                     TextStyles.Subhead,
                 )
                 ValueCard(null, "${item.count}") {
@@ -808,7 +808,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
 
     private fun isValid(from: HumidorCigar?, to: Humidor?, count: Long): Boolean {
         return from?.let { fromCH ->
-            fromCH.humidor?.let { fromH ->
+            fromCH.humidor.let { fromH ->
                 to?.let { to ->
                     from.count >= count && to.compareTo(fromH) != 0
                 }

@@ -1,21 +1,20 @@
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.databases.extensions.ObservableEntity
 import com.akellolcc.cigars.databases.repository.Repository
+import com.badoo.reaktive.disposable.Disposable
+import com.badoo.reaktive.observable.map
+import com.badoo.reaktive.observable.subscribe
 
 
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
     private var sortField by mutableStateOf<String?>(null)
     var accenting by mutableStateOf(true)
     var entities by mutableStateOf(listOf<T>())
-    private var _entities: ObservableEntity<List<T>>? = null
+    private var _entities: Disposable? = null
 
     protected abstract val repository: Repository<T>
 
@@ -32,14 +31,7 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
 
     fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
-            _entities = ObservableEntity(repository.observeAll(sortField, accenting))
-            _entities?.map { entities = it ?: listOf() }
+            _entities = repository.all(sortField, accenting).map { entities = it }.subscribe()
         }
-    }
-
-    @Composable
-    fun asState(): State<List<T>> {
-
-        return repository.observeAll(sortField, accenting).collectAsState(listOf())
     }
 }

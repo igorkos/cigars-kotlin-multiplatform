@@ -3,12 +3,10 @@ package com.akellolcc.cigars.databases
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
-import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightDatabase
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
@@ -27,7 +25,7 @@ enum class DatabaseType {
     companion object {
         fun getDatabase(type: DatabaseType): DatabaseInterface {
             return when (type) {
-                DatabaseType.SqlDelight -> SqlDelightDatabase()
+                SqlDelight -> SqlDelightDatabase()
             }
         }
     }
@@ -45,7 +43,7 @@ enum class RepositoryType {
     HumidorHistory
 }
 
-class Database() : DatabaseInterface {
+class Database : DatabaseInterface {
     private val database = DatabaseType.getDatabase(DatabaseType.SqlDelight)
 
     companion object {
@@ -63,7 +61,7 @@ class Database() : DatabaseInterface {
 
     }
 
-    override fun <R : Repository<*>> getRepository(type: RepositoryType, args: Any?): R {
+    override fun <R> getRepository(type: RepositoryType, args: Any?): R {
         return database.getRepository(type, args)
     }
 
@@ -88,8 +86,6 @@ class Database() : DatabaseInterface {
         val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
         val imagesDatabase: ImagesRepository =
             getRepository(RepositoryType.CigarImages, humidor.rowid)
-        val hcDatabase: CigarHumidorRepository =
-            getRepository(RepositoryType.CigarHumidors, humidor.rowid)
         Log.debug("Added demo database")
         return humidorDatabase.add(demoHumidors[0]).flatMapIterable { h ->
             Log.debug("Added demo Humidor ${h.rowid}")

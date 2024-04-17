@@ -100,8 +100,8 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                     TextStyled(text = viewModel.humidor.name, style = TextStyles.ScreenTitle)
                     TextStyled(
                         text = Localize.humidor_cigars(
-                            viewModel.humidor.count ?: 0,
-                            (viewModel.humidor.holds ?: 0) - (viewModel.humidor.count ?: 0)
+                            viewModel.humidor.count,
+                            viewModel.humidor.holds - viewModel.humidor.count
                         ), style = TextStyles.Subhead
                     )
                 }
@@ -132,7 +132,7 @@ class HumidorCigarsScreen(override val route: NavRoute) :
 
     @Composable
     override fun EntityListRow(entity: HumidorCigar, modifier: Modifier) {
-        entity.cigar?.let {
+        entity.cigar.let {
             CigarListRow(it, modifier)
         }
     }

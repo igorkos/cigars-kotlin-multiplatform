@@ -100,8 +100,8 @@ class HumidorsListScreen(route: NavRoute) :
             ) {
                 TextStyled(
                     text = Localize.humidor_cigars(
-                        entity.count ?: 0,
-                        (entity.holds ?: 0) - (entity.count ?: 0)
+                        entity.count,
+                        entity.holds - entity.count
                     ),
                     style = TextStyles.Subhead
                 )

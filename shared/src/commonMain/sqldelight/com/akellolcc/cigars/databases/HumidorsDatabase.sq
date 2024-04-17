@@ -1,0 +1,70 @@
+import kotlin.Boolean;
+
+CREATE TABLE HumidorsTable (
+    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    brand TEXT NOT NULL,
+    holds INTEGER NOT NULL,
+    count INTEGER NOT NULL,
+    temperature INTEGER,
+    humidity REAL,
+    notes TEXT,
+    link TEXT,
+    price REAL,
+    autoOpen INTEGER AS Boolean,
+    sorting INTEGER,
+    type INTEGER NOT NULL
+);
+
+get:
+SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;
+
+allAsc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END ASC;
+
+allDesc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END DESC;
+
+
+add:
+INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+update:
+UPDATE HumidorsTable SET name = :name, brand = :brand, holds = :holds, count = :count, temperature = :temperature, humidity = :humidity, notes = :notes, link = :link, autoOpen = :autoOpen, sorting = :sorting, type = :type
+WHERE rowid = :id;
+
+remove:
+DELETE FROM HumidorsTable WHERE rowid = :rowid;
+
+removeAll:
+DELETE FROM HumidorsTable;
+
+find:
+SELECT * FROM HumidorsTable WHERE rowid = :rowid;
+
+count:
+SELECT COUNT(*) FROM HumidorsTable;
+
+contains:
+SELECT count(1) FROM HumidorsTable WHERE rowid = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+
+
+
+
+
+

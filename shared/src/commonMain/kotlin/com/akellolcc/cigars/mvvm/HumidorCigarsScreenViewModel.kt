@@ -14,7 +14,7 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) :
         database.getRepository(RepositoryType.HumidorCigars, humidor.rowid)
 
     override fun entitySelected(entity: HumidorCigar) {
-        sendEvent(CigarsAction.RouteToCigar(entity.cigar!!))
+        sendEvent(CigarsAction.RouteToCigar(entity.cigar))
     }
 
     fun humidorDetails() {

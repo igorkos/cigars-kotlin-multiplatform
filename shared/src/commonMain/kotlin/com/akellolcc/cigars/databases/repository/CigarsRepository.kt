@@ -6,4 +6,10 @@ import com.badoo.reaktive.observable.ObservableWrapper
 
 interface CigarsRepository : Repository<Cigar> {
     fun add(cigar: Cigar, humidor: Humidor): ObservableWrapper<Cigar>
+
+    override fun update(entity: Cigar): ObservableWrapper<Cigar>
+
+    fun updateFavorite(value: Boolean, cigar: Cigar): ObservableWrapper<Cigar>
+
+    fun updateRating(value: Long, cigar: Cigar): ObservableWrapper<Cigar>
 }

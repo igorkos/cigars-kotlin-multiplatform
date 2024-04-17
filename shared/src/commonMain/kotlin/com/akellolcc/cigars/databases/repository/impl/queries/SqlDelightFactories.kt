@@ -1,4 +1,8 @@
-package com.akellolcc.cigars.databases.repository.impl
+/*
+ * Copyright (c) 2024.
+ */
+
+package com.akellolcc.cigars.databases.repository.impl.queries
 
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
@@ -6,6 +10,9 @@ import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.extensions.emptyCigar
+import com.akellolcc.cigars.databases.extensions.emptyHumidor
 
 fun historyFactory(
     rowid: Long,
@@ -124,5 +131,17 @@ fun humidorFactory(
         autoOpen == true,
         sorting,
         type,
+    )
+}
+
+fun humidorCigarFactory(
+    count: Long,
+    humidor: Long,
+    cigar: Long,
+): HumidorCigar {
+    return HumidorCigar(
+        count,
+        emptyHumidor.copy(rowid = humidor),
+        emptyCigar.copy(rowid = cigar),
     )
 }
