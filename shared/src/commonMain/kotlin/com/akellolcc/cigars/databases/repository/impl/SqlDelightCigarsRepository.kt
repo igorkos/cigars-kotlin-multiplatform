@@ -42,7 +42,8 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
                     cigar.price,
                     HistoryType.Addition,
                     it.cigar.rowid,
-                    it.humidor.rowid
+                    it.humidor.rowid,
+                    null
                 )
             )
         }.flatMap {

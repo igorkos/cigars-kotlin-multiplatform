@@ -65,6 +65,7 @@ kotlin {
                 implementation(libs.bundles.sqldelight.common)
 
                 implementation(libs.bundles.ktor.common)
+
                 implementation(libs.atomicfu)
 
                 implementation(libs.bundles.multiplatform.firebase)
@@ -90,6 +91,7 @@ kotlin {
                 implementation(libs.androidx.foundation.android)
                 implementation(libs.ui.tooling.preview.android)
                 implementation(libs.accompanist.permissions)
+                implementation(libs.ktor.client.android.okhttp)
             }
         }
 
@@ -97,6 +99,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.sqldelight.ios)
+                implementation(libs.ktor.client.ios)
             }
         }
 

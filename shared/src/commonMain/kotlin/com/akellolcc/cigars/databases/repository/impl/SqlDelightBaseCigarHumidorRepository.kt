@@ -61,7 +61,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         }.wrap()
     }
 
-    override fun updateCount(entity: HumidorCigar, count: Long, price: Double?, historyType: HistoryType?): ObservableWrapper<HumidorCigar>{
+    override fun updateCount(entity: HumidorCigar, count: Long, price: Double?, historyType: HistoryType?, humidorTo: Humidor?): ObservableWrapper<HumidorCigar>{
         val c = entity.count - count
         val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
         var updated : HumidorCigar? = null
@@ -78,7 +78,8 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     price,
                     historyType ?:type,
                     entity.cigar.rowid,
-                    entity.humidor.rowid
+                    entity.humidor.rowid,
+                    humidorTo?.rowid
                 )
             )
         }.map { updated!! }.doOnBeforeError{
@@ -128,7 +129,8 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     price = from.cigar.price,
                     type = HistoryType.MoveFrom,
                     cigarId = from.cigar.rowid,
-                    humidorId = from.humidor.rowid
+                    humidorFrom = from.humidor.rowid,
+                    humidorTo = to.rowid
                 )
             )
         }.flatMap {
@@ -143,7 +145,8 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     price = from.cigar.price,
                     type = HistoryType.MoveTo,
                     cigarId = from.cigar.rowid,
-                    humidorId = to.rowid
+                    humidorFrom = to.rowid,
+                    humidorTo = to.rowid
                 )
             )
         }.flatMap {

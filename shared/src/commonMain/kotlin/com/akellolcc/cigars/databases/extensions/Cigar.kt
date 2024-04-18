@@ -164,8 +164,9 @@ enum class CigarStrength {
             }
         }
 
-        fun fromString(value: String): CigarShapes {
-            return CigarShapes.entries.first {
+        fun fromString(value: String?): CigarStrength? {
+            if (value == null) return null
+            return CigarStrength.entries.firstOrNull() {
                 it.name == value
             }
         }

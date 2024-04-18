@@ -24,7 +24,8 @@ abstract class SqlDelightHistoryRepository(
                     entity.price,
                     entity.type.type,
                     entity.cigarId,
-                    entity.humidorId
+                    entity.humidorFrom,
+                    entity.humidorTo
                 )
             } else {
                 queries.update(
@@ -34,7 +35,8 @@ abstract class SqlDelightHistoryRepository(
                     entity.price,
                     entity.type.type,
                     entity.cigarId,
-                    entity.humidorId,
+                    entity.humidorFrom,
+                    entity.humidorTo,
                     entity.rowid
                 )
             }

@@ -17,7 +17,8 @@ class History(
     var price: Double?,
     var type: HistoryType,
     var cigarId: Long,
-    var humidorId: Long
+    var humidorFrom: Long,
+    var humidorTo: Long?
 ) : BaseEntity() {
 
     constructor(history: HistoryTable) : this(
@@ -28,8 +29,9 @@ class History(
         history.price,
         HistoryType.fromLong(history.type),
         history.cigarId,
-        history.humidorId,
-    )
+        history.humidorTo,
+        history.humidorFrom
+        )
 }
 
 enum class HistoryType(val type: Long) {

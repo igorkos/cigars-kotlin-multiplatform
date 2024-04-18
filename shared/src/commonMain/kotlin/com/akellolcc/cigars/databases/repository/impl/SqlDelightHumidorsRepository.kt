@@ -33,7 +33,8 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
                     entity.price,
                     HistoryType.Addition,
                     -1,
-                    it.rowid
+                    it.rowid,
+                    null
                 )
             )
             it

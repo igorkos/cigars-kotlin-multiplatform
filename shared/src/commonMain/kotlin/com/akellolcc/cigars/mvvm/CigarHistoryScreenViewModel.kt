@@ -18,6 +18,6 @@ class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
     }
 
     override fun entityName(id: History): String {
-        return repository.humidorName(id.humidorId)
+        return repository.humidorName(id.humidorFrom)
     }
 }

@@ -22,7 +22,8 @@ fun historyFactory(
     price: Double?,
     type: Long,
     cigarId: Long,
-    humidorId: Long
+    humidorTo: Long,
+    humidorFrom: Long?
 ): History {
     return History(
         rowid,
@@ -32,7 +33,8 @@ fun historyFactory(
         price,
         HistoryType.fromLong(type),
         cigarId,
-        humidorId
+        humidorTo,
+        humidorFrom
     )
 }
 

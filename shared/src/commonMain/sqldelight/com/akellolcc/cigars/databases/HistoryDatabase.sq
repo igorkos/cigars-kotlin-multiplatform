@@ -7,9 +7,11 @@ CREATE TABLE HistoryTable (
     price REAL,
     type INTEGER NOT NULL,
     cigarId  INTEGER NOT NULL,
-    humidorId  INTEGER NOT NULL,
+    humidorTo  INTEGER NOT NULL,
+    humidorFrom  INTEGER,
     FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION ,
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
+    FOREIGN KEY (humidorTo) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION,
+    FOREIGN KEY (humidorFrom) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
 );
 
 get:
@@ -23,8 +25,8 @@ allDesc:
 
 
 add:
-INSERT INTO HistoryTable (count, date, left, price, type, cigarId, humidorId)
-VALUES (?, ?, ?, ?, ?,?,?);
+INSERT INTO HistoryTable (count, date, left, price, type, cigarId, humidorTo, humidorFrom)
+VALUES (?, ?, ?, ?, ?,?,?, ?);
 
 update:
 UPDATE HistoryTable SET
@@ -34,7 +36,8 @@ UPDATE HistoryTable SET
     price= :price,
     type= :type,
     cigarId= :cigarId,
-    humidorId= :humidorId WHERE rowid = :id;
+    humidorTo= :humidorFrom,
+    humidorFrom= :humidorTo WHERE rowid = :id;
 
 remove:
 DELETE FROM HistoryTable WHERE rowid = :rowid;
@@ -58,7 +61,7 @@ cigarHistory:
 SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar AND type < 3 ORDER BY date DESC;
 
 humidorHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor AND type != 2 ORDER BY date DESC;
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor AND type != 2 ORDER BY date DESC;
 
 humidorName:
 SELECT HumidorsTable.name FROM HumidorsTable WHERE rowid = :id;

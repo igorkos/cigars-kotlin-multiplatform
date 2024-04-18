@@ -33,6 +33,7 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
+import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarsRoute
@@ -74,7 +75,7 @@ class MainScreen : Screen {
                 }
 
                 is MainScreenViewModel.MainScreenActions.OpenDrawer -> {
-                    throw RuntimeException("Test Crash")
+                    //throw RuntimeException("Test Crash")
                     isDrawerVisible = it.isVisible
                 }
             }
@@ -104,7 +105,11 @@ class MainScreen : Screen {
                         NavigationDrawerItem(
                             label = { Text(text = "Drawer Item") },
                             selected = false,
-                            onClick = { /*TODO*/ }
+                            onClick = {
+                                GetCigarsRequest(name = "Fuente").next().subscribe {
+                                    Log.debug("Cigars: ${it.size}")
+                                }
+                            }
                         )
                     }
                 },

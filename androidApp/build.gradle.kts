@@ -49,5 +49,5 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     implementation(libs.bundles.android.firebase)
     implementation(libs.google.gms.services)
-
+    implementation(libs.kotlinx.coroutines.android)
 }
