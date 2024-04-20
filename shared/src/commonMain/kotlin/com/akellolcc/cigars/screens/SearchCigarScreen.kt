@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 10:45 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,7 +46,7 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -109,7 +109,8 @@ class SearchCigarScreen(route: NavRoute) :
                 modifier = Modifier.padding(start = 8.dp).wrapContentSize(),
                 onClick = { expanded = true }
             ) {
-                val icon = if (!last)  Images.icon_menu_minus else if (CigarSearchFields.entries.size == viewModel.searchParams.size) Images.icon_menu_minus else Images.icon_menu_plus
+                val icon =
+                    if (!last) Images.icon_menu_minus else if (CigarSearchFields.entries.size == viewModel.searchParams.size) Images.icon_menu_minus else Images.icon_menu_plus
                 loadIcon(icon, Size(24.0F, 24.0F))
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     viewModel.sortingMenu().map {
@@ -133,10 +134,11 @@ class SearchCigarScreen(route: NavRoute) :
             }
         }
     }
+
     @Composable
     override fun ContentHeader(modifier: Modifier) {
         Column {
-            viewModel.searchParams.mapIndexed{ index, it ->
+            viewModel.searchParams.mapIndexed { index, it ->
                 SearchField(it, index == viewModel.searchParams.lastIndex)
             }
             if (viewModel.loading && viewModel.entities.isEmpty()) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,12 +51,12 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.CigarsRoute
-import com.akellolcc.cigars.navigation.FavoritesRoute
-import com.akellolcc.cigars.navigation.HumidorsRoute
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
-import com.akellolcc.cigars.navigation.SearchCigarRoute
+import com.akellolcc.cigars.screens.navigation.CigarsRoute
+import com.akellolcc.cigars.screens.navigation.FavoritesRoute
+import com.akellolcc.cigars.screens.navigation.HumidorsRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient

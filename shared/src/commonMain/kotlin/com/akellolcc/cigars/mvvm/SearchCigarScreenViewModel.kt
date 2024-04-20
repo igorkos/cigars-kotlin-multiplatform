@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 10:45 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,11 +40,11 @@ class SearchCigarScreenViewModel() :
     override fun entitySelected(entity: Cigar) {
     }
 
-    fun addSearchParameter(parameter: CigarSearchFields)  {
+    fun addSearchParameter(parameter: CigarSearchFields) {
         searchParams = searchParams + parameter
     }
 
-    fun sortingMenu(): List<Pair<CigarSearchFields, String>>  {
+    fun sortingMenu(): List<Pair<CigarSearchFields, String>> {
         val list = CigarSearchFields.enumValues().filter {
             !searchParams.contains(it.first)
         }
@@ -68,12 +68,12 @@ class SearchCigarScreenViewModel() :
         entities = if (accenting) {
             list.sortedWith(compareBy { it.name })
         } else {
-            list.sortedWith (compareBy { it.name }).reversed()
+            list.sortedWith(compareBy { it.name }).reversed()
         }
     }
 
     private val canLoad: Boolean
-        get(){
+        get() {
             var can = true
             searchParams.forEach {
                 can = when (it) {
@@ -84,10 +84,13 @@ class SearchCigarScreenViewModel() :
             }
             return can
         }
+
     override fun loadEntities(reload: Boolean) {
         if (canLoad) {
-            if (request == null || (request != null && request?.name != name && request?.brand != brand && request?.country != country  )) {
-                request = GetCigarsRequest(name = name.ifBlank { null }, brand = brand.ifBlank { null }, country = country.ifBlank { null })
+            if (request == null || (request != null && request?.name != name && request?.brand != brand && request?.country != country)) {
+                request = GetCigarsRequest(name = name.ifBlank { null },
+                    brand = brand.ifBlank { null },
+                    country = country.ifBlank { null })
             }
             loading = true
             request?.next()?.subscribe {
