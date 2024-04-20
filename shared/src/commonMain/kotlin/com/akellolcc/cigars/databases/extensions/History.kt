@@ -31,7 +31,7 @@ class History(
         history.cigarId,
         history.humidorTo,
         history.humidorFrom
-        )
+    )
 }
 
 enum class HistoryType(val type: Long) {

@@ -5,13 +5,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -25,6 +28,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,8 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -49,6 +51,7 @@ import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
+import com.akellolcc.cigars.ui.reachedBottom
 
 abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute) : ITabItem {
     abstract val viewModel: BaseListViewModel<E, A>
@@ -62,6 +65,26 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     @Composable
     abstract fun EntityListRow(entity: E, modifier: Modifier)
 
+    @Composable
+    open fun ListHeader(modifier: Modifier = Modifier) {
+    }
+
+    @Composable
+    open fun ListFooter(modifier: Modifier = Modifier) {
+    }
+
+    @Composable
+    open fun ContentFooter(modifier: Modifier = Modifier) {
+    }
+
+    @Composable
+    open fun ContentHeader(modifier: Modifier = Modifier) {
+    }
+
+    open fun loadMore() {
+        viewModel.loadMore()
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -69,8 +92,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
         // val entities by viewModel.asState()
 
         LaunchedEffect(navigator) {
-            Log.debug("LaunchedEffect")
-            viewModel.loadEntities()
+            viewModel.loadMore()
             if (route.sharedViewModel?.isTabsVisible != route.isTabsVisible)
                 route.sharedViewModel?.isTabsVisible = route.isTabsVisible
         }
@@ -82,15 +104,21 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
         val scrollBehavior =
             TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
-        //Log.debug("Cigars : $cigars")
+        val listState = rememberLazyListState()
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                modifier = Modifier.fillMaxSize(),
                 topBar = { topTabBar(scrollBehavior, navigator) },
+                bottomBar = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(64.dp)
+                            .background(Color.Transparent)
+                    )
+                },
                 content = {
                     val padding by remember { mutableStateOf(it.calculateTopPadding() + 16.dp to it.calculateBottomPadding() + 16.dp) }
-                    if (viewModel.loading) {
+                    Log.debug("padding $padding")
+                    if (viewModel.loading && route.isLoadingCover) {
                         Box(
                             modifier = Modifier.fillMaxSize().background(
                                 materialColor(
@@ -103,8 +131,20 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
                             )
                         }
                     } else {
-                        if (viewModel.entities.isNotEmpty()) {
-                            entitiesList(viewModel.entities, padding)
+                        Column(
+                            modifier = Modifier.padding(
+                                top = padding.first,
+                                bottom = padding.second
+                            ),
+                            verticalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            ContentHeader(Modifier)
+                            if (viewModel.entities.isNotEmpty()) {
+                                entitiesList(viewModel.entities, listState) {
+                                    loadMore()
+                                }
+                            }
+                            ContentFooter(Modifier)
                         }
                     }
                 }
@@ -113,23 +153,25 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     }
 
     @Composable
-    private fun entitiesList(entities: List<E>, padding: Pair<Dp, Dp>) {
-        val listState = rememberLazyListState()
+    private fun entitiesList(
+        entities: List<E>,
+        listState: LazyListState,
+        loadMore: (() -> Unit)? = null
+    ) {
+        val reachedBottom: Boolean by remember { derivedStateOf { listState.reachedBottom() } }
+
+        // load more if scrolled to bottom
+        LaunchedEffect(reachedBottom) {
+            if (reachedBottom) loadMore?.invoke()
+        }
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.Top,
             contentPadding = PaddingValues(horizontal = 16.dp),
-            modifier = Modifier
-                .fillMaxSize()
         )
         {
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(padding.first)
-                        .background(Color.Transparent)
-                )
+                ListHeader(Modifier.fillMaxWidth())
             }
             items(entities, key = { item -> item.key }) {
                 val clickableModifier = remember(it.key) {
@@ -144,12 +186,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
                 )
             }
             item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(padding.second)
-                        .background(Color.Transparent)
-                )
+                ListFooter(Modifier.fillMaxWidth())
             }
         }
     }

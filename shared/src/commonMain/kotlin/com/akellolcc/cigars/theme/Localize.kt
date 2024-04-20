@@ -20,6 +20,7 @@ object Localize {
     val title_humidors: String = Strings.title_humidors.toString()
     val title_cigars: String = Strings.title_cigars.toString()
     val title_favorites: String = Strings.title_favorites.toString()
+    val title_search: String = Strings.title_search.toString()
     val title_login: String = Strings.login.toString()
 
     val button_cancel = Strings.button_cancel.toString()

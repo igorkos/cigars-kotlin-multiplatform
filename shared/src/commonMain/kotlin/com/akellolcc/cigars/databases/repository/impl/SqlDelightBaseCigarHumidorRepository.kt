@@ -26,9 +26,7 @@ import com.badoo.reaktive.observable.doOnBeforeError
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.observableFromFunction
 import com.badoo.reaktive.observable.observableOf
-import com.badoo.reaktive.observable.toObservable
 import com.badoo.reaktive.observable.wrap
 import com.badoo.reaktive.single.SingleWrapper
 import com.badoo.reaktive.single.wrap
@@ -56,18 +54,25 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                 val cigar = (cRepo as Repository<Cigar>).getSync(humidorCigar.cigarId)
                 HumidorCigar(humidorCigar.count, humidor, cigar)
             }
-        }.asObservable().doOnBeforeError{
+        }.asObservable().doOnBeforeError {
             Log.error("Error while getting all humidor cigars $it")
         }.wrap()
     }
 
-    override fun updateCount(entity: HumidorCigar, count: Long, price: Double?, historyType: HistoryType?, humidorTo: Humidor?): ObservableWrapper<HumidorCigar>{
+    override fun updateCount(
+        entity: HumidorCigar,
+        count: Long,
+        price: Double?,
+        historyType: HistoryType?,
+        humidorTo: Humidor?
+    ): ObservableWrapper<HumidorCigar> {
         val c = entity.count - count
         val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
-        var updated : HumidorCigar? = null
+        var updated: HumidorCigar? = null
         return super.update(entity.copy(count = count)).flatMap {
             updated = it
-            val cigarsHistoryDatabase: HistoryRepository = Database.instance.getRepository(RepositoryType.CigarHistory, entity.cigar.rowid)
+            val cigarsHistoryDatabase: HistoryRepository =
+                Database.instance.getRepository(RepositoryType.CigarHistory, entity.cigar.rowid)
             Log.info("UpdateCount: Add Cigar History item ${HistoryType.localized(type)}")
             cigarsHistoryDatabase.add(
                 History(
@@ -76,24 +81,35 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     Clock.System.now().toEpochMilliseconds(),
                     count,
                     price,
-                    historyType ?:type,
+                    historyType ?: type,
                     entity.cigar.rowid,
                     entity.humidor.rowid,
                     humidorTo?.rowid
                 )
             )
-        }.map { updated!! }.doOnBeforeError{
+        }.map { updated!! }.doOnBeforeError {
             Log.error("Error while updating humidor cigars count $it")
         }.wrap()
     }
 
-    override fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): ObservableWrapper<Boolean> {
-        val humidorsRepository: HumidorsRepository = Database.instance.getRepository(RepositoryType.Humidors)
-        var humidorHistoryRepository: HistoryRepository = Database.instance.getRepository(RepositoryType.HumidorHistory, from.humidor.rowid)
+    override fun moveCigar(
+        from: HumidorCigar,
+        to: Humidor,
+        count: Long
+    ): ObservableWrapper<Boolean> {
+        val humidorsRepository: HumidorsRepository =
+            Database.instance.getRepository(RepositoryType.Humidors)
+        var humidorHistoryRepository: HistoryRepository =
+            Database.instance.getRepository(RepositoryType.HumidorHistory, from.humidor.rowid)
         return observable { emitter ->
             if (from.count > count) {
                 Log.info("Update count of cigars left in humidor from we move")
-                updateCount(from, from.count - count, from.cigar.price, HistoryType.Move).subscribe {
+                updateCount(
+                    from,
+                    from.count - count,
+                    from.cigar.price,
+                    HistoryType.Move
+                ).subscribe {
                     emitter.onNext(true)
                 }
             } else {
@@ -135,7 +151,8 @@ abstract class SqlDelightBaseCigarHumidorRepository(
             )
         }.flatMap {
             Log.info("Add history item Move To")
-            humidorHistoryRepository = Database.instance.getRepository(RepositoryType.HumidorHistory, to.rowid)
+            humidorHistoryRepository =
+                Database.instance.getRepository(RepositoryType.HumidorHistory, to.rowid)
             humidorHistoryRepository.add(
                 History(
                     -1L,
@@ -152,7 +169,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         }.flatMap {
             Log.info("Finished moving cigar")
             observableOf(true)
-        }.doOnBeforeError{
+        }.doOnBeforeError {
             Log.error("Error while moving cigars $it")
         }.wrap()
     }
@@ -163,12 +180,14 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                 queries.add(
                     entity.count,
                     entity.humidor.rowid,
-                    entity.cigar.rowid)
+                    entity.cigar.rowid
+                )
             } else {
                 queries.update(
                     entity.count,
                     entity.humidor.rowid,
-                    entity.cigar.rowid)
+                    entity.cigar.rowid
+                )
             }
             entity
         }.wrap()

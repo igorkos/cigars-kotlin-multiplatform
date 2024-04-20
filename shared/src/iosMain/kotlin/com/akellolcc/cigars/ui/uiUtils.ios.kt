@@ -18,6 +18,12 @@ actual fun screenWidth(): Dp {
     return Dp(LocalWindowInfo.current.containerSize.width.toFloat())
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+actual fun screenHeight(): Dp {
+    return Dp(LocalWindowInfo.current.containerSize.height.toFloat())
+}
+
 @Composable
 actual fun BackHandler(block: () -> Unit) {
 }
@@ -53,3 +59,4 @@ actual fun String.parseDate(pattern: String, defValue: Long): Long {
         defValue
     }
 }
+

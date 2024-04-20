@@ -11,7 +11,6 @@ import com.badoo.reaktive.coroutinesinterop.asObservable
 import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.subscribe
 import com.badoo.reaktive.observable.wrap
 import com.badoo.reaktive.single.SingleWrapper
 import com.badoo.reaktive.single.wrap

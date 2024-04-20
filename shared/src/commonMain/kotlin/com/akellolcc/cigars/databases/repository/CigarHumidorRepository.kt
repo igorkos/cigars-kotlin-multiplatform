@@ -14,7 +14,13 @@ interface CigarHumidorRepository : Repository<HumidorCigar> {
 
     fun remove(cigar: Cigar, from: Humidor): ObservableWrapper<Boolean>
 
-    fun updateCount(entity: HumidorCigar, count: Long, price: Double? = null, historyType: HistoryType? = null, humidorTo: Humidor? = null): ObservableWrapper<HumidorCigar>
+    fun updateCount(
+        entity: HumidorCigar,
+        count: Long,
+        price: Double? = null,
+        historyType: HistoryType? = null,
+        humidorTo: Humidor? = null
+    ): ObservableWrapper<HumidorCigar>
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): ObservableWrapper<Boolean>
 }

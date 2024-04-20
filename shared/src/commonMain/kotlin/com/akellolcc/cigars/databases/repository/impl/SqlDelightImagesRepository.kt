@@ -2,7 +2,6 @@ package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.ImagesDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.ImagesTableQueries
 import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine

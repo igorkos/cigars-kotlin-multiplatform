@@ -7,8 +7,6 @@ import com.akellolcc.cigars.components.ValuePickerItem
 import com.akellolcc.cigars.databases.RepositoryType
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
@@ -21,8 +19,6 @@ import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.subscribe
 import dev.icerock.moko.resources.desc.StringDesc
-import kotlinx.datetime.Clock
-import kotlin.math.absoluteValue
 
 
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
@@ -68,7 +64,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     fun observeCigar() {
         if (cigar.rowid >= 0 && observeCigar == null) {
             imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
-            cigarHumidorRepository = database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
+            cigarHumidorRepository =
+                database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
             cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
             observeCigar = cigarsDatabase.observe(cigar.rowid)
             observeCigar?.map {
@@ -204,7 +201,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long) {
-        cigarHumidorRepository?.moveCigar(from, to, count)?.subscribe{
+        cigarHumidorRepository?.moveCigar(from, to, count)?.subscribe {
             moveCigarDialog = false
         }
     }

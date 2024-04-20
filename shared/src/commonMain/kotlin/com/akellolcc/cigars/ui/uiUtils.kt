@@ -7,6 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -25,6 +26,9 @@ import kotlin.random.Random
 
 @Composable
 expect fun screenWidth(): Dp
+
+@Composable
+expect fun screenHeight(): Dp
 
 @Composable
 fun Dp.dpToPx() = with(LocalDensity.current) { this@dpToPx.toPx().roundToInt() }
@@ -70,4 +74,9 @@ expect fun String.parseDate(pattern: String, defValue: Long = 0L): Long
 const val defaultDateFormat = "MMMM d, yyyy"
 fun Long.formatDate(pattern: String? = null, defValue: String = ""): String {
     return Instant.fromEpochMilliseconds(this).formatDate(pattern ?: defaultDateFormat, defValue)
+}
+
+fun LazyListState.reachedBottom(buffer: Int = 1): Boolean {
+    val lastVisibleItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
+    return lastVisibleItem?.index != 0 && lastVisibleItem?.index == this.layoutInfo.totalItemsCount - buffer
 }

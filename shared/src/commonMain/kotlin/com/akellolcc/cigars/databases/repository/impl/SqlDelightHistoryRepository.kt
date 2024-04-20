@@ -1,7 +1,6 @@
 package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
-import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.HistoryTableQueries

@@ -2,15 +2,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.textStyle
 
@@ -29,10 +34,14 @@ fun TextStyled(
     maxHeight: Int = 0,
     keepHeight: Boolean = true,
     onValueChange: ((String) -> Unit)? = null,
+    onKeyboardAction: ((ImeAction) -> Unit)? = null,
     inputMode: KeyboardType = KeyboardType.Text,
     center: Boolean = false,
-    vertical: Boolean = false
+    vertical: Boolean = false,
+    enabled: Boolean = true,
+    imeAction: ImeAction = ImeAction.Default,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val textStyle =
         textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
     val styleLabel = textStyle(labelStyle)
@@ -42,7 +51,7 @@ fun TextStyled(
 
     if (editable) {
         TextField(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier,
             value = text ?: "",
             label = {
                 TextStyled(
@@ -55,11 +64,43 @@ fun TextStyled(
             onValueChange = {
                 onValueChange?.invoke(it)
             },
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    Log.debug("onDone")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Done)
+                },
+                onGo = {
+                    Log.debug("onGo")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Go)
+                },
+                onNext = {
+                    Log.debug("onNext")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Next)
+                },
+                onPrevious = {
+                    Log.debug("onPrevious")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Previous)
+                },
+                onSearch = {
+                    Log.debug("onSearch")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Search)
+                },
+                onSend = {
+                    Log.debug("onSend")
+                    keyboardController?.hide()
+                    onKeyboardAction?.invoke(ImeAction.Send)
+                }),
             minLines = minLines,
             maxLines = maxLines,
             singleLine = maxLines == 1,
             textStyle = textStyle,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = inputMode),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = inputMode, autoCorrect = true, capitalization = Sentences, imeAction = imeAction),
+            enabled = enabled
         )
     } else {
         @Composable

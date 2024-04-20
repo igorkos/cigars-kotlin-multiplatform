@@ -238,3 +238,26 @@ enum class CigarSortingFields(val value: String) {
     }
 }
 
+@Serializable
+enum class CigarSearchFields(val value: String) {
+    Name("name"),
+    Brand("brand"),
+    Country("country");
+
+    companion object {
+        fun enumValues(): Array<Pair<CigarSearchFields, String>> {
+            return CigarSearchFields.entries.map {
+                it to localized(it)
+            }.toTypedArray()
+        }
+
+        fun localized(value: CigarSearchFields): String {
+            return when (value) {
+                Name -> Localize.cigar_details_name
+                Brand -> Localize.cigar_details_company
+                Country -> Localize.cigar_details_country
+            }
+        }
+    }
+}
+

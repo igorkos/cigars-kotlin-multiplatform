@@ -12,7 +12,8 @@ expect class NavRoute(
     icon: ImageResource,
     data: Any? = null,
     isTabsVisible: Boolean = true,
-    isDrawerVisible: Boolean = false
+    isDrawerVisible: Boolean = false,
+    isLoadingCover: Boolean = false,
 ) {
     val route: String
     val title: String
@@ -21,6 +22,7 @@ expect class NavRoute(
     var isDrawerVisible: Boolean
     var sharedViewModel: MainScreenViewModel?
     var data: Any?
+    var isLoadingCover: Boolean
 }
 
 val CigarsRoute = NavRoute("cigars_screen", Localize.title_cigars, Images.tab_icon_cigars)
@@ -60,3 +62,5 @@ val HumidorCigarsRoute = NavRoute(
     Images.tab_icon_cigars,
     isTabsVisible = false
 )
+val SearchCigarRoute =
+    NavRoute("search_cigars_screen", Localize.title_search, Images.tab_icon_search)

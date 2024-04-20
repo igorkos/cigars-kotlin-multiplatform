@@ -21,7 +21,7 @@ val firebaseOptions: FirebaseOptions
     get() = FirebaseOptions(
         "1:888991141757:android:0cd490d7b772d358724614",
         "AIzaSyDqCjCheBkbj1soAiMcA_i-SoiZCdP93cs",
-        projectId= "cigars-e3746",
+        projectId = "cigars-e3746",
     )
 
 actual fun initFirebase(): FirebaseApp? {

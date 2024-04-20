@@ -85,9 +85,10 @@ class Images {
         val icon_menu_sort_alpha_desc = MR.images.icon_menu_sort_alpha_desc
         val icon_menu_sort_amount_asc = MR.images.icon_menu_sort_amount_asc
         val icon_menu_sort_amount_desc = MR.images.icon_menu_sort_amount_desc
-        val icon_menu_sort_numberic_desc = MR.images.icon_menu_sort_numberic_desc
+        val icon_menu_sort_numeric_desc = MR.images.icon_menu_sort_numberic_desc
         val icon_menu_sort_numeric_asc = MR.images.icon_menu_sort_numeric_asc
         val icon_menu_sort = MR.images.icon_menu_sort
+        val tab_icon_search = MR.images.tab_icon_search
     }
 }
 

@@ -33,7 +33,6 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
-import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.navigation.CigarsRoute
@@ -41,6 +40,7 @@ import com.akellolcc.cigars.navigation.FavoritesRoute
 import com.akellolcc.cigars.navigation.HumidorsRoute
 import com.akellolcc.cigars.navigation.ITabItem
 import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient
@@ -48,7 +48,8 @@ import kotlin.jvm.Transient
 private var tabs: List<ITabItem> = listOf(
     CigarsScreen(CigarsRoute),
     HumidorsScreen(HumidorsRoute),
-    FavoritesScreen(FavoritesRoute)
+    FavoritesScreen(FavoritesRoute),
+    SearchCigarScreen(SearchCigarRoute)
 )
 
 class MainScreen : Screen {
@@ -89,8 +90,6 @@ class MainScreen : Screen {
             }
         }
 
-        Log.debug("MainScreen tabs visible $isTabsVisible -> $viewModel")
-
         DefaultTheme {
             ModalNavigationDrawer(
                 drawerState = drawerState,
@@ -106,23 +105,14 @@ class MainScreen : Screen {
                             label = { Text(text = "Drawer Item") },
                             selected = false,
                             onClick = {
-                                GetCigarsRequest(name = "Fuente").next().subscribe {
-                                    Log.debug("Cigars: ${it.size}")
-                                }
+
                             }
                         )
                     }
                 },
                 gesturesEnabled = isTabsVisible,
             ) {
-                TabNavigator(
-                    tabs[0]
-                    /*, tabDisposable = { tabNavigator ->
-                        TabDisposable(
-                            navigator = tabNavigator,
-                            tabs = tabs
-                        )}*/
-                ) {
+                TabNavigator(tabs[0]) {
                     Scaffold(
                         bottomBar = {
                             AnimatedVisibility(

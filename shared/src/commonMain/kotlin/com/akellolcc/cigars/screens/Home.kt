@@ -40,12 +40,13 @@ class Home : Screen {
             database.reset()
             database.createDemoSet().subscribe(
                 onError = {
-                     Log.error("Error creating demo set $it")
+                    Log.error("Error creating demo set $it")
                 },
                 onComplete = {
                     Pref.isFirstStart = false
-                    initialized.value = true },
-                onNext ={
+                    initialized.value = true
+                },
+                onNext = {
                     Pref.isFirstStart = false
                     initialized.value = true
                 }

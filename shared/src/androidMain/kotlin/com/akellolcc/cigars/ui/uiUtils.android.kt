@@ -17,6 +17,11 @@ actual fun screenWidth(): Dp {
 }
 
 @Composable
+actual fun screenHeight(): Dp {
+    return LocalConfiguration.current.screenHeightDp.dp
+}
+
+@Composable
 actual fun BackHandler(block: () -> Unit) {
     androidx.activity.compose.BackHandler {
         block()
@@ -42,3 +47,4 @@ actual fun String.parseDate(pattern: String, defValue: Long): Long {
         defValue
     }
 }
+
