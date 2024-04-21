@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:04 PM
+ * Last modified 4/20/24, 11:55 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.components
+package com.akellolcc.cigars.screens.components
 
 import TextStyled
 import androidx.compose.foundation.BorderStroke
@@ -84,6 +84,24 @@ fun DefaultButton(
     }
 }
 
+@Composable
+fun LinkButton(
+    title: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    TextButton(
+        enabled = enabled,
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        TextStyled(
+            title,
+            TextStyles.Subhead,
+        )
+    }
+}
 
 @Composable
 fun DialogButton(

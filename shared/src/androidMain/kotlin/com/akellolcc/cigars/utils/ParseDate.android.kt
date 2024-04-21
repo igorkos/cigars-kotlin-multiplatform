@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 8:28 PM
+ * Last modified 4/21/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,15 +14,24 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.logging
+package com.akellolcc.cigars.utils
 
-actual fun getCallStack(): CallStackEntry? {
-    val stack = Thread.currentThread().stackTrace
-    val call = stack[5]
-    return if (call != null) CallStackEntry(
-        call.fileName,
-        call.lineNumber,
-        call.methodName
-    ) else null
+import kotlinx.datetime.Instant
+import java.text.SimpleDateFormat
+import java.util.Date
+
+actual fun String.parseDate(pattern: String, defValue: Long): Long {
+    return try {
+        SimpleDateFormat(pattern).parse(this).time
+    } catch (e: Exception) {
+        defValue
+    }
 }
 
+actual fun Instant.formatDate(pattern: String, defValue: String): String {
+    return try {
+        SimpleDateFormat(pattern).format(Date(this.toEpochMilliseconds()))
+    } catch (e: Exception) {
+        defValue
+    }
+}

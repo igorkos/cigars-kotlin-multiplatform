@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/20/24, 7:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,14 +59,14 @@ import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.BaseListViewModel
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.ui.reachedBottom
+import com.akellolcc.cigars.utils.ui.reachedBottom
 
 abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute) : ITabItem {
     abstract val viewModel: BaseListViewModel<E, A>
@@ -82,19 +81,19 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     abstract fun EntityListRow(entity: E, modifier: Modifier)
 
     @Composable
-    open fun ListHeader(modifier: Modifier = Modifier) {
+    open fun ListHeader(modifier: Modifier) {
     }
 
     @Composable
-    open fun ListFooter(modifier: Modifier = Modifier) {
+    open fun ListFooter(modifier: Modifier) {
     }
 
     @Composable
-    open fun ContentFooter(modifier: Modifier = Modifier) {
+    open fun ContentFooter(modifier: Modifier) {
     }
 
     @Composable
-    open fun ContentHeader(modifier: Modifier = Modifier) {
+    open fun ContentHeader(modifier: Modifier) {
     }
 
     open fun loadMore() {
@@ -150,7 +149,9 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
                         Column(
                             modifier = Modifier.padding(
                                 top = padding.first,
-                                bottom = padding.second
+                                bottom = padding.second,
+                                start = 16.dp,
+                                end = 16.dp
                             ),
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -183,7 +184,6 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.Top,
-            contentPadding = PaddingValues(horizontal = 16.dp),
         )
         {
             item {

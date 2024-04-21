@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/21/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.ui
+package com.akellolcc.cigars.utils.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -22,11 +22,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toNSDate
 import org.jetbrains.skia.Image
-import platform.Foundation.NSDateFormatter
-import platform.Foundation.timeIntervalSince1970
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -46,33 +42,5 @@ actual fun BackHandler(block: () -> Unit) {
 
 actual fun toImageBitmap(data: ByteArray): ImageBitmap? {
     return Image.makeFromEncoded(data).toComposeImageBitmap()
-}
-
-actual fun Instant.formatDate(pattern: String, defValue: String): String {
-    return try {
-        val dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = pattern
-        dateFormatter.stringFromDate(
-            toNSDate()
-        )
-    } catch (e: Exception) {
-        defValue
-    }
-
-}
-
-actual fun String.parseDate(pattern: String, defValue: Long): Long {
-    return try {
-        val dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = pattern
-        val result = dateFormatter.dateFromString(this)?.timeIntervalSince1970?.toLong()
-        if (result != null) {
-            result * 1000
-        } else {
-            defValue
-        }
-    } catch (e: Exception) {
-        defValue
-    }
 }
 

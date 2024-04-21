@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:04 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,12 +32,12 @@ import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.components.DefaultButton
 import com.akellolcc.cigars.mvvm.LoginViewModel
-import com.akellolcc.cigars.navigation.SharedScreen
+import com.akellolcc.cigars.screens.components.DefaultButton
+import com.akellolcc.cigars.screens.navigation.SharedScreen
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.LoginBackground
-import com.akellolcc.cigars.ui.BackHandler
+import com.akellolcc.cigars.utils.ui.BackHandler
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import dev.icerock.moko.mvvm.flow.compose.observeAsActions

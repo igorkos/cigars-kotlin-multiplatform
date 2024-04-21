@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:35 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,10 +37,10 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorsViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.HumidorCigarsRoute
-import com.akellolcc.cigars.navigation.HumidorDetailsRoute
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.navigation.HumidorCigarsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors

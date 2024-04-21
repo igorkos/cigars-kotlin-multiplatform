@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 9:48 PM
+ * Last modified 4/20/24, 12:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,15 +16,17 @@
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
@@ -32,7 +34,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
+import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.textStyle
 
 
@@ -69,6 +73,16 @@ fun TextStyled(
         TextField(
             modifier = modifier,
             value = text ?: "",
+            trailingIcon = {
+                if (inputMode == KeyboardType.Text) {
+                    IconButton(
+                        modifier = Modifier.wrapContentSize(),
+                        onClick = { onValueChange?.invoke("") }
+                    ) {
+                        loadIcon(Images.icon_menu_delete, Size(8.0F, 8.0F))
+                    }
+                }
+            },
             label = {
                 TextStyled(
                     text = label ?: "",
@@ -115,7 +129,12 @@ fun TextStyled(
             maxLines = maxLines,
             singleLine = maxLines == 1,
             textStyle = textStyle,
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = inputMode, autoCorrect = true, capitalization = Sentences, imeAction = imeAction),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = inputMode,
+                autoCorrect = true,
+                capitalization = Sentences,
+                imeAction = imeAction
+            ),
             enabled = enabled
         )
     } else {

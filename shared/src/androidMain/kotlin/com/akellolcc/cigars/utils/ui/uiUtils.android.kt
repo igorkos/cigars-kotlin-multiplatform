@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/21/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.ui
+package com.akellolcc.cigars.utils.ui
 
 import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
@@ -23,9 +23,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 actual fun screenWidth(): Dp {
@@ -46,21 +43,5 @@ actual fun BackHandler(block: () -> Unit) {
 
 actual fun toImageBitmap(data: ByteArray): ImageBitmap? {
     return BitmapFactory.decodeByteArray(data, 0, data.size).asImageBitmap()
-}
-
-actual fun Instant.formatDate(pattern: String, defValue: String): String {
-    return try {
-        SimpleDateFormat(pattern).format(Date(this.toEpochMilliseconds()))
-    } catch (e: Exception) {
-        defValue
-    }
-}
-
-actual fun String.parseDate(pattern: String, defValue: Long): Long {
-    return try {
-        SimpleDateFormat(pattern).parse(this).time
-    } catch (e: Exception) {
-        defValue
-    }
 }
 

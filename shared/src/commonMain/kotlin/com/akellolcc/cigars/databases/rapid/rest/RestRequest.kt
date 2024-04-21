@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/20/24, 2:14 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 
 package com.akellolcc.cigars.databases.rapid.rest
 
+import com.akellolcc.cigars.logging.Log
 import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
@@ -23,6 +24,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -49,9 +51,12 @@ data class RestRequest(
 
     fun execute(): ObservableWrapper<RestResponse> {
         val client = HttpClient()
+
         return observable {
             CoroutineScope(Dispatchers.IO).launch {
-                val response = client.get(url) {
+                val encoded = url.encodeURLQueryComponent()
+                Log.debug("Rapid Request url=$encoded")
+                val response = client.get(encoded) {
                     headers {
                         append("X-RapidAPI-Key", RAPID_KEY)
                         append("X-RapidAPI-Host", RAPID_HOST)

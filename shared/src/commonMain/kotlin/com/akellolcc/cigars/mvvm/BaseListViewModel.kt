@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:29 PM
+ * Last modified 4/20/24, 5:51 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,15 +25,15 @@ import com.badoo.reaktive.disposable.Disposable
 
 
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
-    private var sortField by mutableStateOf<String?>(null)
+    protected var sortField by mutableStateOf<String?>(null)
     var accenting by mutableStateOf(true)
     var entities by mutableStateOf(listOf<T>())
-    protected var _entities: Disposable? = null
+    private var _entities: Disposable? = null
 
     protected abstract val repository: Repository<T>
 
     abstract fun entitySelected(entity: T)
-    fun sorting(sorting: String) {
+    open fun sorting(sorting: String) {
         sortField = sorting
         loadEntities(true)
     }

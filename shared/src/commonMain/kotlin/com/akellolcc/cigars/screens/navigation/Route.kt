@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 8:28 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.logging
+package com.akellolcc.cigars.screens.navigation
 
-actual fun getCallStack(): CallStackEntry? {
-    val stack = Thread.currentThread().stackTrace
-    val call = stack[5]
-    return if (call != null) CallStackEntry(
-        call.fileName,
-        call.lineNumber,
-        call.methodName
-    ) else null
+enum class Route {
+    Welcome,
+    Resources,
+    ViewModel,
+    Permissions,
+    Media,
+    Biometry,
+    Geo
 }
-

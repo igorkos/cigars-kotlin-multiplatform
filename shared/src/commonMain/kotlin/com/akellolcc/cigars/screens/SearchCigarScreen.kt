@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 10:45 PM
+ * Last modified 4/21/24, 12:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,14 +38,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
-import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.components.LinkButton
+import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -57,10 +56,12 @@ import kotlin.jvm.Transient
 
 class SearchCigarScreen(route: NavRoute) :
     BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar>(route) {
+    @Transient
+    override var viewModel = SearchCigarScreenViewModel()
 
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
-        CigarSortingFields.enumValues().map {
+        CigarSearchFields.enumValues().map {
             DropdownMenuItem(
                 leadingIcon = {
                     loadIcon(Images.icon_menu_sort, Size(24.0F, 24.0F))
@@ -80,64 +81,54 @@ class SearchCigarScreen(route: NavRoute) :
     }
 
     @Composable
-    private fun SearchField(parameter: CigarSearchFields, last: Boolean = false) {
+    override fun ContentHeader(modifier: Modifier) {
         var expanded by remember { mutableStateOf(false) }
-        var value by remember { mutableStateOf("") }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TextStyled(
-                modifier = Modifier.weight(1f),
-                label = CigarSearchFields.localized(parameter),
-                text = value,
-                enabled = !viewModel.loading,
-                editable = true,
-                style = TextStyles.Headline,
-                maxLines = 1,
-                onValueChange = {
-                    viewModel.setFieldValue(parameter, it)
-                    value = it
-                },
-                onKeyboardAction = {
-                    viewModel.loadMore()
-                },
-                imeAction = ImeAction.Search
+        Column(modifier = modifier) {
+            viewModel.searchParams.map {
+                it.showLeading = viewModel.searchParams.size > 1
+                it.onAction = { action, data ->
+                    when (action) {
+                        SearchParameterAction.Remove -> viewModel.removeSearchParameter(it)
+                        SearchParameterAction.Completed -> {
+                            viewModel.setFieldValue(it.type, data)
+                            viewModel.loadMore()
+                        }
 
-            )
-            IconButton(
-                modifier = Modifier.padding(start = 8.dp).wrapContentSize(),
-                onClick = { expanded = true }
-            ) {
-                val icon = if (!last)  Images.icon_menu_minus else if (CigarSearchFields.entries.size == viewModel.searchParams.size) Images.icon_menu_minus else Images.icon_menu_plus
-                loadIcon(icon, Size(24.0F, 24.0F))
-                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    viewModel.sortingMenu().map {
-                        DropdownMenuItem(
-                            leadingIcon = {
-                                loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
-                            },
-                            text = {
-                                TextStyled(
-                                    it.second,
-                                    TextStyles.Subhead
-                                )
-                            },
-                            onClick = {
-                                viewModel.addSearchParameter(it.first)
-                                expanded = false
-                            }
-                        )
+                        else -> {}
                     }
                 }
+                it.Render(!viewModel.loading)
             }
-        }
-    }
-    @Composable
-    override fun ContentHeader(modifier: Modifier) {
-        Column {
-            viewModel.searchParams.mapIndexed{ index, it ->
-                SearchField(it, index == viewModel.searchParams.lastIndex)
+            if (viewModel.hasMoreSearchParameters) {
+                Column(
+                    modifier = modifier.wrapContentSize().align(Alignment.End),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    LinkButton(
+                        title = Localize.button_title_add_search_field,
+                        onClick = { expanded = true }
+                    )
+                    DropdownMenu(expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
+                        viewModel.sortingMenu().map {
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
+                                },
+                                text = {
+                                    TextStyled(
+                                        it.second,
+                                        TextStyles.Subhead
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.addSearchParameter(it.first)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
             }
             if (viewModel.loading && viewModel.entities.isEmpty()) {
                 ListFooter(Modifier.fillMaxWidth())
@@ -159,8 +150,6 @@ class SearchCigarScreen(route: NavRoute) :
         }
     }
 
-    @Transient
-    override var viewModel = SearchCigarScreenViewModel()
 
     @Composable
     override fun EntityListRow(entity: Cigar, modifier: Modifier) {

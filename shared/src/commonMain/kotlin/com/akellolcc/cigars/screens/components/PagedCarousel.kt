@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/11/24, 12:32 AM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.components
+package com.akellolcc.cigars.screens.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -46,7 +46,7 @@ import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.ui.toImageBitmap
+import com.akellolcc.cigars.utils.ui.toImageBitmap
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
 

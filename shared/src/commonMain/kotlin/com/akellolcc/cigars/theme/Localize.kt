@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:03 PM
+ * Last modified 4/20/24, 11:55 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -118,6 +118,7 @@ object Localize {
     val history_type_deletion = Strings.history_type_deletion.toString()
     val history_type_move = Strings.history_type_move.toString()
 
+    val button_title_add_search_field = Strings.button_title_add_search_field.toString()
     fun humidor_cigars(v: Long, v1: Long): String {
         return Strings.humidor_cigars.createLocalizedString(v, v1).toString()
     }

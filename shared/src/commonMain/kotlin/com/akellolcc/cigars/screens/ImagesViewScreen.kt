@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:13 PM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,21 +52,21 @@ import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
 import com.akellolcc.cigars.camera.rememberCameraManager
 import com.akellolcc.cigars.common.theme.DefaultTheme
-import com.akellolcc.cigars.components.PagedCarousel
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.ui.dpToPx
-import com.akellolcc.cigars.ui.screenWidth
+import com.akellolcc.cigars.utils.ui.dpToPx
+import com.akellolcc.cigars.utils.ui.screenWidth
 import com.preat.peekaboo.image.picker.ResizeOptions
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher

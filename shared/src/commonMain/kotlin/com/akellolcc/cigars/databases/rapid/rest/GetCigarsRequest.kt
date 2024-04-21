@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 10:48 PM
+ * Last modified 4/21/24, 1:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.utils.fraction
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.flatMapIterable
 import com.badoo.reaktive.observable.map
@@ -57,7 +58,7 @@ data class RapidCigar(
             wrapper ?: "",
             wrapper ?: "",
             ringGauge ?: 0,
-            length?.toString() ?: "0.0",
+            length?.fraction ?: "0",
             CigarStrength.fromString(strength) ?: CigarStrength.Mild,
             null,
             null,
@@ -75,7 +76,7 @@ data class RapidCigar(
 @Serializable
 class GetCigarsResponse(val cigars: List<RapidCigar>, val page: Int, val count: Int)
 class GetCigarsRequest(
-    val name: String? = null, val brand: String? = null, val country: String? = null,
+    val name: String? = null, val brand: Long? = null, val country: String? = null,
     val filler: String? = null, val wrapper: String? = null, val color: String? = null,
     val strength: CigarStrength? = null
 ) {
@@ -93,13 +94,12 @@ class GetCigarsRequest(
         get() {
             val url = BASE_URL + "page=$page" +
                     if (name != null) "&name=$name" else "" +
-                            if (brand != null) "&brand=$brand" else "" +
+                            if (brand != null) "&brandId=$brand" else "" +
                                     if (country != null) "&country=$country" else "" +
                                             if (filler != null) "&filler=$filler" else "" +
                                                     if (wrapper != null) "&wrapper=$wrapper" else "" +
                                                             if (color != null) "&color=$color" else "" +
                                                                     if (strength != null) "&strength=$strength" else ""
-            Log.debug("GetCigarsRequest url=$url")
             return RestRequest(GET, url)
         }
     private val json = Json { ignoreUnknownKeys = true }

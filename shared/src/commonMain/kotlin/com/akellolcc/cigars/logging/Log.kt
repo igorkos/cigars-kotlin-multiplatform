@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:35 PM
+ * Last modified 4/21/24, 12:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,48 +16,75 @@
 
 package com.akellolcc.cigars.logging
 
+import com.akellolcc.cigars.utils.getPlatform
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
 data class CallStackEntry(val file: String?, val line: Int?, val function: String?)
 
+enum class AnalyticsEvents {
+    Log,
+}
+
+data class AnalyticsEvent(
+    val event: AnalyticsEvents,
+    var params: Map<String, String> = mutableMapOf()
+) {
+    companion object {
+        fun create(
+            event: AnalyticsEvents,
+            params: Map<String, String> = emptyMap()
+        ): AnalyticsEvent {
+            return AnalyticsEvent(event, params).also {
+                it.params += mapOf("Platform" to getPlatform().name)
+            }
+        }
+    }
+}
 
 class Log {
     companion object {
-        fun initLog() {
+        private var analyticsCallback: ((AnalyticsEvent) -> Unit)? = null
+        fun initLog(analytics: (AnalyticsEvent) -> Unit) {
+            analyticsCallback = analytics
             Napier.base(DebugAntilog())
+            Log.debug("App started", analytics = true)
         }
 
-        fun debug(message: String) {
+        fun debug(message: String, analytics: Boolean = false) {
             Napier.d(tag = getTag()) { message }
+            analyticLog(analytics, "debug", message)
         }
 
-        fun debug(message: () -> String) {
-            Napier.d(tag = getTag()) { message() }
-        }
-
-        fun error(message: String) {
+        fun error(message: String, analytics: Boolean = true) {
             Napier.e(tag = getTag()) { message }
+            analyticLog(analytics, "error", message)
         }
 
-        fun error(message: () -> String) {
-            Napier.d(tag = getTag()) { message() }
-        }
-
-        fun info(message: String) {
+        fun info(message: String, analytics: Boolean = false) {
             Napier.i(tag = getTag()) { message }
+            analyticLog(analytics, "info", message)
         }
 
-        fun info(message: () -> String) {
-            Napier.d(tag = getTag()) { message() }
-        }
 
-        fun warn(message: String) {
+        fun warn(message: String, analytics: Boolean = false) {
             Napier.w(tag = getTag()) { message }
+            analyticLog(analytics, "warn", message)
         }
 
-        fun warn(message: () -> String) {
-            Napier.d(tag = getTag()) { message() }
+        fun analytics(event: AnalyticsEvent) {
+            analyticsCallback?.invoke(event)
+        }
+
+        private fun analyticLog(analytics: Boolean, level: String, message: String) {
+            if (analytics) {
+                analytics(
+                    AnalyticsEvent.create(
+                        AnalyticsEvents.Log,
+                        mapOf("level" to level, "message" to message)
+                    )
+                )
+            }
         }
 
         private fun getTag(): String? {

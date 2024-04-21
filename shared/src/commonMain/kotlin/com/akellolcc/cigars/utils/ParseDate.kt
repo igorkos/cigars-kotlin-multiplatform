@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 1/13/24, 5:51 PM
+ * Last modified 4/21/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.navigation
+package com.akellolcc.cigars.utils
 
-enum class Route {
-    Welcome,
-    Resources,
-    ViewModel,
-    Permissions,
-    Media,
-    Biometry,
-    Geo
+import kotlinx.datetime.Instant
+
+expect fun String.parseDate(pattern: String, defValue: Long = 0L): Long
+expect fun Instant.formatDate(pattern: String, defValue: String = ""): String
+const val defaultDateFormat = "MMMM d, yyyy"
+fun Long.formatDate(pattern: String? = null, defValue: String = ""): String {
+    return Instant.fromEpochMilliseconds(this).formatDate(pattern ?: defaultDateFormat, defValue)
 }

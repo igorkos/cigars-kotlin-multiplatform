@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/17/24, 12:56 AM
+ * Last modified 4/19/24, 11:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,16 +30,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.components.CigarListRow
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.CigarsDetailsRoute
-import com.akellolcc.cigars.navigation.HumidorDetailsRoute
-import com.akellolcc.cigars.navigation.HumidorHistoryRoute
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.screens.components.CigarListRow
+import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorHistoryRoute
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -81,22 +81,24 @@ class HumidorCigarsScreen(override val route: NavRoute) :
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToHumidorDetails -> {
                 mainModel.isTabsVisible = false
                 navigator?.push(
-                    HumidorDetailsScreen(HumidorDetailsRoute
-                        .apply {
-                            this.data = event.humidor
-                            sharedViewModel = mainModel
-                        })
+                    HumidorDetailsScreen(
+                        HumidorDetailsRoute
+                            .apply {
+                                this.data = event.humidor
+                                sharedViewModel = mainModel
+                            })
                 )
             }
 
             is HumidorCigarsScreenViewModel.CigarsAction.OpenHistory -> {
                 mainModel.isTabsVisible = false
                 navigator?.push(
-                    HumidorHistoryScreen(HumidorHistoryRoute
-                        .apply {
-                            this.data = viewModel.humidor
-                            sharedViewModel = mainModel
-                        })
+                    HumidorHistoryScreen(
+                        HumidorHistoryRoute
+                            .apply {
+                                this.data = viewModel.humidor
+                                sharedViewModel = mainModel
+                            })
                 )
             }
         }
