@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:25 PM
+ * Last modified 4/21/24, 1:51 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,15 +27,14 @@ fun randomString() = (1..4)
 val Double.fraction: String
     get() {
         val whole = toInt()
-        val sign = if (whole < 0) -1 else 1
         val fraction = this - whole
 
         for (i in 1 until fractions.size) {
             if (abs(fraction) > (fractionValues[i] + fractionValues[i - 1]) / 2) {
-                return if (fractionValues[i - 1] == 1.0) {
-                    "${whole + sign}"
+                return if (fractionValues[i - 1] == 1.0 || fractionValues[i - 1] == 0.0) {
+                    "$whole'"
                 } else {
-                    "$whole ${fractions[i - 1]}"
+                    "$whole' ${fractions[i - 1]}“"
                 }
             }
         }
@@ -47,21 +46,21 @@ val Float.fraction: String
 
 private val fractions = arrayOf(
     "",                           // 16/16
-    "\u00B9\u2075/\u2081\u2086",  // 15/16
-    "\u215E",                     // 7/8
-    "\u00B9\u00B3/\u2081\u2086",  // 13/16
-    "\u00BE",                     // 3/4
-    "\u00B9\u00B9/\u2081\u2086",  // 11/16
-    "\u215D",                     // 5/8
-    "\u2079/\u2081\u2086",        // 9/16
-    "\u00BD",                     // 1/2
-    "\u2077/\u2081\u2086",        // 7/16
-    "\u215C",                     // 3/8
-    "\u2075/\u2081\u2086",        // 5/16
-    "\u00BC",                     // 1/4
-    "\u00B3/\u2081\u2086",        // 3/16
-    "\u215B",                     // 1/8
-    "\u00B9/\u2081\u2086",        // 1/16
+    "15/16",  // 15/16
+    "7/8",                     // 7/8
+    "13/16",  //
+    "3/4",                     //
+    "11/16",  //
+    "5/8",                     //
+    "9/16",        //
+    "1/2",                     //
+    "7/16",        //
+    "3/8",                     //
+    "5/16",        //
+    "1/4",                     //
+    "3/16",        //
+    "1/8",                     //
+    "1/16",        //
     ""                            // 0/16
 )
 

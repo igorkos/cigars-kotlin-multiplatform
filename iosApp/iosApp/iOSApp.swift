@@ -18,7 +18,9 @@ struct iOSApp: App {
 		}
 	}
 
-	init() {
-           Log.companion.doInitLog()
+    init() {
+        Log.companion.doInitLog(){_ in 
+            
         }
+    }
 }

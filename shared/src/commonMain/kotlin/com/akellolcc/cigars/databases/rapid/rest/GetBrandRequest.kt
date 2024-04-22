@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 2:14 PM
+ * Last modified 4/21/24, 7:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ class GetCigarsBrand(val cigar: RapidCigar) {
     private val restRequest: RestRequest
         get() {
             val url = BASE_URL + cigar.brandId
-            return RestRequest(GET, url)
+            return RestRequest(GET, url, cache = true)
         }
 
     fun execute(): ObservableWrapper<RapidCigar> {
@@ -83,7 +83,8 @@ class GetCigarsBrands(val brand: String?) {
         get() {
             val url = BASE_URL + "page=$page" +
                     if (brand != null) "&search=$brand" else ""
-            return RestRequest(GET, url)
+            //TODO: remove on production cache
+            return RestRequest(GET, url, cache = true)
         }
     private val json = Json { ignoreUnknownKeys = true }
 

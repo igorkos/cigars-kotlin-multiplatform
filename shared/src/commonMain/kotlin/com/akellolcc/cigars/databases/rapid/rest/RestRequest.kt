@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 2:14 PM
+ * Last modified 4/21/24, 7:04 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,10 @@ import com.badoo.reaktive.observable.ObservableWrapper
 import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.cache.HttpCache
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsText
@@ -29,16 +33,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlin.math.min
+
 
 data class RestResponse(val status: Int, val body: String)
 
 data class RestError(val status: Int, val body: String)
 
+
 data class RestRequest(
     val method: String,
     val url: String,
     val body: String? = null,
-    val token: String? = null
+    val token: String? = null,
+    val cache: Boolean = false
 ) {
     companion object {
         const val GET = "GET"
@@ -47,20 +55,53 @@ data class RestRequest(
         const val DELETE = "DELETE"
         const val RAPID_KEY = "1d231078e9msh6d5d9403dcf4a9bp106fcfjsnf5eaa93115f0"
         const val RAPID_HOST = "cigars.p.rapidapi.com"
+        private var remaining = Long.MAX_VALUE
+        private val clientMemory = HttpClient() {
+            install(HttpCache) {
+                publicStorage(HttpCacheStorage(true))
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Log.debug("Rapid Request $message")
+                    }
+                }
+                level = LogLevel.INFO
+            }
+        }
+
+
+        private val clientPermanent = HttpClient() {
+            install(HttpCache) {
+                publicStorage(HttpCacheStorage(false))
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Log.debug("Rapid Request $message")
+                    }
+                }
+                level = LogLevel.INFO
+            }
+        }
     }
 
     fun execute(): ObservableWrapper<RestResponse> {
-        val client = HttpClient()
-
         return observable {
             CoroutineScope(Dispatchers.IO).launch {
                 val encoded = url.encodeURLQueryComponent()
-                Log.debug("Rapid Request url=$encoded")
-                val response = client.get(encoded) {
-                    headers {
-                        append("X-RapidAPI-Key", RAPID_KEY)
-                        append("X-RapidAPI-Host", RAPID_HOST)
+                val response =
+                    (if (cache) clientPermanent else clientMemory).get(encoded) {
+                        headers {
+                            append("X-RapidAPI-Key", RAPID_KEY)
+                            append("X-RapidAPI-Host", RAPID_HOST)
+                        }
                     }
+                val reqCount =
+                    response.headers["x-ratelimit-requests-remaining"]?.toLong() ?: Long.MAX_VALUE
+                if (reqCount < remaining) {
+                    remaining = min(reqCount, remaining)
+                    Log.debug("Rapid request left -> $remaining")
                 }
                 it.onNext(RestResponse(response.status.value, response.bodyAsText()))
             }

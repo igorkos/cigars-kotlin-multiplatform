@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:08 PM
+ * Last modified 4/21/24, 7:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,7 +76,9 @@ fun rotateImage(image: ImageResource, size: Size) {
 
 expect fun toImageBitmap(data: ByteArray): ImageBitmap?
 
-fun LazyListState.reachedBottom(buffer: Int = 1): Boolean {
-    val lastVisibleItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
-    return lastVisibleItem?.index != 0 && lastVisibleItem?.index == this.layoutInfo.totalItemsCount - buffer
+fun LazyListState.reachedBottom(buffer: Int = 2): Boolean {
+    val lastVisibleItem = this.layoutInfo.visibleItemsInfo.lastOrNull() ?: return false
+    val reachedBottom =
+        lastVisibleItem.index != 0 && lastVisibleItem.index >= this.layoutInfo.totalItemsCount - buffer
+    return reachedBottom
 }

@@ -43,6 +43,8 @@ atomicfu-version = "0.23.2"
 firebase-version = "1.12.0"
 firebase-plugin-version = "2.9.9"
 google-gms-services-version = "4.4.1"
+datastoreCoreAndroid = "1.1.0"
+datastoreCoreJvm = "1.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -99,6 +101,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-android-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
@@ -122,6 +125,8 @@ reaktive-annotations = { group = "com.badoo.reaktive", name = "reaktive-annotati
 reaktive-coroutines = { group = "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
 reaktive-rxjava2 = { group = "com.badoo.reaktive", name = "rxjava2-interop", version.ref = "reaktive-version" }
 reaktive-rxjava3 = { group = "com.badoo.reaktive", name = "rxjava3-interop", version.ref = "reaktive-version" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
+androidx-datastore-core-jvm = { group = "androidx.datastore", name = "datastore-core-jvm", version.ref = "datastoreCoreJvm" }
 
 
 [plugins]
@@ -139,7 +144,7 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "
 google-gms-services = { id = "com.google.gms.google-services", version.ref = "google-gms-services-version" }
 
 [bundles]
-ktor-common = ["ktor-client-core", "ktor-client-serialization", "kotlinx-coroutines-core"]
+ktor-common = ["ktor-client-core", "ktor-client-serialization", "kotlinx-coroutines-core", "ktor-client-logging"]
 moko-common = ["moko-resources-compose", "moko-resources", "mvvm-core", "mvvm-flow", "mvvm-flow-compose", "mvvm-flow-resources", "mvvm-livedata", "mvvm-livedata-compose", "mvvm-livedata-resources", "mvvm-state", "moko-mvvm"]
 voyager-common = ["voyager-bottom-sheet-navigator", "voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
 sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines"]

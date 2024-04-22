@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:48 PM
+ * Last modified 4/21/24, 11:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,21 +17,33 @@
 package com.akellolcc.cigars.utils
 
 import kotlinx.datetime.Instant
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
-actual fun String.parseDate(pattern: String, defValue: Long): Long {
-    return try {
-        SimpleDateFormat(pattern, Locale.getDefault()).parse(this)?.time ?: defValue
-    } catch (e: Exception) {
-        defValue
-    }
-}
+import kotlinx.datetime.toNSDate
+import platform.Foundation.NSDateFormatter
+import platform.Foundation.timeIntervalSince1970
 
 actual fun Instant.formatDate(pattern: String, defValue: String): String {
     return try {
-        SimpleDateFormat(pattern, Locale.getDefault()).format(Date(this.toEpochMilliseconds()))
+        val dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = pattern
+        dateFormatter.stringFromDate(
+            toNSDate()
+        )
+    } catch (e: Exception) {
+        defValue
+    }
+
+}
+
+actual fun String.parseDate(pattern: String, defValue: Long): Long {
+    return try {
+        val dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = pattern
+        val result = dateFormatter.dateFromString(this)?.timeIntervalSince1970?.toLong()
+        if (result != null) {
+            result * 1000
+        } else {
+            defValue
+        }
     } catch (e: Exception) {
         defValue
     }

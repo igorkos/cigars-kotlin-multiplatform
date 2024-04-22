@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 12:42 PM
+ * Last modified 4/21/24, 10:30 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ class Log {
         fun initLog(analytics: (AnalyticsEvent) -> Unit) {
             analyticsCallback = analytics
             Napier.base(DebugAntilog())
-            Log.debug("App started", analytics = true)
+            debug("App started", analytics = true)
         }
 
         fun debug(message: String, analytics: Boolean = false) {
@@ -56,7 +56,7 @@ class Log {
             analyticLog(analytics, "debug", message)
         }
 
-        fun error(message: String, analytics: Boolean = true) {
+        fun error(message: String, analytics: Boolean = false) {
             Napier.e(tag = getTag()) { message }
             analyticLog(analytics, "error", message)
         }
