@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/23/24, 3:43 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@ import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
+import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.SqlDelightDatabase
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
@@ -34,6 +35,7 @@ import com.badoo.reaktive.observable.flatMapIterable
 import com.badoo.reaktive.observable.take
 import com.badoo.reaktive.observable.wrap
 import kotlinx.serialization.json.Json
+import kotlin.reflect.KClass
 
 enum class DatabaseType {
     SqlDelight;
@@ -41,22 +43,10 @@ enum class DatabaseType {
     companion object {
         fun getDatabase(type: DatabaseType): DatabaseInterface {
             return when (type) {
-                SqlDelight -> SqlDelightDatabase()
+                SqlDelight -> SqlDelightDatabase.instance
             }
         }
     }
-}
-
-enum class RepositoryType {
-    Cigars,
-    Humidors,
-    Favorites,
-    CigarImages,
-    HumidorImages,
-    CigarHumidors,
-    HumidorCigars,
-    CigarHistory,
-    HumidorHistory
 }
 
 class Database : DatabaseInterface {
@@ -77,16 +67,15 @@ class Database : DatabaseInterface {
 
     }
 
-    override fun <R> getRepository(type: RepositoryType, args: Any?): R {
-        return database.getRepository(type, args)
+    inline fun <reified R : Repository<*>> getRepository(
+        repoKClass: KClass<out R>,
+        args: Any? = null
+    ): R {
+        return createRepository(repoKClass, args)
     }
 
     override fun reset() {
         database.reset()
-    }
-
-    override fun numberOfEntriesIn(type: RepositoryType): Long {
-        return database.numberOfEntriesIn(type)
     }
 
     fun createDemoSet(): ObservableWrapper<Any> {
@@ -98,10 +87,9 @@ class Database : DatabaseInterface {
         val demoCigarsImages = Json.decodeFromString<List<CigarImage>>(
             readTextFile(AssetFiles.demo_cigars_images) ?: ""
         )
-        val humidorDatabase: HumidorsRepository = getRepository(RepositoryType.Humidors)
-        val cigarsDatabase: CigarsRepository = getRepository(RepositoryType.Cigars)
-        val imagesDatabase: ImagesRepository =
-            getRepository(RepositoryType.CigarImages, humidor.rowid)
+        val humidorDatabase: HumidorsRepository = getRepository(HumidorsRepository::class)
+        val cigarsDatabase: CigarsRepository = getRepository(CigarsRepository::class)
+        val imagesDatabase: ImagesRepository = getRepository(ImagesRepository::class, humidor.rowid)
         Log.debug("Added demo database")
         return humidorDatabase.add(demoHumidors[1]).flatMap {
             humidorDatabase.add(demoHumidors[0])

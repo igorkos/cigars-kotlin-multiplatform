@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:31 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +19,15 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
+import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
+import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
@@ -39,9 +42,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     DatabaseViewModel<Cigar, CigarsDetailsScreenViewModel.CigarsDetailsAction>() {
-    private var cigarsDatabase: CigarsRepository = database.getRepository(RepositoryType.Cigars)
-    private var humidorsRepository: HumidorsRepository =
-        database.getRepository(RepositoryType.Humidors)
+    private var cigarsDatabase: CigarsRepository = createRepository(CigarsRepository::class)
+    private var humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
     private var imagesDatabase: ImagesRepository? = null
     private var cigarHumidorRepository: CigarHumidorRepository? = null
     private var cigarsHistoryDatabase: HistoryRepository? = null
@@ -77,10 +79,9 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
 
     fun observeCigar() {
         if (cigar.rowid >= 0) {
-            imagesDatabase = database.getRepository(RepositoryType.CigarImages, cigar.rowid)
-            cigarHumidorRepository =
-                database.getRepository(RepositoryType.CigarHumidors, cigar.rowid)
-            cigarsHistoryDatabase = database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
+            imagesDatabase = createRepository(CigarImagesRepository::class, cigar.rowid)
+            cigarHumidorRepository = createRepository(CigarHumidorsRepository::class, cigar.rowid)
+            cigarsHistoryDatabase = createRepository(CigarHistoryRepository::class, cigar.rowid)
             loading = true
             disposable += cigarsDatabase.observe(cigar.rowid).map {
                 if (!editing) {
@@ -116,7 +117,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun humidorsCount(): Long {
-        return database.numberOfEntriesIn(RepositoryType.Humidors)
+        val repo = createRepository(HumidorsRepository::class)
+        return repo.numberOfEntries()
     }
 
     fun humidors(): List<Humidor> {

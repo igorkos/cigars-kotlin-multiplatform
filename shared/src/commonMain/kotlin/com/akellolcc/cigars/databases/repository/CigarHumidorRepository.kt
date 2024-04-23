@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/23/24, 2:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,3 +40,7 @@ interface CigarHumidorRepository : Repository<HumidorCigar> {
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): ObservableWrapper<Boolean>
 }
+
+interface CigarHumidorsRepository : CigarHumidorRepository
+
+interface HumidorCigarsRepository : CigarHumidorRepository

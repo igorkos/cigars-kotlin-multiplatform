@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 
 package com.akellolcc.cigars.mvvm
 
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 class HumidorsViewModel : BaseListViewModel<Humidor, HumidorsViewModel.Action>() {
-    override val repository: HumidorsRepository = database.getRepository(RepositoryType.Humidors)
+    override val repository: HumidorsRepository = createRepository(HumidorsRepository::class)
 
     override fun entitySelected(entity: Humidor) {
         sendEvent(Action.RouteToHumidor(entity))

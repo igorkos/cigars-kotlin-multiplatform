@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:30 PM
+ * Last modified 4/23/24, 3:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,40 +14,43 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.databases
 
 import cafe.adriel.voyager.core.concurrent.ThreadSafeMap
-import cafe.adriel.voyager.core.model.ScreenModel
+import com.akellolcc.cigars.databases.repository.Repository
 import kotlin.reflect.KClass
 
-abstract class ViewModelsFactory<T : ScreenModel> {
+abstract class RepositoryFactory<T : Repository<*>> {
     abstract fun factory(data: Any? = null): T
 }
 
-object ViewModelRegistry {
+object RepositoryRegistry {
 
     @PublishedApi
-    internal val factories: ThreadSafeMap<KClass<*>, ViewModelsFactory<*>> = ThreadSafeMap()
+    internal val factories: ThreadSafeMap<KClass<*>, RepositoryFactory<*>> = ThreadSafeMap()
 
-    inline fun <reified T : ScreenModel> register(
-        modelKClass: KClass<out T>,
-        factory: ViewModelsFactory<T>
+    inline fun <reified T : Repository<*>> register(
+        modelKClass: KClass<*>,
+        factory: RepositoryFactory<T>
     ) {
         factories[modelKClass] = factory
     }
 
-    inline fun <reified T : ScreenModel> create(modelKClass: KClass<out T>, data: Any? = null): T {
+    inline fun <reified T : Repository<*>> create(
+        modelKClass: KClass<out T>,
+        data: Any? = null
+    ): T {
         if (factories.containsKey(modelKClass)) {
-            val factory: ViewModelsFactory<T> = factories[modelKClass] as ViewModelsFactory<T>
+            val factory: RepositoryFactory<T> = factories[modelKClass] as RepositoryFactory<T>
             return factory.factory(data)
         }
-        throw IllegalArgumentException("ViewModel not found")
+        throw IllegalArgumentException("Repository for ${modelKClass.simpleName} not found")
     }
 }
 
-inline fun <reified T : ScreenModel> createViewModel(
+inline fun <reified T : Repository<*>> createRepository(
     modelKClass: KClass<out T>,
     data: Any? = null
-): T = ViewModelRegistry.create(modelKClass, data)
+): T = RepositoryRegistry.create(modelKClass, data)
 
 

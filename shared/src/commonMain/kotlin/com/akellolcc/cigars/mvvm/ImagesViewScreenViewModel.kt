@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,11 +23,12 @@ import com.akellolcc.cigars.camera.PermissionCallback
 import com.akellolcc.cigars.camera.PermissionStatus
 import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.ImagesRepository
+import com.akellolcc.cigars.databases.repository.CigarImagesRepository
+import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.logging.Log
 import com.badoo.reaktive.observable.flatMap
 import com.badoo.reaktive.observable.flatMapIterable
@@ -111,8 +112,8 @@ class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :
         return CigarImage(-1, bytes = bytes, cigarId = cigar.rowid)
     }
 
-    override val repository: ImagesRepository =
-        database.getRepository(RepositoryType.CigarImages, cigar.rowid)
+    override val repository: CigarImagesRepository =
+        createRepository(CigarImagesRepository::class, cigar.rowid)
 
     companion object Factory : ViewModelsFactory<CigarImagesViewScreenViewModel>() {
         override fun factory(data: Any?): CigarImagesViewScreenViewModel {
@@ -126,8 +127,8 @@ class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :
 
 class HumidorImagesViewScreenViewModel(val humidor: Humidor, select: Int) :
     BaseImagesViewScreenViewModel(humidor.rowid, select) {
-    override val repository: ImagesRepository =
-        database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
+    override val repository: HumidorImagesRepository =
+        createRepository(HumidorImagesRepository::class, humidor.rowid)
 
     override fun getImage(bytes: ByteArray): CigarImage {
         return CigarImage(-1, bytes = bytes, humidorId = humidor.rowid)

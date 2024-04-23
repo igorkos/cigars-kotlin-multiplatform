@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/17/24, 1:12 AM
+ * Last modified 4/23/24, 3:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 
 package com.akellolcc.cigars.databases.repository.impl
 
-import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.HumidorsDatabaseQueries
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.RepositoryFactory
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.HistoryRepository
+import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.HumidorsTableQueries
 import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
@@ -38,8 +38,8 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
 
     override fun add(entity: Humidor): ObservableWrapper<Humidor> {
         return super.add(entity).map {
-            val hisDatabase: HistoryRepository =
-                Database.instance.getRepository(RepositoryType.HumidorHistory, entity.rowid)
+            val hisDatabase: HumidorHistoryRepository =
+                createRepository(HumidorHistoryRepository::class, entity.rowid)
             hisDatabase.add(
                 History(
                     -1,
@@ -91,5 +91,16 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
             }
             entity
         }.wrap()
+    }
+
+    override fun numberOfEntries(): Long {
+        return queries.count().executeAsOne()
+    }
+
+    companion object Factory : RepositoryFactory<SqlDelightHumidorsRepository>() {
+        override fun factory(data: Any?): SqlDelightHumidorsRepository {
+            val queries = SqlDelightDatabase.instance.database.humidorsDatabaseQueries
+            return SqlDelightHumidorsRepository(queries)
+        }
     }
 }

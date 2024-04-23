@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +19,12 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
-import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.badoo.reaktive.disposable.Disposable
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.subscribe
@@ -32,9 +32,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
-    private var imagesDatabase: ImagesRepository? = null
-    private var humidorsDatabase: HumidorsRepository? =
-        database.getRepository(RepositoryType.Humidors)
+    private var imagesDatabase: HumidorImagesRepository? = null
+    private var humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
     private var disposable: List<Disposable> = mutableListOf()
 
     var editing by mutableStateOf(humidor.rowid < 0)
@@ -52,7 +51,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
 
 
     fun observeHumidor() {
-        imagesDatabase = database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
+        imagesDatabase = createRepository(HumidorImagesRepository::class, humidor.rowid)
         disposable += humidorsDatabase!!.observe(humidor.rowid).map {
             if (!editing) {
                 name = it.name

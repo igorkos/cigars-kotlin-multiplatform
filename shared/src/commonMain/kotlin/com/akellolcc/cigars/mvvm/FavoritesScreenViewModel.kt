@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,13 @@
 
 package com.akellolcc.cigars.mvvm
 
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
 
 
 class FavoritesScreenViewModel : CigarsScreenViewModel() {
     override val repository: FavoriteCigarsRepository =
-        database.getRepository(RepositoryType.Favorites)
+        createRepository(FavoriteCigarsRepository::class)
 
     companion object Factory : ViewModelsFactory<FavoritesScreenViewModel>() {
         override fun factory(data: Any?): FavoritesScreenViewModel {

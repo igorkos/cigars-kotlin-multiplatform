@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,7 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
@@ -38,7 +38,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class SearchCigarScreenViewModel() :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
-    override val repository: CigarsRepository = database.getRepository(RepositoryType.Cigars)
+    override val repository: CigarsRepository = createRepository(CigarsRepository::class)
 
     private var request: GetCigarsRequest? = null
     private var brandRequest: GetCigarsBrands? = null

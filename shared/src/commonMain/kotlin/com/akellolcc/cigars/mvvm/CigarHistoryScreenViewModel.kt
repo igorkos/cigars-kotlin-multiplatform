@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,15 +16,15 @@
 
 package com.akellolcc.cigars.mvvm
 
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.databases.repository.HistoryRepository
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
-    override val repository: HistoryRepository =
-        database.getRepository(RepositoryType.CigarHistory, cigar.rowid)
+    override val repository: CigarHistoryRepository =
+        createRepository(CigarHistoryRepository::class, cigar.rowid)
 
     override fun entitySelected(entity: History) {
     }

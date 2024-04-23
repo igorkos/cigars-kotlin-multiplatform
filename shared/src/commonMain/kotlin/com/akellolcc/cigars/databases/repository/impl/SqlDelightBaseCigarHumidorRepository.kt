@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/23/24, 2:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,17 +20,18 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.CigarHumidorTable
-import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
+import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarHumidorTableQueries
@@ -62,8 +63,8 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         sortField: String?,
         accenting: Boolean
     ): ObservableWrapper<List<HumidorCigar>> {
-        val hRepo = Database.instance.getRepository<HumidorsRepository>(RepositoryType.Humidors)
-        val cRepo = Database.instance.getRepository<CigarsRepository>(RepositoryType.Cigars)
+        val hRepo = createRepository(HumidorsRepository::class)
+        val cRepo = createRepository(CigarsRepository::class)
         return observeAllQuery().asFlow().mapToList(Dispatchers.IO).map {
             it.map { humidorCigar ->
                 val humidor = hRepo.getSync(humidorCigar.humidorId)
@@ -88,7 +89,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         return super.update(entity.copy(count = count)).flatMap {
             updated = it
             val cigarsHistoryDatabase: HistoryRepository =
-                Database.instance.getRepository(RepositoryType.CigarHistory, entity.cigar.rowid)
+                createRepository(CigarHistoryRepository::class, entity.cigar.rowid)
             Log.info("UpdateCount: Add Cigar History item ${HistoryType.localized(type)}")
             cigarsHistoryDatabase.add(
                 History(
@@ -113,10 +114,9 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         to: Humidor,
         count: Long
     ): ObservableWrapper<Boolean> {
-        val humidorsRepository: HumidorsRepository =
-            Database.instance.getRepository(RepositoryType.Humidors)
+        val humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
         var humidorHistoryRepository: HistoryRepository =
-            Database.instance.getRepository(RepositoryType.HumidorHistory, from.humidor.rowid)
+            createRepository(HumidorHistoryRepository::class, from.humidor.rowid)
         return observable { emitter ->
             if (from.count > count) {
                 Log.info("Update count of cigars left in humidor from we move")
@@ -167,8 +167,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
             )
         }.flatMap {
             Log.info("Add history item Move To")
-            humidorHistoryRepository =
-                Database.instance.getRepository(RepositoryType.HumidorHistory, to.rowid)
+            humidorHistoryRepository = createRepository(HumidorHistoryRepository::class, to.rowid)
             humidorHistoryRepository.add(
                 History(
                     -1L,

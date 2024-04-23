@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/17/24, 1:12 AM
+ * Last modified 4/23/24, 3:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,16 +17,16 @@
 package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
-import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.RepositoryFactory
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
-import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
 import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
 import com.badoo.reaktive.observable.ObservableWrapper
@@ -43,12 +43,11 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
     //CigarsRepository
     override fun add(cigar: Cigar, humidor: Humidor): ObservableWrapper<Cigar> {
         return super.add(cigar).flatMap {
-            val hcDatabase: CigarHumidorRepository =
-                Database.instance.getRepository(RepositoryType.CigarHumidors, humidor.rowid)
+            val hcDatabase: CigarHumidorRepository = createRepository(CigarHumidorRepository::class)
             hcDatabase.add(it, humidor, cigar.count)
         }.flatMap {
-            val hisDatabase: HistoryRepository =
-                Database.instance.getRepository(RepositoryType.CigarHistory, it.cigar.rowid)
+            val hisDatabase: CigarHistoryRepository =
+                createRepository(CigarHistoryRepository::class, it.cigar.rowid)
             hisDatabase.add(
                 History(
                     -1,
@@ -75,6 +74,10 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
 
     override fun updateRating(value: Long, cigar: Cigar): ObservableWrapper<Cigar> {
         return update(cigar.copy(myrating = value))
+    }
+
+    override fun numberOfEntries(): Long {
+        return queries.count().executeAsOne()
     }
 
     //BaseRepository
@@ -126,5 +129,12 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
             }
             entity
         }.wrap()
+    }
+
+    companion object Factory : RepositoryFactory<SqlDelightCigarsRepository>() {
+        override fun factory(data: Any?): SqlDelightCigarsRepository {
+            val queries = SqlDelightDatabase.instance.database.cigarsDatabaseQueries
+            return SqlDelightCigarsRepository(queries)
+        }
     }
 }

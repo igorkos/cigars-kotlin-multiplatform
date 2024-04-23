@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 3:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 
 package com.akellolcc.cigars.mvvm
 
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
-    override val repository: CigarsRepository = database.getRepository(RepositoryType.Cigars)
+    override val repository: CigarsRepository = createRepository(CigarsRepository::class)
 
     override fun entitySelected(entity: Cigar) {
         sendEvent(CigarsAction.RouteToCigar(entity))

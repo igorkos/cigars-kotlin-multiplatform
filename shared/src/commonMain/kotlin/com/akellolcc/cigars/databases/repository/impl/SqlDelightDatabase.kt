@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:35 PM
+ * Last modified 4/23/24, 3:43 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,56 +17,70 @@
 package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.CigarsDatabase
-import com.akellolcc.cigars.databases.RepositoryType
+import com.akellolcc.cigars.databases.RepositoryRegistry
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
+import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
+import com.akellolcc.cigars.databases.repository.CigarImagesRepository
+import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
-import com.akellolcc.cigars.databases.repository.Repository
+import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
+import com.akellolcc.cigars.databases.repository.HumidorCigarsRepository
+import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
+import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import kotlinx.coroutines.runBlocking
 
 class SqlDelightDatabase : DatabaseInterface {
-    private val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver())
+    internal val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver())
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <R> getRepository(type: RepositoryType, args: Any?): R {
-        return when (type) {
-            RepositoryType.Cigars -> (SqlDelightCigarsRepository(database.cigarsDatabaseQueries) as? R)
-                ?: error("Invalid repository type")
+    companion object {
+        private var _instance: SqlDelightDatabase? = null
+        val instance: SqlDelightDatabase
+            get() {
+                return createInstance()
+            }
 
-            RepositoryType.Humidors -> (SqlDelightHumidorsRepository(database.humidorsDatabaseQueries) as? R)
-                ?: error("Invalid repository type")
-
-            RepositoryType.Favorites -> (SqlDelightFavoriteCigarsRepository(database.cigarsDatabaseQueries) as? R)
-                ?: error("Invalid repository type")
-
-            RepositoryType.CigarImages -> (SqlDelightCigarImagesRepository(
-                args as Long,
-                database.imagesDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
-
-            RepositoryType.HumidorImages -> (SqlDelightHumidorImagesRepository(
-                args as Long,
-                database.imagesDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
-
-            RepositoryType.CigarHumidors -> (SqlDelightCigarHumidorsRepository(
-                args as Long,
-                database.humidorCigarsDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
-
-            RepositoryType.HumidorCigars -> (SqlDelightHumidorCigarsRepository(
-                args as Long,
-                database.humidorCigarsDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
-
-            RepositoryType.CigarHistory -> (SqlDelightCigarHistoryRepository(
-                args as Long,
-                database.historyDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
-
-            RepositoryType.HumidorHistory -> (SqlDelightHumidorHistoryRepository(
-                args as Long,
-                database.historyDatabaseQueries
-            ) as? R) ?: error("Invalid repository type")
+        private fun createInstance(): SqlDelightDatabase {
+            if (_instance == null) {
+                _instance = SqlDelightDatabase()
+                _instance!!.register()
+            }
+            return _instance!!
         }
+
+    }
+
+    private fun register() {
+        RepositoryRegistry.register(CigarsRepository::class, SqlDelightCigarsRepository.Factory)
+        RepositoryRegistry.register(HumidorsRepository::class, SqlDelightHumidorsRepository.Factory)
+        RepositoryRegistry.register(
+            FavoriteCigarsRepository::class,
+            SqlDelightFavoriteCigarsRepository.Factory
+        )
+        RepositoryRegistry.register(
+            CigarImagesRepository::class,
+            SqlDelightCigarImagesRepository.Factory
+        )
+        RepositoryRegistry.register(
+            HumidorImagesRepository::class,
+            SqlDelightHumidorImagesRepository.Factory
+        )
+        RepositoryRegistry.register(
+            CigarHumidorsRepository::class,
+            SqlDelightCigarHumidorsRepository.Factory
+        )
+        RepositoryRegistry.register(
+            HumidorCigarsRepository::class,
+            SqlDelightHumidorCigarsRepository.Factory
+        )
+        RepositoryRegistry.register(
+            CigarHistoryRepository::class,
+            SqlDelightCigarHistoryRepository.Factory
+        )
+        RepositoryRegistry.register(
+            HumidorHistoryRepository::class,
+            SqlDelightHumidorHistoryRepository.Factory
+        )
     }
 
 
@@ -80,7 +94,4 @@ class SqlDelightDatabase : DatabaseInterface {
         }
     }
 
-    override fun numberOfEntriesIn(type: RepositoryType): Long {
-        return getRepository<Repository<*>>(type).count()
-    }
 }
