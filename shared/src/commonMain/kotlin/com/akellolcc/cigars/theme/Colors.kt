@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:51 PM
+ * Last modified 4/22/24, 9:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -67,7 +66,6 @@ fun createColorsTheme(): ColorScheme {
 
 @Composable
 fun materialColor(color: ColorResource, alpha: Float = 1.0f): Color {
-    val dark = isSystemInDarkTheme()
     val resColor = colorResource(color)
     return if (alpha != 1.0f) Color(
         resColor.red,

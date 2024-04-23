@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 4/22/24, 9:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens.navigation
 
-import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.registry.ScreenProvider
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.registry.screenModule
@@ -48,9 +47,4 @@ fun setupNavGraph() {
             MainScreen()
         }
     }
-}
-
-@Composable
-fun SetupHomeNavGraph(route: (Route) -> Unit) {
-
 }
