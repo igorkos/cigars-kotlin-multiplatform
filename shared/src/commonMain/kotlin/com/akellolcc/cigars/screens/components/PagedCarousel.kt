@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 8:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -65,14 +66,9 @@ fun PagedCarousel(
     select: Int = 0,
     onClick: ((page: Int) -> Unit)? = null
 ) {
-    // Create a pager state
-    if (loading) return
-
     val pagerState = rememberPagerState(select) {
         if (!images.isNullOrEmpty()) images.size else 1
     }
-
-    //Log.debug("Images: ${images?.size} : $select : $loading")
 
     LaunchedEffect(loading, select) {
         if (!loading) {
@@ -80,47 +76,51 @@ fun PagedCarousel(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // HorizontalPager composable: Swiping through images
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxWidth(),
-        ) { page ->
-            //Log.debug("Images1: ${images?.size}")
-            if (!images.isNullOrEmpty()) {
-                CarouselItem(images[page].bytes, scale) {
-                    onClick?.invoke(page)
-                }
-            } else {
-                CarouselItem(null, scale, Images.default_cigar_image) {
-                    onClick?.invoke(page)
+        if (loading) {
+            CircularProgressIndicator()
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth(),
+            ) { page ->
+                //Log.debug("Images1: ${images?.size}")
+                if (!images.isNullOrEmpty()) {
+                    CarouselItem(images[page].bytes, scale) {
+                        onClick?.invoke(page)
+                    }
+                } else {
+                    CarouselItem(null, scale, Images.default_cigar_image) {
+                        onClick?.invoke(page)
+                    }
                 }
             }
-        }
-        // Bottom row of indicators
-        if (!images.isNullOrEmpty()) {
-            Row(
-                Modifier
-                    .wrapContentHeight()
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(pagerState.pageCount) { iteration ->
-                    val color =
-                        if (pagerState.currentPage == iteration) materialColor(MaterialColors.color_onPrimaryContainer) else materialColor(
-                            MaterialColors.color_onPrimaryContainer
-                        ).copy(
-                            alpha = 0.5f
+            // Bottom row of indicators
+            if (!images.isNullOrEmpty()) {
+                Row(
+                    Modifier
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(pagerState.pageCount) { iteration ->
+                        val color =
+                            if (pagerState.currentPage == iteration) materialColor(MaterialColors.color_onPrimaryContainer) else materialColor(
+                                MaterialColors.color_onPrimaryContainer
+                            ).copy(
+                                alpha = 0.5f
+                            )
+                        Box(
+                            modifier = Modifier
+                                .padding(2.dp)
+                                .clip(CircleShape)
+                                .background(color)
+                                .size(12.dp)
                         )
-                    Box(
-                        modifier = Modifier
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                            .size(12.dp)
-                    )
+                    }
                 }
             }
         }

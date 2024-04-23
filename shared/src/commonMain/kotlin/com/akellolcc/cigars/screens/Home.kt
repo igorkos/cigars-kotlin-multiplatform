@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,8 +38,10 @@ import com.akellolcc.cigars.screens.navigation.setupNavGraph
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.Pref
+import kotlin.jvm.Transient
 
 class Home : Screen {
+    @Transient
     val database = Database.instance
 
     init {
@@ -48,11 +50,11 @@ class Home : Screen {
 
     @Composable
     override fun Content() {
-        val initialized = remember { mutableStateOf(true) }
+        val initialized = remember { mutableStateOf(false) }
         val navigator = LocalNavigator.currentOrThrow
 
-        // && Pref.isFirstStart
-        if (!initialized.value) {
+        //
+        if (!initialized.value && Pref.isFirstStart) {
             database.reset()
             database.createDemoSet().subscribe(
                 onError = {
@@ -81,7 +83,7 @@ class Home : Screen {
             }
         } else {
             initialized.value = true
-            val postLoginScreen = rememberScreen(SharedScreen.LoginScreen)
+            //val postLoginScreen = rememberScreen(SharedScreen.LoginScreen)
             val postMainScreen = rememberScreen(SharedScreen.MainScreen)
             navigator.push(postMainScreen)
         }

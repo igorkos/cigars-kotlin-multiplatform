@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/15/24, 10:04 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,7 +77,7 @@ fun DefaultBackground(
     content: @Composable () -> Unit,
 ) {
     Box(
-        modifier = with(Modifier) {
+        modifier = with(modifier) {
             fillMaxSize()
             //  .paint(
             //      imagePainter(Images.default_background),
@@ -105,7 +105,7 @@ fun LoginBackground(
     content: @Composable () -> Unit,
 ) {
     Box(
-        modifier = with(Modifier) {
+        modifier = with(modifier) {
             fillMaxSize()
             //      .paint(
             //           imagePainter(Images.splash_background),

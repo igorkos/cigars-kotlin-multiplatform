@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 8:23 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -100,7 +100,10 @@ import kotlin.jvm.Transient
 class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
 
     @Transient
-    private val viewModel = CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar)
+    private val viewModel =
+        CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar).apply {
+            loading = true
+        }
 
     @Composable
     override fun Content() {
@@ -594,7 +597,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = {
-                    if (item.humidor != null) viewModel.openHumidor(item.humidor)
+                    viewModel.openHumidor(item.humidor)
                 })
         ) {
             Row(
@@ -610,7 +613,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
                     TextStyles.Subhead,
                 )
                 ValueCard(null, "${item.count}") {
-                    if (item.humidor != null) viewModel.addToHumidor(item)
+                    viewModel.addToHumidor(item)
                 }
             }
         }

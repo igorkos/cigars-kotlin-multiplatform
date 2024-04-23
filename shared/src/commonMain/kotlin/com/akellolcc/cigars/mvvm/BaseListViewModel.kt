@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 5:51 PM
+ * Last modified 4/22/24, 3:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,8 +45,10 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
 
     protected open fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
+            loading = true
             _entities = repository.all(sortField, accenting).subscribe {
                 entities = it
+                loading = false
             }
         }
     }

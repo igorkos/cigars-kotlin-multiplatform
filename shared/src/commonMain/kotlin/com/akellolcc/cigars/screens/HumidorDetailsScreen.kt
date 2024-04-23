@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,7 +55,6 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.emptyHumidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.components.ValueCard
@@ -81,7 +80,6 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
     override fun Content() {
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
-        val mainModel = route.sharedViewModel as MainScreenViewModel
         Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
         viewModel.observeEvents {
             when (it) {

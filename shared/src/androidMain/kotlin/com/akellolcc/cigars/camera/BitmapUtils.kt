@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:04 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,14 +20,12 @@ import android.content.ContentResolver
 import android.graphics.BitmapFactory
 import android.net.Uri
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 
 
 object BitmapUtils {
     fun getBitmapFromUri(uri: Uri, contentResolver: ContentResolver): android.graphics.Bitmap? {
-        var inputStream: InputStream? = null
         try {
-            inputStream = contentResolver.openInputStream(uri)
+            val inputStream = contentResolver.openInputStream(uri)
             val s = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
             return s
@@ -44,11 +42,8 @@ object BitmapUtils {
         try {
             val byteBuffer = ByteArrayOutputStream()
             contentResolver.openInputStream(uri)?.let { inputStream ->
-                val bufferSize = 1024
-                val buffer = ByteArray(bufferSize)
-
-                // we need to know how may bytes were read to write them to the byteBuffer
-                var len = 0
+                val buffer = ByteArray(1024)
+                var len: Int
                 while ((inputStream.read(buffer).also { len = it }) != -1) {
                     byteBuffer.write(buffer, 0, len)
                 }

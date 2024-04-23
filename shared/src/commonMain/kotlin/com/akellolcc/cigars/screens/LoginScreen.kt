@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -68,9 +66,9 @@ class LoginScreen : Screen {
             }
         }
 
-        val isLoading: Boolean by viewModel!!.isLoading.collectAsState()
-        val isEnabled: Boolean by viewModel!!.isLoginButtonEnabled.collectAsState()
-        val isLogin: Boolean by viewModel!!.isLoginButtonEnabled.collectAsState()
+        // val isLoading: Boolean by viewModel!!.isLoading.collectAsState()
+        // val isEnabled: Boolean by viewModel!!.isLoginButtonEnabled.collectAsState()
+        //  val isLogin: Boolean by viewModel!!.isLoginButtonEnabled.collectAsState()
 
         LoginBackground {
             Box(

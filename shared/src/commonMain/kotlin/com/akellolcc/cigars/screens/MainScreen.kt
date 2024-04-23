@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 12:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,10 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
@@ -49,6 +45,8 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
+import com.akellolcc.cigars.logging.AnalyticsEvents
+import com.akellolcc.cigars.logging.AnalyticsParams
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
@@ -76,30 +74,19 @@ class MainScreen : Screen {
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        var isTabsVisible by remember { mutableStateOf(true) }
-        var isDrawerVisible by remember { mutableStateOf(false) }
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) {
-            isDrawerVisible = it == DrawerValue.Open
+            viewModel.isDrawerVisible = it == DrawerValue.Open
             true
         }
 
         viewModel.observeEvents {
             when (it) {
                 is MainScreenViewModel.MainScreenActions.ShowError -> TODO()
-                is MainScreenViewModel.MainScreenActions.TabsVisibility -> {
-                    Log.debug("MainScreen received tabs visible ${it.isVisible}")
-                    isTabsVisible = it.isVisible
-                }
-
-                is MainScreenViewModel.MainScreenActions.OpenDrawer -> {
-                    //throw RuntimeException("Test Crash")
-                    isDrawerVisible = it.isVisible
-                }
             }
         }
 
-        LaunchedEffect(isDrawerVisible) {
-            if (isDrawerVisible) {
+        LaunchedEffect(viewModel.isDrawerVisible) {
+            if (viewModel.isDrawerVisible) {
                 drawerState.open()
             } else {
                 drawerState.close()
@@ -126,13 +113,13 @@ class MainScreen : Screen {
                         )
                     }
                 },
-                gesturesEnabled = isTabsVisible,
+                gesturesEnabled = viewModel.isTabsVisible,
             ) {
                 TabNavigator(tabs[0]) {
                     Scaffold(
                         bottomBar = {
                             AnimatedVisibility(
-                                visible = isTabsVisible,
+                                visible = viewModel.isTabsVisible,
                                 enter = slideInVertically { height ->
                                     height
                                 },
@@ -166,6 +153,11 @@ fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
             tabNavigator.current = tabs.first {
                 it.route.route == tab.route
             }
+            Log.debug(
+                "Selected tab ${tab.route}", AnalyticsEvents.ScreenEnter, mapOf(
+                    AnalyticsParams.ContentId.parm to tab.route
+                )
+            )
         },
         icon = { loadIcon(tab.icon, Size(width = 24f, height = 24f)) },
         label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },

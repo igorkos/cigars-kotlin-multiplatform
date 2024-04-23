@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/15/24, 10:04 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,8 @@ import dev.icerock.moko.resources.desc.StringDesc
 open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
     override val repository: CigarsRepository = database.getRepository(RepositoryType.Cigars)
 
-    override fun entitySelected(cigar: Cigar) {
-        sendEvent(CigarsAction.RouteToCigar(cigar))
+    override fun entitySelected(entity: Cigar) {
+        sendEvent(CigarsAction.RouteToCigar(entity))
     }
 
     sealed interface CigarsAction {

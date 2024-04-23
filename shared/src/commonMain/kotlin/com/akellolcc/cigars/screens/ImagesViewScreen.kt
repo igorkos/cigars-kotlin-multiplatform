@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/22/24, 3:50 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,14 +30,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -45,8 +41,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.camera.PermissionCallback
-import com.akellolcc.cigars.camera.PermissionStatus
 import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
@@ -54,7 +48,6 @@ import com.akellolcc.cigars.camera.rememberCameraManager
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
@@ -82,120 +75,80 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
     init {
         val params = route.data as Pair<*, *>
         viewModel = if (params.first is Cigar) {
-            CigarImagesViewScreenViewModel((route.data as Pair<*, *>).first as Cigar)
+            CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
         } else {
-            HumidorImagesViewScreenViewModel((route.data as Pair<*, *>).first as Humidor)
+            HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun Content() {
-        val select by remember { mutableStateOf((route.data as Pair<*, *>).second as Int) }
-        var lastSelect by remember { mutableStateOf(select) }
+    fun imageActions() {
         val coroutineScope = rememberCoroutineScope()
-        var launchCamera by remember { mutableStateOf(value = false) }
-        var launchGallery by remember { mutableStateOf(value = false) }
         val resizeOptions = ResizeOptions(
             width = screenWidth().dpToPx(), // Custom width
             height = (screenWidth().dpToPx() * 0.8).roundToInt(), // Custom height
             resizeThresholdBytes = 2 * 1024 * 1024L, // Custom threshold for 2MB,
         )
 
-        //val images by
+        val permissionsManager = createPermissionsManager(viewModel)
 
         val multipleImagePicker = rememberImagePickerLauncher(
-            // Optional: Set a maximum selection limit, e.g., SelectionMode.Multiple(maxSelection = 5).
-            // Default: No limit, depends on system's maximum capacity.
             selectionMode = SelectionMode.Multiple(),
             scope = coroutineScope,
             resizeOptions = resizeOptions,
             onResult = { byteArrays ->
-                lastSelect = viewModel.entities.size
-                byteArrays.forEach {
-                    // Process the selected images' ByteArrays.
-                    Log.debug("Image size ${it.size}")
-                    viewModel.addImage(SharedImage(it, null))
-                }
+                viewModel.addImages(byteArrays.map {
+                    SharedImage(it, null)
+                })
             }
         )
-
-        viewModel.observeEvents {
-        }
-
-        val permissionsManager = createPermissionsManager(object : PermissionCallback {
-            override fun onPermissionStatus(
-                permissionType: PermissionType,
-                status: PermissionStatus
-            ) {
-                Log.debug("Permission $permissionType -> $status")
-                when (status) {
-                    PermissionStatus.SHOW_RATIONAL -> {
-
-                    }
-
-                    PermissionStatus.DENIED -> {
-                        if (permissionType == PermissionType.GALLERY) {
-                            launchCamera = false
-                        } else {
-                            launchGallery = false
-                        }
-                    }
-
-                    PermissionStatus.GRANTED -> {
-                        if (permissionType == PermissionType.GALLERY) {
-                            launchCamera = true
-                        } else {
-                            launchGallery = true
-                        }
-                    }
-                }
-            }
-
-
-        })
 
         val cameraManager = rememberCameraManager {
             coroutineScope.launch {
-                lastSelect = viewModel.entities.size
                 it?.let {
-                    Log.debug("Image size ${it.toByteArray()?.size}")
-                    viewModel.addImage(it)
+                    viewModel.addImages(listOf(it))
                 }
             }
         }
 
-        if (launchCamera) {
+        if (!viewModel.isPermissionGranted) {
             if (permissionsManager.isPermissionGranted(PermissionType.CAMERA)) {
-                cameraManager.launch()
+                viewModel.permissionCamera = true
             } else {
                 permissionsManager.askPermission(PermissionType.CAMERA)
             }
-            launchCamera = false
-        }
-
-        if (launchGallery) {
             if (permissionsManager.isPermissionGranted(PermissionType.GALLERY)) {
-                multipleImagePicker.launch()
+                viewModel.permissionGallery = true
             } else {
                 permissionsManager.askPermission(PermissionType.GALLERY)
             }
-            launchGallery = false
         }
 
+        if (viewModel.launchCamera) {
+            cameraManager.launch()
+            viewModel.launchCamera = false
+        }
+        if (viewModel.launchGallery) {
+            multipleImagePicker.launch()
+            viewModel.launchGallery = false
+        }
+    }
 
-        val topColors = centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+
+        imageActions()
+
+        LaunchedEffect(Unit) {
+            viewModel.loadMore()
+        }
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     CenterAlignedTopAppBar(
-                        colors = topColors,
                         navigationIcon = {
                             IconButton(onClick = {
                                 navigator.pop()
@@ -207,10 +160,10 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                             }
                         },
                         actions = {
-                            IconButton(onClick = { launchCamera = true }) {
+                            IconButton(onClick = { viewModel.launchCamera = true }) {
                                 loadIcon(Images.icon_menu_camera, Size(24.0F, 24.0F))
                             }
-                            IconButton(onClick = { launchGallery = true }) {
+                            IconButton(onClick = { viewModel.launchGallery = true }) {
                                 loadIcon(Images.icon_menu_image, Size(24.0F, 24.0F))
                             }
                         },
@@ -240,7 +193,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
                                 viewModel.entities,
                                 loading = viewModel.loading,
                                 scale = ContentScale.Fit,
-                                select = select,
+                                select = viewModel.select,
                             )
                         }
                     }

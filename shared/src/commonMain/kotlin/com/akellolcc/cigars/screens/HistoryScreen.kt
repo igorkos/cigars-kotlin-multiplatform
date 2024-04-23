@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:08 PM
+ * Last modified 4/22/24, 5:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,7 @@ abstract class HistoryScreen(override val route: NavRoute) :
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
         val topColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = materialColor(MaterialColors.color_transparent),
             navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),

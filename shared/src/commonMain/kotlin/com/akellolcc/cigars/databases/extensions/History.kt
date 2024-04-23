@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,7 +86,7 @@ enum class HistoryType(val type: Long) {
             }
         }
 
-        inline fun fromLong(value: Long): HistoryType = when (value) {
+        fun fromLong(value: Long): HistoryType = when (value) {
             0L -> Addition
             1L -> Deletion
             2L -> Move

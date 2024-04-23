@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:04 PM
+ * Last modified 4/22/24, 4:46 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,9 +56,8 @@ actual fun rememberCameraManager(
     val contentResolver: ContentResolver = context.contentResolver
     var tempPhotoUri by remember { mutableStateOf(value = Uri.EMPTY) }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 PeekabooImageResizer.resizeImageAsync(
                     contentResolver = contentResolver,
@@ -77,14 +76,12 @@ actual fun rememberCameraManager(
 
             }
         }
-    )
+
     return remember {
-        CameraManager(
-            onLaunch = {
-                tempPhotoUri = ComposeFileProvider.getImageUri(context)
-                cameraLauncher.launch(tempPhotoUri)
-            }
-        )
+        CameraManager {
+            tempPhotoUri = ComposeFileProvider.getImageUri(context)
+            cameraLauncher.launch(tempPhotoUri)
+        }
     }
 }
 

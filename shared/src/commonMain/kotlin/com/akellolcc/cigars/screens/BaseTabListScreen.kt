@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 2:10 PM
+ * Last modified 4/22/24, 5:19 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.BaseListViewModel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -132,7 +131,6 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
                 },
                 content = {
                     val padding by remember { mutableStateOf(it.calculateTopPadding() + 16.dp to it.calculateBottomPadding() + 16.dp) }
-                    Log.debug("padding $padding")
                     if (viewModel.loading && route.isLoadingCover) {
                         Box(
                             modifier = Modifier.fillMaxSize().background(
@@ -179,7 +177,6 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
 
         // load more if scrolled to bottom
         LaunchedEffect(reachedBottom) {
-            Log.debug("entitiesList reachedBottom $reachedBottom")
             if (reachedBottom) loadMore?.invoke()
         }
         LazyColumn(
@@ -211,7 +208,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
+    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
         var expanded by remember { mutableStateOf(false) }
 
         CenterAlignedTopAppBar(

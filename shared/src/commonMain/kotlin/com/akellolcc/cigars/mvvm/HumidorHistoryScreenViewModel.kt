@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/15/24, 10:04 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,14 +26,14 @@ class HumidorHistoryScreenViewModel(val humidor: Humidor) : HistoryScreenViewMod
     override val repository: HistoryRepository =
         database.getRepository(RepositoryType.HumidorHistory, humidor.rowid)
 
-    override fun entitySelected(cigar: History) {}
+    override fun entitySelected(entity: History) {}
 
     init {
         name = humidor.name
     }
 
-    override fun entityName(history: History): String {
-        if (history.cigarId < 0) return humidor.name
-        return repository.cigarName(history.cigarId)
+    override fun entityName(id: History): String {
+        if (id.cigarId < 0) return humidor.name
+        return repository.cigarName(id.cigarId)
     }
 }

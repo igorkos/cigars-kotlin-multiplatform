@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 12:40 AM
+ * Last modified 4/22/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ import com.google.firebase.analytics.analytics
 
 
 class MainActivity : ComponentActivity() {
-    lateinit var firebaseAnalytics: FirebaseAnalytics
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         setAppContext(this.applicationContext)
         firebaseAnalytics = Firebase.analytics
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
             event.params.forEach { (key, value) ->
                 bundle.putString(key, value)
             }
-            firebaseAnalytics.logEvent(event.event.name, bundle)
+            firebaseAnalytics.logEvent(event.event.event, bundle)
         }
 
         super.onCreate(savedInstanceState)

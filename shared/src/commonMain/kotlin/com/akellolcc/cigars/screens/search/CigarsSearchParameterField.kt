@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 2:53 PM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,6 @@ class CigarsSearchParameterField(type: CigarSearchFields, label: String, showLea
     SearchParameterField<CigarSearchFields>(type, label, showLeading) {
     @Composable
     override fun Render(enabled: Boolean) {
-        var expanded by remember { mutableStateOf(false) }
         var value by remember { mutableStateOf("") }
         Row(
             modifier = Modifier.fillMaxWidth(),

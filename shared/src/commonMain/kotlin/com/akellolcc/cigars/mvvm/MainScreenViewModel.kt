@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:05 PM
+ * Last modified 4/22/24, 12:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,28 +16,17 @@
 
 package com.akellolcc.cigars.mvvm
 
-import com.akellolcc.cigars.logging.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import dev.icerock.moko.resources.desc.StringDesc
 
 
 class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActions>() {
-
-    var isTabsVisible: Boolean = true
-        set(value) {
-            field = value
-            Log.debug("Setting tabs visible $value")
-            sendEvent(MainScreenActions.TabsVisibility(value))
-        }
-
-    var isDrawerVisible: Boolean = false
-        set(value) {
-            field = value
-            sendEvent(MainScreenActions.OpenDrawer(value))
-        }
+    var isTabsVisible by mutableStateOf(true)
+    var isDrawerVisible by mutableStateOf(false)
 
     sealed interface MainScreenActions {
-        data class OpenDrawer(val isVisible: Boolean = false) : MainScreenActions
-        data class TabsVisibility(val isVisible: Boolean) : MainScreenActions
         data class ShowError(val error: StringDesc) : MainScreenActions
     }
 }

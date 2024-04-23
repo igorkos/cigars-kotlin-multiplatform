@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 3/30/24, 3:41 PM
+ * Last modified 4/22/24, 1:39 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 
 @Composable
 actual fun createPermissionsManager(callback: PermissionCallback): PermissionsManager {
@@ -38,8 +39,14 @@ actual fun createPermissionsManager(callback: PermissionCallback): PermissionsMa
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class PermissionsManager actual constructor(private val callback: PermissionCallback) :
+actual class PermissionsManager actual constructor(callback: PermissionCallback) :
     PermissionHandler {
+    private val _callback: WeakReference<PermissionCallback> = WeakReference(callback)
+    private val callback: PermissionCallback?
+        get() {
+            return _callback.get()
+        }
+
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     override fun askPermission(permission: PermissionType) {
@@ -52,7 +59,7 @@ actual class PermissionsManager actual constructor(private val callback: Permiss
                     val permissionResult = cameraPermissionState.status
                     if (!permissionResult.isGranted) {
                         if (permissionResult.shouldShowRationale) {
-                            callback.onPermissionStatus(
+                            callback?.onPermissionStatus(
                                 permission, PermissionStatus.SHOW_RATIONAL
                             )
                         } else {
@@ -61,7 +68,7 @@ actual class PermissionsManager actual constructor(private val callback: Permiss
                             }
                         }
                     } else {
-                        callback.onPermissionStatus(
+                        callback?.onPermissionStatus(
                             permission, PermissionStatus.GRANTED
                         )
                     }
@@ -71,7 +78,7 @@ actual class PermissionsManager actual constructor(private val callback: Permiss
             PermissionType.GALLERY -> {
                 // Granted by default because in Android GetContent API does not require any
                 // runtime permissions, and i am using it to access gallery in my app
-                callback.onPermissionStatus(
+                callback?.onPermissionStatus(
                     permission, PermissionStatus.GRANTED
                 )
             }

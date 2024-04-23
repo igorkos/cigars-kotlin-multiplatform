@@ -28,7 +28,7 @@ mvvmCore = "0.16.1"
 moko-mvvm-version = "0.16.0"
 
 multiplatform-settings-version = "1.1.1"
-accompanist = "0.35.0-alpha"
+accompanist = "0.34.0"
 
 reaktive-version = "2.1.0"
 

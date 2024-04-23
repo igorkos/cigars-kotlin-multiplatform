@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 11:55 AM
+ * Last modified 4/22/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,7 +70,6 @@ fun DefaultButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true
 ) {
-    val style = defaultButtonStyle()
     ElevatedButton(
         enabled = enabled,
         modifier = modifier.width(150.dp),

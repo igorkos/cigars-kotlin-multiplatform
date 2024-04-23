@@ -1,6 +1,7 @@
 import SwiftUI
 import shared
 import FirebaseCore
+import FirebaseAnalytics
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
@@ -19,8 +20,8 @@ struct iOSApp: App {
 	}
 
     init() {
-        Log.companion.doInitLog(){_ in 
-            
+        Log.companion.doInitLog(){event in
+            Analytics.logEvent(event.event.name, parameters: event.params)
         }
     }
 }
