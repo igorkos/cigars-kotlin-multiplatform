@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 11:39 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,6 +77,7 @@ import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.InfoImageDialog
@@ -105,7 +106,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
     @Composable
     override fun Content() {
         viewModel = rememberScreenModel {
-            CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar).apply {
+            createViewModel(CigarsDetailsScreenViewModel::class, route.data ?: emptyCigar).apply {
                 loading = true
             }
         }

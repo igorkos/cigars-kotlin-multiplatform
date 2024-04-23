@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:15 AM
+ * Last modified 4/23/24, 1:19 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
@@ -46,7 +47,7 @@ class CigarsScreen(
 
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel { CigarsScreenViewModel() }
+        viewModel = rememberScreenModel { createViewModel(CigarsScreenViewModel::class) }
         Navigator(CigarsListScreen<CigarsScreenViewModel>(route, viewModel))
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 12:15 PM
+ * Last modified 4/23/24, 1:23 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,7 @@ expect class NavRoute(
     var isLoadingCover: Boolean
 }
 
+val MainRoute = NavRoute("MainScreen", "", Images.tab_icon_cigars)
 val CigarsRoute = NavRoute("CigarsScreen", Localize.title_cigars, Images.tab_icon_cigars)
 val CigarsDetailsRoute = NavRoute(
     "CigarDetailsScreen",

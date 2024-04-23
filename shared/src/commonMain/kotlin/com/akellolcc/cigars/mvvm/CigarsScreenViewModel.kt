@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,13 @@ open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewMode
 
     override fun entitySelected(entity: Cigar) {
         sendEvent(CigarsAction.RouteToCigar(entity))
+    }
+
+    companion object Factory : ViewModelsFactory<CigarsScreenViewModel>() {
+        override fun factory(data: Any?): CigarsScreenViewModel {
+            return CigarsScreenViewModel()
+        }
+
     }
 
     sealed interface CigarsAction {

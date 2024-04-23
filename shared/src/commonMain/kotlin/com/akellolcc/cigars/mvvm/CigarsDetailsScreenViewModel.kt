@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 10:44 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -250,6 +250,13 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             }
             disposable = mutableListOf()
         }
+    }
+
+    companion object Factory : ViewModelsFactory<CigarsDetailsScreenViewModel>() {
+        override fun factory(data: Any?): CigarsDetailsScreenViewModel {
+            return CigarsDetailsScreenViewModel(data as Cigar)
+        }
+
     }
 
     sealed interface CigarsDetailsAction {

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 5:02 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -113,6 +113,14 @@ class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :
 
     override val repository: ImagesRepository =
         database.getRepository(RepositoryType.CigarImages, cigar.rowid)
+
+    companion object Factory : ViewModelsFactory<CigarImagesViewScreenViewModel>() {
+        override fun factory(data: Any?): CigarImagesViewScreenViewModel {
+            val params = data as Pair<*, *>
+            return CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
+        }
+    }
+
 }
 
 
@@ -123,5 +131,12 @@ class HumidorImagesViewScreenViewModel(val humidor: Humidor, select: Int) :
 
     override fun getImage(bytes: ByteArray): CigarImage {
         return CigarImage(-1, bytes = bytes, humidorId = humidor.rowid)
+    }
+
+    companion object Factory : ViewModelsFactory<HumidorImagesViewScreenViewModel>() {
+        override fun factory(data: Any?): HumidorImagesViewScreenViewModel {
+            val params = data as Pair<*, *>
+            return HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)
+        }
     }
 }

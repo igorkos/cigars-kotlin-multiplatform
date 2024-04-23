@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:27 AM
+ * Last modified 4/23/24, 1:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.LinkButton
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -64,7 +65,8 @@ class SearchScreen(
 
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel { SearchCigarScreenViewModel() }
+        viewModel =
+            rememberScreenModel { createViewModel(SearchCigarScreenViewModel::class, route.data) }
         Navigator(SearchCigarScreen(route, viewModel))
     }
 }

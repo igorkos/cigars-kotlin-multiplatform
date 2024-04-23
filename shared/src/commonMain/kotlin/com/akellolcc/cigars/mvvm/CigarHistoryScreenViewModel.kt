@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/17/24, 1:17 AM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,5 +35,12 @@ class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
 
     override fun entityName(id: History): String {
         return repository.humidorName(id.humidorFrom)
+    }
+
+    companion object Factory : ViewModelsFactory<CigarHistoryScreenViewModel>() {
+        override fun factory(data: Any?): CigarHistoryScreenViewModel {
+            return CigarHistoryScreenViewModel(data as Cigar)
+        }
+
     }
 }

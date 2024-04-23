@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 10:40 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,18 +16,38 @@
 
 package com.akellolcc.cigars.mvvm
 
+import cafe.adriel.voyager.core.concurrent.ThreadSafeMap
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.akellolcc.cigars.databases.extensions.Cigar
 import kotlin.reflect.KClass
 
-fun <T : ScreenModel> createViewModel(viewModel: KClass<T>, data: Any?): T? {
-    return when (viewModel.simpleName) {
-        "CigarsDetailsScreenViewModel" -> {
-            return CigarsDetailsScreenViewModel(data as Cigar) as T
-        }
+abstract class ViewModelsFactory<T : ScreenModel> {
+    abstract fun factory(data: Any? = null): T
+}
 
-        else -> {
-            null
+object ViewModelRegistry {
+
+    @PublishedApi
+    internal val factories: ThreadSafeMap<KClass<*>, ViewModelsFactory<*>> = ThreadSafeMap()
+
+    inline fun <reified T : ScreenModel> register(
+        modelKClass: KClass<out T>,
+        factory: ViewModelsFactory<T>
+    ) {
+        factories[T::class] = factory
+    }
+
+    inline fun <reified T : ScreenModel> create(modelKClass: KClass<out T>, data: Any? = null): T {
+        if (factories.containsKey(modelKClass)) {
+            val factory: ViewModelsFactory<T> = factories[modelKClass] as ViewModelsFactory<T>
+            return factory.factory(data)
         }
+        throw IllegalArgumentException("ViewModel not found")
     }
 }
+
+inline fun <reified T : ScreenModel> createViewModel(
+    modelKClass: KClass<out T>,
+    data: Any? = null
+): T = ViewModelRegistry.create(modelKClass, data)
+
+

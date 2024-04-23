@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:51 AM
+ * Last modified 4/23/24, 1:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,9 +54,9 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.emptyHumidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.components.ValueCard
@@ -80,11 +80,13 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel {
-            HumidorDetailsScreenViewModel(
-                (route.data ?: emptyHumidor) as Humidor
-            )
-        }
+        viewModel =
+            rememberScreenModel {
+                createViewModel(
+                    HumidorDetailsScreenViewModel::class,
+                    route.data
+                )
+            }
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
         Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")

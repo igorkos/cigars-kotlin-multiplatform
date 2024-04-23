@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:27 AM
+ * Last modified 4/23/24, 1:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,8 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
@@ -49,10 +48,12 @@ import com.akellolcc.cigars.logging.AnalyticsEvents
 import com.akellolcc.cigars.logging.AnalyticsParams
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.FavoritesRoute
 import com.akellolcc.cigars.screens.navigation.HumidorsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.MainRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.TextStyles
@@ -66,14 +67,18 @@ private var tabs: List<ITabItem<*>> = listOf(
     SearchScreen(SearchCigarRoute)
 )
 
-class MainScreen : Screen {
+class MainScreen() :
+    ITabItem<MainScreenViewModel> {
+    override val route: NavRoute = MainRoute
 
     @Transient
-    private val viewModel = MainScreenViewModel()
+    override lateinit var viewModel: MainScreenViewModel
 
-    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+        viewModel =
+            rememberScreenModel { createViewModel(MainScreenViewModel::class) }
+
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) {
             viewModel.isDrawerVisible = it == DrawerValue.Open
             true

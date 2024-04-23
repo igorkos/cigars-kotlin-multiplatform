@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:40 AM
+ * Last modified 4/23/24, 1:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,10 +48,10 @@ import com.akellolcc.cigars.camera.createPermissionsManager
 import com.akellolcc.cigars.camera.rememberCameraManager
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -129,14 +129,16 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel {
-            val params = route.data as Pair<*, *>
-            if (params.first is Cigar) {
-                CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
-            } else {
-                HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)
+        viewModel =
+            rememberScreenModel {
+                val params = route.data as Pair<*, *>
+                if (params.first is Cigar) {
+                    createViewModel(CigarImagesViewScreenViewModel::class, route.data)
+                } else {
+                    createViewModel(HumidorImagesViewScreenViewModel::class, route.data)
+                }
             }
-        }
+
         val navigator = LocalNavigator.currentOrThrow
 
         imageActions()

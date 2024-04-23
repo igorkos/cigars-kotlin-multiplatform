@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 12:15 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,12 @@ import dev.icerock.moko.resources.desc.StringDesc
 class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActions>() {
     var isTabsVisible by mutableStateOf(true)
     var isDrawerVisible by mutableStateOf(false)
+
+    companion object Factory : ViewModelsFactory<MainScreenViewModel>() {
+        override fun factory(data: Any?): MainScreenViewModel {
+            return MainScreenViewModel()
+        }
+    }
 
     sealed interface MainScreenActions {
         data class ShowError(val error: StringDesc) : MainScreenActions

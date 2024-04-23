@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 2:09 PM
+ * Last modified 4/23/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -183,6 +183,12 @@ class SearchCigarScreenViewModel() :
     override fun loadMore() {
         Log.debug("loadMore")
         loadEntities(false)
+    }
+
+    companion object Factory : ViewModelsFactory<SearchCigarScreenViewModel>() {
+        override fun factory(data: Any?): SearchCigarScreenViewModel {
+            return SearchCigarScreenViewModel()
+        }
     }
 
     sealed interface Actions {
