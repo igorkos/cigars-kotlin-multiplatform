@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 5:19 PM
+ * Last modified 4/23/24, 12:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,8 +67,8 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.ui.reachedBottom
 
-abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute) : ITabItem {
-    abstract val viewModel: BaseListViewModel<E, A>
+abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>>(override val route: NavRoute) :
+    ITabItem<VM> {
 
     abstract fun handleAction(event: A, navigator: Navigator?)
 
@@ -103,7 +103,6 @@ abstract class BaseTabListScreen<A, E : BaseEntity>(override val route: NavRoute
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.current
-        // val entities by viewModel.asState()
 
         LaunchedEffect(navigator) {
             viewModel.loadMore()

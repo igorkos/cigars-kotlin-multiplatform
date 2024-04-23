@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/23/24, 12:40 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,15 +16,21 @@
 
 package com.akellolcc.cigars.screens
 
+import androidx.compose.runtime.Composable
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.mvvm.HistoryScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorHistoryScreenViewModel
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import kotlin.jvm.Transient
 
-class HumidorHistoryScreen(route: NavRoute) : HistoryScreen(route) {
+class HumidorHistoryScreen(route: NavRoute) : HistoryScreen<HumidorHistoryScreenViewModel>(route) {
 
     @Transient
-    override var viewModel =
-        HumidorHistoryScreenViewModel(route.data as Humidor) as HistoryScreenViewModel
+    override lateinit var viewModel: HumidorHistoryScreenViewModel
+
+    @Composable
+    override fun Content() {
+        viewModel = rememberScreenModel { HumidorHistoryScreenViewModel(route.data as Humidor) }
+        super.Content()
+    }
 }

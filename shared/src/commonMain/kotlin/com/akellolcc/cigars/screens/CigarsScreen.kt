@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 11:45 PM
+ * Last modified 4/23/24, 12:15 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
@@ -38,21 +40,23 @@ import kotlin.jvm.Transient
 
 class CigarsScreen(
     override val route: NavRoute
-) : ITabItem {
-    private val screen = CigarsListScreen(route)
+) : ITabItem<CigarsScreenViewModel> {
+    @Transient
+    override lateinit var viewModel: CigarsScreenViewModel
 
     @Composable
     override fun Content() {
-        Navigator(screen)
+        viewModel = rememberScreenModel { CigarsScreenViewModel() }
+        Navigator(CigarsListScreen<CigarsScreenViewModel>(route, viewModel))
     }
 }
 
-open class CigarsListScreen(override val route: NavRoute) :
-    BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar>(route) {
-
+open class CigarsListScreen<V : ScreenModel>(
+    override val route: NavRoute,
     @Transient
-    override val viewModel = CigarsScreenViewModel()
-
+    override var viewModel: CigarsScreenViewModel
+) :
+    BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
         CigarSortingFields.enumValues().map {

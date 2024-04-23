@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:40 AM
+ * Last modified 4/22/24, 10:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package com.akellolcc.cigars.screens
+package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.core.model.ScreenModel
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.mvvm.CigarHistoryScreenViewModel
-import com.akellolcc.cigars.screens.navigation.NavRoute
-import kotlin.jvm.Transient
+import kotlin.reflect.KClass
 
-class CigarHistoryScreen(route: NavRoute) : HistoryScreen<CigarHistoryScreenViewModel>(route) {
+fun <T : ScreenModel> createViewModel(viewModel: KClass<T>, data: Any?): T? {
+    return when (viewModel.simpleName) {
+        "CigarsDetailsScreenViewModel" -> {
+            return CigarsDetailsScreenViewModel(data as Cigar) as T
+        }
 
-    @Transient
-    override lateinit var viewModel: CigarHistoryScreenViewModel
-
-    @Composable
-    override fun Content() {
-        viewModel = rememberScreenModel { CigarHistoryScreenViewModel(route.data as Cigar) }
-        super.Content()
+        else -> {
+            null
+        }
     }
 }

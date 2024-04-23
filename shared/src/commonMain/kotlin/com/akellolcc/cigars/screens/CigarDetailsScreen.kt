@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:23 PM
+ * Last modified 4/22/24, 11:39 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,6 +64,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -97,16 +98,17 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class CigarDetailsScreen(override val route: NavRoute) : ITabItem {
-
+class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsScreenViewModel> {
     @Transient
-    private val viewModel =
-        CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar).apply {
-            loading = true
-        }
+    override lateinit var viewModel: CigarsDetailsScreenViewModel
 
     @Composable
     override fun Content() {
+        viewModel = rememberScreenModel {
+            CigarsDetailsScreenViewModel((route.data ?: emptyCigar) as Cigar).apply {
+                loading = true
+            }
+        }
         val navigator = LocalNavigator.currentOrThrow
         // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
 

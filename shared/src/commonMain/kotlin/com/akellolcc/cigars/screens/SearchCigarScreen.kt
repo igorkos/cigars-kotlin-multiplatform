@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 12:52 PM
+ * Last modified 4/23/24, 12:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,11 +39,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
 import com.akellolcc.cigars.screens.components.LinkButton
+import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.theme.Images
@@ -54,10 +56,25 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class SearchCigarScreen(route: NavRoute) :
-    BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar>(route) {
+class SearchScreen(
+    override val route: NavRoute
+) : ITabItem<SearchCigarScreenViewModel> {
     @Transient
-    override var viewModel = SearchCigarScreenViewModel()
+    override lateinit var viewModel: SearchCigarScreenViewModel
+
+    @Composable
+    override fun Content() {
+        viewModel = rememberScreenModel { SearchCigarScreenViewModel() }
+        Navigator(SearchCigarScreen(route, viewModel))
+    }
+}
+
+class SearchCigarScreen(
+    route: NavRoute,
+    @Transient
+    override var viewModel: SearchCigarScreenViewModel
+) :
+    BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar, SearchCigarScreenViewModel>(route) {
 
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 5:09 PM
+ * Last modified 4/23/24, 12:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
@@ -49,20 +50,22 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class HumidorsScreen(override val route: NavRoute) : ITabItem {
-    private val screen = HumidorsListScreen(route)
+class HumidorsScreen(override val route: NavRoute) : ITabItem<HumidorsViewModel> {
+    override lateinit var viewModel: HumidorsViewModel
 
     @Composable
     override fun Content() {
-        Navigator(screen)
+        viewModel = rememberScreenModel { HumidorsViewModel() }
+        Navigator(HumidorsListScreen(route, viewModel))
     }
 }
 
-class HumidorsListScreen(route: NavRoute) :
-    BaseTabListScreen<HumidorsViewModel.Action, Humidor>(route) {
-
+class HumidorsListScreen(
+    route: NavRoute,
     @Transient
-    override val viewModel = HumidorsViewModel()
+    override var viewModel: HumidorsViewModel
+) :
+    BaseTabListScreen<HumidorsViewModel.Action, Humidor, HumidorsViewModel>(route) {
 
     @ExperimentalMaterial3Api
     @Composable

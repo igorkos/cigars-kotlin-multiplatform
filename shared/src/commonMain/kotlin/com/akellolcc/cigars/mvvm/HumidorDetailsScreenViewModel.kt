@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:35 PM
+ * Last modified 4/23/24, 12:51 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
-import com.badoo.reaktive.observable.ObservableWrapper
+import com.badoo.reaktive.disposable.Disposable
 import com.badoo.reaktive.observable.map
 import com.badoo.reaktive.observable.subscribe
 import dev.icerock.moko.resources.desc.StringDesc
@@ -35,8 +35,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     private var imagesDatabase: ImagesRepository? = null
     private var humidorsDatabase: HumidorsRepository? =
         database.getRepository(RepositoryType.Humidors)
-    private var observeHumidor: ObservableWrapper<Humidor>? = null
-    private var _images: ObservableWrapper<List<CigarImage>>? = null
+    private var disposable: List<Disposable> = mutableListOf()
 
     var editing by mutableStateOf(humidor.rowid < 0)
     var name by mutableStateOf(humidor.name)
@@ -52,16 +51,9 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     var humidors by mutableStateOf(listOf<HumidorCigar>())
 
 
-    init {
-        if (humidor.rowid >= 0) {
-            observeHumidor()
-        }
-    }
-
-    private fun observeHumidor() {
+    fun observeHumidor() {
         imagesDatabase = database.getRepository(RepositoryType.HumidorImages, humidor.rowid)
-        observeHumidor = humidorsDatabase!!.observe(humidor.rowid)
-        observeHumidor?.map {
+        disposable += humidorsDatabase!!.observe(humidor.rowid).map {
             if (!editing) {
                 name = it.name
                 brand = it.brand
@@ -73,12 +65,11 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
                 link = it.link
                 type = it.type
             }
-        }?.subscribe()
+        }.subscribe()
 
-        _images = imagesDatabase!!.all()
-        _images?.map {
+        disposable += imagesDatabase!!.all().map {
             images = it
-        }?.subscribe()
+        }.subscribe()
     }
 
     fun verifyFields(): Boolean {
@@ -114,6 +105,16 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
         editing = false
         if (humidorsDatabase == null) {
             sendEvent(Action.OnBackAction(0))
+        }
+    }
+
+    override fun onDispose() {
+        super.onDispose()
+        if (disposable.isNotEmpty()) {
+            disposable.forEach {
+                it.dispose()
+            }
+            disposable = mutableListOf()
         }
     }
 

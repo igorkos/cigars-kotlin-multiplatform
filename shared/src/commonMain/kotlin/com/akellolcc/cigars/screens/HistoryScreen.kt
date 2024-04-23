@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 5:09 PM
+ * Last modified 4/23/24, 12:40 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,10 +49,9 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.formatDate
 
-abstract class HistoryScreen(override val route: NavRoute) :
-    BaseTabListScreen<HistoryScreenViewModel.CigarsAction, History>(route) {
+abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: NavRoute) :
+    BaseTabListScreen<HistoryScreenViewModel.CigarsAction, History, VM>(route) {
 
-    override lateinit var viewModel: HistoryScreenViewModel
     override fun handleAction(
         event: HistoryScreenViewModel.CigarsAction,
         navigator: Navigator?

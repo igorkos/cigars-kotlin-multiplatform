@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 12:34 PM
+ * Last modified 4/23/24, 12:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,11 +59,11 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient
 
-private var tabs: List<ITabItem> = listOf(
+private var tabs: List<ITabItem<*>> = listOf(
     CigarsScreen(CigarsRoute),
     HumidorsScreen(HumidorsRoute),
     FavoritesScreen(FavoritesRoute),
-    SearchCigarScreen(SearchCigarRoute)
+    SearchScreen(SearchCigarRoute)
 )
 
 class MainScreen : Screen {
@@ -144,9 +144,9 @@ class MainScreen : Screen {
 }
 
 @Composable
-fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
+fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem<*>>) {
     val tabNavigator = LocalTabNavigator.current
-    val selected = (tabNavigator.current as ITabItem).route.route == tab.route
+    val selected = (tabNavigator.current as ITabItem<*>).route.route == tab.route
     NavigationBarItem(
         selected = selected,
         onClick = {

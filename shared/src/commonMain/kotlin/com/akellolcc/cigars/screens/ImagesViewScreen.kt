@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 3:50 PM
+ * Last modified 4/23/24, 12:40 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.camera.PermissionType
@@ -67,19 +68,10 @@ import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 import kotlin.math.roundToInt
 
-class ImagesViewScreen(override val route: NavRoute) : ITabItem {
+class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewScreenViewModel> {
 
     @Transient
-    private val viewModel: BaseImagesViewScreenViewModel
-
-    init {
-        val params = route.data as Pair<*, *>
-        viewModel = if (params.first is Cigar) {
-            CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
-        } else {
-            HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)
-        }
-    }
+    override lateinit var viewModel: BaseImagesViewScreenViewModel
 
     @Composable
     fun imageActions() {
@@ -137,6 +129,14 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        viewModel = rememberScreenModel {
+            val params = route.data as Pair<*, *>
+            if (params.first is Cigar) {
+                CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
+            } else {
+                HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)
+            }
+        }
         val navigator = LocalNavigator.currentOrThrow
 
         imageActions()

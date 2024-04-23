@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 4/23/24, 12:51 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.common.theme.DefaultTheme
@@ -70,14 +72,19 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
+class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetailsScreenViewModel> {
 
     @Transient
-    private val viewModel = HumidorDetailsScreenViewModel((route.data ?: emptyHumidor) as Humidor)
+    override lateinit var viewModel: HumidorDetailsScreenViewModel
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        viewModel = rememberScreenModel {
+            HumidorDetailsScreenViewModel(
+                (route.data ?: emptyHumidor) as Humidor
+            )
+        }
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
         Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
@@ -86,6 +93,10 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                 is HumidorDetailsScreenViewModel.Action.OnBackAction -> navigator.pop()
                 is HumidorDetailsScreenViewModel.Action.ShowError -> TODO()
             }
+        }
+
+        LaunchedEffect(viewModel.editing) {
+            viewModel.observeHumidor()
         }
 
         val topColors = centerAlignedTopAppBarColors(

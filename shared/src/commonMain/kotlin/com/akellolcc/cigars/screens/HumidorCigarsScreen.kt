@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 5:09 PM
+ * Last modified 4/23/24, 12:40 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
@@ -49,10 +50,17 @@ import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class HumidorCigarsScreen(override val route: NavRoute) :
-    BaseTabListScreen<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar>(route) {
-
+    BaseTabListScreen<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar, HumidorCigarsScreenViewModel>(
+        route
+    ) {
     @Transient
-    override val viewModel = HumidorCigarsScreenViewModel(route.data as Humidor)
+    override lateinit var viewModel: HumidorCigarsScreenViewModel
+
+    @Composable
+    override fun Content() {
+        viewModel = rememberScreenModel { HumidorCigarsScreenViewModel(route.data as Humidor) }
+        super.Content()
+    }
 
     override fun handleAction(
         event: HumidorCigarsScreenViewModel.CigarsAction,
