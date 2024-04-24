@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/23/24, 11:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,6 @@ import com.badoo.reaktive.observable.observable
 import com.badoo.reaktive.observable.wrap
 import com.badoo.reaktive.single.SingleWrapper
 import com.badoo.reaktive.single.wrap
-import dev.icerock.moko.mvvm.flow.cMutableStateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -54,8 +53,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
 
     fun observe(entity: ENTITY): ObservableWrapper<ENTITY> = observe(entity.rowid)
     override fun observe(id: Long): ObservableWrapper<ENTITY> {
-        if (id < 0) return MutableStateFlow(wrapper.empty()).cMutableStateFlow().asObservable()
-            .wrap()
+        if (id < 0) return MutableStateFlow(wrapper.empty()).asObservable().wrap()
         return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO).asObservable().wrap()
     }
 
@@ -77,6 +75,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
                             val id = lastInsertRowId()
                             entity.rowid = id
                             emitter.onNext(entity)
+                            emitter.onComplete()
                         }
                     }
                 } else {
@@ -91,6 +90,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
             if (contains(entity)) {
                 doUpsert(entity, false).subscribe {
                     emitter.onNext(entity)
+                    emitter.onComplete()
                 }
             } else {
                 emitter.onError(Exception("Can't update entity: $entity which doesn't exist in the database."))
@@ -116,6 +116,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
             if (idExists) {
                 doDelete(id, where).subscribe {
                     emitter.onNext(true)
+                    emitter.onComplete()
                 }
             } else {
                 emitter.onError(Exception("Can't remove entity with id: $id which doesn't exist in the database."))

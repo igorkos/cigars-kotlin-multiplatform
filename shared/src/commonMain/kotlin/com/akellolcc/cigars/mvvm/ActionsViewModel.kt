@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 9:53 PM
+ * Last modified 4/23/24, 11:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,10 @@
 
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.ScreenModel
-import dev.icerock.moko.mvvm.flow.CFlow
-import dev.icerock.moko.mvvm.flow.cFlow
-import dev.icerock.moko.mvvm.flow.compose.observeAsActions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -31,15 +27,16 @@ import kotlinx.coroutines.launch
 open class ActionsViewModel<E> : ScreenModel {
 
     private val _events = Channel<E>(Channel.BUFFERED)
-    private val events: CFlow<E> get() = _events.receiveAsFlow().cFlow()
+    private val events: Flow<E> get() = _events.receiveAsFlow()
 
-    @Composable
     fun observeEvents(onEach: (E) -> Unit) {
-        events.observeAsActions(onEach = onEach)
+        screenModelScope.launch {
+            events.collect { onEach(it) }
+        }
     }
 
     fun sendEvent(event: E) {
-        CoroutineScope(Dispatchers.Main).launch {
+        screenModelScope.launch {
             _events.send(event)
         }
     }

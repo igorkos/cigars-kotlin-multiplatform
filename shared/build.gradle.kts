@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 3:04 PM
+ * Last modified 4/24/24, 12:26 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +56,6 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.material3)
 
                 implementation(libs.kotlin.datetime)
@@ -72,7 +71,6 @@ kotlin {
                 implementation(libs.bundles.voyager.common)
 
                 // peekaboo-ui
-                implementation(libs.peekaboo.ui)
                 implementation(libs.peekaboo.image.picker)
 
                 implementation(libs.cloudinary)
@@ -93,7 +91,6 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
-                implementation(libs.moko.resources.test)
             }
         }
 
@@ -102,10 +99,7 @@ kotlin {
             dependencies {
                 api(libs.androidx.activity.compose)
                 implementation(libs.sqldelight.android)
-                implementation(libs.compose.ui.tooling)
-                implementation(libs.compose.ui.tooling.preview)
                 implementation(libs.androidx.foundation.android)
-                implementation(libs.ui.tooling.preview.android)
                 implementation(libs.accompanist.permissions)
                 implementation(libs.ktor.client.android.okhttp)
                 implementation(libs.androidx.datastore.core.android)
@@ -158,7 +152,6 @@ android {
         jvmToolchain(11)
     }
     dependencies {
-        implementation(libs.ui.tooling.preview.android)
         implementation(libs.androidx.exifinterface)
     }
 

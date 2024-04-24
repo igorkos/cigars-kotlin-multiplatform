@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:23 PM
+ * Last modified 4/23/24, 10:37 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,8 +41,18 @@ expect class NavRoute(
     var isLoadingCover: Boolean
 }
 
-val MainRoute = NavRoute("MainScreen", "", Images.tab_icon_cigars)
-val CigarsRoute = NavRoute("CigarsScreen", Localize.title_cigars, Images.tab_icon_cigars)
+val MainRoute = NavRoute(
+    "MainScreen",
+    "",
+    Images.tab_icon_cigars
+)
+
+val CigarsRoute = NavRoute(
+    "CigarsScreen",
+    Localize.title_cigars,
+    Images.tab_icon_cigars
+)
+
 val CigarsDetailsRoute = NavRoute(
     "CigarDetailsScreen",
     Localize.title_cigars,
@@ -75,9 +85,16 @@ val ImagesViewRoute =
         Images.tab_icon_cigars,
         isTabsVisible = false
     )
-val HumidorsRoute = NavRoute("HumidorsScreen", Localize.title_humidors, Images.tab_icon_humidors)
-val FavoritesRoute =
-    NavRoute("FavoritesScreen", Localize.title_favorites, Images.tab_icon_favorites)
+val HumidorsRoute = NavRoute(
+    "HumidorsScreen",
+    Localize.title_humidors,
+    Images.tab_icon_humidors
+)
+val FavoritesRoute = NavRoute(
+    "FavoritesScreen",
+    Localize.title_favorites,
+    Images.tab_icon_favorites
+)
 val HumidorCigarsRoute = NavRoute(
     "HumidorCigarScreen",
     Localize.title_cigars,
@@ -85,4 +102,8 @@ val HumidorCigarsRoute = NavRoute(
     isTabsVisible = false
 )
 val SearchCigarRoute =
-    NavRoute("SearchCigarsScreen", Localize.title_search, Images.tab_icon_search)
+    NavRoute(
+        "SearchCigarsScreen",
+        Localize.title_search,
+        Images.tab_icon_search
+    )

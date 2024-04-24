@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:31 PM
+ * Last modified 4/23/24, 5:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,9 +29,7 @@ import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
-import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
-import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.theme.Images
 import com.badoo.reaktive.disposable.Disposable
@@ -42,11 +40,11 @@ import dev.icerock.moko.resources.desc.StringDesc
 
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     DatabaseViewModel<Cigar, CigarsDetailsScreenViewModel.CigarsDetailsAction>() {
-    private var cigarsDatabase: CigarsRepository = createRepository(CigarsRepository::class)
+    private var cigarsRepository: CigarsRepository = createRepository(CigarsRepository::class)
     private var humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
-    private var imagesDatabase: ImagesRepository? = null
+    private var imagesRepository: CigarImagesRepository? = null
     private var cigarHumidorRepository: CigarHumidorRepository? = null
-    private var cigarsHistoryDatabase: HistoryRepository? = null
+    private var cigarHistoryRepository: CigarHistoryRepository? = null
     private var disposable: List<Disposable> = mutableListOf()
 
     var editing by mutableStateOf(cigar.rowid < 0)
@@ -61,7 +59,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     var filler by mutableStateOf(cigar.filler)
     var strength by mutableStateOf(cigar.strength)
     var rating by mutableStateOf(cigar.rating)
-    var myrating by mutableStateOf(cigar.myrating)
+    var myRating by mutableStateOf(cigar.myrating)
     var favorites by mutableStateOf(cigar.favorites)
     var notes by mutableStateOf(cigar.notes)
     var link by mutableStateOf(cigar.link)
@@ -76,14 +74,16 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     var cigarRating by mutableStateOf(false)
     var moveCigarDialog by mutableStateOf(false)
 
-
+    /**
+     * Observing cigar state
+     */
     fun observeCigar() {
         if (cigar.rowid >= 0) {
-            imagesDatabase = createRepository(CigarImagesRepository::class, cigar.rowid)
+            imagesRepository = createRepository(CigarImagesRepository::class, cigar.rowid)
             cigarHumidorRepository = createRepository(CigarHumidorsRepository::class, cigar.rowid)
-            cigarsHistoryDatabase = createRepository(CigarHistoryRepository::class, cigar.rowid)
+            cigarHistoryRepository = createRepository(CigarHistoryRepository::class, cigar.rowid)
             loading = true
-            disposable += cigarsDatabase.observe(cigar.rowid).map {
+            disposable += cigarsRepository.observe(cigar.rowid).map {
                 if (!editing) {
                     name = it.name
                     brand = it.brand
@@ -96,7 +96,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                     filler = it.filler
                     strength = it.strength
                     rating = it.rating
-                    myrating = it.myrating
+                    myRating = it.myrating
                     favorites = it.favorites
                     notes = it.notes
                     link = it.link
@@ -104,7 +104,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 }
             }.subscribe()
 
-            disposable += imagesDatabase!!.all().map {
+            disposable += imagesRepository!!.all().map {
                 images = it
             }.subscribe {
                 loading = false
@@ -116,15 +116,9 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
-    fun humidorsCount(): Long {
-        val repo = createRepository(HumidorsRepository::class)
-        return repo.numberOfEntries()
-    }
-
-    fun humidors(): List<Humidor> {
-        return humidorsRepository.allSync(null, true)
-    }
-
+    /**
+     * Editing cigar
+     */
     fun verifyFields(): Boolean {
         return name.isNotBlank()
                 && brand?.isNotBlank() == true
@@ -135,7 +129,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 && filler.isNotBlank()
     }
 
-    fun saveEdit() {
+    fun onSaveEdit() {
         val updated = Cigar(
             cigar.rowid,
             name = name,
@@ -149,7 +143,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             length = length,
             strength = strength,
             rating = rating,
-            myrating = myrating,
+            myrating = myRating,
             notes = notes,
             filler = filler,
             link = link,
@@ -158,11 +152,11 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             favorites = favorites,
             price = cigar.price,
         )
-        cigarsDatabase.update(updated)
+        cigarsRepository.update(updated)
         editing = false
     }
 
-    fun cancelEdit() {
+    fun onCancelEdit() {
         if (disposable.isNotEmpty()) {
             disposable.forEach {
                 it.dispose()
@@ -175,26 +169,13 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         editing = false
     }
 
-    fun rate() {
-        cigarRating = true
-    }
-
+    /**
+     *  Updating cigar no edit mode
+     */
     fun favorite() {
         if (disposable.isNotEmpty()) {
-            cigarsDatabase.updateFavorite(!favorites, cigar).subscribe()
+            cigarsRepository.updateFavorite(!favorites, cigar).subscribe()
         }
-    }
-
-    fun addToHumidor(humidor: HumidorCigar) {
-        sendEvent(CigarsDetailsAction.AddToHumidor(humidor))
-    }
-
-    fun openHumidor(humidor: Humidor) {
-        sendEvent(CigarsDetailsAction.OpenHumidor(humidor))
-    }
-
-    fun historyOpen() {
-        sendEvent(CigarsDetailsAction.OpenHistory(cigar))
     }
 
     fun updateCigarCount(entity: HumidorCigar, count: Long, price: Double? = null) {
@@ -205,10 +186,18 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     }
 
     fun updateCigarRating(rating: Long) {
-        cigarsDatabase.updateRating(rating, cigar).subscribe()
+        cigarsRepository.updateRating(rating, cigar).subscribe()
     }
 
-    fun moveFromHumidors(selected: Humidor?): List<ValuePickerItem<HumidorCigar>> {
+    /**
+     * Moving cigars cigar to humidor
+     */
+    fun humidorsCount(): Long {
+        val repo = createRepository(HumidorsRepository::class)
+        return repo.numberOfEntries()
+    }
+
+    fun moveFromHumidors(): List<ValuePickerItem<HumidorCigar>> {
         return humidors.map {
             ValuePickerItem(it, it.humidor.name, Images.tab_icon_humidors)
         }
@@ -225,15 +214,26 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
+    /**
+     * Events
+     */
+    fun addToHumidor(humidor: HumidorCigar) {
+        sendEvent(CigarsDetailsAction.AddToHumidor(humidor))
+    }
+
+    fun openHumidor(humidor: Humidor) {
+        sendEvent(CigarsDetailsAction.OpenHumidor(humidor))
+    }
+
+    fun historyOpen() {
+        sendEvent(CigarsDetailsAction.OpenHistory(cigar))
+    }
+
     enum class InfoActions {
         None,
         CigarSize,
         CigarTobacco,
         CigarRatings,
-    }
-
-    fun openInfo(info: InfoActions) {
-        infoDialog = info
     }
 
     fun moveCigar() {

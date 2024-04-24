@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:17 PM
+ * Last modified 4/23/24, 11:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,14 +33,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -83,7 +82,7 @@ fun PagedCarousel(
         } else {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
             ) { page ->
                 //Log.debug("Images1: ${images?.size}")
                 if (!images.isNullOrEmpty()) {
@@ -140,19 +139,29 @@ fun CarouselItem(
     }
 
     if (imageBitmap == null && default == null) return
-    Card(
-        modifier = Modifier
-            .fillMaxSize().clickable {
-                onClick()
-            }
-            .shadow(elevation = shadowElevation, shape = shape),
-        backgroundColor = materialColor(MaterialColors.color_transparent)
+    Column(
+        modifier = Modifier.fillMaxSize().clickable {
+            onClick()
+        },
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val modifier = Modifier.fillMaxSize()
         if (imageBitmap != null) {
-            Image(bitmap = imageBitmap, contentDescription = "", contentScale = scale)
+            Image(
+                modifier = modifier,
+                bitmap = imageBitmap,
+                contentDescription = "",
+                contentScale = scale
+            )
         } else {
             val painter: Painter = painterResource(default!!)
-            Image(painter = painter, contentDescription = "", contentScale = scale)
+            Image(
+                modifier = modifier,
+                painter = painter,
+                contentDescription = "",
+                contentScale = scale
+            )
         }
     }
 }

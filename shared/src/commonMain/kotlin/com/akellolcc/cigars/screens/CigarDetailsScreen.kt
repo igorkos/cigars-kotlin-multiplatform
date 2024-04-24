@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:07 PM
+ * Last modified 4/23/24, 5:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -255,12 +255,12 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                     DefaultButton(
                         title = Localize.button_cancel,
                         modifier = Modifier.padding(end = 10.dp).weight(2f),
-                        onClick = { viewModel.cancelEdit() })
+                        onClick = { viewModel.onCancelEdit() })
                     DefaultButton(
                         modifier = Modifier.weight(2f),
                         enabled = viewModel.verifyFields(),
                         title = Localize.button_save,
-                        onClick = { viewModel.saveEdit() })
+                        onClick = { viewModel.onSaveEdit() })
                 }
             )
         }
@@ -269,7 +269,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
     @Composable
     private fun dialogs() {
         HumidorCigarsCountDialog {
-            viewModel.cancelEdit()
+            viewModel.onCancelEdit()
         }
         if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
             InfoImageDialog(
@@ -357,7 +357,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 vertical = viewModel.editing,
                 actionIcon = Images.icon_menu_info,
                 onAction = {
-                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarSize)
+                    viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.CigarSize
                 }
             ) {
                 if (!viewModel.editing) {
@@ -422,7 +422,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 vertical = true,
                 actionIcon = Images.icon_menu_info,
                 onAction = {
-                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarTobacco)
+                    viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.CigarTobacco
                 }
             ) {
                 TextStyled(
@@ -494,7 +494,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 vertical = viewModel.editing,
                 actionIcon = Images.icon_menu_info,
                 onAction = {
-                    viewModel.openInfo(CigarsDetailsScreenViewModel.InfoActions.CigarRatings)
+                    viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.CigarRatings
                 }
             ) {
                 if (!viewModel.editing) {
@@ -504,9 +504,9 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                     )
                     ValueCard(
                         Localize.cigar_details_myrating,
-                        "${viewModel.myrating}"
+                        "${viewModel.myRating}"
                     ) {
-                        viewModel.rate()
+                        viewModel.cigarRating = true
                     }
                     IconButton(onClick = {
                         viewModel.favorite()
@@ -530,14 +530,14 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                         inputMode = KeyboardType.Number
                     )
                     TextStyled(
-                        if (viewModel.myrating == 0L) "" else viewModel.myrating.toString(),
+                        if (viewModel.myRating == 0L) "" else viewModel.myRating.toString(),
                         TextStyles.Subhead,
                         labelStyle = TextStyles.Subhead,
                         label = Localize.cigar_details_myrating,
                         editable = viewModel.editing,
                         modifier = Modifier.padding(bottom = 10.dp),
                         onValueChange = {
-                            viewModel.myrating =
+                            viewModel.myRating =
                                 if (it.isNotBlank()) it.toLong() else 0
                         },
                         inputMode = KeyboardType.Number
@@ -767,8 +767,8 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
     @Composable
     private fun CigarsRatingDialog(onDismissRequest: () -> Unit) {
         val rating = remember { mutableStateOf("0") }
-        LaunchedEffect(viewModel.myrating) {
-            rating.value = (viewModel.myrating ?: 0).toString()
+        LaunchedEffect(viewModel.myRating) {
+            rating.value = (viewModel.myRating ?: 0).toString()
         }
         if (viewModel.cigarRating) {
             Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -850,7 +850,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
             val toList = remember { mutableStateOf<List<ValuePickerItem<Humidor>>>(listOf()) }
 
             LaunchedEffect(from.value, to.value) {
-                fromList.value = viewModel.moveFromHumidors(from.value?.humidor)
+                fromList.value = viewModel.moveFromHumidors()
                 toList.value = viewModel.moveToHumidors(from.value?.humidor)
                 count.value = from.value?.count ?: 1L
             }
