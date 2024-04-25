@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:25 PM
+ * Last modified 4/24/24, 3:35 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,15 +21,14 @@ import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.utils.fraction
-import com.badoo.reaktive.observable.flatMap
-import com.badoo.reaktive.observable.flatMapIterable
-import com.badoo.reaktive.observable.map
-import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.subscribe
-import com.badoo.reaktive.observable.toList
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.singleOf
-import com.badoo.reaktive.single.wrap
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -104,38 +103,35 @@ class GetCigarsRequest(
         }
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun next(): SingleWrapper<List<Cigar>> {
+    fun next(): Flow<List<Cigar>> {
         if (isLastPage) {
-            return singleOf(emptyList<Cigar>()).wrap()
+            return flowOf(emptyList())
         }
         page++
         return call()
     }
 
-    private fun call(): SingleWrapper<List<Cigar>> {
-        return observable { emitter ->
-            restRequest.execute().map { restResponse ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun call(): Flow<List<Cigar>> {
+        return flow {
+            emit(restRequest.execute().flatMapConcat { restResponse ->
                 if (restResponse.status == 200) {
                     val response = json.decodeFromString<GetCigarsResponse>(restResponse.body)
                     Log.debug("GetCigarsRequest got page=${response.page} count=${response.count} get=${response.cigars.size}")
                     totalItems = response.count
                     receivedItems += response.cigars.size
                     page = response.page
-                    emitter.onNext(response.cigars)
+                    response.cigars.asFlow()
                 } else {
                     Log.error("GetCigarsRequest got response ${restResponse.status}")
-                    emitter.onError(Exception("Got response ${restResponse.status}"))
+                    throw Exception("Got response ${restResponse.status}")
                 }
-            }.subscribe {
-                emitter.onComplete()
-            }
-        }.flatMapIterable {
-            it
-        }.flatMap {
-            GetCigarsBrand(it).execute()
-        }.map {
-            it.toCigar()
-        }.toList().wrap()
+            }.flatMapConcat {
+                GetCigarsBrand(it).execute()
+            }.map {
+                it.toCigar()
+            }.toList())
+        }
     }
 }
 

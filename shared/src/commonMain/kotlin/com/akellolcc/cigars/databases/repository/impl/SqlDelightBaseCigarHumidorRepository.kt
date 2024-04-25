@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 2:52 PM
+ * Last modified 4/24/24, 12:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,19 +36,14 @@ import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarHumidorTableQueries
 import com.akellolcc.cigars.logging.Log
-import com.badoo.reaktive.coroutinesinterop.asObservable
-import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.doOnBeforeError
-import com.badoo.reaktive.observable.flatMap
-import com.badoo.reaktive.observable.map
-import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.observableOf
-import com.badoo.reaktive.observable.wrap
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.wrap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlin.math.absoluteValue
@@ -62,7 +57,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
     override fun all(
         sortField: String?,
         accenting: Boolean
-    ): ObservableWrapper<List<HumidorCigar>> {
+    ): Flow<List<HumidorCigar>> {
         val hRepo = createRepository(HumidorsRepository::class)
         val cRepo = createRepository(CigarsRepository::class)
         return observeAllQuery().asFlow().mapToList(Dispatchers.IO).map {
@@ -71,22 +66,23 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                 val cigar = (cRepo as Repository<Cigar>).getSync(humidorCigar.cigarId)
                 HumidorCigar(humidorCigar.count, humidor, cigar)
             }
-        }.asObservable().doOnBeforeError {
+        }.catch {
             Log.error("Error while getting all humidor cigars $it")
-        }.wrap()
+        }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun updateCount(
         entity: HumidorCigar,
         count: Long,
         price: Double?,
         historyType: HistoryType?,
         humidorTo: Humidor?
-    ): ObservableWrapper<HumidorCigar> {
+    ): Flow<HumidorCigar> {
         val c = entity.count - count
         val type = if (c < 0) HistoryType.Addition else HistoryType.Deletion
         var updated: HumidorCigar? = null
-        return super.update(entity.copy(count = count)).flatMap {
+        return super.update(entity.copy(count = count)).flatMapConcat {
             updated = it
             val cigarsHistoryDatabase: HistoryRepository =
                 createRepository(CigarHistoryRepository::class, entity.cigar.rowid)
@@ -104,20 +100,21 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     humidorTo?.rowid
                 )
             )
-        }.map { updated!! }.doOnBeforeError {
+        }.map { updated!! }.catch {
             Log.error("Error while updating humidor cigars count $it")
-        }.wrap()
+        }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun moveCigar(
         from: HumidorCigar,
         to: Humidor,
         count: Long
-    ): ObservableWrapper<Boolean> {
+    ): Flow<Boolean> {
         val humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
         var humidorHistoryRepository: HistoryRepository =
             createRepository(HumidorHistoryRepository::class, from.humidor.rowid)
-        return observable { emitter ->
+        return flow {
             if (from.count > count) {
                 Log.info("Update count of cigars left in humidor from we move")
                 updateCount(
@@ -125,20 +122,20 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     from.count - count,
                     from.cigar.price,
                     HistoryType.Move
-                ).subscribe {
-                    emitter.onNext(true)
+                ).collect {
+                    emit(true)
                 }
             } else {
                 Log.info("All Cigars is moved from humidor")
-                remove(from.cigar, from.humidor).subscribe {
-                    emitter.onNext(it)
+                remove(from.cigar, from.humidor).collect() {
+                    emit(it)
                 }
             }
-        }.flatMap {
+        }.flatMapConcat {
             val fromEntry = from.humidor.copy(count = from.humidor.count - count)
             Log.info("Update total count of cigars left in humidor from we move $fromEntry")
             humidorsRepository.update(fromEntry)
-        }.flatMap {
+        }.flatMapConcat {
             val toEntry = find(from.cigar, to)
             if (toEntry == null) {
                 Log.info("Add cigar to humidor")
@@ -147,10 +144,10 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                 Log.info("Update count of cigar we moved to humidor")
                 updateCount(toEntry, toEntry.count + count, toEntry.cigar.price, HistoryType.Move)
             }
-        }.flatMap {
+        }.flatMapConcat {
             Log.info("Update total count of cigars left in humidor from we move")
             humidorsRepository.update(to.copy(count = to.count + count))
-        }.flatMap {
+        }.flatMapConcat {
             Log.info("Add history item Move From")
             humidorHistoryRepository.add(
                 History(
@@ -165,7 +162,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     humidorTo = to.rowid
                 )
             )
-        }.flatMap {
+        }.flatMapConcat {
             Log.info("Add history item Move To")
             humidorHistoryRepository = createRepository(HumidorHistoryRepository::class, to.rowid)
             humidorHistoryRepository.add(
@@ -181,16 +178,16 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     humidorTo = to.rowid
                 )
             )
-        }.flatMap {
+        }.flatMapConcat {
             Log.info("Finished moving cigar")
-            observableOf(true)
-        }.doOnBeforeError {
+            flowOf(true)
+        }.catch {
             Log.error("Error while moving cigars $it")
-        }.wrap()
+        }
     }
 
-    override fun doUpsert(entity: HumidorCigar, add: Boolean): SingleWrapper<HumidorCigar> {
-        return singleFromCoroutine {
+    override fun doUpsert(entity: HumidorCigar, add: Boolean): Flow<HumidorCigar> {
+        return flow {
             if (add) {
                 queries.add(
                     entity.count,
@@ -204,15 +201,15 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     entity.cigar.rowid
                 )
             }
-            entity
-        }.wrap()
+            emit(entity)
+        }
     }
 
-    override fun add(cigar: Cigar, humidor: Humidor, count: Long): ObservableWrapper<HumidorCigar> {
+    override fun add(cigar: Cigar, humidor: Humidor, count: Long): Flow<HumidorCigar> {
         return super.add(HumidorCigar(count, humidor, cigar))
     }
 
-    override fun remove(cigar: Cigar, from: Humidor): ObservableWrapper<Boolean> {
+    override fun remove(cigar: Cigar, from: Humidor): Flow<Boolean> {
         return super.remove(from.rowid, cigar.rowid)
     }
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:47 PM
+ * Last modified 4/24/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,20 +23,17 @@ import com.akellolcc.cigars.databases.RepositoryFactory
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.imageFactory
-import com.badoo.reaktive.coroutinesinterop.asObservable
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.wrap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 
 class SqlDelightHumidorImagesRepository(
     private val humidorId: Long,
     queries: ImagesDatabaseQueries
 ) : SqlDelightImagesRepository(queries), HumidorImagesRepository {
 
-    override fun all(sortField: String?, accenting: Boolean): ObservableWrapper<List<CigarImage>> {
-        return queries.humidorImages(humidorId, ::imageFactory).asFlow()
-            .mapToList(Dispatchers.IO).asObservable().wrap()
+    override fun all(sortField: String?, accenting: Boolean): Flow<List<CigarImage>> {
+        return queries.humidorImages(humidorId, ::imageFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
     companion object Factory : RepositoryFactory<SqlDelightHumidorImagesRepository>() {

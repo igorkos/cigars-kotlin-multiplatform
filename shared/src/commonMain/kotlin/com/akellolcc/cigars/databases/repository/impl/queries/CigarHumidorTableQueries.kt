@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/16/24, 6:35 PM
+ * Last modified 4/24/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.databases.repository.DatabaseQueries
 
 class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQueries) :
     DatabaseQueries<HumidorCigar> {

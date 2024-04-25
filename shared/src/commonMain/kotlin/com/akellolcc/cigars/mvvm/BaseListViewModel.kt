@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 4:32 PM
+ * Last modified 4/24/24, 1:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,13 +19,16 @@ package com.akellolcc.cigars.mvvm
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
-import com.badoo.reaktive.disposable.Disposable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.launch
 
 
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
-    private var _entities: Disposable? = null
+    private var _entities: Job? = null
     protected abstract val repository: Repository<T>
     protected var sortField by mutableStateOf<String?>(null)
 
@@ -52,10 +55,19 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     protected open fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
             loading = true
-            _entities = repository.all(sortField, accenting).subscribe {
-                entities = it
-                loading = false
+            _entities = screenModelScope.launch {
+                repository.all(sortField, accenting).cancellable().collect {
+                    entities = it
+                    loading = false
+                }
             }
         }
     }
+
+    override fun onDispose() {
+        super.onDispose()
+        _entities?.cancel()
+        _entities = null
+    }
+
 }

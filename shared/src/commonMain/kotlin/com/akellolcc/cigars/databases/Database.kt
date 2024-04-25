@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:43 PM
+ * Last modified 4/24/24, 1:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,11 +29,12 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
 import com.akellolcc.cigars.theme.readTextFile
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.flatMap
-import com.badoo.reaktive.observable.flatMapIterable
-import com.badoo.reaktive.observable.take
-import com.badoo.reaktive.observable.wrap
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
 
@@ -78,7 +79,8 @@ class Database : DatabaseInterface {
         database.reset()
     }
 
-    fun createDemoSet(): ObservableWrapper<Any> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun createDemoSet(): Flow<Any> {
         val demoHumidors =
             Json.decodeFromString<List<Humidor>>(readTextFile(AssetFiles.demo_humidors) ?: "")
         var humidor: Humidor = demoHumidors[0]
@@ -89,38 +91,44 @@ class Database : DatabaseInterface {
         )
         val humidorDatabase: HumidorsRepository = getRepository(HumidorsRepository::class)
         val cigarsDatabase: CigarsRepository = getRepository(CigarsRepository::class)
-        val imagesDatabase: ImagesRepository = getRepository(ImagesRepository::class, humidor.rowid)
+        val imagesDatabase: ImagesRepository =
+            getRepository(ImagesRepository::class, humidor.rowid)
         Log.debug("Added demo database")
-        return humidorDatabase.add(demoHumidors[1]).flatMap {
-            humidorDatabase.add(demoHumidors[0])
-        }.flatMapIterable { h ->
+        return demoHumidors.asFlow().flatMapConcat {
+            humidorDatabase.add(it)
+        }.flatMapLatest { h ->
             Log.debug("Added demo Humidor ${h.rowid}")
             humidor = h
-            demoCigarsImages.filter { it.humidorId == 0L }
-        }.flatMap { image ->
+            demoCigarsImages.filter { it.humidorId == 0L }.asFlow()
+        }.flatMapConcat { image ->
             Log.debug("Added image to Humidor ${image.rowid}")
             image.humidorId = humidor.rowid
             image.bytes = imageData(image.notes!!)!!
             imagesDatabase.add(image)
-        }.take(1).flatMapIterable {
+        }.flatMapLatest {
             Log.debug("Add cigars")
-            demoCigars
-        }.flatMap { cigar ->
+            demoCigars.asFlow()
+        }.flatMapConcat { cigar ->
             Log.debug("Add demo Cigar ${cigar.rowid}")
             cigarsDatabase.add(cigar, humidor)
-        }.flatMap { cigar ->
-            val image = demoCigarsImages.first {
+        }.flatMapConcat { cigar ->
+            demoCigarsImages.filter {
                 it.rowid == cigar.myrating
-            }
-            Log.debug("Add image $image to Cigar ${cigar.rowid} : ${cigar.myrating}")
-            image.rowid = -1
-            image.cigarId = cigar.rowid
+            }.map {
+                it.rowid = -1
+                it.cigarId = cigar.rowid
+                it
+            }.asFlow()
+        }.flatMapConcat { image ->
+            Log.debug("Add image $image to Cigar ${image.cigarId}")
             try {
                 image.bytes = imageData(image.notes!!)!!
             } catch (e: Exception) {
                 Log.error("Get image data failed $e")
             }
             imagesDatabase.add(image)
-        }.wrap()
+        }.flatMapLatest {
+            flowOf(true)
+        }
     }
 }

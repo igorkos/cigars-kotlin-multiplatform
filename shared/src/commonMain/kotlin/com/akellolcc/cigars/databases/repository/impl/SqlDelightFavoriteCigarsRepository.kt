@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 2:59 PM
+ * Last modified 4/24/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,16 +23,14 @@ import com.akellolcc.cigars.databases.RepositoryFactory
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.cigarFactory
-import com.badoo.reaktive.coroutinesinterop.asObservable
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.wrap
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 
 class SqlDelightFavoriteCigarsRepository(queries: CigarsDatabaseQueries) :
     SqlDelightCigarsRepository(queries), FavoriteCigarsRepository {
-    override fun all(sortField: String?, accenting: Boolean): ObservableWrapper<List<Cigar>> {
-        return queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.Main)
-            .asObservable().wrap()
+    override fun all(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
+        return queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
     companion object Factory : RepositoryFactory<SqlDelightFavoriteCigarsRepository>() {

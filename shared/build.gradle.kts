@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:26 AM
+ * Last modified 4/24/24, 7:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,9 +83,6 @@ kotlin {
                 implementation(libs.atomicfu)
 
                 implementation(libs.bundles.multiplatform.firebase)
-
-                implementation(libs.bundles.reaktive)
-
             }
         }
         val commonTest by getting {
@@ -156,6 +153,7 @@ android {
     }
 
 }
+
 
 sqldelight {
     databases {

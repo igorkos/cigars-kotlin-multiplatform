@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 2:53 PM
+ * Last modified 4/24/24, 4:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
 import com.akellolcc.cigars.databases.extensions.CigarSearchFields
-import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
@@ -49,20 +48,13 @@ class CigarsSearchBrandField(
 ) : SearchParameterField<CigarSearchFields>(type, label, showLeading) {
     @Composable
     override fun Render(enabled: Boolean) {
-        var expanded by remember { mutableStateOf(false) }
+        //var expanded by remember { mutableStateOf(false) }
         var value by remember { mutableStateOf("") }
-        var brands by remember { mutableStateOf(listOf<RapidCigarBrand>()) }
-        var selectedBrand by remember { mutableStateOf<RapidCigarBrand?>(null) }
+        //var selectedBrand by remember { mutableStateOf<RapidCigarBrand?>(null) }
 
         LaunchedEffect(value) {
-            if (selectedBrand == null && value.isNotBlank() && value.length > 3) {
-                viewModel.getBrands(value.trim()).subscribe {
-                    brands = it
-                    expanded = brands.isNotEmpty()
-                }
-            }
-            if (selectedBrand != null) {
-                onAction?.invoke(SearchParameterAction.Completed, selectedBrand)
+            if (viewModel.brand == null && value.isNotBlank() && value.length > 3) {
+                viewModel.getBrands(value.trim())
             }
         }
 
@@ -90,8 +82,8 @@ class CigarsSearchBrandField(
                     style = TextStyles.Headline,
                     maxLines = 1,
                     onValueChange = {
-                        selectedBrand = null
-                        brands = listOf()
+                        viewModel.brand = null
+                        viewModel.brands = listOf()
                         value = it
                     },
                     onKeyboardAction = {
@@ -99,9 +91,9 @@ class CigarsSearchBrandField(
                     },
                     imeAction = ImeAction.Search
                 )
-                DropdownMenu(expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
-                    brands.map {
+                DropdownMenu(expanded = viewModel.expanded,
+                    onDismissRequest = { viewModel.expanded = false }) {
+                    viewModel.brands.map {
                         DropdownMenuItem(
                             leadingIcon = {
                                 loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
@@ -113,8 +105,7 @@ class CigarsSearchBrandField(
                                 )
                             },
                             onClick = {
-                                expanded = false
-                                selectedBrand = it
+                                viewModel.selectBrand(it)
                                 value = it.name ?: " "
                             }
                         )

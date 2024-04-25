@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:29 PM
+ * Last modified 4/24/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,12 +30,12 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.logging.Log
-import com.badoo.reaktive.observable.flatMap
-import com.badoo.reaktive.observable.flatMapIterable
-import com.badoo.reaktive.observable.observableOf
-import com.badoo.reaktive.observable.subscribe
-import com.badoo.reaktive.observable.take
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 
 abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) :
     BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>(), PermissionCallback {
@@ -51,30 +51,15 @@ abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) :
 
     abstract fun getImage(bytes: ByteArray): CigarImage
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun addImages(images: List<SharedImage>) {
         lastSelect = entities.size
-        observableOf(images).take(1).flatMapIterable {
-            it
-        }.flatMap {
-            observableOf(it.toByteArray())
-        }.flatMap {
-            if (it != null) {
+        executeQuery(
+            images.asFlow().map {
+                it.toByteArray()
+            }.filterNotNull().flatMapConcat {
                 repository.add(getImage(it))
-            } else {
-                observableOf(null)
-            }
-        }.subscribe(
-            onNext = {
-                Log.debug("Image added")
-            },
-            onError = {
-                Log.error("Error add image $it")
-            },
-            onComplete = {
-                Log.debug("Complete add images")
-                loading = false
-            }
-        )
+            })
     }
 
     override fun entitySelected(entity: CigarImage) {}

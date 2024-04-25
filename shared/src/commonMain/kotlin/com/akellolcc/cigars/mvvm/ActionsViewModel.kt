@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 11:15 PM
+ * Last modified 4/24/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,8 +26,8 @@ import kotlinx.coroutines.launch
 
 open class ActionsViewModel<E> : ScreenModel {
 
-    private val _events = Channel<E>(Channel.BUFFERED)
-    private val events: Flow<E> get() = _events.receiveAsFlow()
+    private val _channel = Channel<E>(Channel.BUFFERED)
+    private val events: Flow<E> get() = _channel.receiveAsFlow()
 
     fun observeEvents(onEach: (E) -> Unit) {
         screenModelScope.launch {
@@ -37,7 +37,7 @@ open class ActionsViewModel<E> : ScreenModel {
 
     fun sendEvent(event: E) {
         screenModelScope.launch {
-            _events.send(event)
+            _channel.send(event)
         }
     }
 

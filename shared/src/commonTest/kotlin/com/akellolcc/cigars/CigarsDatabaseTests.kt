@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 1/13/24, 1:17 PM
+ * Last modified 4/24/24, 7:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,5 @@
 
 package com.akellolcc.cigars
 
-import org.junit.Assert.assertTrue
-import org.junit.Test
-
-class AndroidGreetingTest {
-
-    @Test
-    fun testExample() {
-        assertTrue("Check Android is mentioned", Greeting().greet().contains("Android"))
-    }
+class CigarsDatabaseTests {
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 11:21 PM
+ * Last modified 4/24/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,19 +21,14 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.databases.repository.DatabaseQueries
 import com.akellolcc.cigars.databases.repository.Repository
-import com.badoo.reaktive.coroutinesinterop.asObservable
-import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.wrap
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.wrap
+import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
@@ -51,51 +46,49 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
                 ).executeAsList()
     }
 
-    fun observe(entity: ENTITY): ObservableWrapper<ENTITY> = observe(entity.rowid)
-    override fun observe(id: Long): ObservableWrapper<ENTITY> {
-        if (id < 0) return MutableStateFlow(wrapper.empty()).asObservable().wrap()
-        return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO).asObservable().wrap()
+    fun observe(entity: ENTITY): Flow<ENTITY> = observe(entity.rowid)
+    override fun observe(id: Long): Flow<ENTITY> {
+        if (id < 0) return MutableStateFlow(wrapper.empty())
+        return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO)
     }
 
-    override fun all(sortField: String?, accenting: Boolean): ObservableWrapper<List<ENTITY>> {
+    override fun all(sortField: String?, accenting: Boolean): Flow<List<ENTITY>> {
         return (
                 if (accenting)
                     wrapper.allAsc(sortField ?: "name")
                 else
                     wrapper.allDesc(sortField ?: "name")
-                ).asFlow().mapToList(Dispatchers.IO).asObservable().wrap()
+                ).asFlow().mapToList(Dispatchers.IO)
     }
 
-    override fun add(entity: ENTITY): ObservableWrapper<ENTITY> {
-        return observable { emitter ->
+    override fun add(entity: ENTITY): Flow<ENTITY> {
+        return flow {
             CoroutineScope(Dispatchers.IO).launch {
                 if (!contains(entity)) {
                     wrapper.transactionWithResult {
-                        doUpsert(entity).subscribe {
+                        doUpsert(entity).collect {
                             val id = lastInsertRowId()
                             entity.rowid = id
-                            emitter.onNext(entity)
-                            emitter.onComplete()
+                            emit(entity)
                         }
                     }
                 } else {
-                    emitter.onError(Exception("Can't insert entity: $entity which already exist in the database."))
+                    throw Exception("Can't insert entity: $entity which already exist in the database.")
                 }
             }
-        }.wrap()
+        }
     }
 
-    override fun update(entity: ENTITY): ObservableWrapper<ENTITY> {
-        return observable { emitter ->
+    override fun update(entity: ENTITY): Flow<ENTITY> {
+        return flow {
             if (contains(entity)) {
-                doUpsert(entity, false).subscribe {
-                    emitter.onNext(entity)
-                    emitter.onComplete()
+                doUpsert(entity, false).collect() {
+                    emit(entity)
                 }
             } else {
-                emitter.onError(Exception("Can't update entity: $entity which doesn't exist in the database."))
+                throw Exception("Can't update entity: $entity which doesn't exist in the database.")
             }
-        }.wrap()
+        }
     }
 
     fun remove(entity: ENTITY) = remove(entity.rowid)
@@ -110,18 +103,17 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     }
 
 
-    override fun remove(id: Long, where: Long?): ObservableWrapper<Boolean> {
-        return observable { emitter ->
+    override fun remove(id: Long, where: Long?): Flow<Boolean> {
+        return flow {
             val idExists = contains(id, where)
             if (idExists) {
-                doDelete(id, where).subscribe {
-                    emitter.onNext(true)
-                    emitter.onComplete()
+                doDelete(id, where).collect() {
+                    emit(true)
                 }
             } else {
-                emitter.onError(Exception("Can't remove entity with id: $id which doesn't exist in the database."))
+                throw Exception("Can't remove entity with id: $id which doesn't exist in the database.")
             }
-        }.wrap()
+        }
     }
 
     fun contains(entity: ENTITY): Boolean {
@@ -144,12 +136,13 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     }
 
 
-    protected abstract fun doUpsert(entity: ENTITY, add: Boolean = true): SingleWrapper<ENTITY>
+    protected abstract fun doUpsert(entity: ENTITY, add: Boolean = true): Flow<ENTITY>
 
-    protected open fun doDelete(id: Long, where: Long? = null): SingleWrapper<Unit> {
-        return singleFromCoroutine {
+    protected open fun doDelete(id: Long, where: Long? = null): Flow<Unit> {
+        return flow {
             wrapper.remove(id, where)
-        }.wrap()
+            emit(Unit)
+        }
     }
 
     protected fun Long.toBoolean(): Boolean = this != 0L

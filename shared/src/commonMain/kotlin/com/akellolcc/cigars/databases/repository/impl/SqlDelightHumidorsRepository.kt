@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:34 PM
+ * Last modified 4/24/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,18 +25,15 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.HumidorsTableQueries
-import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.map
-import com.badoo.reaktive.observable.wrap
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.wrap
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 
 class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
     BaseRepository<Humidor>(HumidorsTableQueries(queries)), HumidorsRepository {
 
-    override fun add(entity: Humidor): ObservableWrapper<Humidor> {
+    override fun add(entity: Humidor): Flow<Humidor> {
         return super.add(entity).map {
             val hisDatabase: HumidorHistoryRepository =
                 createRepository(HumidorHistoryRepository::class, entity.rowid)
@@ -54,11 +51,11 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
                 )
             )
             it
-        }.wrap()
+        }
     }
 
-    override fun doUpsert(entity: Humidor, add: Boolean): SingleWrapper<Humidor> {
-        return singleFromCoroutine {
+    override fun doUpsert(entity: Humidor, add: Boolean): Flow<Humidor> {
+        return flow {
             if (add) {
                 queries.add(
                     entity.name,
@@ -89,8 +86,8 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
                     entity.rowid
                 )
             }
-            entity
-        }.wrap()
+            emit(entity)
+        }
     }
 
     override fun numberOfEntries(): Long {

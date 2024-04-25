@@ -99,11 +99,6 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 google-gms-services = { module = "com.google.gms:google-services", version.ref = "google-gms-services-version" }
 
-
-reaktive-reaktive = { group = "com.badoo.reaktive", name = "reaktive", version.ref = "reaktive-version" }
-reaktive-annotations = { group = "com.badoo.reaktive", name = "reaktive-annotations", version.ref = "reaktive-version" }
-reaktive-coroutines = { group = "com.badoo.reaktive", name = "coroutines-interop", version.ref = "reaktive-version" }
-
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -125,4 +120,3 @@ voyager-common = ["voyager-bottom-sheet-navigator", "voyager-navigator", "voyage
 sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines"]
 android-firebase = ["firebase-analytics", "firebase-bom", "google-firebase-crashlytics"]
 multiplatform-firebase = ["firebase-realtime-database", "firebase-installations", "firebase-performance", "firebase-crashlytics"]
-reaktive = ["reaktive-reaktive", "reaktive-annotations", "reaktive-coroutines"]

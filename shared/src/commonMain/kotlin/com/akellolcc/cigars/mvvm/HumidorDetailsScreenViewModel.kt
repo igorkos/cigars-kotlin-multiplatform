@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:29 PM
+ * Last modified 4/24/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,16 +25,14 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
-import com.badoo.reaktive.disposable.Disposable
-import com.badoo.reaktive.observable.map
-import com.badoo.reaktive.observable.subscribe
 import dev.icerock.moko.resources.desc.StringDesc
+import kotlinx.coroutines.Job
 
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
     private var imagesDatabase: HumidorImagesRepository? = null
     private var humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
-    private var disposable: List<Disposable> = mutableListOf()
+    private var disposable: List<Job> = mutableListOf()
 
     var editing by mutableStateOf(humidor.rowid < 0)
     var name by mutableStateOf(humidor.name)
@@ -52,7 +50,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
 
     fun observeHumidor() {
         imagesDatabase = createRepository(HumidorImagesRepository::class, humidor.rowid)
-        disposable += humidorsDatabase!!.observe(humidor.rowid).map {
+        disposable += execute(humidorsDatabase!!.observe(humidor.rowid)) {
             if (!editing) {
                 name = it.name
                 brand = it.brand
@@ -64,11 +62,11 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
                 link = it.link
                 type = it.type
             }
-        }.subscribe()
+        }
 
-        disposable += imagesDatabase!!.all().map {
+        disposable += execute(imagesDatabase!!.all()) {
             images = it
-        }.subscribe()
+        }
     }
 
     fun verifyFields(): Boolean {
@@ -111,7 +109,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
         super.onDispose()
         if (disposable.isNotEmpty()) {
             disposable.forEach {
-                it.dispose()
+                it.cancel()
             }
             disposable = mutableListOf()
         }

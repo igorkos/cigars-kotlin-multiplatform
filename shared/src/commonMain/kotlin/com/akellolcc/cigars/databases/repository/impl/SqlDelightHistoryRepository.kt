@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/24/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,17 +20,16 @@ import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.HistoryTableQueries
-import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.wrap
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 abstract class SqlDelightHistoryRepository(
     protected open var id: Long,
     protected val queries: HistoryDatabaseQueries
 ) : BaseRepository<History>(HistoryTableQueries(queries)), HistoryRepository {
 
-    override fun doUpsert(entity: History, add: Boolean): SingleWrapper<History> {
-        return singleFromCoroutine {
+    override fun doUpsert(entity: History, add: Boolean): Flow<History> {
+        return flow {
             if (add) {
                 queries.add(
                     entity.count,
@@ -55,8 +54,8 @@ abstract class SqlDelightHistoryRepository(
                     entity.rowid
                 )
             }
-            entity
-        }.wrap()
+            emit(entity)
+        }
     }
 
     override fun humidorName(id: Long): String = queries.humidorName(id).executeAsOne()

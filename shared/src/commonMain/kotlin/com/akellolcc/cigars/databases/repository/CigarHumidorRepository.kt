@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 2:06 PM
+ * Last modified 4/24/24, 12:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,15 +20,15 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.badoo.reaktive.observable.ObservableWrapper
+import kotlinx.coroutines.flow.Flow
 
 
 interface CigarHumidorRepository : Repository<HumidorCigar> {
-    fun add(cigar: Cigar, humidor: Humidor, count: Long): ObservableWrapper<HumidorCigar>
+    fun add(cigar: Cigar, humidor: Humidor, count: Long): Flow<HumidorCigar>
 
     fun find(cigar: Cigar, humidor: Humidor): HumidorCigar?
 
-    fun remove(cigar: Cigar, from: Humidor): ObservableWrapper<Boolean>
+    fun remove(cigar: Cigar, from: Humidor): Flow<Boolean>
 
     fun updateCount(
         entity: HumidorCigar,
@@ -36,9 +36,9 @@ interface CigarHumidorRepository : Repository<HumidorCigar> {
         price: Double? = null,
         historyType: HistoryType? = null,
         humidorTo: Humidor? = null
-    ): ObservableWrapper<HumidorCigar>
+    ): Flow<HumidorCigar>
 
-    fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): ObservableWrapper<Boolean>
+    fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): Flow<Boolean>
 }
 
 interface CigarHumidorsRepository : CigarHumidorRepository

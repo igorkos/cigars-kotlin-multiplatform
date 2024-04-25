@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/17/24, 12:31 AM
+ * Last modified 4/24/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,11 +16,8 @@
 
 package com.akellolcc.cigars.databases.repository
 
-import app.cash.sqldelight.ExecutableQuery
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.badoo.reaktive.observable.ObservableWrapper
+import kotlinx.coroutines.flow.Flow
 
 interface Repository<ENTITY : BaseEntity> {
     /**
@@ -30,15 +27,15 @@ interface Repository<ENTITY : BaseEntity> {
 
     fun allSync(sortField: String? = null, accenting: Boolean = true): List<ENTITY>
 
-    fun observe(id: Long): ObservableWrapper<ENTITY>
+    fun observe(id: Long): Flow<ENTITY>
 
-    fun all(sortField: String? = null, accenting: Boolean = true): ObservableWrapper<List<ENTITY>>
+    fun all(sortField: String? = null, accenting: Boolean = true): Flow<List<ENTITY>>
 
-    fun add(entity: ENTITY): ObservableWrapper<ENTITY>
+    fun add(entity: ENTITY): Flow<ENTITY>
 
-    fun update(entity: ENTITY): ObservableWrapper<ENTITY>
+    fun update(entity: ENTITY): Flow<ENTITY>
 
-    fun remove(id: Long, where: Long? = null): ObservableWrapper<Boolean>
+    fun remove(id: Long, where: Long? = null): Flow<Boolean>
 
     fun removeAll()
 
@@ -51,25 +48,3 @@ interface Repository<ENTITY : BaseEntity> {
     fun lastInsertRowId(): Long
 }
 
-interface DatabaseQueries<T : BaseEntity> {
-    val queries: Any
-    fun get(id: Long, where: Long? = null): Query<T>
-    fun allAsc(sort: String): Query<T>
-
-    fun allDesc(sort: String): Query<T>
-
-    fun find(rowid: Long, where: Long? = null): Query<T>
-
-    fun count(): Query<Long>
-    fun contains(rowid: Long, where: Long? = null): Query<Long>
-    fun lastInsertRowId(): ExecutableQuery<Long>
-
-    suspend fun remove(rowid: Long, where: Long? = null)
-
-    suspend fun removeAll()
-
-    fun empty(): T
-    suspend fun <R> transactionWithResult(
-        bodyWithReturn: suspend SuspendingTransactionWithReturn<R>.() -> R,
-    ): R
-}

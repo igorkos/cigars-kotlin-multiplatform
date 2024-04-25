@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:29 PM
+ * Last modified 4/24/24, 4:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,9 +30,6 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.search.CigarsSearchBrandField
 import com.akellolcc.cigars.screens.search.CigarsSearchParameterField
 import com.akellolcc.cigars.screens.search.SearchParameterField
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.wrap
 import dev.icerock.moko.resources.desc.StringDesc
 
 
@@ -44,9 +41,13 @@ class SearchCigarScreenViewModel() :
     private var brandRequest: GetCigarsBrands? = null
 
     var name by mutableStateOf("")
-    var brand by mutableStateOf<RapidCigarBrand?>(null)
     var country by mutableStateOf("")
     var searchParams by mutableStateOf(listOf<SearchParameterField<CigarSearchFields>>())
+
+    //CigarsSearchBrandField values
+    var brand by mutableStateOf<RapidCigarBrand?>(null)
+    var brands by mutableStateOf(listOf<RapidCigarBrand>())
+    var expanded by mutableStateOf(false)
 
     init {
         addSearchParameter(CigarSearchFields.Name)
@@ -152,32 +153,34 @@ class SearchCigarScreenViewModel() :
                     brand = brand?.brandId,
                     country = country.ifBlank { null })
             }
-            loading = true
-            request?.next()?.subscribe {
-                Log.debug("Cigars: ${it.size}")
-                loading = false
-                if (it.isNotEmpty()) {
-                    val list = entities + it
-                    sortEntities(list)
+            request?.let {
+                execute(it.next()) { cigars ->
+                    Log.debug("Cigars: ${cigars.size}")
+                    if (cigars.isNotEmpty()) {
+                        val list = entities + it
+                        sortEntities(cigars)
+                    }
                 }
             }
         }
     }
 
-    fun getBrands(query: String): ObservableWrapper<List<RapidCigarBrand>> {
-        return observable { emitter ->
-            if (query.isNotBlank()) {
-                if (brandRequest == null || brandRequest?.brand != query) {
-                    brandRequest = GetCigarsBrands(brand = query)
-                }
-                loading = true
-                brandRequest?.next()?.subscribe {
-                    Log.debug("Brands: ${it.size}")
-                    loading = false
-                    emitter.onNext(it)
-                }
+    fun getBrands(query: String) {
+        if (query.isNotBlank()) {
+            if (brandRequest == null || brandRequest?.brand != query) {
+                brandRequest = GetCigarsBrands(brand = query)
             }
-        }.wrap()
+            execute(brandRequest!!.next()) {
+                brands = it
+                expanded = true
+            }
+        }
+    }
+
+    fun selectBrand(brand: RapidCigarBrand) {
+        this.brand = brand
+        expanded = false
+        sendEvent(Actions.BrandSelected(brand))
     }
 
     override fun loadMore() {
@@ -192,6 +195,7 @@ class SearchCigarScreenViewModel() :
     }
 
     sealed interface Actions {
+        data class BrandSelected(val brand: RapidCigarBrand) : Actions
         data class ShowError(val error: StringDesc) : Actions
     }
 }

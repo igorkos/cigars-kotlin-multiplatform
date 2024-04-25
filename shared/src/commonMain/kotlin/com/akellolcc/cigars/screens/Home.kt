@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 10:37 PM
+ * Last modified 4/24/24, 2:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,12 +32,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.navigation.SharedScreen
 import com.akellolcc.cigars.screens.navigation.setupNavGraph
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.Pref
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 
 class Home : Screen {
@@ -56,19 +59,12 @@ class Home : Screen {
         //
         if (!initialized.value && Pref.isFirstStart) {
             database.reset()
-            database.createDemoSet().subscribe(
-                onError = {
-                    Log.error("Error creating demo set $it")
-                },
-                onComplete = {
-                    Pref.isFirstStart = false
-                    initialized.value = true
-                },
-                onNext = {
+            CoroutineScope(Dispatchers.IO).launch {
+                database.createDemoSet().collect {
                     Pref.isFirstStart = false
                     initialized.value = true
                 }
-            )
+            }
 
             Box(
                 modifier = Modifier.fillMaxSize().background(

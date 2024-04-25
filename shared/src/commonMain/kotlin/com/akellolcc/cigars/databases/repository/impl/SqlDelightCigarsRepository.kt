@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:34 PM
+ * Last modified 4/24/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,24 +28,23 @@ import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
-import com.badoo.reaktive.coroutinesinterop.singleFromCoroutine
-import com.badoo.reaktive.observable.ObservableWrapper
-import com.badoo.reaktive.observable.flatMap
-import com.badoo.reaktive.observable.observable
-import com.badoo.reaktive.observable.wrap
-import com.badoo.reaktive.single.SingleWrapper
-import com.badoo.reaktive.single.wrap
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
 open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
     BaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
 
     //CigarsRepository
-    override fun add(cigar: Cigar, humidor: Humidor): ObservableWrapper<Cigar> {
-        return super.add(cigar).flatMap {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar> {
+        return super.add(cigar).flatMapConcat {
             val hcDatabase: CigarHumidorRepository = createRepository(CigarHumidorRepository::class)
             hcDatabase.add(it, humidor, cigar.count)
-        }.flatMap {
+        }.flatMapConcat {
             val hisDatabase: CigarHistoryRepository =
                 createRepository(CigarHistoryRepository::class, it.cigar.rowid)
             hisDatabase.add(
@@ -61,18 +60,16 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
                     null
                 )
             )
-        }.flatMap {
-            observable {
-                it.onNext(cigar)
-            }
-        }.wrap()
+        }.flatMapConcat {
+            flowOf(cigar)
+        }
     }
 
-    override fun updateFavorite(value: Boolean, cigar: Cigar): ObservableWrapper<Cigar> {
+    override fun updateFavorite(value: Boolean, cigar: Cigar): Flow<Cigar> {
         return update(cigar.copy(favorites = value))
     }
 
-    override fun updateRating(value: Long, cigar: Cigar): ObservableWrapper<Cigar> {
+    override fun updateRating(value: Long, cigar: Cigar): Flow<Cigar> {
         return update(cigar.copy(myrating = value))
     }
 
@@ -81,8 +78,8 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
     }
 
     //BaseRepository
-    override fun doUpsert(entity: Cigar, add: Boolean): SingleWrapper<Cigar> {
-        return singleFromCoroutine {
+    override fun doUpsert(entity: Cigar, add: Boolean): Flow<Cigar> {
+        return flow {
             if (add) {
                 queries.add(
                     entity.name,
@@ -127,8 +124,8 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
                     entity.rowid
                 )
             }
-            entity
-        }.wrap()
+            emit(entity)
+        }
     }
 
     companion object Factory : RepositoryFactory<SqlDelightCigarsRepository>() {
