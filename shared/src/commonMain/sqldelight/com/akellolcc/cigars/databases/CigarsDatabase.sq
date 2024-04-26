@@ -20,7 +20,8 @@ CREATE TABLE CigarsTable (
     count INTEGER NOT NULL,
     shopping INTEGER AS Boolean NOT NULL,
     favorites INTEGER AS Boolean  NOT NULL,
-    price REAL
+    price REAL,
+    other INTEGER
 );
 
 

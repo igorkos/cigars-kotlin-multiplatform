@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:24 PM
+ * Last modified 4/25/24, 8:55 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,10 +25,14 @@ import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
@@ -61,20 +65,38 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
                 ).asFlow().mapToList(Dispatchers.IO)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun addAll(entities: List<ENTITY>): Flow<List<ENTITY>> {
+        return flow {
+            if (entities.isEmpty()) {
+                emit(emptyList())
+                return@flow
+            }
+            var count = 0
+            val list = mutableListOf<ENTITY>()
+            entities.asFlow().flatMapConcat { entity ->
+                add(entity)
+            }.collect {
+                list += it
+                count++
+                if (count == entities.size) {
+                    emit(list)
+                }
+            }
+        }
+    }
+
     override fun add(entity: ENTITY): Flow<ENTITY> {
         return flow {
-            CoroutineScope(Dispatchers.IO).launch {
-                if (!contains(entity)) {
-                    wrapper.transactionWithResult {
-                        doUpsert(entity).collect {
-                            val id = lastInsertRowId()
-                            entity.rowid = id
-                            emit(entity)
-                        }
-                    }
-                } else {
-                    throw Exception("Can't insert entity: $entity which already exist in the database.")
+            if (entity.rowid < 0 || !contains(entity)) {
+                wrapper.transactionWithResult {
+                    doUpsert(entity).single()
+                    val id = lastInsertRowId()
+                    entity.rowid = id
+                    emit(entity)
                 }
+            } else {
+                throw Exception("Can't insert entity: $entity which already exist in the database.")
             }
         }
     }

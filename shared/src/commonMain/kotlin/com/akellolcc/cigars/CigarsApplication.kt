@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 5:22 PM
+ * Last modified 4/25/24, 3:44 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,8 +38,6 @@ import com.akellolcc.cigars.screens.navigation.mainScreenModule
 
 @Composable
 fun CigarsApplication() {
-    //Init Database
-    Database.instance
     //Register ViewModels
     ViewModelRegistry.register(
         CigarsDetailsScreenViewModel::class,
@@ -77,6 +75,9 @@ fun CigarsApplication() {
         SearchCigarScreenViewModel::class,
         SearchCigarScreenViewModel.Factory
     )
+    //Init Database
+    Database.instance
+
 
     ScreenRegistry {
         mainScreenModule()

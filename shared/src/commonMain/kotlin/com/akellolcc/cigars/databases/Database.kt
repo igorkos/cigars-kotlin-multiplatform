@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 1:33 PM
+ * Last modified 4/25/24, 8:55 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
+import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.databases.repository.Repository
@@ -33,8 +34,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KClass
 
@@ -80,10 +80,9 @@ class Database : DatabaseInterface {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun createDemoSet(): Flow<Any> {
+    fun createDemoSet(): Flow<Boolean> {
         val demoHumidors =
             Json.decodeFromString<List<Humidor>>(readTextFile(AssetFiles.demo_humidors) ?: "")
-        var humidor: Humidor = demoHumidors[0]
         val demoCigars =
             Json.decodeFromString<List<Cigar>>(readTextFile(AssetFiles.demo_cigars) ?: "")
         val demoCigarsImages = Json.decodeFromString<List<CigarImage>>(
@@ -91,44 +90,36 @@ class Database : DatabaseInterface {
         )
         val humidorDatabase: HumidorsRepository = getRepository(HumidorsRepository::class)
         val cigarsDatabase: CigarsRepository = getRepository(CigarsRepository::class)
-        val imagesDatabase: ImagesRepository =
-            getRepository(ImagesRepository::class, humidor.rowid)
-        Log.debug("Added demo database")
-        return demoHumidors.asFlow().flatMapConcat {
-            humidorDatabase.add(it)
-        }.flatMapLatest { h ->
-            Log.debug("Added demo Humidor ${h.rowid}")
-            humidor = h
-            demoCigarsImages.filter { it.humidorId == 0L }.asFlow()
-        }.flatMapConcat { image ->
-            Log.debug("Added image to Humidor ${image.rowid}")
-            image.humidorId = humidor.rowid
-            image.bytes = imageData(image.notes!!)!!
-            imagesDatabase.add(image)
-        }.flatMapLatest {
-            Log.debug("Add cigars")
-            demoCigars.asFlow()
-        }.flatMapConcat { cigar ->
-            Log.debug("Add demo Cigar ${cigar.rowid}")
-            cigarsDatabase.add(cigar, humidor)
-        }.flatMapConcat { cigar ->
-            demoCigarsImages.filter {
-                it.rowid == cigar.myrating
-            }.map {
-                it.rowid = -1
-                it.cigarId = cigar.rowid
-                it
-            }.asFlow()
-        }.flatMapConcat { image ->
-            Log.debug("Add image $image to Cigar ${image.cigarId}")
-            try {
-                image.bytes = imageData(image.notes!!)!!
-            } catch (e: Exception) {
-                Log.error("Get image data failed $e")
+        var imagesDatabase: ImagesRepository
+        Log.debug("Create demo database")
+        var count = 0
+        return flow {
+            demoHumidors.asFlow().flatMapConcat {
+                humidorDatabase.add(it)
+            }.flatMapConcat { h ->
+                flow {
+                    val images = demoCigarsImages.filter { it.humidorId == h.other }.map {
+                        it.humidorId = h.rowid
+                        it.bytes = imageData(it.notes!!)!!
+                        it
+                    }
+                    imagesDatabase = getRepository(HumidorImagesRepository::class, h.rowid)
+                    imagesDatabase.addAll(images).collect {
+                        emit(h)
+                    }
+                }
+            }.flatMapConcat { humidor ->
+                val cigars = demoCigars.filter { it.other == humidor.other }.map {
+                    it.rowid = -1
+                    it
+                }
+                cigarsDatabase.addAll(cigars, humidor)
+            }.collect {
+                count++
+                if (count == demoHumidors.size) {
+                    emit(true)
+                }
             }
-            imagesDatabase.add(image)
-        }.flatMapLatest {
-            flowOf(true)
         }
     }
 }

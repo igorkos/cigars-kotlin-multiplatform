@@ -12,7 +12,8 @@
     "autoOpen": false,
     "sorting": 0,
     "type": 0,
-    "price": 99.99
+    "price": 99.99,
+    "other": 0
   },
   {
     "rowid": -1,
@@ -27,6 +28,7 @@
     "autoOpen": false,
     "sorting": 0,
     "type": 0,
-    "price": 99.99
+    "price": 99.99,
+    "other": 1
   }
 ]

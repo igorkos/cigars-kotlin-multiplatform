@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/15/24, 10:04 PM
+ * Last modified 4/25/24, 5:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ data class Humidor(
     var autoOpen: Boolean = false,
     var sorting: Long? = null,
     var type: Long = 0,
+    var other: Long? = null
 ) : BaseEntity() {
 
     constructor(humidor: HumidorsTable) : this(
@@ -53,7 +54,8 @@ data class Humidor(
         humidor.price,
         humidor.autoOpen ?: false,
         humidor.sorting,
-        humidor.type
+        humidor.type,
+        humidor.other
     )
 }
 

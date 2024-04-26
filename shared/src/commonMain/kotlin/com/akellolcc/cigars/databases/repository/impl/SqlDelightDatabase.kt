@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:43 PM
+ * Last modified 4/25/24, 5:38 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,8 +51,14 @@ class SqlDelightDatabase : DatabaseInterface {
     }
 
     private fun register() {
-        RepositoryRegistry.register(CigarsRepository::class, SqlDelightCigarsRepository.Factory)
-        RepositoryRegistry.register(HumidorsRepository::class, SqlDelightHumidorsRepository.Factory)
+        RepositoryRegistry.register(
+            CigarsRepository::class,
+            SqlDelightCigarsRepository.Factory
+        )
+        RepositoryRegistry.register(
+            HumidorsRepository::class,
+            SqlDelightHumidorsRepository.Factory
+        )
         RepositoryRegistry.register(
             FavoriteCigarsRepository::class,
             SqlDelightFavoriteCigarsRepository.Factory

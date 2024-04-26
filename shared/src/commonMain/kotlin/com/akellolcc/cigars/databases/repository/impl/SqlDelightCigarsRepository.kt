@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:49 PM
+ * Last modified 4/25/24, 8:50 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,11 +25,12 @@ import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
-import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
+import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -42,7 +43,8 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar> {
         return super.add(cigar).flatMapConcat {
-            val hcDatabase: CigarHumidorRepository = createRepository(CigarHumidorRepository::class)
+            val hcDatabase: CigarHumidorsRepository =
+                createRepository(CigarHumidorsRepository::class, it.rowid)
             hcDatabase.add(it, humidor, cigar.count)
         }.flatMapConcat {
             val hisDatabase: CigarHistoryRepository =
@@ -62,6 +64,26 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
             )
         }.flatMapConcat {
             flowOf(cigar)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun addAll(cigars: List<Cigar>, humidor: Humidor): Flow<List<Cigar>> {
+        if (cigars.isEmpty()) {
+            return flowOf(emptyList())
+        }
+        var count = 0
+        val list = mutableListOf<Cigar>()
+        return flow {
+            cigars.asFlow().flatMapConcat {
+                add(it, humidor)
+            }.collect {
+                list.add(it)
+                count++
+                if (count == cigars.size) {
+                    emit(list)
+                }
+            }
         }
     }
 

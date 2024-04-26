@@ -51,7 +51,7 @@
     "notes": "top_1_humidor",
     "type": 0,
     "cigarId": -1,
-    "humidorId": 0
+    "humidorId": 1
   },
   {
     "rowid": 6,
@@ -60,7 +60,7 @@
     "notes": "top_2_humidor",
     "type": 0,
     "cigarId": -1,
-    "humidorId": 0
+    "humidorId": 1
   },
   {
     "rowid": 7,
@@ -69,6 +69,6 @@
     "notes": "top_3_humidor",
     "type": 0,
     "cigarId": -1,
-    "humidorId": 0
+    "humidorId": 1
   }
 ]

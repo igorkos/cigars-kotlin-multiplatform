@@ -19,7 +19,8 @@
     "favorites": "false",
     "shopping": "false",
     "count": 10,
-    "price": 19.15
+    "price": 19.15,
+    "other": 1
   },
   {
     "rowid": 1,
@@ -41,7 +42,8 @@
     "favorites": "false",
     "shopping": "false",
     "count": 10,
-    "price": 24.90
+    "price": 24.90,
+    "other": 1
   },
   {
     "rowid": 2,
@@ -63,7 +65,8 @@
     "favorites": "false",
     "shopping": "false",
     "count": 10,
-    "price": 15.75
+    "price": 15.75,
+    "other": 1
   },
   {
     "rowid": 3,
@@ -85,7 +88,8 @@
     "favorites": "false",
     "shopping": "false",
     "count": 10,
-    "price": 16.25
+    "price": 16.25,
+    "other": 1
   },
   {
     "rowid": 4,
@@ -107,6 +111,7 @@
     "favorites": "false",
     "shopping": "false",
     "count": 10,
-    "price": 13.10
+    "price": 13.10,
+    "other": 1
   }
 ]

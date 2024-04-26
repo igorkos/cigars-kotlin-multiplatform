@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 2:49 PM
+ * Last modified 4/25/24, 4:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.navigation.SharedScreen
 import com.akellolcc.cigars.screens.navigation.setupNavGraph
 import com.akellolcc.cigars.theme.MaterialColors
@@ -61,6 +62,7 @@ class Home : Screen {
             database.reset()
             CoroutineScope(Dispatchers.IO).launch {
                 database.createDemoSet().collect {
+                    Log.debug("Created demo set")
                     Pref.isFirstStart = false
                     initialized.value = true
                 }

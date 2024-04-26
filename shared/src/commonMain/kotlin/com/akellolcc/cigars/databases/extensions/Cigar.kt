@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 4/25/24, 5:55 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,7 +43,8 @@ var emptyCigar =
         0,
         false,
         false,
-        0.0
+        0.0,
+        null
     )
 
 @Stable
@@ -68,7 +69,8 @@ data class Cigar(
     var count: Long,
     var shopping: Boolean,
     var favorites: Boolean,
-    var price: Double?
+    var price: Double?,
+    var other: Long? = null
 ) : BaseEntity() {
 
     constructor(cigar: CigarsTable) : this(
@@ -91,7 +93,8 @@ data class Cigar(
         cigar.count,
         cigar.shopping,
         cigar.favorites,
-        cigar.price
+        cigar.price,
+        cigar.other
     )
 }
 

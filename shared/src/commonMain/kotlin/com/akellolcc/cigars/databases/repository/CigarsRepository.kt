@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:24 PM
+ * Last modified 4/25/24, 8:01 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface CigarsRepository : Repository<Cigar> {
     fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar>
+
+    fun addAll(cigars: List<Cigar>, humidor: Humidor): Flow<List<Cigar>>
 
     override fun update(entity: Cigar): Flow<Cigar>
 
