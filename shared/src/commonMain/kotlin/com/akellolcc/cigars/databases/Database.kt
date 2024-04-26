@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 9:36 PM
+ * Last modified 4/25/24, 10:00 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
 import com.akellolcc.cigars.theme.readTextFile
+import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -133,11 +134,8 @@ class Database : DatabaseInterface {
                 }
                 imagesDatabase = getRepository(CigarImagesRepository::class, cigar.rowid)
                 imagesDatabase.addAll(images)
-            }.collect {
-                count++
-                if (count == demoCigars.size) {
-                    emit(true)
-                }
+            }.collectFirst(demoCigars.size) {
+                emit(true)
             }
         }
     }

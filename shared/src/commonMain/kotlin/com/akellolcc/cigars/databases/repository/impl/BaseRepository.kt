@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 8:55 PM
+ * Last modified 4/25/24, 10:00 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@ import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
+import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -76,12 +77,8 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
             val list = mutableListOf<ENTITY>()
             entities.asFlow().flatMapConcat { entity ->
                 add(entity)
-            }.collect {
-                list += it
-                count++
-                if (count == entities.size) {
-                    emit(list)
-                }
+            }.collectFirst(entities.size) {
+                emit(list)
             }
         }
     }
