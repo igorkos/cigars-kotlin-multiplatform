@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/15/24, 10:04 PM
+ * Last modified 4/25/24, 9:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 
 @Stable
 @Serializable
-class CigarImage(
+data class CigarImage(
     override var rowid: Long,
     val image: String? = null,
     var bytes: ByteArray,
@@ -29,4 +29,32 @@ class CigarImage(
     var type: Long? = null,
     var cigarId: Long? = null,
     var humidorId: Long? = null
-) : BaseEntity()
+) : BaseEntity() {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+        if (!super.equals(other)) return false
+
+        other as CigarImage
+
+        if (rowid != other.rowid) return false
+        if (image != other.image) return false
+        if (notes != other.notes) return false
+        if (type != other.type) return false
+        if (cigarId != other.cigarId) return false
+        if (humidorId != other.humidorId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + rowid.hashCode()
+        result = 31 * result + (image?.hashCode() ?: 0)
+        result = 31 * result + (notes?.hashCode() ?: 0)
+        result = 31 * result + (type?.hashCode() ?: 0)
+        result = 31 * result + (cigarId?.hashCode() ?: 0)
+        result = 31 * result + (humidorId?.hashCode() ?: 0)
+        return result
+    }
+}

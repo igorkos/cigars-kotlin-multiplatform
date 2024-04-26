@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 8:55 PM
+ * Last modified 4/25/24, 9:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ package com.akellolcc.cigars.databases
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.DatabaseInterface
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
@@ -99,9 +100,13 @@ class Database : DatabaseInterface {
             }.flatMapConcat { h ->
                 flow {
                     val images = demoCigarsImages.filter { it.humidorId == h.other }.map {
-                        it.humidorId = h.rowid
-                        it.bytes = imageData(it.notes!!)!!
-                        it
+                        val image = it.copy().apply {
+                            rowid = -1
+                            humidorId = h.rowid
+                            bytes = imageData(it.notes!!)!!
+                            notes = null
+                        }
+                        image
                     }
                     imagesDatabase = getRepository(HumidorImagesRepository::class, h.rowid)
                     imagesDatabase.addAll(images).collect {
@@ -114,9 +119,23 @@ class Database : DatabaseInterface {
                     it
                 }
                 cigarsDatabase.addAll(cigars, humidor)
+            }.flatMapConcat {
+                it.asFlow()
+            }.flatMapConcat { cigar ->
+                val images = demoCigarsImages.filter { it.cigarId == cigar.myrating }.map {
+                    val image = it.copy().apply {
+                        rowid = -1
+                        cigarId = cigar.rowid
+                        bytes = imageData(it.notes!!)!!
+                        notes = null
+                    }
+                    image
+                }
+                imagesDatabase = getRepository(CigarImagesRepository::class, cigar.rowid)
+                imagesDatabase.addAll(images)
             }.collect {
                 count++
-                if (count == demoHumidors.size) {
+                if (count == demoCigars.size) {
                     emit(true)
                 }
             }
