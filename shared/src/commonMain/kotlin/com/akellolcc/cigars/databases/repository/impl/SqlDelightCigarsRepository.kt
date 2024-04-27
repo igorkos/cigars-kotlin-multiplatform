@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 8:50 PM
+ * Last modified 4/27/24, 11:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl
 
@@ -27,7 +27,9 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
+import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -39,17 +41,24 @@ import kotlinx.datetime.Clock
 open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
     BaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
 
-    //CigarsRepository
+    /**
+     * Add a new cigar to the database
+     * 1. Add to Cigars table
+     * 2. Add to Cigar to Humidor (CigarHumidors table)
+     * 3. Add to History entry (History table)
+     * 4. Update cigars count in humidor
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar> {
+        //Add to cigars table
         return super.add(cigar).flatMapConcat {
-            val hcDatabase: CigarHumidorsRepository =
-                createRepository(CigarHumidorsRepository::class, it.rowid)
-            hcDatabase.add(it, humidor, cigar.count)
+            //Add to Cigars to Humidor
+            val hcRepository: CigarHumidorsRepository = createRepository(CigarHumidorsRepository::class, it.rowid)
+            hcRepository.add(it, humidor, cigar.count)
         }.flatMapConcat {
-            val hisDatabase: CigarHistoryRepository =
-                createRepository(CigarHistoryRepository::class, it.cigar.rowid)
-            hisDatabase.add(
+            //Add to History entry
+            val hisRepository: CigarHistoryRepository = createRepository(CigarHistoryRepository::class, it.cigar.rowid)
+            hisRepository.add(
                 History(
                     -1,
                     it.count,
@@ -59,9 +68,14 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
                     HistoryType.Addition,
                     it.cigar.rowid,
                     it.humidor.rowid,
-                    null
+                    it.humidor.rowid
                 )
             )
+        }.flatMapConcat {
+            //Update cigars count in humidor
+            val humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
+            val humidorTo = humidorsRepository.getSync(it.humidorTo!!)
+            humidorsRepository.updateCigarsCount(it.humidorTo!!, humidorTo.count + it.count)
         }.flatMapConcat {
             flowOf(cigar)
         }
@@ -72,31 +86,27 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
         if (cigars.isEmpty()) {
             return flowOf(emptyList())
         }
-        var count = 0
-        val list = mutableListOf<Cigar>()
         return flow {
             cigars.asFlow().flatMapConcat {
                 add(it, humidor)
-            }.collect {
-                list.add(it)
-                count++
-                if (count == cigars.size) {
-                    emit(list)
-                }
+            }.collectFirst(cigars.size) {
+                emit(it)
             }
         }
     }
 
-    override fun updateFavorite(value: Boolean, cigar: Cigar): Flow<Cigar> {
-        return update(cigar.copy(favorites = value))
+    override fun updateFavorite(value: Boolean, cigar: Cigar): Flow<Boolean> {
+        return flow {
+            queries.setFavorite(value, cigar.rowid)
+            emit(value)
+        }
     }
 
-    override fun updateRating(value: Long, cigar: Cigar): Flow<Cigar> {
-        return update(cigar.copy(myrating = value))
-    }
-
-    override fun numberOfEntries(): Long {
-        return queries.count().executeAsOne()
+    override fun updateRating(value: Long, cigar: Cigar): Flow<Long> {
+        return flow {
+            queries.setRating(value, cigar.rowid)
+            emit(value)
+        }
     }
 
     //BaseRepository

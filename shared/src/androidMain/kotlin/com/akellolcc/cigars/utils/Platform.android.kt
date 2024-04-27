@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/26/24, 9:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,8 @@
 package com.akellolcc.cigars.utils
 
 import android.content.Context
-import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
-import dev.gitlive.firebase.initialize
 
 var appContext: Context? = null;
 
@@ -41,5 +39,5 @@ val firebaseOptions: FirebaseOptions
     )
 
 actual fun initFirebase(): FirebaseApp? {
-    return Firebase.initialize(context = appContext, options = firebaseOptions)
+    return null
 }

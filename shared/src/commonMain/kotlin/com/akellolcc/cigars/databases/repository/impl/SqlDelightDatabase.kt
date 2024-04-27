@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 5:38 PM
+ * Last modified 4/26/24, 11:31 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,24 +30,26 @@ import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import kotlinx.coroutines.runBlocking
 
-class SqlDelightDatabase : DatabaseInterface {
-    internal val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver())
+class SqlDelightDatabase(override val inMemory: Boolean) : DatabaseInterface {
+    internal val database = CigarsDatabase(SqlDelightDatabaseDriverFactory().createDriver(inMemory))
 
     companion object {
         private var _instance: SqlDelightDatabase? = null
         val instance: SqlDelightDatabase
             get() {
-                return createInstance()
+                if (_instance == null) {
+                    throw IllegalStateException("Database not initialized")
+                }
+                return _instance!!
             }
 
-        private fun createInstance(): SqlDelightDatabase {
+        internal fun createInstance(inMemory: Boolean): SqlDelightDatabase {
             if (_instance == null) {
-                _instance = SqlDelightDatabase()
+                _instance = SqlDelightDatabase(inMemory)
                 _instance!!.register()
             }
             return _instance!!
         }
-
     }
 
     private fun register() {

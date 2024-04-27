@@ -58,16 +58,22 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 cigarHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar AND type < 3 ORDER BY date DESC;
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
 
 humidorHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor AND type != 2 ORDER BY date DESC;
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor OR humidorFrom = :humidor ORDER BY date DESC;
 
 humidorName:
 SELECT HumidorsTable.name FROM HumidorsTable WHERE rowid = :id;
 
 cigarName:
 SELECT CigarsTable.name FROM CigarsTable WHERE rowid = :id;
+
+cigarHistoryCount:
+SELECT COUNT(*) FROM HistoryTable WHERE cigarId = :id;
+
+humidorHistoryCount:
+SELECT COUNT(*) FROM HistoryTable WHERE humidorTo = :id OR humidorFrom = :id;
 
 
 

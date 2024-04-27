@@ -45,6 +45,10 @@ update:
 UPDATE HumidorsTable SET name = :name, brand = :brand, holds = :holds, count = :count, temperature = :temperature, humidity = :humidity, notes = :notes, link = :link, autoOpen = :autoOpen, sorting = :sorting, type = :type
 WHERE rowid = :id;
 
+updateCigarsCount:
+UPDATE HumidorsTable SET count = :count WHERE rowid = :id;
+
+
 remove:
 DELETE FROM HumidorsTable WHERE rowid = :rowid;
 

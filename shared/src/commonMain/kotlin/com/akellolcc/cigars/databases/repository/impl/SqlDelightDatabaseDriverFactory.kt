@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/10/24, 10:04 PM
+ * Last modified 4/26/24, 11:29 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,6 @@ import com.akellolcc.cigars.databases.repository.DatabaseDriverFactory
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 expect class SqlDelightDatabaseDriverFactory() : DatabaseDriverFactory<SqlDriver> {
-    override fun createDriver(): SqlDriver
+    override fun createDriver(inMemory: Boolean): SqlDriver
 }
 

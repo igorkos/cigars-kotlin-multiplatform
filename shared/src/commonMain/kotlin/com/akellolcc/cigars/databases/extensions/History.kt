@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 4/27/24, 11:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.extensions
 
@@ -53,9 +53,7 @@ class History(
 enum class HistoryType(val type: Long) {
     Addition(0L),
     Deletion(1L),
-    Move(2L),
-    MoveFrom(3L),
-    MoveTo(4L);
+    Move(2L);
 
     override fun toString(): String {
         return localized(this)
@@ -67,8 +65,6 @@ enum class HistoryType(val type: Long) {
                 Addition -> Localize.history_type_addition
                 Deletion -> Localize.history_type_deletion
                 Move -> Localize.history_type_move
-                MoveFrom -> Localize.history_type_move
-                MoveTo -> Localize.history_type_move
             }
         }
 
@@ -81,8 +77,6 @@ enum class HistoryType(val type: Long) {
                 Addition -> Images.icon_arrow_right
                 Deletion -> Images.icon_arrow_left
                 Move -> Images.icon_tab
-                MoveFrom -> Images.icon_tab
-                MoveTo -> Images.icon_tab
             }
         }
 
@@ -90,8 +84,6 @@ enum class HistoryType(val type: Long) {
             0L -> Addition
             1L -> Deletion
             2L -> Move
-            3L -> MoveFrom
-            4L -> MoveTo
             else -> Addition
         }
     }

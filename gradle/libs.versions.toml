@@ -20,6 +20,7 @@ moko-compose-version = "0.23.0"
 moko-resources-version = "0.22.2"
 
 sqldelight-version = "2.0.1"
+sqldelight-version-test = "1.5.5"
 
 voyagerNavigator = "1.0.0-rc08"
 
@@ -71,6 +72,7 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight-version" }
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight-version" }
 sqldelight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight-version" }
+sqldelight-android-test = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight-version" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight-version" }
 
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings-version" }

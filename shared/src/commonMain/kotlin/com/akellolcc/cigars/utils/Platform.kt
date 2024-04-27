@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/18/24, 4:21 PM
+ * Last modified 4/26/24, 9:00 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,5 +25,6 @@ interface Platform {
 expect fun getPlatform(): Platform
 
 expect fun setAppContext(context: Any)
+
 
 expect fun initFirebase(): FirebaseApp?

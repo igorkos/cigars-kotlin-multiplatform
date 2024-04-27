@@ -6,7 +6,10 @@ import FirebaseAnalytics
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
+      Platform_iosKt.doInitFirebase()
+      Log.companion.doInitLog(){event in
+          Analytics.logEvent(event.event.name, parameters: event.params)
+      }
     return true
   }
 }
@@ -18,10 +21,4 @@ struct iOSApp: App {
 			ContentView()
 		}
 	}
-
-    init() {
-        Log.companion.doInitLog(){event in
-            Analytics.logEvent(event.event.name, parameters: event.params)
-        }
-    }
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/19/24, 6:00 PM
+ * Last modified 4/26/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,10 @@
 
 package com.akellolcc.cigars.utils
 
+import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
+import dev.gitlive.firebase.initialize
 import platform.UIKit.UIDevice
 
 class IOSPlatform : Platform {
@@ -31,12 +33,13 @@ actual fun setAppContext(context: Any) {
 
 val firebaseOptions: FirebaseOptions
     get() = FirebaseOptions(
-        "1:888991141757:ios:0645c41b9abfdb7f724614",
-        "AIzaSyCnlvU3Mwd71UV3blX0iYSKPJBIsz1baZc",
-        gcmSenderId = "888991141757",
+        applicationId = "1:888991141757:ios:0645c41b9abfdb7f724614",
+        apiKey = "AIzaSyCnlvU3Mwd71UV3blX0iYSKPJBIsz1baZc",
+        storageBucket = "cigars-e3746.appspot.com",
         projectId = "cigars-e3746",
+        gcmSenderId = "888991141757",
     )
 
 actual fun initFirebase(): FirebaseApp? {
-    return null //Firebase.initialize(context = null, options = firebaseOptions)
+    return Firebase.initialize()
 }

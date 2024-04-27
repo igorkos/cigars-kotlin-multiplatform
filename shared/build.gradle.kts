@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 7:21 PM
+ * Last modified 4/27/24, 1:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -100,8 +100,10 @@ kotlin {
                 implementation(libs.accompanist.permissions)
                 implementation(libs.ktor.client.android.okhttp)
                 implementation(libs.androidx.datastore.core.android)
+                implementation(libs.sqldelight.android.test)
             }
         }
+
 
         val iosMain by creating {
             dependsOn(commonMain)
@@ -151,7 +153,6 @@ android {
     dependencies {
         implementation(libs.androidx.exifinterface)
     }
-
 }
 
 

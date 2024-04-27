@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:49 PM
+ * Last modified 4/27/24, 11:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl
 
@@ -28,15 +28,20 @@ import com.akellolcc.cigars.databases.repository.impl.queries.HumidorsTableQueri
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import kotlinx.datetime.Clock
 
 class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
     BaseRepository<Humidor>(HumidorsTableQueries(queries)), HumidorsRepository {
 
+    /**
+     * Adds a new Humidor to the database.
+     * 1. Adds the Humidor to the database.
+     * 2. Adds the Humidor's history to the database.
+     */
     override fun add(entity: Humidor): Flow<Humidor> {
         return super.add(entity).map {
-            val hisDatabase: HumidorHistoryRepository =
-                createRepository(HumidorHistoryRepository::class, entity.rowid)
+            val hisDatabase: HumidorHistoryRepository = createRepository(HumidorHistoryRepository::class, entity.rowid)
             hisDatabase.add(
                 History(
                     -1,
@@ -47,9 +52,9 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
                     HistoryType.Addition,
                     -1,
                     it.rowid,
-                    null
+                    it.rowid
                 )
-            )
+            ).single()
             it
         }
     }
@@ -90,8 +95,11 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
         }
     }
 
-    override fun numberOfEntries(): Long {
-        return queries.count().executeAsOne()
+    override fun updateCigarsCount(humidor: Long, count: Long): Flow<Long> {
+        return flow {
+            queries.updateCigarsCount(count, humidor)
+            emit(humidor)
+        }
     }
 
     companion object Factory : RepositoryFactory<SqlDelightHumidorsRepository>() {

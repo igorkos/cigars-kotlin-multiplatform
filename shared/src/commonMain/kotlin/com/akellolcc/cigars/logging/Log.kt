@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 12:43 PM
+ * Last modified 4/27/24, 1:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,11 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.logging
 
 import com.akellolcc.cigars.utils.getPlatform
+import io.github.aakira.napier.Antilog
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
@@ -53,9 +54,9 @@ data class AnalyticsEvent(
 class Log {
     companion object {
         private var analyticsCallback: ((AnalyticsEvent) -> Unit)? = null
-        fun initLog(analytics: (AnalyticsEvent) -> Unit) {
+        fun initLog(antilog: Any? = null, analytics: (AnalyticsEvent) -> Unit) {
             analyticsCallback = analytics
-            Napier.base(DebugAntilog())
+            Napier.base(antilog as? Antilog ?: DebugAntilog())
             debug("App started", analytics = AnalyticsEvents.Log)
         }
 

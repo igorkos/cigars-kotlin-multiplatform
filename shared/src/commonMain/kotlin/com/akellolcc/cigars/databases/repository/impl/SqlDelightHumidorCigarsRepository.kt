@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:52 PM
+ * Last modified 4/26/24, 5:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,10 @@ class SqlDelightHumidorCigarsRepository(
 
     override fun observeAllQuery(): Query<CigarHumidorTable> {
         return queries.humidorCigars(humidorId)
+    }
+
+    override fun count(): Long {
+        return queries.cigarsCount(humidorId).executeAsOne()
     }
 
     companion object Factory : RepositoryFactory<SqlDelightHumidorCigarsRepository>() {

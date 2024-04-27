@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 3:44 PM
+ * Last modified 4/26/24, 9:23 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,7 +76,7 @@ fun CigarsApplication() {
         SearchCigarScreenViewModel.Factory
     )
     //Init Database
-    Database.instance
+    Database.createInstance(false)
 
 
     ScreenRegistry {

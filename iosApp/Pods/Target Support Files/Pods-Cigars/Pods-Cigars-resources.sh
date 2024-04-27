@@ -97,9 +97,15 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseABTesting/FirebaseABTesting_Privacy.bundle"
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseRemoteConfig/FirebaseRemoteConfig_Privacy.bundle"
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/leveldb-library/leveldb_Privacy.bundle"
   install_resource "${PODS_ROOT}/../../shared/src/commonMain/resources/MR"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseABTesting/FirebaseABTesting_Privacy.bundle"
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/FirebaseRemoteConfig/FirebaseRemoteConfig_Privacy.bundle"
+  install_resource "${PODS_CONFIGURATION_BUILD_DIR}/leveldb-library/leveldb_Privacy.bundle"
   install_resource "${PODS_ROOT}/../../shared/src/commonMain/resources/MR"
 fi
 

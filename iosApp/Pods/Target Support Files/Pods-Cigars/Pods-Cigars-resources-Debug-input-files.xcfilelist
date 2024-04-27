@@ -1,2 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-Cigars/Pods-Cigars-resources.sh
+${PODS_CONFIGURATION_BUILD_DIR}/FirebaseABTesting/FirebaseABTesting_Privacy.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/FirebaseRemoteConfig/FirebaseRemoteConfig_Privacy.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/leveldb-library/leveldb_Privacy.bundle
 ${PODS_ROOT}/../../shared/src/commonMain/resources/MR

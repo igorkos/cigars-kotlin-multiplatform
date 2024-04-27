@@ -93,13 +93,22 @@ find:
 SELECT * FROM CigarsTable WHERE rowid = :rowid;
 
 count:
-SELECT COUNT(*) FROM CigarsTable;
+SELECT COUNT(*) FROM CigarsTable ;
 
 contains:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
+
+setRating:
+UPDATE CigarsTable SET myrating= :myrating WHERE rowid = :id;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
 favoriteCigars:
 SELECT * FROM CigarsTable WHERE favorites = 1;
+
+favoriteCount:
+SELECT COUNT(*) FROM CigarsTable WHERE favorites = 1;
+
+setFavorite:
+UPDATE CigarsTable SET favorites= :favorites WHERE rowid = :id;

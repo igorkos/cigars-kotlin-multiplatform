@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:49 PM
+ * Last modified 4/26/24, 5:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,10 @@ class SqlDelightFavoriteCigarsRepository(queries: CigarsDatabaseQueries) :
     SqlDelightCigarsRepository(queries), FavoriteCigarsRepository {
     override fun all(sortField: String?, accenting: Boolean): Flow<List<Cigar>> {
         return queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.IO)
+    }
+
+    override fun count(): Long {
+        return queries.favoriteCount().executeAsOne()
     }
 
     companion object Factory : RepositoryFactory<SqlDelightFavoriteCigarsRepository>() {

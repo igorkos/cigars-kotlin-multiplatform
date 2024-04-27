@@ -37,6 +37,13 @@ SELECT * FROM CigarHumidorTable WHERE humidorId = :rowid AND cigarId = :cigarId;
 count:
 SELECT COUNT(*) FROM CigarHumidorTable;
 
+humidorsCount:
+SELECT COUNT(*) FROM CigarHumidorTable WHERE cigarId=:id;
+
+cigarsCount:
+SELECT COUNT(*) FROM CigarHumidorTable WHERE humidorId=:id;
+
+
 contains:
 SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :rowid AND cigarId = :cigarId;
 
