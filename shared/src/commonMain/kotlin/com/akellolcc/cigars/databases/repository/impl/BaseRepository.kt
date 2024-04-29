@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/26/24, 9:09 PM
+ * Last modified 4/28/24, 11:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,10 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl
 
+import app.cash.sqldelight.Query
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
@@ -23,6 +24,7 @@ import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
+import com.akellolcc.cigars.screens.search.SearchParam
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,13 +45,17 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
         return wrapper.get(id, where).executeAsOne()
     }
 
-    override fun allSync(sortField: String?, accenting: Boolean): List<ENTITY> {
-        return (if (accenting)
-            wrapper.allAsc(sortField ?: "name")
+    private fun queryAll(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Query<ENTITY> {
+        val accenting = sorting?.value ?: true
+        val sortKey = sorting?.key ?: "name"
+        return if (accenting)
+            wrapper.allAsc(sortKey, filter)
         else
-            wrapper.allDesc(sortField ?: "name")
-                ).executeAsList()
+            wrapper.allDesc(sortKey, filter)
     }
+
+    override fun allSync(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): List<ENTITY> =
+        queryAll(sorting, filter).executeAsList()
 
     fun observe(entity: ENTITY): Flow<ENTITY> = observe(entity.rowid)
     override fun observe(id: Long): Flow<ENTITY> {
@@ -57,14 +63,8 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
         return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO)
     }
 
-    override fun all(sortField: String?, accenting: Boolean): Flow<List<ENTITY>> {
-        return (
-                if (accenting)
-                    wrapper.allAsc(sortField ?: "name")
-                else
-                    wrapper.allDesc(sortField ?: "name")
-                ).asFlow().mapToList(Dispatchers.IO)
-    }
+    override fun all(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Flow<List<ENTITY>> =
+        queryAll(sorting, filter).asFlow().mapToList(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun addAll(entities: List<ENTITY>): Flow<List<ENTITY>> {

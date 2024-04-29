@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:19 AM
+ * Last modified 4/29/24, 12:23 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,20 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
 import TextStyled
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
@@ -34,9 +34,13 @@ import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.screens.search.CigarSearchParameters
+import com.akellolcc.cigars.screens.search.SearchComponent
+import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlinx.coroutines.flow.flow
 import kotlin.jvm.Transient
 
 class CigarsScreen(
@@ -60,19 +64,20 @@ open class CigarsListScreen<V : ScreenModel>(
     BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
-        CigarSortingFields.enumValues().map {
+        viewModel.sortingFields?.map {
+            val selected = viewModel.sorting == it.key
             DropdownMenuItem(
                 leadingIcon = {
-                    loadIcon(Images.icon_menu_sort, Size(24.0F, 24.0F))
+                    loadIcon(if (selected) Images.icon_menu_checkmark else Images.icon_menu_sort, Size(24.0F, 24.0F))
                 },
                 text = {
                     TextStyled(
-                        it.second,
+                        it.label,
                         TextStyles.Subhead
                     )
                 },
                 onClick = {
-                    viewModel.sorting(it.first.value)
+                    viewModel.sorting = it.key
                     onDismiss()
                 }
             )
@@ -80,18 +85,50 @@ open class CigarsListScreen<V : ScreenModel>(
     }
 
     override fun handleAction(event: CigarsScreenViewModel.CigarsAction, navigator: Navigator?) {
-        val mainModel = route.sharedViewModel as MainScreenViewModel
+        val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is CigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
                 navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
-                    sharedViewModel = mainModel
                 }))
             }
 
             is CigarsScreenViewModel.CigarsAction.ShowError -> TODO()
+        }
+    }
+
+    @Composable
+    override fun ListHeader(modifier: Modifier) {
+        if (viewModel.search) {
+            val fields = remember { CigarSearchParameters() }
+            SearchComponent(
+                modifier = modifier,
+                loading = viewModel.loading,
+                fields = fields,
+            ) { action, param ->
+                flow {
+                    when (action) {
+                        SearchParameterAction.Completed -> {
+                            viewModel.reload()
+                        }
+
+                        SearchParameterAction.LoadData -> {
+
+                        }
+
+                        SearchParameterAction.Add -> {
+                            viewModel.searchingFields = fields.selected
+                        }
+
+                        SearchParameterAction.Remove -> {
+                            viewModel.searchingFields = fields.selected
+                        }
+                    }
+                    emit(true)
+                }
+            }
         }
     }
 

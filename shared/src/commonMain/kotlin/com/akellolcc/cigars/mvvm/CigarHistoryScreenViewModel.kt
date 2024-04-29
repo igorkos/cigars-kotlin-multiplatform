@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 3:07 PM
+ * Last modified 4/27/24, 2:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.mvvm
 
@@ -23,18 +23,13 @@ import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
-    override val repository: CigarHistoryRepository =
-        createRepository(CigarHistoryRepository::class, cigar.rowid)
+    override val repository: CigarHistoryRepository = createRepository(CigarHistoryRepository::class, cigar.rowid)
 
     override fun entitySelected(entity: History) {
     }
 
     init {
         name = cigar.name
-    }
-
-    override fun entityName(id: History): String {
-        return repository.humidorName(id.humidorFrom)
     }
 
     companion object Factory : ViewModelsFactory<CigarHistoryScreenViewModel>() {

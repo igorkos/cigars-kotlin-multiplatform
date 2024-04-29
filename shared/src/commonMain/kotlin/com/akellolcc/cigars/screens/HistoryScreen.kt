@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:40 AM
+ * Last modified 4/27/24, 2:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -112,7 +112,7 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                             keepHeight = true
                         )
                         TextStyled(
-                            text = viewModel.entityName(entity),
+                            text = entity.cigar?.name ?: entity.humidorFrom.name,
                             style = TextStyles.Subhead,
                             keepHeight = true
                         )
@@ -122,7 +122,7 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             TextStyled(
-                                text = if (entity.cigarId < 0) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
+                                text = if (entity.cigar == null) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
                                     entity.type,
                                     entity.count
                                 ),
@@ -131,6 +131,20 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                             if (entity.price != null) {
                                 TextStyled(
                                     text = Localize.history_transaction_price(entity.price!!),
+                                    style = TextStyles.Subhead
+                                )
+                            }
+                        }
+                        if (entity.type == HistoryType.Move) {
+                            Column {
+                                TextStyled(
+                                    label = "From",
+                                    text = entity.humidorFrom.name,
+                                    style = TextStyles.Subhead
+                                )
+                                TextStyled(
+                                    label = "To",
+                                    text = entity.humidorTo.name,
                                     style = TextStyles.Subhead
                                 )
                             }

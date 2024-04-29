@@ -6,9 +6,9 @@ CREATE TABLE HistoryTable (
     left INTEGER NOT NULL,
     price REAL,
     type INTEGER NOT NULL,
-    cigarId  INTEGER NOT NULL,
+    cigarId  INTEGER,
     humidorTo  INTEGER NOT NULL,
-    humidorFrom  INTEGER,
+    humidorFrom  INTEGER NOT NULL,
     FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION ,
     FOREIGN KEY (humidorTo) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION,
     FOREIGN KEY (humidorFrom) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION

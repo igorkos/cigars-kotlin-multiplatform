@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:20 PM
+ * Last modified 4/28/24, 1:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -67,14 +67,13 @@ class HumidorCigarsScreen(override val route: NavRoute) :
         event: HumidorCigarsScreenViewModel.CigarsAction,
         navigator: Navigator?
     ) {
-        val mainModel = route.sharedViewModel as MainScreenViewModel
+        val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
                 navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
-                    sharedViewModel = mainModel
                 }))
             }
 
@@ -83,7 +82,6 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                 mainModel.isTabsVisible = false
                 navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     this.data = null
-                    sharedViewModel = mainModel
                 }))
             }
 
@@ -94,7 +92,6 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                         HumidorDetailsRoute
                             .apply {
                                 this.data = event.humidor
-                                sharedViewModel = mainModel
                             })
                 )
             }
@@ -106,7 +103,6 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                         HumidorHistoryRoute
                             .apply {
                                 this.data = viewModel.humidor
-                                sharedViewModel = mainModel
                             })
                 )
             }

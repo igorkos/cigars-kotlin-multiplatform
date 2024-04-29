@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 11:27 AM
+ * Last modified 4/27/24, 2:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,16 +66,16 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
                     it.count,
                     cigar.price,
                     HistoryType.Addition,
-                    it.cigar.rowid,
-                    it.humidor.rowid,
-                    it.humidor.rowid
+                    it.cigar,
+                    it.humidor,
+                    it.humidor
                 )
             )
         }.flatMapConcat {
             //Update cigars count in humidor
             val humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
-            val humidorTo = humidorsRepository.getSync(it.humidorTo!!)
-            humidorsRepository.updateCigarsCount(it.humidorTo!!, humidorTo.count + it.count)
+            val humidorTo = humidorsRepository.getSync(it.humidorTo.rowid)
+            humidorsRepository.updateCigarsCount(it.humidorTo.rowid, humidorTo.count + it.count)
         }.flatMapConcat {
             flowOf(cigar)
         }

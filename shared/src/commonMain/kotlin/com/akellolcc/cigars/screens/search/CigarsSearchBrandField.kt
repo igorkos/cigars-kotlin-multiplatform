@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 4:06 PM
+ * Last modified 4/28/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens.search
 
@@ -34,27 +34,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
-import com.akellolcc.cigars.databases.extensions.CigarSearchFields
-import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
+import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlinx.coroutines.flow.Flow
 
 class CigarsSearchBrandField(
-    type: CigarSearchFields,
-    label: String,
+    parameter: SearchParam<String>,
     showLeading: Boolean,
-    val viewModel: SearchCigarScreenViewModel
-) : SearchParameterField<CigarSearchFields>(type, label, showLeading) {
+    onAction: ((SearchParameterAction, SearchParam<String>) -> Flow<Any?>)?
+) : SearchParameterField<String>(parameter, showLeading, onAction) {
     @Composable
     override fun Render(enabled: Boolean) {
-        //var expanded by remember { mutableStateOf(false) }
+        var expanded by remember { mutableStateOf(false) }
         var value by remember { mutableStateOf("") }
+        var brands by remember { mutableStateOf(listOf<RapidCigarBrand>()) }
         //var selectedBrand by remember { mutableStateOf<RapidCigarBrand?>(null) }
 
         LaunchedEffect(value) {
-            if (viewModel.brand == null && value.isNotBlank() && value.length > 3) {
-                viewModel.getBrands(value.trim())
+            parameter.value = value
+            onAction?.invoke(SearchParameterAction.LoadData, parameter)?.collect {
+
             }
         }
 
@@ -65,7 +66,7 @@ class CigarsSearchBrandField(
             if (showLeading) {
                 IconButton(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = { onAction?.invoke(SearchParameterAction.Remove, type) }
+                    onClick = { onAction?.invoke(SearchParameterAction.Remove, parameter) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }
@@ -75,25 +76,24 @@ class CigarsSearchBrandField(
             ) {
                 TextStyled(
                     modifier = Modifier.fillMaxWidth(),
-                    label = label,
+                    label = parameter.label,
                     text = value,
                     enabled = enabled,
                     editable = true,
                     style = TextStyles.Headline,
                     maxLines = 1,
                     onValueChange = {
-                        viewModel.brand = null
-                        viewModel.brands = listOf()
                         value = it
                     },
                     onKeyboardAction = {
-                        onAction?.invoke(SearchParameterAction.Completed, value)
+                        parameter.value = value
+                        onAction?.invoke(SearchParameterAction.Completed, parameter)
                     },
                     imeAction = ImeAction.Search
                 )
-                DropdownMenu(expanded = viewModel.expanded,
-                    onDismissRequest = { viewModel.expanded = false }) {
-                    viewModel.brands.map {
+                DropdownMenu(expanded = expanded,
+                    onDismissRequest = { expanded = false }) {
+                    brands.map {
                         DropdownMenuItem(
                             leadingIcon = {
                                 loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
@@ -105,8 +105,9 @@ class CigarsSearchBrandField(
                                 )
                             },
                             onClick = {
-                                viewModel.selectBrand(it)
-                                value = it.name ?: " "
+                                value = it.name ?: ""
+                                parameter.value = value
+                                onAction?.invoke(SearchParameterAction.Completed, parameter)
                             }
                         )
                     }

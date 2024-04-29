@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:28 PM
+ * Last modified 4/27/24, 2:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository
 
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import kotlinx.coroutines.flow.Flow
@@ -33,9 +32,7 @@ interface CigarHumidorRepository : Repository<HumidorCigar> {
     fun updateCount(
         entity: HumidorCigar,
         count: Long,
-        price: Double? = null,
-        historyType: HistoryType? = null,
-        humidorTo: Humidor? = null
+        price: Double? = null
     ): Flow<HumidorCigar>
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long): Flow<Boolean>

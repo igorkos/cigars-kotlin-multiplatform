@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 6:52 PM
+ * Last modified 4/28/24, 11:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,11 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository
 
 import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.screens.search.SearchParam
 import kotlinx.coroutines.flow.Flow
 
 interface Repository<ENTITY : BaseEntity> {
@@ -25,11 +26,11 @@ interface Repository<ENTITY : BaseEntity> {
      */
     fun getSync(id: Long, where: Long? = null): ENTITY
 
-    fun allSync(sortField: String? = null, accenting: Boolean = true): List<ENTITY>
+    fun allSync(sorting: SearchParam<Boolean>? = null, filter: List<SearchParam<*>>? = null): List<ENTITY>
 
     fun observe(id: Long): Flow<ENTITY>
 
-    fun all(sortField: String? = null, accenting: Boolean = true): Flow<List<ENTITY>>
+    fun all(sorting: SearchParam<Boolean>? = null, filter: List<SearchParam<*>>? = null): Flow<List<ENTITY>>
 
     fun add(entity: ENTITY): Flow<ENTITY>
 

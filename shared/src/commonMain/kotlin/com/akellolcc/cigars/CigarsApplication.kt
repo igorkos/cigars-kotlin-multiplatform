@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/26/24, 9:23 PM
+ * Last modified 4/28/24, 1:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars
 
@@ -47,8 +47,14 @@ fun CigarsApplication() {
         CigarHistoryScreenViewModel::class,
         CigarHistoryScreenViewModel.Factory
     )
-    ViewModelRegistry.register(CigarsScreenViewModel::class, CigarsScreenViewModel.Factory)
-    ViewModelRegistry.register(FavoritesScreenViewModel::class, FavoritesScreenViewModel.Factory)
+    ViewModelRegistry.register(
+        CigarsScreenViewModel::class,
+        CigarsScreenViewModel.Factory
+    )
+    ViewModelRegistry.register(
+        FavoritesScreenViewModel::class,
+        FavoritesScreenViewModel.Factory
+    )
     ViewModelRegistry.register(
         HumidorCigarsScreenViewModel::class,
         HumidorCigarsScreenViewModel.Factory
@@ -61,7 +67,10 @@ fun CigarsApplication() {
         HumidorHistoryScreenViewModel::class,
         HumidorHistoryScreenViewModel.Factory
     )
-    ViewModelRegistry.register(HumidorsViewModel::class, HumidorsViewModel.Factory)
+    ViewModelRegistry.register(
+        HumidorsViewModel::class,
+        HumidorsViewModel.Factory
+    )
     ViewModelRegistry.register(
         CigarImagesViewScreenViewModel::class,
         CigarImagesViewScreenViewModel.Factory
@@ -70,7 +79,11 @@ fun CigarsApplication() {
         HumidorImagesViewScreenViewModel::class,
         HumidorImagesViewScreenViewModel.Factory
     )
-    ViewModelRegistry.register(MainScreenViewModel::class, MainScreenViewModel.Factory)
+    ViewModelRegistry.register(
+        MainScreenViewModel::class,
+        MainScreenViewModel.Factory,
+        true
+    )
     ViewModelRegistry.register(
         SearchCigarScreenViewModel::class,
         SearchCigarScreenViewModel.Factory

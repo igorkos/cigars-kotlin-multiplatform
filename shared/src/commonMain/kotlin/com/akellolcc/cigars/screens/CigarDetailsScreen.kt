@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 10:14 PM
+ * Last modified 4/28/24, 1:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -76,7 +76,6 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
@@ -171,7 +170,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
         event: CigarsDetailsScreenViewModel.CigarsDetailsAction,
         navigator: Navigator
     ) {
-        val mainModel = route.sharedViewModel as MainScreenViewModel
         when (event) {
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> viewModel.humidorCigarsCount =
@@ -181,7 +179,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 HumidorCigarsScreen(
                     HumidorCigarsRoute.apply {
                         this.data = event.humidor
-                        this.sharedViewModel = mainModel
                     })
             )
 
@@ -190,7 +187,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 CigarHistoryScreen(
                     CigarHistoryRoute.apply {
                         this.data = event.cigar
-                        this.sharedViewModel = mainModel
                     })
             )
 

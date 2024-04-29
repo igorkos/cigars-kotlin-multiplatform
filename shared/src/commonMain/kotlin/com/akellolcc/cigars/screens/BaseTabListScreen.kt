@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 12:27 AM
+ * Last modified 4/28/24, 10:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -58,6 +58,8 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.mvvm.BaseListViewModel
+import com.akellolcc.cigars.mvvm.MainScreenViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
@@ -103,11 +105,11 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.current
-
+        val sharedViewModel = createViewModel(MainScreenViewModel::class)
         LaunchedEffect(navigator) {
             viewModel.loadMore()
-            if (route.sharedViewModel?.isTabsVisible != route.isTabsVisible)
-                route.sharedViewModel?.isTabsVisible = route.isTabsVisible
+            if (sharedViewModel.isTabsVisible != route.isTabsVisible)
+                sharedViewModel.isTabsVisible = route.isTabsVisible
         }
 
         viewModel.observeEvents {
@@ -213,10 +215,19 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
         CenterAlignedTopAppBar(
             navigationIcon = {
                 IconButton(onClick = {
-                    route.sharedViewModel?.isDrawerVisible = true
+                    val sharedViewModel = createViewModel(MainScreenViewModel::class)
+                    sharedViewModel.isDrawerVisible = true
                 }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
             },
             actions = {
+                if (route.isSearchEnabled) {
+                    IconButton(onClick = { viewModel.updateSearch(!viewModel.search) }) {
+                        loadIcon(
+                            Images.tab_icon_search,
+                            Size(24.0F, 24.0F)
+                        )
+                    }
+                }
                 IconButton(onClick = { viewModel.sortingOrder(!viewModel.accenting) }) {
                     loadIcon(
                         if (viewModel.accenting) Images.icon_menu_sort_alpha_asc else Images.icon_menu_sort_alpha_desc,

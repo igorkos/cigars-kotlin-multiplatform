@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 1:19 PM
+ * Last modified 4/29/24, 12:21 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens.search
 
@@ -20,18 +20,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 enum class SearchParameterAction {
     Add,
     Remove,
-    Completed
+    Completed,
+    LoadData
 }
 
-abstract class SearchParameterField<T>(
-    val type: T,
-    val label: String,
+abstract class SearchParameterField<T : Comparable<T>>(
+    val parameter: SearchParam<T>,
     var showLeading: Boolean = false,
-    var onAction: ((SearchParameterAction, Any?) -> Any?)? = null
+    var onAction: ((SearchParameterAction, SearchParam<T>) -> Flow<Any?>)? = null
 ) {
     var value by mutableStateOf("")
 
@@ -44,5 +49,11 @@ abstract class SearchParameterField<T>(
 
     fun dropDownMenu(): List<Pair<T, String>>? {
         return null
+    }
+
+    protected fun onAction(action: SearchParameterAction) {
+        CoroutineScope(Dispatchers.IO).launch {
+            onAction?.invoke(action, parameter)?.collect {}
+        }
     }
 }

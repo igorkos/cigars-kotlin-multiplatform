@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 11:27 AM
+ * Last modified 4/27/24, 2:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,6 @@
 package com.akellolcc.cigars.databases.extensions
 
 import androidx.compose.runtime.Stable
-import com.akellolcc.cigars.databases.HistoryTable
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import dev.icerock.moko.resources.ImageResource
@@ -32,23 +31,10 @@ class History(
     var left: Long,
     var price: Double?,
     var type: HistoryType,
-    var cigarId: Long,
-    var humidorFrom: Long,
-    var humidorTo: Long?
-) : BaseEntity() {
-
-    constructor(history: HistoryTable) : this(
-        history.rowid,
-        history.count,
-        history.date,
-        history.left,
-        history.price,
-        HistoryType.fromLong(history.type),
-        history.cigarId,
-        history.humidorTo,
-        history.humidorFrom
-    )
-}
+    var cigar: Cigar?,
+    var humidorFrom: Humidor,
+    var humidorTo: Humidor
+) : BaseEntity()
 
 enum class HistoryType(val type: Long) {
     Addition(0L),

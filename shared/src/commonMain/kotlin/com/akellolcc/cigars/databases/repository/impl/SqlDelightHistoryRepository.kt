@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:49 PM
+ * Last modified 4/27/24, 2:23 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl
 
@@ -37,9 +37,9 @@ abstract class SqlDelightHistoryRepository(
                     entity.left,
                     entity.price,
                     entity.type.type,
-                    entity.cigarId,
-                    entity.humidorFrom,
-                    entity.humidorTo
+                    entity.cigar?.rowid,
+                    entity.humidorFrom.rowid,
+                    entity.humidorTo.rowid
                 )
             } else {
                 queries.update(
@@ -48,9 +48,9 @@ abstract class SqlDelightHistoryRepository(
                     entity.left,
                     entity.price,
                     entity.type.type,
-                    entity.cigarId,
-                    entity.humidorFrom,
-                    entity.humidorTo,
+                    entity.cigar?.rowid,
+                    entity.humidorFrom.rowid,
+                    entity.humidorTo.rowid,
                     entity.rowid
                 )
             }

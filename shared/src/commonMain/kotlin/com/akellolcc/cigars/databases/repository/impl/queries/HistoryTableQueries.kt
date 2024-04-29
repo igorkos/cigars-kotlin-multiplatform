@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:24 PM
+ * Last modified 4/29/24, 12:01 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl.queries
 
@@ -21,17 +21,18 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.History
+import com.akellolcc.cigars.screens.search.SearchParam
 
 class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : DatabaseQueries<History> {
     override fun get(id: Long, where: Long?): Query<History> {
         return queries.get(id, ::historyFactory)
     }
 
-    override fun allAsc(sort: String): Query<History> {
+    override fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<History> {
         return queries.allAsc(::historyFactory)
     }
 
-    override fun allDesc(sort: String): Query<History> {
+    override fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<History> {
         return queries.allDesc(::historyFactory)
     }
 

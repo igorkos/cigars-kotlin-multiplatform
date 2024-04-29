@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 12:24 PM
+ * Last modified 4/27/24, 2:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,10 +34,15 @@ fun historyFactory(
     left: Long,
     price: Double?,
     type: Long,
-    cigarId: Long,
+    cigarId: Long?,
     humidorTo: Long,
-    humidorFrom: Long?
+    humidorFrom: Long
 ): History {
+    val humidorsRepository = createRepository(HumidorsRepository::class)
+    val cigarRepository = createRepository(CigarsRepository::class)
+    val humTo = humidorsRepository.getSync(humidorTo)
+    val humFrom = humidorsRepository.getSync(humidorFrom)
+    val cigar = cigarId?.let { cigarRepository.getSync(cigarId) }
     return History(
         rowid,
         count,
@@ -45,16 +50,16 @@ fun historyFactory(
         left,
         price,
         HistoryType.fromLong(type),
-        cigarId,
-        humidorTo,
-        humidorFrom
+        cigar,
+        humTo,
+        humFrom
     )
 }
 
 fun imageFactory(
     rowid: Long,
     image: String?,
-    data_: ByteArray,
+    data: ByteArray,
     notes: String?,
     type: Long?,
     cigarId: Long?,
@@ -63,7 +68,7 @@ fun imageFactory(
     return CigarImage(
         rowid = rowid,
         image = image,
-        bytes = data_,
+        bytes = data,
         notes = notes,
         type = type,
         cigarId = cigarId,
@@ -155,13 +160,13 @@ fun humidorFactory(
 
 fun humidorCigarFactory(
     count: Long,
-    humidor: Long,
-    cigar: Long,
+    humidorID: Long,
+    cigarID: Long,
 ): HumidorCigar {
     val humidorsRepository = createRepository(HumidorsRepository::class)
     val cigarRepository = createRepository(CigarsRepository::class)
-    val humidor = humidorsRepository.getSync(humidor)
-    val cigar = cigarRepository.getSync(cigar)
+    val humidor = humidorsRepository.getSync(humidorID)
+    val cigar = cigarRepository.getSync(cigarID)
     return HumidorCigar(
         count,
         humidor,

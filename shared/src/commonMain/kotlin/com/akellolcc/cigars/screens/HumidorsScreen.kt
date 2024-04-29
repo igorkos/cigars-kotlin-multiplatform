@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:27 PM
+ * Last modified 4/28/24, 1:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -76,7 +76,8 @@ class HumidorsListScreen(
         CenterAlignedTopAppBar(
             navigationIcon = {
                 IconButton(onClick = {
-                    route.sharedViewModel?.isDrawerVisible = true
+                    val mainModel = createViewModel(MainScreenViewModel::class)
+                    mainModel.isDrawerVisible = true
                 }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
             },
             actions = {
@@ -132,14 +133,13 @@ class HumidorsListScreen(
     }
 
     override fun handleAction(event: HumidorsViewModel.Action, navigator: Navigator?) {
-        val mainModel = route.sharedViewModel as MainScreenViewModel
+        val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is HumidorsViewModel.Action.RouteToHumidor -> {
                 Log.debug("Selected humidor ${event.humidor.rowid}")
                 mainModel.isTabsVisible = false
                 navigator?.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
                     this.data = event.humidor
-                    this.sharedViewModel = mainModel
                 }))
             }
 
@@ -151,7 +151,6 @@ class HumidorsListScreen(
                         HumidorDetailsRoute
                             .apply {
                                 this.data = null
-                                sharedViewModel = mainModel
                             })
                 )
             }

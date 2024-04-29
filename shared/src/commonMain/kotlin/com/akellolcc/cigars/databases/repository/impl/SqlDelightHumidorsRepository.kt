@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 11:27 AM
+ * Last modified 4/27/24, 2:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,9 +50,9 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
                     1,
                     entity.price,
                     HistoryType.Addition,
-                    -1,
-                    it.rowid,
-                    it.rowid
+                    null,
+                    it,
+                    it
                 )
             ).single()
             it

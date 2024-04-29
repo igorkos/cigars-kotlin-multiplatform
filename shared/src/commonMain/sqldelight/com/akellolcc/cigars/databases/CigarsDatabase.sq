@@ -29,7 +29,16 @@ get:
 SELECT * FROM CigarsTable WHERE rowid = :id;
 
 allAsc:
-    SELECT * FROM CigarsTable ORDER BY CASE
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength
+     ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
         WHEN :sort = 'country' THEN country
@@ -43,8 +52,18 @@ allAsc:
         ELSE NULL
     END ASC;
 
+
 allDesc:
-    SELECT * FROM CigarsTable ORDER BY CASE
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength
+       ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
         WHEN :sort = 'country' THEN country

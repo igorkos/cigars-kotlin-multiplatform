@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 12:24 PM
+ * Last modified 4/29/24, 12:01 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.repository.impl.queries
 
@@ -21,6 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.screens.search.SearchParam
 
 class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQueries) :
     DatabaseQueries<HumidorCigar> {
@@ -28,11 +29,11 @@ class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQuerie
         return queries.get(id, where!!, ::humidorCigarFactory)
     }
 
-    override fun allAsc(sort: String): Query<HumidorCigar> {
+    override fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<HumidorCigar> {
         return queries.allAsc(::humidorCigarFactory)
     }
 
-    override fun allDesc(sort: String): Query<HumidorCigar> {
+    override fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<HumidorCigar> {
         return queries.allDesc(::humidorCigarFactory)
     }
 

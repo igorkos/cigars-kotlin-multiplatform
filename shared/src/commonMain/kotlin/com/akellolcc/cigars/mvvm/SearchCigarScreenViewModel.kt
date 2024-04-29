@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 4:07 PM
+ * Last modified 4/28/24, 12:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.mvvm
 
@@ -21,15 +21,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarSearchFields
+import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.CigarsSearchBrandField
-import com.akellolcc.cigars.screens.search.CigarsSearchParameterField
-import com.akellolcc.cigars.screens.search.SearchParameterField
 import dev.icerock.moko.resources.desc.StringDesc
 
 
@@ -42,7 +39,6 @@ class SearchCigarScreenViewModel() :
 
     var name by mutableStateOf("")
     var country by mutableStateOf("")
-    var searchParams by mutableStateOf(listOf<SearchParameterField<CigarSearchFields>>())
 
     //CigarsSearchBrandField values
     var brand by mutableStateOf<RapidCigarBrand?>(null)
@@ -50,55 +46,22 @@ class SearchCigarScreenViewModel() :
     var expanded by mutableStateOf(false)
 
     init {
-        addSearchParameter(CigarSearchFields.Name)
+        //addSearchParameter(CigarSearchFields.Name)
+        //sortField = CigarSearchFields.Name.value
     }
 
     override fun entitySelected(entity: Cigar) {
     }
 
-    fun addSearchParameter(parameter: CigarSearchFields) {
-        val field = when (parameter) {
-            CigarSearchFields.Name -> CigarsSearchParameterField(
-                CigarSearchFields.Name,
-                CigarSearchFields.localized(CigarSearchFields.Name),
-                false
-            )
 
-            CigarSearchFields.Brand -> CigarsSearchBrandField(
-                CigarSearchFields.Brand,
-                CigarSearchFields.localized(CigarSearchFields.Brand),
-                false,
-                this
-            )
-
-            CigarSearchFields.Country -> CigarsSearchParameterField(
-                CigarSearchFields.Country,
-                CigarSearchFields.localized(CigarSearchFields.Country),
-                false
-            )
-        }
-        searchParams = searchParams + field
-    }
-
-    fun removeSearchParameter(parameter: SearchParameterField<CigarSearchFields>) {
-        searchParams = searchParams - parameter
-    }
-
-    val hasMoreSearchParameters: Boolean
-        get() = sortingMenu().isNotEmpty()
-
-    fun sortingMenu(): List<Pair<CigarSearchFields, String>> {
-        val list = CigarSearchFields.enumValues().filter { field ->
-            searchParams.firstOrNull { it.type == field.first } == null
-        }
-        return list
-    }
-
-    fun setFieldValue(parameter: CigarSearchFields, value: Any?) {
+    fun setFieldValue(parameter: CigarSortingFields, value: Any?) {
         when (parameter) {
-            CigarSearchFields.Name -> name = value as String
-            CigarSearchFields.Country -> country = value as String
-            CigarSearchFields.Brand -> brand = value as RapidCigarBrand
+            CigarSortingFields.Name -> name = value as String
+            CigarSortingFields.Country -> country = value as String
+            CigarSortingFields.Brand -> brand = value as RapidCigarBrand
+            CigarSortingFields.Shape -> TODO()
+            CigarSortingFields.Gauge -> TODO()
+            CigarSortingFields.Length -> TODO()
         }
     }
 
@@ -107,24 +70,20 @@ class SearchCigarScreenViewModel() :
         sortEntities(entities)
     }
 
-    override fun sorting(sorting: String) {
-        sortField = sorting
-        sortEntities(entities)
-    }
-
     private fun sortEntities(list: List<Cigar>) {
         val field = when (sortField) {
-            CigarSearchFields.Name.name -> CigarSearchFields.Name
-            CigarSearchFields.Brand.name -> CigarSearchFields.Brand
-            CigarSearchFields.Country.name -> CigarSearchFields.Country
-            else -> CigarSearchFields.Name
+            CigarSortingFields.Name.name -> CigarSortingFields.Name
+            CigarSortingFields.Brand.name -> CigarSortingFields.Brand
+            CigarSortingFields.Country.name -> CigarSortingFields.Country
+            else -> CigarSortingFields.Name
         }
 
         entities = list.sortedWith(compareBy {
             when (field) {
-                CigarSearchFields.Name -> it.name
-                CigarSearchFields.Brand -> it.brand
-                CigarSearchFields.Country -> it.country
+                CigarSortingFields.Name -> it.name
+                CigarSortingFields.Brand -> it.brand
+                CigarSortingFields.Country -> it.country
+                else -> CigarSortingFields.Name
             }
         }).also {
             if (!accenting) {
@@ -136,13 +95,13 @@ class SearchCigarScreenViewModel() :
     private val canLoad: Boolean
         get() {
             var can = true
-            searchParams.forEach {
+            /*searchParams.forEach {
                 can = when (it.type) {
                     CigarSearchFields.Name -> can && name.isNotBlank()
                     CigarSearchFields.Brand -> can && brand != null
                     CigarSearchFields.Country -> can && country.isNotBlank()
                 }
-            }
+            }*/
             return can
         }
 
