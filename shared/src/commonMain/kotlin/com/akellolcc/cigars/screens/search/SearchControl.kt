@@ -50,8 +50,8 @@ import kotlinx.coroutines.launch
 fun <T : Comparable<T>> SearchComponent(
     modifier: Modifier = Modifier,
     loading: Boolean,
-    fields: SearchParameters<T, SearchParameterField<T>>,
-    onAction: (SearchParameterAction, SearchParam<T>?) -> Flow<Any?>,
+    fields: FilterCollection<T, SearchParameterField<T>>,
+    onAction: (SearchParameterAction, FilterParameter<T>?) -> Flow<Any?>,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var compose by remember { mutableStateOf(false) }

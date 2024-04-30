@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 11:53 AM
+ * Last modified 4/29/24, 12:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,10 +41,10 @@ var emptyCigar =
         "",
         "",
         0,
-        false,
-        false,
-        0.0,
-        null
+        shopping = false,
+        favorites = false,
+        price = 0.0,
+        other = null
     )
 
 @Stable
@@ -137,7 +137,7 @@ enum class CigarShapes {
             }
         }
 
-        fun localized(value: CigarShapes): String {
+        private fun localized(value: CigarShapes): String {
             return when (value) {
                 Corona -> Localize.cigar_shape_corona
                 PetitCorona -> Localize.cigar_shape_petit_corona
@@ -185,7 +185,7 @@ enum class CigarStrength {
 
         fun fromString(value: String?): CigarStrength? {
             if (value == null) return null
-            return CigarStrength.entries.firstOrNull() {
+            return CigarStrength.entries.firstOrNull {
                 it.name == value
             }
         }
@@ -241,7 +241,7 @@ enum class CigarSortingFields(val value: String) {
             }.toTypedArray()
         }
 
-        fun localized(value: CigarSortingFields): String {
+        private fun localized(value: CigarSortingFields): String {
             return when (value) {
                 Name -> Localize.cigar_details_name
                 Brand -> Localize.cigar_details_company

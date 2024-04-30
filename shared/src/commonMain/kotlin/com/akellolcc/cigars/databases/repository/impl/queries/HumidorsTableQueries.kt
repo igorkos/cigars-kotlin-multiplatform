@@ -21,7 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HumidorsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 
 class HumidorsTableQueries(override val queries: HumidorsDatabaseQueries) :
     DatabaseQueries<Humidor> {
@@ -29,11 +29,11 @@ class HumidorsTableQueries(override val queries: HumidorsDatabaseQueries) :
         return queries.get(id, ::humidorFactory)
     }
 
-    override fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<Humidor> {
+    override fun allAsc(sortBy: String, filter: List<FilterParameter<*>>?): Query<Humidor> {
         return queries.allAsc(sortBy, ::humidorFactory)
     }
 
-    override fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<Humidor> {
+    override fun allDesc(sortBy: String, filter: List<FilterParameter<*>>?): Query<Humidor> {
         return queries.allDesc(sortBy, ::humidorFactory)
     }
 

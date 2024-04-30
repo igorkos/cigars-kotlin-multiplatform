@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 12:23 AM
+ * Last modified 4/29/24, 1:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,9 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
-import com.akellolcc.cigars.screens.search.SearchParam
-import com.akellolcc.cigars.screens.search.SearchParameters
+import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.search.FilterCollection
+import com.akellolcc.cigars.screens.search.FilterParameter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
@@ -32,18 +33,21 @@ import kotlinx.coroutines.launch
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
     private var _entities: Job? = null
     protected abstract val repository: Repository<T>
-    protected var sortField by mutableStateOf<String?>(null)
+    protected var sortField by mutableStateOf<FilterParameter<Boolean>?>(null)
 
-    var accenting by mutableStateOf(true)
     var entities by mutableStateOf(listOf<T>())
 
     var search by mutableStateOf(false)
-    var sortingFields by mutableStateOf<SearchParameters<String, SearchParam<String>>?>(null)
-    var searchingFields by mutableStateOf<List<SearchParam<String>>?>(null)
+
+    var sortingFields by mutableStateOf<FilterCollection<Boolean, FilterParameter<Boolean>>?>(null)
+    var searchingFields by mutableStateOf<List<FilterParameter<String>>?>(null)
 
     abstract fun entitySelected(entity: T)
 
-    var sorting: String?
+    val accenting: Boolean
+        get() = sortField?.value == true
+
+    var sorting: FilterParameter<Boolean>?
         get() = sortField
         set(value) {
             sortField = value
@@ -51,7 +55,7 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
         }
 
     open fun sortingOrder(ascending: Boolean) {
-        accenting = ascending
+        sortField?.value = ascending
         loadEntities(true)
     }
 
@@ -71,8 +75,9 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     protected open fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
             loading = true
+            Log.debug("Load all: $searchingFields")
             _entities = screenModelScope.launch {
-                repository.all(if (sortField != null) SearchParam(sortField!!, accenting) else null, searchingFields).cancellable()
+                repository.all(sortField, searchingFields).cancellable()
                     .collect {
                         entities = it
                         loading = false

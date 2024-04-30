@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 12:23 AM
+ * Last modified 4/29/24, 1:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ package com.akellolcc.cigars.screens
 import TextStyled
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -34,7 +35,7 @@ import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.screens.search.CigarSearchParameters
+import com.akellolcc.cigars.screens.search.CigarFilterParameters
 import com.akellolcc.cigars.screens.search.SearchComponent
 import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.theme.Images
@@ -65,7 +66,7 @@ open class CigarsListScreen<V : ScreenModel>(
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
         viewModel.sortingFields?.map {
-            val selected = viewModel.sorting == it.key
+            val selected = viewModel.sorting == it
             DropdownMenuItem(
                 leadingIcon = {
                     loadIcon(if (selected) Images.icon_menu_checkmark else Images.icon_menu_sort, Size(24.0F, 24.0F))
@@ -77,7 +78,7 @@ open class CigarsListScreen<V : ScreenModel>(
                     )
                 },
                 onClick = {
-                    viewModel.sorting = it.key
+                    viewModel.sorting = it
                     onDismiss()
                 }
             )
@@ -102,29 +103,22 @@ open class CigarsListScreen<V : ScreenModel>(
     @Composable
     override fun ListHeader(modifier: Modifier) {
         if (viewModel.search) {
-            val fields = remember { CigarSearchParameters() }
+            val fields = remember { CigarFilterParameters() }
+            LaunchedEffect(fields.selected) {
+                viewModel.searchingFields = fields.selected
+            }
             SearchComponent(
                 modifier = modifier,
                 loading = viewModel.loading,
                 fields = fields,
-            ) { action, param ->
+            ) { action, _ ->
                 flow {
                     when (action) {
                         SearchParameterAction.Completed -> {
                             viewModel.reload()
                         }
 
-                        SearchParameterAction.LoadData -> {
-
-                        }
-
-                        SearchParameterAction.Add -> {
-                            viewModel.searchingFields = fields.selected
-                        }
-
-                        SearchParameterAction.Remove -> {
-                            viewModel.searchingFields = fields.selected
-                        }
+                        else -> {}
                     }
                     emit(true)
                 }

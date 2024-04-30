@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:13 PM
+ * Last modified 4/29/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
+import com.akellolcc.cigars.utils.ObjectFactory
 
 
 class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
@@ -32,7 +33,7 @@ class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
         name = cigar.name
     }
 
-    companion object Factory : ViewModelsFactory<CigarHistoryScreenViewModel>() {
+    companion object Factory : ObjectFactory<CigarHistoryScreenViewModel>() {
         override fun factory(data: Any?): CigarHistoryScreenViewModel {
             return CigarHistoryScreenViewModel(data as Cigar)
         }

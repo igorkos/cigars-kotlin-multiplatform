@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 12:01 AM
+ * Last modified 4/29/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
 
@@ -257,7 +258,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
-    companion object Factory : ViewModelsFactory<CigarsDetailsScreenViewModel>() {
+    companion object Factory : ObjectFactory<CigarsDetailsScreenViewModel>() {
         override fun factory(data: Any?): CigarsDetailsScreenViewModel {
             return CigarsDetailsScreenViewModel(data as Cigar)
         }

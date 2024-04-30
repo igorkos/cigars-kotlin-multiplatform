@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 10:22 PM
+ * Last modified 4/29/24, 8:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarHumidorTableQueries
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO
@@ -51,11 +51,11 @@ import kotlin.math.absoluteValue
 
 abstract class SqlDelightBaseCigarHumidorRepository(
     protected val queries: HumidorCigarsDatabaseQueries
-) : BaseRepository<HumidorCigar>(CigarHumidorTableQueries(queries)), CigarHumidorRepository {
+) : SQLDelightBaseRepository<HumidorCigar>(CigarHumidorTableQueries(queries)), CigarHumidorRepository {
 
     abstract fun observeAllQuery(): Query<CigarHumidorTable>
 
-    override fun all(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Flow<List<HumidorCigar>> {
+    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Flow<List<HumidorCigar>> {
         val hRepo = createRepository(HumidorsRepository::class)
         val cRepo = createRepository(CigarsRepository::class)
         return observeAllQuery().asFlow().mapToList(Dispatchers.IO).map {

@@ -21,18 +21,18 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 
 class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : DatabaseQueries<History> {
     override fun get(id: Long, where: Long?): Query<History> {
         return queries.get(id, ::historyFactory)
     }
 
-    override fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<History> {
+    override fun allAsc(sortBy: String, filter: List<FilterParameter<*>>?): Query<History> {
         return queries.allAsc(::historyFactory)
     }
 
-    override fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<History> {
+    override fun allDesc(sortBy: String, filter: List<FilterParameter<*>>?): Query<History> {
         return queries.allDesc(::historyFactory)
     }
 

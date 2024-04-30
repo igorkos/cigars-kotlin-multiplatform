@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 10:20 PM
+ * Last modified 4/29/24, 8:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,11 +19,11 @@ package com.akellolcc.cigars.databases.repository.impl
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
-import com.akellolcc.cigars.databases.RepositoryFactory
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.historyFactory
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +33,7 @@ class SqlDelightCigarHistoryRepository(
     queries: HistoryDatabaseQueries
 ) : SqlDelightHistoryRepository(id, queries), CigarHistoryRepository {
 
-    override fun all(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Flow<List<History>> {
+    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Flow<List<History>> {
         return queries.cigarHistory(id, ::historyFactory).asFlow().mapToList(Dispatchers.IO)
     }
 
@@ -41,7 +41,7 @@ class SqlDelightCigarHistoryRepository(
         return queries.cigarHistoryCount(id).executeAsOne()
     }
 
-    companion object Factory : RepositoryFactory<SqlDelightCigarHistoryRepository>() {
+    companion object Factory : ObjectFactory<SqlDelightCigarHistoryRepository>() {
         override fun factory(data: Any?): SqlDelightCigarHistoryRepository {
             val queries = SqlDelightDatabase.instance.database.historyDatabaseQueries
             return SqlDelightCigarHistoryRepository(data as Long, queries)

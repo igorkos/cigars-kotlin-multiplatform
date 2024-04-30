@@ -20,14 +20,14 @@ import app.cash.sqldelight.ExecutableQuery
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 
 interface DatabaseQueries<T : BaseEntity> {
     val queries: Any
     fun get(id: Long, where: Long? = null): Query<T>
-    fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<T>
+    fun allAsc(sortBy: String, filter: List<FilterParameter<*>>?): Query<T>
 
-    fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<T>
+    fun allDesc(sortBy: String, filter: List<FilterParameter<*>>?): Query<T>
 
     fun find(rowid: Long, where: Long? = null): Query<T>
 

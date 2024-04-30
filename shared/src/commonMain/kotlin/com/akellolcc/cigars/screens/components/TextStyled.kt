@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 9:38 PM
+ * Last modified 4/29/24, 1:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -77,7 +77,10 @@ fun TextStyled(
                 if (inputMode == KeyboardType.Text) {
                     IconButton(
                         modifier = Modifier.wrapContentSize(),
-                        onClick = { onValueChange?.invoke("") }
+                        onClick = {
+                            onValueChange?.invoke("")
+                            onKeyboardAction?.invoke(ImeAction.Default)
+                        }
                     ) {
                         loadIcon(Images.icon_menu_delete, Size(8.0F, 8.0F))
                     }

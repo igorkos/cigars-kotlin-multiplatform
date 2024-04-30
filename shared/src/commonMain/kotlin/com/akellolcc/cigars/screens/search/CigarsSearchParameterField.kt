@@ -36,9 +36,9 @@ import com.akellolcc.cigars.theme.loadIcon
 import kotlinx.coroutines.flow.Flow
 
 class CigarsSearchParameterField(
-    parameter: SearchParam<String>,
+    parameter: FilterParameter<String>,
     showLeading: Boolean,
-    onAction: ((SearchParameterAction, SearchParam<String>) -> Flow<Any?>)?
+    onAction: ((SearchParameterAction, FilterParameter<String>) -> Flow<Any?>)?
 ) :
     SearchParameterField<String>(parameter, showLeading, onAction) {
     @Composable

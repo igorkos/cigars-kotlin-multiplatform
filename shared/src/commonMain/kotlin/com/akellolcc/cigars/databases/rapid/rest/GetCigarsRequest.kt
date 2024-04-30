@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 3:35 PM
+ * Last modified 4/29/24, 2:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.rapid.rest
 
@@ -20,6 +20,7 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.search.FilterParameter
 import com.akellolcc.cigars.utils.fraction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -74,15 +74,11 @@ data class RapidCigar(
 
 @Serializable
 class GetCigarsResponse(val cigars: List<RapidCigar>, val page: Int, val count: Int)
-class GetCigarsRequest(
-    val name: String? = null, val brand: Long? = null, val country: String? = null,
-    val filler: String? = null, val wrapper: String? = null, val color: String? = null,
-    val strength: CigarStrength? = null
-) {
+class GetCigarsRequest(val fields: List<FilterParameter<String>>) {
     private var page = 0
     private var totalItems = 0
     private var receivedItems = 0
-    val isLastPage: Boolean
+    private val isLastPage: Boolean
         get() = if (page == 0) false else receivedItems >= totalItems
 
     companion object {
@@ -91,14 +87,19 @@ class GetCigarsRequest(
 
     private val restRequest: RestRequest
         get() {
-            val url = BASE_URL + "page=$page" +
-                    if (name != null) "&name=$name" else "" +
-                            if (brand != null) "&brandId=$brand" else "" +
-                                    if (country != null) "&country=$country" else "" +
-                                            if (filler != null) "&filler=$filler" else "" +
-                                                    if (wrapper != null) "&wrapper=$wrapper" else "" +
-                                                            if (color != null) "&color=$color" else "" +
-                                                                    if (strength != null) "&strength=$strength" else ""
+            var url = BASE_URL + "page=$page"
+            fields.forEach { field ->
+                url += when (field.key) {
+                    "name" -> "&name=${field.value}"
+                    "brand" -> "&brand=${field.value}"
+                    "country" -> "&country=${field.value}"
+                    "filler" -> "&filler=${field.value}"
+                    "wrapper" -> "&wrapper=${field.value}"
+                    "color" -> "&color=${field.value}"
+                    "strength" -> "&strength=${field.value}"
+                    else -> {}
+                }
+            }
             return RestRequest(GET, url)
         }
     private val json = Json { ignoreUnknownKeys = true }
@@ -114,7 +115,7 @@ class GetCigarsRequest(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun call(): Flow<List<Cigar>> {
         return flow {
-            emit(restRequest.execute().flatMapConcat { restResponse ->
+            val list = restRequest.execute().flatMapConcat { restResponse ->
                 if (restResponse.status == 200) {
                     val response = json.decodeFromString<GetCigarsResponse>(restResponse.body)
                     Log.debug("GetCigarsRequest got page=${response.page} count=${response.count} get=${response.cigars.size}")
@@ -128,9 +129,10 @@ class GetCigarsRequest(
                 }
             }.flatMapConcat {
                 GetCigarsBrand(it).execute()
-            }.map {
-                it.toCigar()
-            }.toList())
+            }.flatMapConcat {
+                flowOf(it.toCigar())
+            }.toList()
+            emit(list)
         }
     }
 }

@@ -21,7 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.ImagesDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 
 class ImagesTableQueries(override val queries: ImagesDatabaseQueries) :
     DatabaseQueries<CigarImage> {
@@ -29,11 +29,11 @@ class ImagesTableQueries(override val queries: ImagesDatabaseQueries) :
         return queries.get(id, ::imageFactory)
     }
 
-    override fun allAsc(sortBy: String, filter: List<SearchParam<*>>?): Query<CigarImage> {
+    override fun allAsc(sortBy: String, filter: List<FilterParameter<*>>?): Query<CigarImage> {
         return queries.allAsc(::imageFactory)
     }
 
-    override fun allDesc(sortBy: String, filter: List<SearchParam<*>>?): Query<CigarImage> {
+    override fun allDesc(sortBy: String, filter: List<FilterParameter<*>>?): Query<CigarImage> {
         return queries.allDesc(::imageFactory)
     }
 

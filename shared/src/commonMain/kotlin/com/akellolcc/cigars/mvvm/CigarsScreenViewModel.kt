@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 8:20 PM
+ * Last modified 4/29/24, 8:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,8 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.screens.search.CigarSortingParameters
+import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 
 
@@ -28,7 +30,7 @@ open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewMode
     override val repository: CigarsRepository = createRepository(CigarsRepository::class)
 
     init {
-        sortField = CigarSortingFields.Name.value
+        sortField = FilterParameter(CigarSortingFields.Name.value, true)
         sortingFields = CigarSortingParameters()
     }
 
@@ -36,7 +38,7 @@ open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewMode
         sendEvent(CigarsAction.RouteToCigar(entity))
     }
 
-    companion object Factory : ViewModelsFactory<CigarsScreenViewModel>() {
+    companion object Factory : ObjectFactory<CigarsScreenViewModel>() {
         override fun factory(data: Any?): CigarsScreenViewModel {
             return CigarsScreenViewModel()
         }

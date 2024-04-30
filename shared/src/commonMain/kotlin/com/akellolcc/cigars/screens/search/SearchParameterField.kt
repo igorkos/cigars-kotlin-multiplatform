@@ -34,9 +34,9 @@ enum class SearchParameterAction {
 }
 
 abstract class SearchParameterField<T : Comparable<T>>(
-    val parameter: SearchParam<T>,
+    val parameter: FilterParameter<T>,
     var showLeading: Boolean = false,
-    var onAction: ((SearchParameterAction, SearchParam<T>) -> Flow<Any?>)? = null
+    var onAction: ((SearchParameterAction, FilterParameter<T>) -> Flow<Any?>)? = null
 ) {
     var value by mutableStateOf("")
 

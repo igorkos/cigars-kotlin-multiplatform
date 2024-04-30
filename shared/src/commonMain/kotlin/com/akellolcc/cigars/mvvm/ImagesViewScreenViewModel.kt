@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 2:56 PM
+ * Last modified 4/29/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.mvvm
 
@@ -30,6 +30,7 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
@@ -100,7 +101,7 @@ class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :
     override val repository: CigarImagesRepository =
         createRepository(CigarImagesRepository::class, cigar.rowid)
 
-    companion object Factory : ViewModelsFactory<CigarImagesViewScreenViewModel>() {
+    companion object Factory : ObjectFactory<CigarImagesViewScreenViewModel>() {
         override fun factory(data: Any?): CigarImagesViewScreenViewModel {
             val params = data as Pair<*, *>
             return CigarImagesViewScreenViewModel(params.first as Cigar, params.second as Int)
@@ -119,7 +120,7 @@ class HumidorImagesViewScreenViewModel(val humidor: Humidor, select: Int) :
         return CigarImage(-1, bytes = bytes, humidorId = humidor.rowid)
     }
 
-    companion object Factory : ViewModelsFactory<HumidorImagesViewScreenViewModel>() {
+    companion object Factory : ObjectFactory<HumidorImagesViewScreenViewModel>() {
         override fun factory(data: Any?): HumidorImagesViewScreenViewModel {
             val params = data as Pair<*, *>
             return HumidorImagesViewScreenViewModel(params.first as Humidor, params.second as Int)

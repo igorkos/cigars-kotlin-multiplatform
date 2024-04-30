@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 3:10 PM
+ * Last modified 4/29/24, 3:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.rapid.rest
 
@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -47,14 +48,14 @@ class GetCigarsBrand(val cigar: RapidCigar) {
             restRequest.execute().map { restResponse ->
                 if (restResponse.status == 200) {
                     val response = Json.decodeFromString<GetCigarsBrandResponse>(restResponse.body)
-                    //Log.debug("Got brand=${response.brand.brandId} name=${response.brand.name}")
+                    Log.debug("Got brand=${response.brand.brandId} name=${response.brand.name}")
                     cigar.brand = response.brand.name
                     emit(cigar)
                 } else {
                     Log.error("GetCigarsBrand got response ${restResponse.status}")
                     throw Exception("Got response ${restResponse.status}")
                 }
-            }
+            }.single()
         }
     }
 
@@ -106,7 +107,7 @@ class GetCigarsBrands(val brand: String?) {
                     Log.error("GetCigarsRequest got response ${restResponse.status}")
                     throw Exception("Got response ${restResponse.status}")
                 }
-            }
+            }.single()
         }
     }
 

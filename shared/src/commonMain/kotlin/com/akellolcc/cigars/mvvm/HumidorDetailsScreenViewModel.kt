@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 2:56 PM
+ * Last modified 4/29/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.mvvm
 
@@ -25,6 +25,7 @@ import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
 
@@ -115,7 +116,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
         }
     }
 
-    companion object Factory : ViewModelsFactory<HumidorDetailsScreenViewModel>() {
+    companion object Factory : ObjectFactory<HumidorDetailsScreenViewModel>() {
         override fun factory(data: Any?): HumidorDetailsScreenViewModel {
             return HumidorDetailsScreenViewModel(data as Humidor)
         }

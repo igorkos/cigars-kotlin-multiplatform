@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 1:38 PM
+ * Last modified 4/29/24, 9:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,7 +54,8 @@ enum class DatabaseType {
 expect fun <T> loadDemoSet(resource: FileResource, inMemory: Boolean): List<T>
 
 class Database(override val inMemory: Boolean) : DatabaseInterface {
-    private val database = DatabaseType.getDatabase(DatabaseType.SqlDelight, inMemory)
+
+    private val database: DatabaseInterface = DatabaseType.getDatabase(DatabaseType.SqlDelight, inMemory)
 
     companion object {
         private var _instance: Database? = null

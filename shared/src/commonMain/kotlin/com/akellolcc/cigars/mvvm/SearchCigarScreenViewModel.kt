@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 12:59 PM
+ * Last modified 4/29/24, 9:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,65 +16,43 @@
 
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
-import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.search.CigarSortingParameters
+import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 
 
-class SearchCigarScreenViewModel() :
+class SearchCigarScreenViewModel :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
     override val repository: CigarsRepository = createRepository(CigarsRepository::class)
 
     private var request: GetCigarsRequest? = null
-    private var brandRequest: GetCigarsBrands? = null
-
-    var name by mutableStateOf("")
-    var country by mutableStateOf("")
-
-    //CigarsSearchBrandField values
-    var brand by mutableStateOf<RapidCigarBrand?>(null)
-    var brands by mutableStateOf(listOf<RapidCigarBrand>())
-    var expanded by mutableStateOf(false)
 
     init {
-        //addSearchParameter(CigarSearchFields.Name)
-        //sortField = CigarSearchFields.Name.value
+        sortField = FilterParameter(CigarSortingFields.Name.value, false)
+        sortingFields = CigarSortingParameters()
     }
 
     override fun entitySelected(entity: Cigar) {
     }
 
-
-    fun setFieldValue(parameter: CigarSortingFields, value: Any?) {
-        when (parameter) {
-            CigarSortingFields.Name -> name = value as String
-            CigarSortingFields.Country -> country = value as String
-            CigarSortingFields.Brand -> brand = value as RapidCigarBrand
-            CigarSortingFields.Shape -> TODO()
-            CigarSortingFields.Gauge -> TODO()
-            CigarSortingFields.Length -> TODO()
-        }
-    }
-
     override fun sortingOrder(ascending: Boolean) {
-        accenting = ascending
+        sortField?.value = ascending
         sortEntities(entities)
     }
 
     private fun sortEntities(list: List<Cigar>) {
-        val field = when (sortField) {
-            CigarSortingFields.Name.name -> CigarSortingFields.Name
-            CigarSortingFields.Brand.name -> CigarSortingFields.Brand
-            CigarSortingFields.Country.name -> CigarSortingFields.Country
+        val field = when (sortField?.key) {
+            CigarSortingFields.Name.value -> CigarSortingFields.Name
+            CigarSortingFields.Brand.value -> CigarSortingFields.Brand
+            CigarSortingFields.Country.value -> CigarSortingFields.Country
             else -> CigarSortingFields.Name
         }
 
@@ -86,60 +64,31 @@ class SearchCigarScreenViewModel() :
                 else -> CigarSortingFields.Name
             }
         }).also {
-            if (!accenting) {
+            if (sortField?.value == false) {
                 it.reversed()
             }
         }
     }
 
-    private val canLoad: Boolean
-        get() {
-            var can = true
-            /*searchParams.forEach {
-                can = when (it.type) {
-                    CigarSearchFields.Name -> can && name.isNotBlank()
-                    CigarSearchFields.Brand -> can && brand != null
-                    CigarSearchFields.Country -> can && country.isNotBlank()
-                }
-            }*/
-            return can
-        }
+    fun searchFieldsChanged(fields: List<FilterParameter<String>>?) {
+        searchingFields = fields
+        entities = listOf()
+    }
+
 
     override fun loadEntities(reload: Boolean) {
-        if (canLoad) {
-            if (request == null || (request != null && request?.name != name && brand != null && request?.brand != brand?.brandId && request?.country != country)) {
-                request = GetCigarsRequest(name = name.ifBlank { null },
-                    brand = brand?.brandId,
-                    country = country.ifBlank { null })
+        searchingFields?.let {
+            if (request == null || request!!.fields != it) {
+                request = GetCigarsRequest(it)
             }
-            request?.let {
-                execute(it.next()) { cigars ->
-                    Log.debug("Cigars: ${cigars.size}")
-                    if (cigars.isNotEmpty()) {
-                        val list = entities + it
-                        sortEntities(cigars)
-                    }
+            execute(request!!.next()) { cigars ->
+                Log.debug("Cigars: ${cigars.size}")
+                if (cigars.isNotEmpty()) {
+                    val list = entities + it
+                    sortEntities(cigars)
                 }
             }
         }
-    }
-
-    fun getBrands(query: String) {
-        if (query.isNotBlank()) {
-            if (brandRequest == null || brandRequest?.brand != query) {
-                brandRequest = GetCigarsBrands(brand = query)
-            }
-            execute(brandRequest!!.next()) {
-                brands = it
-                expanded = true
-            }
-        }
-    }
-
-    fun selectBrand(brand: RapidCigarBrand) {
-        this.brand = brand
-        expanded = false
-        sendEvent(Actions.BrandSelected(brand))
     }
 
     override fun loadMore() {
@@ -147,7 +96,7 @@ class SearchCigarScreenViewModel() :
         loadEntities(false)
     }
 
-    companion object Factory : ViewModelsFactory<SearchCigarScreenViewModel>() {
+    companion object Factory : ObjectFactory<SearchCigarScreenViewModel>() {
         override fun factory(data: Any?): SearchCigarScreenViewModel {
             return SearchCigarScreenViewModel()
         }

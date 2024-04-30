@@ -17,7 +17,7 @@
 package com.akellolcc.cigars.databases.repository
 
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.screens.search.FilterParameter
 import kotlinx.coroutines.flow.Flow
 
 interface Repository<ENTITY : BaseEntity> {
@@ -26,11 +26,11 @@ interface Repository<ENTITY : BaseEntity> {
      */
     fun getSync(id: Long, where: Long? = null): ENTITY
 
-    fun allSync(sorting: SearchParam<Boolean>? = null, filter: List<SearchParam<*>>? = null): List<ENTITY>
+    fun allSync(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null): List<ENTITY>
 
     fun observe(id: Long): Flow<ENTITY>
 
-    fun all(sorting: SearchParam<Boolean>? = null, filter: List<SearchParam<*>>? = null): Flow<List<ENTITY>>
+    fun all(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null): Flow<List<ENTITY>>
 
     fun add(entity: ENTITY): Flow<ENTITY>
 

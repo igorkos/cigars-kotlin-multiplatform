@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 12:24 PM
+ * Last modified 4/29/24, 3:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,28 +34,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
+import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class CigarsSearchBrandField(
-    parameter: SearchParam<String>,
+    parameter: FilterParameter<String>,
     showLeading: Boolean,
-    onAction: ((SearchParameterAction, SearchParam<String>) -> Flow<Any?>)?
+    onAction: ((SearchParameterAction, FilterParameter<String>) -> Flow<Any?>)?
 ) : SearchParameterField<String>(parameter, showLeading, onAction) {
+
+    private var brandRequest: GetCigarsBrands? = null
+
+    private fun getBrands(query: String, callback: (List<RapidCigarBrand>) -> Unit) {
+        if (query.isNotBlank()) {
+            if (brandRequest == null || brandRequest?.brand != query) {
+                brandRequest = GetCigarsBrands(brand = query)
+            }
+            CoroutineScope(Dispatchers.IO).launch {
+                brandRequest!!.next().collect {
+                    callback(it)
+                }
+            }
+        }
+    }
+
     @Composable
     override fun Render(enabled: Boolean) {
         var expanded by remember { mutableStateOf(false) }
         var value by remember { mutableStateOf("") }
-        var brands by remember { mutableStateOf(listOf<RapidCigarBrand>()) }
-        //var selectedBrand by remember { mutableStateOf<RapidCigarBrand?>(null) }
+        var brands by mutableStateOf(listOf<RapidCigarBrand>())
 
-        LaunchedEffect(value) {
-            parameter.value = value
-            onAction?.invoke(SearchParameterAction.LoadData, parameter)?.collect {
-
+        LaunchedEffect(parameter.value) {
+            Log.debug("Brand search field: ${parameter.value}")
+            getBrands(parameter.value) {
+                Log.debug("Get Brands: $it")
+                brands = it
+                expanded = true
             }
         }
 
@@ -66,7 +89,7 @@ class CigarsSearchBrandField(
             if (showLeading) {
                 IconButton(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = { onAction?.invoke(SearchParameterAction.Remove, parameter) }
+                    onClick = { onAction(SearchParameterAction.Remove) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }
@@ -87,7 +110,6 @@ class CigarsSearchBrandField(
                     },
                     onKeyboardAction = {
                         parameter.value = value
-                        onAction?.invoke(SearchParameterAction.Completed, parameter)
                     },
                     imeAction = ImeAction.Search
                 )
@@ -107,7 +129,7 @@ class CigarsSearchBrandField(
                             onClick = {
                                 value = it.name ?: ""
                                 parameter.value = value
-                                onAction?.invoke(SearchParameterAction.Completed, parameter)
+                                onAction(SearchParameterAction.Completed)
                             }
                         )
                     }

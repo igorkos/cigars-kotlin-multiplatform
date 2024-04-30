@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 2:27 PM
+ * Last modified 4/29/24, 1:31 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,6 +28,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,20 +37,20 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.screens.search.CigarSearchParameters
 import com.akellolcc.cigars.screens.search.SearchComponent
+import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlin.jvm.Transient
 
 class SearchScreen(
@@ -75,20 +76,20 @@ class SearchCigarScreen(
 
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
-        CigarSortingFields.enumValues().map {
-            val selected = viewModel.sorting == it.first.value
+        viewModel.sortingFields?.map {
+            val selected = viewModel.sorting == it
             DropdownMenuItem(
                 leadingIcon = {
                     loadIcon(if (selected) Images.icon_menu_checkmark else Images.icon_menu_sort, Size(24.0F, 24.0F))
                 },
                 text = {
                     TextStyled(
-                        it.second,
+                        it.label,
                         TextStyles.Subhead
                     )
                 },
                 onClick = {
-                    viewModel.sorting = it.first.value
+                    viewModel.sorting = it
                     onDismiss()
                 }
             )
@@ -98,12 +99,24 @@ class SearchCigarScreen(
     @Composable
     override fun ContentHeader(modifier: Modifier) {
         val fields = remember { CigarSearchParameters() }
+        LaunchedEffect(fields.selected) {
+            viewModel.searchFieldsChanged(fields.selected)
+        }
         SearchComponent(
             modifier = modifier,
             loading = viewModel.loading,
             fields = fields,
-        ) { a, b ->
-            flowOf(true)
+        ) { action, b ->
+            flow {
+                when (action) {
+                    SearchParameterAction.Completed -> {
+                        viewModel.reload()
+                    }
+
+                    else -> {}
+                }
+                emit(true)
+            }
         }
     }
 

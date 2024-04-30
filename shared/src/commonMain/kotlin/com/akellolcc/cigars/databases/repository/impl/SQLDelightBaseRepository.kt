@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 11:56 PM
+ * Last modified 4/29/24, 8:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,8 @@ import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
-import com.akellolcc.cigars.screens.search.SearchParam
+import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.search.FilterParameter
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,33 +39,34 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
-abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
+abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
     Repository<ENTITY> {
 
     override fun getSync(id: Long, where: Long?): ENTITY {
         return wrapper.get(id, where).executeAsOne()
     }
 
-    private fun queryAll(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Query<ENTITY> {
+    private fun queryAll(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Query<ENTITY> {
         val accenting = sorting?.value ?: true
         val sortKey = sorting?.key ?: "name"
+        Log.debug("queryAll: $filter")
         return if (accenting)
             wrapper.allAsc(sortKey, filter)
         else
             wrapper.allDesc(sortKey, filter)
     }
 
-    override fun allSync(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): List<ENTITY> =
+    override fun allSync(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): List<ENTITY> =
         queryAll(sorting, filter).executeAsList()
 
-    fun observe(entity: ENTITY): Flow<ENTITY> = observe(entity.rowid)
+
+    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Flow<List<ENTITY>> =
+        queryAll(sorting, filter).asFlow().mapToList(Dispatchers.IO)
+
     override fun observe(id: Long): Flow<ENTITY> {
         if (id < 0) return MutableStateFlow(wrapper.empty())
         return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO)
     }
-
-    override fun all(sorting: SearchParam<Boolean>?, filter: List<SearchParam<*>>?): Flow<List<ENTITY>> =
-        queryAll(sorting, filter).asFlow().mapToList(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun addAll(entities: List<ENTITY>): Flow<List<ENTITY>> {
@@ -73,7 +75,6 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
                 emit(emptyList())
                 return@flow
             }
-            var count = 0
             val list = mutableListOf<ENTITY>()
             entities.asFlow().flatMapConcat { entity ->
                 add(entity)
@@ -101,7 +102,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
     override fun update(entity: ENTITY): Flow<ENTITY> {
         return flow {
             if (contains(entity)) {
-                doUpsert(entity, false).collect() {
+                doUpsert(entity, false).collect {
                     emit(entity)
                 }
             } else {
@@ -126,7 +127,7 @@ abstract class BaseRepository<ENTITY : BaseEntity>(protected open val wrapper: D
         return flow {
             val idExists = contains(id, where)
             if (idExists) {
-                doDelete(id, where).collect() {
+                doDelete(id, where).collect {
                     emit(true)
                 }
             } else {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 10:22 PM
+ * Last modified 4/29/24, 1:18 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,20 +20,41 @@ import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
 
 
-data class SearchParam<T : Comparable<T>>(val key: String, var value: T, val label: String, val icon: ImageResource) :
-    Comparable<SearchParam<T>> {
+data class FilterParameter<T>(val key: String, var value: T, val label: String, val icon: ImageResource) :
+    Comparable<FilterParameter<T>> {
     constructor(key: String, value: T) : this(key, value, "", Images.tab_icon_search)
 
-    override fun compareTo(other: SearchParam<T>): Int {
+    override fun compareTo(other: FilterParameter<T>): Int {
         if (other == this) return 0
-        return value.compareTo(other.value)
+        if (key != other.key) return key.compareTo(other.key)
+        when (value) {
+            is String -> {
+                return (value as String).compareTo(other.value as String)
+            }
+
+            is Long -> {
+                return (value as Long).compareTo(other.value as Long)
+            }
+
+            is Double -> {
+                return (value as Double).compareTo(other.value as Double)
+            }
+
+            is Boolean -> {
+                return (value as Boolean).compareTo(other.value as Boolean)
+            }
+
+            else -> {
+                return -1
+            }
+        }
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
-        other as SearchParam<*>
+        other as FilterParameter<*>
 
         if (key != other.key) return false
         if (value != other.value) return false
@@ -48,10 +69,10 @@ data class SearchParam<T : Comparable<T>>(val key: String, var value: T, val lab
     }
 }
 
-abstract class SearchParameters<T : Comparable<T>, R>() : Iterable<R> {
-    protected lateinit var params: List<SearchParam<T>>
-    protected var selectedParams: List<SearchParam<T>> = mutableListOf()
-    val selected: List<SearchParam<T>>
+abstract class FilterCollection<T : Comparable<T>, out R> : Iterable<R> {
+    protected lateinit var params: List<FilterParameter<T>>
+    protected var selectedParams: List<FilterParameter<T>> = mutableListOf()
+    val selected: List<FilterParameter<T>>
         get() = selectedParams
 
     override fun iterator(): Iterator<R> {
@@ -68,22 +89,22 @@ abstract class SearchParameters<T : Comparable<T>, R>() : Iterable<R> {
         }
     }
 
-    abstract fun build(param: SearchParam<T>): R
+    abstract fun build(param: FilterParameter<T>): R
 
     val showLeading: Boolean
         get() = selectedParams.size > 1
 
-    val availableFields: List<SearchParam<T>>
+    val availableFields: List<FilterParameter<T>>
         get() {
             return params.filter { it !in selectedParams }
         }
 
 
-    fun add(value: SearchParam<T>) {
+    fun add(value: FilterParameter<T>) {
         selectedParams = selectedParams + value
     }
 
-    fun remove(value: SearchParam<T>) {
+    fun remove(value: FilterParameter<T>) {
         selectedParams = selectedParams - value
     }
 

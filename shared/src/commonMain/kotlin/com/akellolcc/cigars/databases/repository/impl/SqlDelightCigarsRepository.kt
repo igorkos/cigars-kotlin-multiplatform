@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:24 PM
+ * Last modified 4/29/24, 8:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,6 @@
 package com.akellolcc.cigars.databases.repository.impl
 
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
-import com.akellolcc.cigars.databases.RepositoryFactory
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
@@ -29,6 +28,7 @@ import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarsTableQueries
+import com.akellolcc.cigars.utils.ObjectFactory
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
 open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
-    BaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
+    SQLDelightBaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
 
     /**
      * Add a new cigar to the database
@@ -160,7 +160,7 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
         }
     }
 
-    companion object Factory : RepositoryFactory<SqlDelightCigarsRepository>() {
+    companion object Factory : ObjectFactory<SqlDelightCigarsRepository>() {
         override fun factory(data: Any?): SqlDelightCigarsRepository {
             val queries = SqlDelightDatabase.instance.database.cigarsDatabaseQueries
             return SqlDelightCigarsRepository(queries)

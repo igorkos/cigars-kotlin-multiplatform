@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 11:21 PM
+ * Last modified 4/29/24, 8:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,44 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases
 
-import cafe.adriel.voyager.core.concurrent.ThreadSafeMap
 import com.akellolcc.cigars.databases.repository.Repository
+import com.akellolcc.cigars.utils.ObjectRegistry
 import kotlin.reflect.KClass
 
-abstract class RepositoryFactory<T : Repository<*>> {
-    abstract fun factory(data: Any? = null): T
-}
-
-object RepositoryRegistry {
-
-    @PublishedApi
-    internal val factories: ThreadSafeMap<KClass<*>, RepositoryFactory<*>> = ThreadSafeMap()
-
-    inline fun <reified T : Repository<*>> register(
-        modelKClass: KClass<*>,
-        factory: RepositoryFactory<T>
-    ) {
-        factories[modelKClass] = factory
-    }
-
-    inline fun <reified T : Repository<*>> create(
-        modelKClass: KClass<out T>,
-        data: Any? = null
-    ): T {
-        if (factories.containsKey(modelKClass)) {
-            val factory: RepositoryFactory<T> = factories[modelKClass] as RepositoryFactory<T>
-            return factory.factory(data)
-        }
-        throw IllegalArgumentException("Repository for ${modelKClass.simpleName} not found")
-    }
-}
+object RepositoryRegistry : ObjectRegistry<Repository<*>>()
 
 inline fun <reified T : Repository<*>> createRepository(
     modelKClass: KClass<out T>,
     data: Any? = null
-): T = RepositoryRegistry.create(modelKClass, data)
+): T = RepositoryRegistry.create(modelKClass, data) as T
 

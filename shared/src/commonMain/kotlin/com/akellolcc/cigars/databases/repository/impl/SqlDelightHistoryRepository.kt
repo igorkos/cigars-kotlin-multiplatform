@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:23 PM
+ * Last modified 4/29/24, 8:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.flow
 abstract class SqlDelightHistoryRepository(
     protected open var id: Long,
     protected val queries: HistoryDatabaseQueries
-) : BaseRepository<History>(HistoryTableQueries(queries)), HistoryRepository {
+) : SQLDelightBaseRepository<History>(HistoryTableQueries(queries)), HistoryRepository {
 
     override fun doUpsert(entity: History, add: Boolean): Flow<History> {
         return flow {
