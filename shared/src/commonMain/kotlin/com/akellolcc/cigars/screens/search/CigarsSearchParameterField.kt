@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 12:21 AM
+ * Last modified 5/4/24, 11:42 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,34 +16,65 @@
 
 package com.akellolcc.cigars.screens.search
 
-import TextStyled
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.CigarsSearchFieldViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.flow.Flow
 
-class CigarsSearchParameterField(
-    parameter: FilterParameter<String>,
-    showLeading: Boolean,
-    onAction: ((SearchParameterAction, FilterParameter<String>) -> Flow<Any?>)?
-) :
-    SearchParameterField<String>(parameter, showLeading, onAction) {
+class CigarsSearchParameterField<T : Comparable<T>>(
+    parameter: FilterParameter<T>,
+    showLeading: Boolean = false,
+    enabled: Boolean = true,
+    onAction: ((SearchParameterAction, FilterParameter<T>) -> Unit)? = null
+) : SearchParameterField<T>(parameter, showLeading, enabled, onAction) {
+    override fun handleAction(event: Any, navigator: Navigator?) {
+        when (event) {
+            is CigarsSearchFieldViewModel.Action.Selected -> {
+                onAction(SearchParameterAction.Completed)
+            }
+
+            else -> {}
+        }
+    }
+
+    private val viewModel = createViewModel(CigarsSearchFieldViewModel::class, parameter)
+
+    override fun validate(): Boolean {
+        val valid = viewModel.validate()
+        Log.debug("validate(${parameter.key}): $valid")
+        return valid
+    }
+
     @Composable
-    override fun Render(enabled: Boolean) {
-        var value by remember { mutableStateOf("") }
+    override fun Content() {
+        Log.debug("isErorr: ${viewModel.isError}")
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(state) {
+            Log.debug("LaunchedEffect: $state")
+            state?.let { handleAction(it, null) }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -57,23 +88,35 @@ class CigarsSearchParameterField(
                 }
             }
             TextStyled(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).onFocusChanged {
+                    viewModel.onFocusChange(it.isFocused)
+                },
                 label = parameter.label,
-                text = value,
+                text = viewModel.value,
                 enabled = enabled,
                 editable = true,
                 style = TextStyles.Headline,
                 maxLines = 1,
                 onValueChange = {
-                    value = it
+                    viewModel.value = it
                 },
                 onKeyboardAction = {
-                    value = value.trim()
-                    parameter.value = value
-                    onAction(SearchParameterAction.Completed)
+                    viewModel.onCompleted()
                 },
-                imeAction = ImeAction.Search
+                imeAction = ImeAction.Search,
+                isError = viewModel.isError,
+                inputMode = viewModel.keyboardType,
+                supportingText = if (!viewModel.isError) null else {
+                    @Composable {
+                        TextStyled(
+                            modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
+                            text = viewModel.annotation,
+                            style = TextStyles.Error
+                        )
+                    }
+                }
             )
         }
     }
+
 }

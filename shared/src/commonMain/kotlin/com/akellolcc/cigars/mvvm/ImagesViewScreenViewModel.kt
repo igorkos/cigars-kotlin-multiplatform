@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 9:02 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) :
     BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>(), PermissionCallback {
     var launchCamera by mutableStateOf(false)
     var launchGallery by mutableStateOf(false)
-    var lastSelect by mutableStateOf(select)
+    private var lastSelect by mutableStateOf(select)
     var select by mutableStateOf(select)
 
     var permissionCamera by mutableStateOf(false)

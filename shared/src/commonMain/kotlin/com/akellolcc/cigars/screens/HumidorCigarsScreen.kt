@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 1:56 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -37,6 +36,7 @@ import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.CigarListRow
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
 import com.akellolcc.cigars.screens.navigation.HumidorHistoryRoute
@@ -47,14 +47,11 @@ import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import kotlin.jvm.Transient
 
 class HumidorCigarsScreen(override val route: NavRoute) :
     BaseTabListScreen<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar, HumidorCigarsScreenViewModel>(
         route
     ) {
-    @Transient
-    override lateinit var viewModel: HumidorCigarsScreenViewModel
 
     @Composable
     override fun Content() {

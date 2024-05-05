@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 10:07 PM
+ * Last modified 5/4/24, 11:35 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens.search
 
-import TextStyled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,99 +26,102 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.CigarsSearchControlViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.LinkButton
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.search.data.FilterCollection
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.launch
 
-@Composable
-fun <T : Comparable<T>> SearchComponent(
-    modifier: Modifier = Modifier,
-    loading: Boolean,
-    fields: FilterCollection<T, SearchParameterField<T>>,
-    onAction: (SearchParameterAction, FilterParameter<T>?) -> Flow<Any?>,
+data class SearchComponent(
+    val modifier: Modifier = Modifier,
+    val loading: Boolean,
+    val fields: FilterCollection,
+    val onAction: (SearchParameterAction) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var compose by remember { mutableStateOf(false) }
 
-    LaunchedEffect(compose) {}
+    val viewModel = createViewModel(CigarsSearchControlViewModel::class, fields)
 
-    Column(modifier = modifier) {
-        fields.map { field ->
-            field.showLeading = fields.showLeading
-            field.onAction = { action, value ->
-                flow {
-                    when (action) {
-                        SearchParameterAction.Remove -> {
-                            fields.remove(value)
-                            compose = !compose
+    @Composable
+    fun Content() {
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(state) {
+            state?.let {
+                when (state) {
+                    is CigarsSearchControlViewModel.Action.Completed -> {
+                        if (viewModel.isAllValid) {
+                            onAction(SearchParameterAction.Completed)
                         }
+                    }
 
-                        else -> {}
-                    }
-                    onAction(action, value).collect {
-                        emit(it)
+                    else -> {
+                        Log.debug("SearchComponent state: $state")
                     }
                 }
             }
-            field.Render(!loading)
         }
-        if (fields.availableFields.isNotEmpty()) {
-            Column(
-                modifier = modifier.wrapContentSize().align(Alignment.End),
-                horizontalAlignment = Alignment.End
-            ) {
-                LinkButton(
-                    title = Localize.button_title_add_search_field,
-                    onClick = { expanded = true }
-                )
-                DropdownMenu(expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
-                    fields.availableFields.map {
-                        DropdownMenuItem(
-                            leadingIcon = {
-                                loadIcon(it.icon, Size(24.0F, 24.0F))
-                            },
-                            text = {
-                                TextStyled(
-                                    it.label,
-                                    TextStyles.Subhead
-                                )
-                            },
-                            onClick = {
-                                fields.add(it)
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    onAction(SearchParameterAction.Add, it).single()
+
+        Column() {
+            viewModel.fields.controls.map {
+                it.showLeading = fields.showLeading
+                it.onAction = { action, parameter ->
+                    viewModel.onFieldAction(action, parameter)
+                }
+                it.enabled = !loading
+                it.Content()
+            }
+            if (fields.availableFields.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    LinkButton(
+                        title = Localize.button_title_add_search_field,
+                        onClick = { viewModel.expanded = true }
+                    )
+                    DropdownMenu(expanded = viewModel.expanded,
+                        onDismissRequest = { viewModel.expanded = false }) {
+                        fields.availableFields.map {
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    loadIcon(it.icon, Size(24.0F, 24.0F))
+                                },
+                                text = {
+                                    TextStyled(
+                                        it.label,
+                                        TextStyles.Subhead
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.onFieldAction(SearchParameterAction.Add, it)
+                                    viewModel.expanded = false
                                 }
-                                expanded = false
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
-        }
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(32.dp),
-                )
+
+            if (loading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(32.dp),
+                    )
+                }
+
             }
         }
     }

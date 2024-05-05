@@ -17,7 +17,7 @@
 package com.akellolcc.cigars.databases.repository
 
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import kotlinx.coroutines.flow.Flow
 
 interface Repository<ENTITY : BaseEntity> {

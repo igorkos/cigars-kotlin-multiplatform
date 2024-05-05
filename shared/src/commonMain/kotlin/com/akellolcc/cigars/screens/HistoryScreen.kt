@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:21 PM
+ * Last modified 5/1/24, 12:36 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +40,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
 import com.akellolcc.cigars.mvvm.HistoryScreenViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -109,12 +109,10 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                         TextStyled(
                             text = entity.date.formatDate(),
                             style = TextStyles.Subhead,
-                            keepHeight = true
                         )
                         TextStyled(
                             text = entity.cigar?.name ?: entity.humidorFrom.name,
                             style = TextStyles.Subhead,
-                            keepHeight = true
                         )
                         Row(
                             verticalAlignment = Alignment.Bottom,

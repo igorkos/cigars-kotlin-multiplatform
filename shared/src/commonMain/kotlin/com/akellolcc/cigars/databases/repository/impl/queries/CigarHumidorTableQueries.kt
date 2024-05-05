@@ -21,7 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 
 class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQueries) :
     DatabaseQueries<HumidorCigar> {

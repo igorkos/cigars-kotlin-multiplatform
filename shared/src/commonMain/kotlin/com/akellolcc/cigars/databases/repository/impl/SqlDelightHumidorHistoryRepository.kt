@@ -22,7 +22,7 @@ import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.historyFactory
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

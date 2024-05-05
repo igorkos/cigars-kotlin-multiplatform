@@ -23,7 +23,7 @@ import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 
 class CigarsTableQueries(override val queries: CigarsDatabaseQueries) : DatabaseQueries<Cigar> {
     override fun get(id: Long, where: Long?): Query<Cigar> {

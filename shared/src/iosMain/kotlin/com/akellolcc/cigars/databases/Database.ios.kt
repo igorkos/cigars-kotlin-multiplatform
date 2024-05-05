@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/26/24, 12:55 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases
 
@@ -24,9 +24,9 @@ actual fun <T> loadDemoSet(
     resource: FileResource,
     inMemory: Boolean
 ): List<T> {
-    if (inMemory) {
-        return emptyList()
+    return if (inMemory) {
+        emptyList()
     } else {
-        return Json.decodeFromString<List<T>>(readTextFile(resource) ?: "")
+        Json.decodeFromString<List<T>>(readTextFile(resource) ?: "")
     }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 2:27 PM
+ * Last modified 5/4/24, 11:18 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.fraction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -74,7 +74,7 @@ data class RapidCigar(
 
 @Serializable
 class GetCigarsResponse(val cigars: List<RapidCigar>, val page: Int, val count: Int)
-class GetCigarsRequest(val fields: List<FilterParameter<String>>) {
+class GetCigarsRequest(val fields: List<FilterParameter<*>>) {
     private var page = 0
     private var totalItems = 0
     private var receivedItems = 0
@@ -91,7 +91,7 @@ class GetCigarsRequest(val fields: List<FilterParameter<String>>) {
             fields.forEach { field ->
                 url += when (field.key) {
                     "name" -> "&name=${field.value}"
-                    "brand" -> "&brand=${field.value}"
+                    "brand" -> "&brandId=${field.value}"
                     "country" -> "&country=${field.value}"
                     "filler" -> "&filler=${field.value}"
                     "wrapper" -> "&wrapper=${field.value}"

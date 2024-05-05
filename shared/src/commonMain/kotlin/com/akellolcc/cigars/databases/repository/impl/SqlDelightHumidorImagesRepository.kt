@@ -22,7 +22,7 @@ import com.akellolcc.cigars.databases.ImagesDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.imageFactory
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

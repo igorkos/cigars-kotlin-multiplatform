@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 1:40 PM
+ * Last modified 5/4/24, 5:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************************************************************************/
+package com.akellolcc.cigars.screens.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,13 +25,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
@@ -51,8 +60,6 @@ fun TextStyled(
     minLines: Int = 1,
     editable: Boolean = false,
     modifier: Modifier = Modifier,
-    maxHeight: Int = 0,
-    keepHeight: Boolean = true,
     onValueChange: ((String) -> Unit)? = null,
     onKeyboardAction: ((ImeAction) -> Unit)? = null,
     inputMode: KeyboardType = KeyboardType.Text,
@@ -60,20 +67,48 @@ fun TextStyled(
     vertical: Boolean = false,
     enabled: Boolean = true,
     imeAction: ImeAction = ImeAction.Default,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    supportingText: @Composable (() -> Unit)? = null,
+    selection: TextRange? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val textStyle =
-        textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
+    val textStyle = textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
     val styleLabel = textStyle(labelStyle)
-    //   val textMeasurer = rememberTextMeasurer()
-    //   var textWith by remember { mutableStateOf(0) }
-    //   var textHeight by remember { mutableStateOf(maxHeight.dp) }
+    var hide by remember { mutableStateOf(false) }
+
+    SideEffect {
+        if (hide) {
+            keyboardController?.hide()
+            hide = false
+        }
+    }
 
     if (editable) {
+        var textFieldState by remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = text ?: "",
+                    selection = when {
+                        text.isNullOrEmpty() -> TextRange.Zero
+                        selection != null -> selection
+                        else -> TextRange(text.length, text.length)
+                    }
+                )
+            )
+        }
+
+        textFieldState = if (selection != null) {
+            textFieldState.copy(text = text ?: "", selection = selection)
+        } else {
+            textFieldState.copy(text = text ?: "")
+        }
+
+
         TextField(
             modifier = modifier,
-            value = text ?: "",
-            trailingIcon = {
+            value = textFieldState,
+            trailingIcon = trailingIcon ?: {
                 if (inputMode == KeyboardType.Text) {
                     IconButton(
                         modifier = Modifier.wrapContentSize(),
@@ -95,50 +130,54 @@ fun TextStyled(
                 )
             },
             onValueChange = {
-                onValueChange?.invoke(it)
+                textFieldState = it
+                onValueChange?.invoke(it.text)
             },
             keyboardActions = KeyboardActions(
                 onDone = {
                     Log.debug("onDone")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Done)
                 },
                 onGo = {
                     Log.debug("onGo")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Go)
                 },
                 onNext = {
                     Log.debug("onNext")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Next)
                 },
                 onPrevious = {
                     Log.debug("onPrevious")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Previous)
                 },
                 onSearch = {
                     Log.debug("onSearch")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Search)
                 },
                 onSend = {
                     Log.debug("onSend")
-                    keyboardController?.hide()
+                    hide = true
                     onKeyboardAction?.invoke(ImeAction.Send)
                 }),
             minLines = minLines,
             maxLines = maxLines,
             singleLine = maxLines == 1,
             textStyle = textStyle,
+            isError = isError,
+            supportingText = supportingText,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = inputMode,
                 autoCorrect = true,
                 capitalization = Sentences,
                 imeAction = imeAction
             ),
-            enabled = enabled
+            enabled = enabled,
+            visualTransformation = VisualTransformation.None
         )
     } else {
         @Composable
@@ -178,74 +217,3 @@ fun TextStyled(
         }
     }
 }
-
-/*
-val density = LocalDensity.current
-        if (maxLines != Int.MAX_VALUE) {
-            LazyColumn(
-                modifier = modifier
-                    .height(textHeight)
-                    //.background(materialColor(MaterialColors.color_error))
-                    .onSizeChanged {
-                        //Log.debug("Text size for '$text' -> $it maxHeight $maxHeight")
-                        textWith = it.width
-                        val oneLine = with(density) {
-                            textMeasurer.measure(
-                                text = text ?: "",
-                                maxLines = 1,
-                                style = textStyle,
-                                constraints = Constraints(maxWidth = textWith)
-                            ).size.height.toDp()
-                        }
-                        val height = with(density) {
-                            textMeasurer.measure(
-                                text = text ?: "",
-                                maxLines = maxLines,
-                                style = textStyle,
-                                constraints = Constraints(maxWidth = textWith)
-                            ).size.height.toDp()
-                        }
-                        textHeight = if (maxHeight > 0) {
-                            if (height < maxHeight.dp) {
-                                maxHeight.dp
-                            } else {
-                                height
-                            }
-                        } else {
-                            if (height < oneLine * maxLines && keepHeight) {
-                                oneLine * maxLines
-                            } else {
-                                height
-                            }
-                        }
-                    }
-            ) {
-                label?.let {
-                    item {
-                        Text(
-                            text = "$it$labelSuffix",
-                            color = styleLabel.color,
-                            fontSize = styleLabel.fontSize,
-                            fontStyle = styleLabel.fontStyle,
-                            fontFamily = styleLabel.fontFamily,
-                            textAlign = styleLabel.textAlign,
-                            maxLines = 1,
-                            minLines = 1
-                        )
-                    }
-                }
-                item {
-                    Text(
-                        modifier = modifier,
-                        text = text ?: "",
-                        color = textStyle.color,
-                        fontSize = textStyle.fontSize,
-                        fontStyle = textStyle.fontStyle,
-                        fontFamily = textStyle.fontFamily,
-                        textAlign = textStyle.textAlign,
-                    )
-                }
-            }
-        } else {
-
- */

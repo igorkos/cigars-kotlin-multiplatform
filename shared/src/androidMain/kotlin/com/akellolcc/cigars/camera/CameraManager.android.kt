@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 4:46 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.camera
 
@@ -35,12 +35,12 @@ import com.preat.peekaboo.image.picker.ResizeOptions
 class TakePictureCrop : ActivityResultContracts.TakePicture() {
     override fun createIntent(context: Context, input: Uri): Intent {
         val intent = super.createIntent(context, input)
-        intent.putExtra("crop", "true");
-        intent.putExtra("outputX", 200);
-        intent.putExtra("outputY", 200);
-        intent.putExtra("aspectX", 1);
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("scale", true);
+        intent.putExtra("crop", "true")
+        intent.putExtra("outputX", 200)
+        intent.putExtra("outputY", 200)
+        intent.putExtra("aspectX", 1)
+        intent.putExtra("aspectY", 1)
+        intent.putExtra("scale", true)
         return intent
     }
 }

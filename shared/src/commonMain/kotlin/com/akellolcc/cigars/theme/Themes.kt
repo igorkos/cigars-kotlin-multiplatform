@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,9 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.common.theme
+package com.akellolcc.cigars.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -26,13 +26,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.akellolcc.cigars.theme.Backgrounds
-import com.akellolcc.cigars.theme.DefaultBackground
-import com.akellolcc.cigars.theme.LocalBackgroundTheme
-import com.akellolcc.cigars.theme.LocalTintTheme
-import com.akellolcc.cigars.theme.TintTheme
-import com.akellolcc.cigars.theme.backgroundTheme
-import com.akellolcc.cigars.theme.createColorsTheme
 
 val typography = Typography(
     bodyMedium = TextStyle(

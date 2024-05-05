@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 10:13 PM
+ * Last modified 5/1/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,13 +54,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.mvvm.BaseListViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
@@ -71,7 +71,8 @@ import com.akellolcc.cigars.utils.ui.reachedBottom
 
 abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>>(override val route: NavRoute) :
     ITabItem<VM> {
-
+    @kotlin.jvm.Transient
+    override lateinit var viewModel: VM
     abstract fun handleAction(event: A, navigator: Navigator?)
 
     @Composable

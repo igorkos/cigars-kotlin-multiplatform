@@ -20,8 +20,8 @@ import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.databases.repository.CigarsRepository
-import com.akellolcc.cigars.screens.search.CigarSortingParameters
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.CigarSortingParameters
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 1:52 PM
+ * Last modified 5/2/24, 1:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,11 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.mvvm.CigarHistoryScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.CigarsBrandsSearchViewModel
 import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
+import com.akellolcc.cigars.mvvm.CigarsSearchControlViewModel
+import com.akellolcc.cigars.mvvm.CigarsSearchFieldViewModel
 import com.akellolcc.cigars.mvvm.FavoritesScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
@@ -88,6 +91,19 @@ fun CigarsApplication() {
         SearchCigarScreenViewModel::class,
         SearchCigarScreenViewModel.Factory
     )
+    ViewModelRegistry.register(
+        CigarsBrandsSearchViewModel::class,
+        CigarsBrandsSearchViewModel.Factory
+    )
+    ViewModelRegistry.register(
+        CigarsSearchFieldViewModel::class,
+        CigarsSearchFieldViewModel.Factory
+    )
+    ViewModelRegistry.register(
+        CigarsSearchControlViewModel::class,
+        CigarsSearchControlViewModel.Factory
+    )
+
     //Init Database
     Database.createInstance(false)
 

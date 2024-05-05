@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:20 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -46,7 +46,6 @@ import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
 import com.akellolcc.cigars.camera.rememberCameraManager
-import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
@@ -55,6 +54,7 @@ import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.loadIcon

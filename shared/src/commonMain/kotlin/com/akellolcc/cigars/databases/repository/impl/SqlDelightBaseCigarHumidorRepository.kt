@@ -36,7 +36,7 @@ import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.CigarHumidorTableQueries
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.IO

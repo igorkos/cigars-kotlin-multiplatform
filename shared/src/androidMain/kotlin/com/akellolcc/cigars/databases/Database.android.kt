@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/26/24, 3:32 PM
+ * Last modified 5/1/24, 12:55 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases
 
@@ -25,27 +25,27 @@ import com.akellolcc.cigars.theme.readTextFile
 import dev.icerock.moko.resources.FileResource
 import kotlinx.serialization.json.Json
 
+@Suppress("UNCHECKED_CAST")
 actual fun <T> loadDemoSet(
     resource: FileResource,
     inMemory: Boolean
 ): List<T> {
-    var jsonString = ""
     if (inMemory) {
-        jsonString = when (resource) {
-            AssetFiles.demo_humidors -> return Json.decodeFromString<List<Humidor>>(DemoTestSets.humidorsSet) as List<T>
-            AssetFiles.demo_cigars -> return Json.decodeFromString<List<Cigar>>(DemoTestSets.cigarsSet) as List<T>
-            else -> return emptyList()
+        return when (resource) {
+            AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(DemoTestSets.humidorsSet) as List<T>
+            AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(DemoTestSets.cigarsSet) as List<T>
+            else -> emptyList()
         }
     } else {
-        jsonString = readTextFile(resource) ?: ""
-        when (resource) {
-            AssetFiles.demo_humidors -> return Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
-            AssetFiles.demo_cigars -> return Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
-            AssetFiles.demo_cigars_images -> return Json.decodeFromString<List<CigarImage>>(
+        val jsonString = readTextFile(resource) ?: ""
+        return when (resource) {
+            AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
+            AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
+            AssetFiles.demo_cigars_images -> Json.decodeFromString<List<CigarImage>>(
                 jsonString
             ) as List<T>
 
-            else -> return emptyList()
+            else -> emptyList()
         }
     }
 }

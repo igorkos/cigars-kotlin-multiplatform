@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 1:56 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -43,12 +42,12 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.logging.AnalyticsEvents
 import com.akellolcc.cigars.logging.AnalyticsParams
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.FavoritesRoute
 import com.akellolcc.cigars.screens.navigation.HumidorsRoute
@@ -56,6 +55,7 @@ import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.MainRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient
@@ -67,7 +67,7 @@ private var tabs: List<ITabItem<*>> = listOf(
     SearchScreen(SearchCigarRoute)
 )
 
-class MainScreen() :
+class MainScreen :
     ITabItem<MainScreenViewModel> {
     override val route: NavRoute = MainRoute
 
@@ -163,7 +163,7 @@ fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem<*>>) {
                 )
             )
         },
-        icon = { loadIcon(tab.icon!!, Size(width = 24f, height = 24f)) },
+        icon = { loadIcon(tab.icon, Size(width = 24f, height = 24f)) },
         label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
     )
 }

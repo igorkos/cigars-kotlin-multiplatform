@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 1:31 PM
+ * Last modified 5/5/24, 11:33 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,18 +38,19 @@ import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.screens.search.CigarSearchParameters
 import com.akellolcc.cigars.screens.search.SearchComponent
 import com.akellolcc.cigars.screens.search.SearchParameterAction
+import com.akellolcc.cigars.screens.search.data.CigarSearchParameters
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import kotlinx.coroutines.flow.flow
 import kotlin.jvm.Transient
 
 class SearchScreen(
@@ -76,7 +76,7 @@ class SearchCigarScreen(
 
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
-        viewModel.sortingFields?.map {
+        viewModel.sortingFields?.selected?.map {
             val selected = viewModel.sorting == it
             DropdownMenuItem(
                 leadingIcon = {
@@ -89,7 +89,7 @@ class SearchCigarScreen(
                     )
                 },
                 onClick = {
-                    viewModel.sorting = it
+                    viewModel.sorting = it as FilterParameter<Boolean>
                     onDismiss()
                 }
             )
@@ -100,14 +100,15 @@ class SearchCigarScreen(
     override fun ContentHeader(modifier: Modifier) {
         val fields = remember { CigarSearchParameters() }
         LaunchedEffect(fields.selected) {
-            viewModel.searchFieldsChanged(fields.selected)
+            viewModel.searchingFields = fields.selected
         }
-        SearchComponent(
-            modifier = modifier,
-            loading = viewModel.loading,
-            fields = fields,
-        ) { action, b ->
-            flow {
+
+        val searchComponent = remember {
+            SearchComponent(
+                modifier = modifier,
+                loading = viewModel.loading,
+                fields = fields,
+            ) { action ->
                 when (action) {
                     SearchParameterAction.Completed -> {
                         viewModel.reload()
@@ -115,9 +116,9 @@ class SearchCigarScreen(
 
                     else -> {}
                 }
-                emit(true)
             }
         }
+        searchComponent.Content()
     }
 
     @Composable
@@ -137,46 +138,60 @@ class SearchCigarScreen(
 
     @Composable
     override fun EntityListRow(entity: Cigar, modifier: Modifier) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = materialColor(MaterialColors.color_primaryContainer)
-            ),
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 0.dp)
-
+        if (entity.rowid < 0) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = materialColor(MaterialColors.color_transparent),
+                    contentColor = materialColor(MaterialColors.color_primary)
+                ),
+                modifier = modifier.fillMaxWidth()
             ) {
                 TextStyled(
-                    maxLines = 2,
-                    minLines = 2,
-                    text = entity.name,
+                    text = "No cigar found",
                     style = TextStyles.Headline,
-                    keepHeight = true
                 )
             }
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
+        } else {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = materialColor(MaterialColors.color_primaryContainer)
+                ),
+                modifier = modifier.fillMaxWidth()
             ) {
-                TextStyled(
-                    label = Localize.cigar_details_length,
-                    labelSuffix = "",
-                    text = entity.length,
-                    style = TextStyles.Subhead,
-                )
-                TextStyled(
-                    label = Localize.cigar_details_gauge,
-                    labelSuffix = "",
-                    text = "${entity.gauge}",
-                    style = TextStyles.Subhead,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 0.dp)
+
+                ) {
+                    TextStyled(
+                        maxLines = 2,
+                        minLines = 2,
+                        text = entity.name,
+                        style = TextStyles.Headline,
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                ) {
+                    TextStyled(
+                        label = Localize.cigar_details_length,
+                        labelSuffix = "",
+                        text = entity.length,
+                        style = TextStyles.Subhead,
+                    )
+                    TextStyled(
+                        label = Localize.cigar_details_gauge,
+                        labelSuffix = "",
+                        text = "${entity.gauge}",
+                        style = TextStyles.Subhead,
+                    )
+                }
             }
         }
     }

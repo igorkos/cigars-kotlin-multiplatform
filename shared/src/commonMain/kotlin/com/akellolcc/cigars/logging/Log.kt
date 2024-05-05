@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 1:49 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -127,7 +127,7 @@ class Log {
             }
         }
 
-        private fun getTag(): String? {
+        private fun getTag(): String {
             val call = getCallStack()
             return if (call != null) {
                 if (call.file != null) {

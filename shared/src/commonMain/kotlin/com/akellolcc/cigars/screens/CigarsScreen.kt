@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 1:22 PM
+ * Last modified 5/4/24, 11:35 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,22 +31,22 @@ import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.CigarListRow
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.screens.search.CigarFilterParameters
 import com.akellolcc.cigars.screens.search.SearchComponent
 import com.akellolcc.cigars.screens.search.SearchParameterAction
+import com.akellolcc.cigars.screens.search.data.CigarFilterParameters
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.flow.flow
-import kotlin.jvm.Transient
 
 class CigarsScreen(
     override val route: NavRoute
 ) : ITabItem<CigarsScreenViewModel> {
-    @Transient
+    @kotlin.jvm.Transient
     override lateinit var viewModel: CigarsScreenViewModel
 
     @Composable
@@ -58,14 +57,13 @@ class CigarsScreen(
 }
 
 open class CigarsListScreen<V : ScreenModel>(
-    override val route: NavRoute,
-    @Transient
+    route: NavRoute,
+    @kotlin.jvm.Transient
     override var viewModel: CigarsScreenViewModel
-) :
-    BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
+) : BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
-        viewModel.sortingFields?.map {
+        viewModel.sortingFields?.selected?.map {
             val selected = viewModel.sorting == it
             DropdownMenuItem(
                 leadingIcon = {
@@ -78,7 +76,7 @@ open class CigarsListScreen<V : ScreenModel>(
                     )
                 },
                 onClick = {
-                    viewModel.sorting = it
+                    viewModel.sorting = it as FilterParameter<Boolean>
                     onDismiss()
                 }
             )
@@ -104,15 +102,17 @@ open class CigarsListScreen<V : ScreenModel>(
     override fun ListHeader(modifier: Modifier) {
         if (viewModel.search) {
             val fields = remember { CigarFilterParameters() }
+
             LaunchedEffect(fields.selected) {
                 viewModel.searchingFields = fields.selected
             }
-            SearchComponent(
-                modifier = modifier,
-                loading = viewModel.loading,
-                fields = fields,
-            ) { action, _ ->
-                flow {
+
+            val searchComponent = remember {
+                SearchComponent(
+                    modifier = modifier,
+                    loading = viewModel.loading,
+                    fields = fields,
+                ) { action ->
                     when (action) {
                         SearchParameterAction.Completed -> {
                             viewModel.reload()
@@ -120,9 +120,10 @@ open class CigarsListScreen<V : ScreenModel>(
 
                         else -> {}
                     }
-                    emit(true)
                 }
             }
+
+            searchComponent.Content()
         }
     }
 

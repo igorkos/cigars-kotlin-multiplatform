@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 3:13 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ class GetCigarsBrands(val brand: String?) {
     private var page = 0
     private var totalItems = 0
     private var receivedItems = 0
-    val isLastPage: Boolean
+    private val isLastPage: Boolean
         get() = if (page == 0) false else receivedItems >= totalItems
 
     companion object {

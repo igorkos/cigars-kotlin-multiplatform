@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/22/24, 8:42 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.theme
 
@@ -65,12 +65,11 @@ fun backgroundTheme(background: Backgrounds): BackgroundTheme {
 
 /**
  * The main background for the app.
- * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a [Surface].
+ * Uses [LocalBackgroundTheme] to set the color and tonal elevation of a Surface.
  *
  * @param modifier Modifier to be applied to the background.
  * @param content The background content.
  */
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun DefaultBackground(
     modifier: Modifier = Modifier,
@@ -92,10 +91,9 @@ fun DefaultBackground(
 
 /**
  * A gradient background for select screens. Uses [LocalBackgroundTheme] to set the gradient colors
- * of a [Box] within a [Surface].
+ * of a [Box] within a Surface.
  *
  * @param modifier Modifier to be applied to the background.
- * @param gradientColors The gradient colors to be rendered.
  * @param content The background content.
  */
 

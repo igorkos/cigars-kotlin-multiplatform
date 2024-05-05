@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 1:18 PM
+ * Last modified 5/4/24, 11:55 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,15 +14,43 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search
+package com.akellolcc.cigars.screens.search.data
 
+import androidx.compose.ui.text.input.KeyboardType
 import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
 
-
 data class FilterParameter<T>(val key: String, var value: T, val label: String, val icon: ImageResource) :
     Comparable<FilterParameter<T>> {
+
     constructor(key: String, value: T) : this(key, value, "", Images.tab_icon_search)
+
+    val keyboardType: KeyboardType
+        get() = when (value) {
+            is Long -> KeyboardType.Number
+            is Double -> KeyboardType.Decimal
+            is Boolean -> KeyboardType.Decimal
+            else -> KeyboardType.Text
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    fun set(v: String) {
+        this.value = try {
+            when (value) {
+                is Long -> v.toLong() as T
+                is Double -> v.toDouble() as T
+                is Boolean -> v.toBoolean() as T
+                else -> v as T
+            }
+        } catch (e: Exception) {
+            when (value) {
+                is Long -> 0.toLong() as T
+                is Double -> 0.toDouble() as T
+                is Boolean -> false as T
+                else -> throw e
+            }
+        }
+    }
 
     override fun compareTo(other: FilterParameter<T>): Int {
         if (other == this) return 0
@@ -67,49 +95,4 @@ data class FilterParameter<T>(val key: String, var value: T, val label: String, 
         result = 31 * result + (value.hashCode())
         return result
     }
-}
-
-abstract class FilterCollection<T : Comparable<T>, out R> : Iterable<R> {
-    protected lateinit var params: List<FilterParameter<T>>
-    protected var selectedParams: List<FilterParameter<T>> = mutableListOf()
-    val selected: List<FilterParameter<T>>
-        get() = selectedParams
-
-    override fun iterator(): Iterator<R> {
-        return object : Iterator<R> {
-            var index = 0
-            override fun hasNext(): Boolean {
-                return index < selectedParams.size
-            }
-
-            override fun next(): R {
-                val param = selectedParams[index++]
-                return build(param)
-            }
-        }
-    }
-
-    abstract fun build(param: FilterParameter<T>): R
-
-    val showLeading: Boolean
-        get() = selectedParams.size > 1
-
-    val availableFields: List<FilterParameter<T>>
-        get() {
-            return params.filter { it !in selectedParams }
-        }
-
-
-    fun add(value: FilterParameter<T>) {
-        selectedParams = selectedParams + value
-    }
-
-    fun remove(value: FilterParameter<T>) {
-        selectedParams = selectedParams - value
-    }
-
-    fun clear() {
-        selectedParams = mutableListOf()
-    }
-
 }

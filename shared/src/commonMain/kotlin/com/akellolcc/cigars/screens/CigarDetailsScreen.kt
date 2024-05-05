@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 1:56 PM
+ * Last modified 5/1/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -68,7 +67,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarShapes
 import com.akellolcc.cigars.databases.extensions.CigarStrength
@@ -81,15 +79,17 @@ import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.InfoImageDialog
 import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.ValueCard
 import com.akellolcc.cigars.screens.components.ValuePicker
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.screens.components.ValuesCard
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
+import com.akellolcc.cigars.screens.navigation.CigarImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.HumidorCigarsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
-import com.akellolcc.cigars.screens.navigation.ImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -111,6 +111,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
         }
         val navigator = LocalNavigator.currentOrThrow
         // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
+
 
         viewModel.observeEvents {
             handleAction(it, navigator)
@@ -195,7 +196,7 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowImages -> {
                 val data = route.data as Cigar
-                navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
+                navigator.push(ImagesViewScreen(CigarImagesViewRoute.apply {
                     this.data = Pair(data, event.selected)
                 }))
             }
@@ -318,7 +319,6 @@ class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsS
                 editable = viewModel.editing,
                 maxLines = 2,
                 modifier = Modifier.padding(bottom = 4.dp),
-                keepHeight = false,
                 onValueChange = {
                     viewModel.name = it
                 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 3:28 PM
+ * Last modified 5/5/24, 11:33 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,71 +16,55 @@
 
 package com.akellolcc.cigars.screens.search
 
-import TextStyled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.text.input.ImeAction
-import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
-import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.CigarsBrandsSearchViewModel
+import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 class CigarsSearchBrandField(
     parameter: FilterParameter<String>,
-    showLeading: Boolean,
-    onAction: ((SearchParameterAction, FilterParameter<String>) -> Flow<Any?>)?
-) : SearchParameterField<String>(parameter, showLeading, onAction) {
+    showLeading: Boolean = false,
+    enabled: Boolean = true,
+    onAction: ((SearchParameterAction, FilterParameter<String>) -> Unit)? = null
+) : SearchParameterField<String>(parameter, showLeading, enabled, onAction) {
 
-    private var brandRequest: GetCigarsBrands? = null
-
-    private fun getBrands(query: String, callback: (List<RapidCigarBrand>) -> Unit) {
-        if (query.isNotBlank()) {
-            if (brandRequest == null || brandRequest?.brand != query) {
-                brandRequest = GetCigarsBrands(brand = query)
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                brandRequest!!.next().collect {
-                    callback(it)
-                }
+    override fun handleAction(event: Any, navigator: Navigator?) {
+        when (event) {
+            is CigarsBrandsSearchViewModel.Action.Selected -> {
+                onAction(SearchParameterAction.Completed)
             }
         }
     }
 
-    @Composable
-    override fun Render(enabled: Boolean) {
-        var expanded by remember { mutableStateOf(false) }
-        var value by remember { mutableStateOf("") }
-        var brands by mutableStateOf(listOf<RapidCigarBrand>())
+    private val viewModel = createViewModel(CigarsBrandsSearchViewModel::class, parameter)
+    override fun validate(): Boolean {
+        return viewModel.validate()
+    }
 
-        LaunchedEffect(parameter.value) {
-            Log.debug("Brand search field: ${parameter.value}")
-            getBrands(parameter.value) {
-                Log.debug("Get Brands: $it")
-                brands = it
-                expanded = true
-            }
-        }
+
+    @Composable
+    override fun Content() {
+        Log.debug("Render Brand field: ${viewModel.value} ${viewModel.expanded} ${viewModel.brands.size}")
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -98,24 +82,47 @@ class CigarsSearchBrandField(
                 modifier = Modifier.weight(1f),
             ) {
                 TextStyled(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().onFocusChanged {
+                        viewModel.onFocusChange(it.isFocused)
+                    },
                     label = parameter.label,
-                    text = value,
+                    text = viewModel.value,
                     enabled = enabled,
+                    isError = viewModel.isError,
                     editable = true,
-                    style = TextStyles.Headline,
-                    maxLines = 1,
+                    style = if (viewModel.isError) TextStyles.ErrorTitle else TextStyles.Headline,
                     onValueChange = {
-                        value = it
+                        viewModel.value = it
                     },
-                    onKeyboardAction = {
-                        parameter.value = value
-                    },
-                    imeAction = ImeAction.Search
+                    imeAction = ImeAction.Search,
+                    trailingIcon = if (viewModel.brands.isNotEmpty()) {
+                        @Composable {
+                            IconButton(
+                                modifier = Modifier.wrapContentSize(),
+                                onClick = {
+                                    viewModel.onDropDown(viewModel.expanded)
+                                }
+                            ) {
+                                loadIcon(Images.icon_drop_down, Size(12.0F, 12.0F))
+                            }
+                        }
+                    } else null,
+                    supportingText = if (viewModel.annotation != null) {
+                        @Composable {
+                            TextStyled(
+                                modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
+                                text = viewModel.annotation,
+                                style = if (viewModel.isError) TextStyles.Error else TextStyles.Description
+                            )
+                        }
+                    } else null,
+                    selection = viewModel.inputSelection
                 )
-                DropdownMenu(expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
-                    brands.map {
+
+                DropdownMenu(expanded = viewModel.expanded,
+                    onDismissRequest = { viewModel.onDropDown(true) }) {
+                    viewModel.brands.map {
+                        Log.debug("Brand: $it")
                         DropdownMenuItem(
                             leadingIcon = {
                                 loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
@@ -127,9 +134,7 @@ class CigarsSearchBrandField(
                                 )
                             },
                             onClick = {
-                                value = it.name ?: ""
-                                parameter.value = value
-                                onAction(SearchParameterAction.Completed)
+                                viewModel.onBrandSelected(it)
                             }
                         )
                     }

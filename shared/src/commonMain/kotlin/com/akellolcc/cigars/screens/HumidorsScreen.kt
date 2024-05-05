@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 1:56 PM
+ * Last modified 5/1/24, 12:36 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +38,7 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorsViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.HumidorCigarsRoute
 import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
@@ -111,7 +111,6 @@ class HumidorsListScreen(
                     minLines = 2,
                     text = entity.name,
                     style = TextStyles.Headline,
-                    keepHeight = true
                 )
             }
             Row(

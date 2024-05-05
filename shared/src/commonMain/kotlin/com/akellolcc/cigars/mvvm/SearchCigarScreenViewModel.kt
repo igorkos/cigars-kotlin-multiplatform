@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 9:02 PM
+ * Last modified 5/4/24, 11:18 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +19,13 @@ package com.akellolcc.cigars.mvvm
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
+import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.CigarSortingParameters
-import com.akellolcc.cigars.screens.search.FilterParameter
+import com.akellolcc.cigars.screens.search.data.CigarSortingParameters
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 
@@ -70,7 +71,7 @@ class SearchCigarScreenViewModel :
         }
     }
 
-    fun searchFieldsChanged(fields: List<FilterParameter<String>>?) {
+    fun searchFieldsChanged(fields: List<FilterParameter<*>>?) {
         searchingFields = fields
         entities = listOf()
     }
@@ -86,6 +87,10 @@ class SearchCigarScreenViewModel :
                 if (cigars.isNotEmpty()) {
                     val list = entities + it
                     sortEntities(cigars)
+                } else {
+                    if (entities.isEmpty()) {
+                        entities = listOf(emptyCigar.copy(name = "No results"))
+                    }
                 }
             }
         }

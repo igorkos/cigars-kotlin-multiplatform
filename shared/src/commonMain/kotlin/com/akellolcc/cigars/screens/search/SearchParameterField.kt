@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 12:21 AM
+ * Last modified 5/5/24, 11:33 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,8 @@
 package com.akellolcc.cigars.screens.search
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
+import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.screens.search.data.FilterParameter
 
 enum class SearchParameterAction {
     Add,
@@ -36,24 +30,18 @@ enum class SearchParameterAction {
 abstract class SearchParameterField<T : Comparable<T>>(
     val parameter: FilterParameter<T>,
     var showLeading: Boolean = false,
-    var onAction: ((SearchParameterAction, FilterParameter<T>) -> Flow<Any?>)? = null
+    var enabled: Boolean = true,
+    var onAction: ((SearchParameterAction, FilterParameter<T>) -> Unit)? = null
 ) {
-    var value by mutableStateOf("")
+
+    abstract fun validate(): Boolean
 
     @Composable
-    abstract fun Render(enabled: Boolean)
+    abstract fun Content()
 
-    fun validate(): Boolean {
-        return true
-    }
-
-    fun dropDownMenu(): List<Pair<T, String>>? {
-        return null
-    }
+    abstract fun handleAction(event: Any, navigator: Navigator?)
 
     protected fun onAction(action: SearchParameterAction) {
-        CoroutineScope(Dispatchers.IO).launch {
-            onAction?.invoke(action, parameter)?.collect {}
-        }
+        onAction?.invoke(action, parameter)
     }
 }

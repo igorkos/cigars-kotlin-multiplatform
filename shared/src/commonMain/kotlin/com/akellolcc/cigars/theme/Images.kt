@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 4:07 PM
+ * Last modified 4/30/24, 3:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -106,6 +106,8 @@ class Images {
         val icon_menu_sort = MR.images.icon_menu_sort
         val tab_icon_search = MR.images.tab_icon_search
         val icon_menu_checkmark = MR.images.icon_menu_checkmark
+        val icon_drop_down = MR.images.icon_drop_down
+        val icon_drop_up = MR.images.icon_drop_up
     }
 }
 

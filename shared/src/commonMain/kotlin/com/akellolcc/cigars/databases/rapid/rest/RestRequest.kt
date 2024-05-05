@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/24/24, 3:07 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.rapid.rest
 
@@ -51,7 +51,7 @@ data class RestRequest(
         const val RAPID_KEY = "1d231078e9msh6d5d9403dcf4a9bp106fcfjsnf5eaa93115f0"
         const val RAPID_HOST = "cigars.p.rapidapi.com"
         private var remaining = Long.MAX_VALUE
-        private val clientMemory = HttpClient() {
+        private val clientMemory = HttpClient {
             install(HttpCache) {
                 publicStorage(HttpCacheStorage(true))
             }
@@ -66,7 +66,7 @@ data class RestRequest(
         }
 
 
-        private val clientPermanent = HttpClient() {
+        private val clientPermanent = HttpClient {
             install(HttpCache) {
                 publicStorage(HttpCacheStorage(false))
             }

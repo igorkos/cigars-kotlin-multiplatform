@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 1:20 PM
+ * Last modified 5/1/24, 1:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,11 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -52,18 +51,19 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.common.theme.DefaultTheme
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.ValueCard
 import com.akellolcc.cigars.screens.components.ValuesCard
+import com.akellolcc.cigars.screens.navigation.HumidorImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
-import com.akellolcc.cigars.screens.navigation.ImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -176,7 +176,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                     loading = viewModel.loading,
                                 ) {
                                     val data = route.data as Humidor
-                                    navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
+                                    navigator.push(ImagesViewScreen(HumidorImagesViewRoute.apply {
                                         this.data = Pair(data, it)
                                     }))
                                 }
@@ -203,7 +203,6 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                     editable = viewModel.editing,
                                     maxLines = 2,
                                     modifier = Modifier.padding(bottom = 4.dp),
-                                    keepHeight = false,
                                     onValueChange = {
                                         viewModel.name = it
                                     }
