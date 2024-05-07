@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 12:10 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,8 +73,8 @@ import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
-import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
 import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.InfoImageDialog

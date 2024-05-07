@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 9:02 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,35 +14,21 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.mvvm.cigars
 
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 
 
-class HumidorsViewModel : BaseListViewModel<Humidor, HumidorsViewModel.Action>() {
-    override val repository: HumidorsRepository = createRepository(HumidorsRepository::class)
+class FavoritesScreenViewModel : CigarsScreenViewModel() {
+    override val repository: FavoriteCigarsRepository =
+        createRepository(FavoriteCigarsRepository::class)
 
-    override fun entitySelected(entity: Humidor) {
-        sendEvent(Action.RouteToHumidor(entity))
-    }
-
-    fun addHumidor() {
-        sendEvent(Action.AddHumidor(null))
-    }
-
-    companion object Factory : ObjectFactory<HumidorsViewModel>() {
-        override fun factory(data: Any?): HumidorsViewModel {
-            return HumidorsViewModel()
+    companion object Factory : ObjectFactory<FavoritesScreenViewModel>() {
+        override fun factory(data: Any?): FavoritesScreenViewModel {
+            return FavoritesScreenViewModel()
         }
-    }
 
-    sealed interface Action {
-        data class RouteToHumidor(val humidor: Humidor) : Action
-        data class AddHumidor(val dummy: Any?) : Action
-        data class ShowError(val error: StringDesc) : Action
     }
 }

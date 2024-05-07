@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 9:02 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,14 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.mvvm.humidor
 
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.Humidor
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorCigarsRepository
+import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 

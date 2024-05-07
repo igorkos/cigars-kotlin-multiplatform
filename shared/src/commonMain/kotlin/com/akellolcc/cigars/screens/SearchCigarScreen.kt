@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/6/24, 10:06 PM
+ * Last modified 5/7/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,8 +39,9 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.search.SearchCigarScreenViewModel
+import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute

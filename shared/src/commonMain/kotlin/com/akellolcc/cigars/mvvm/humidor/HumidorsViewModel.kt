@@ -14,26 +14,36 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.mvvm.humidor
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.mvvm.base.ActionsViewModel
+import com.akellolcc.cigars.databases.createRepository
+import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 
-class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActions>() {
-    var isTabsVisible by mutableStateOf(true)
-    var isDrawerVisible by mutableStateOf(false)
 
-    companion object Factory : ObjectFactory<MainScreenViewModel>() {
-        override fun factory(data: Any?): MainScreenViewModel {
-            return MainScreenViewModel()
+class HumidorsViewModel : BaseListViewModel<Humidor, HumidorsViewModel.Action>() {
+    override val repository: HumidorsRepository = createRepository(HumidorsRepository::class)
+
+    override fun entitySelected(entity: Humidor) {
+        sendEvent(Action.RouteToHumidor(entity))
+    }
+
+    fun addHumidor() {
+        sendEvent(Action.AddHumidor(null))
+    }
+
+    companion object Factory : ObjectFactory<HumidorsViewModel>() {
+        override fun factory(data: Any?): HumidorsViewModel {
+            return HumidorsViewModel()
         }
     }
 
-    sealed interface MainScreenActions {
-        data class ShowError(val error: StringDesc) : MainScreenActions
+    sealed interface Action {
+        data class RouteToHumidor(val humidor: Humidor) : Action
+        data class AddHumidor(val dummy: Any?) : Action
+        data class ShowError(val error: StringDesc) : Action
     }
 }

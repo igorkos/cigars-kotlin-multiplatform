@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/6/24, 1:41 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,13 +14,14 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.mvvm.search
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObservableValue
 

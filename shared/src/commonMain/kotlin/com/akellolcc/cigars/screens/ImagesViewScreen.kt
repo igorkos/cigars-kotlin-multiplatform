@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,10 +47,10 @@ import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
 import com.akellolcc.cigars.camera.rememberCameraManager
 import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.mvvm.BaseImagesViewScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.BaseImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.base.CigarImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute

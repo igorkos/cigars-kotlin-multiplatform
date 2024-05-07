@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:14 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,21 +14,30 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.mvvm
+package com.akellolcc.cigars.mvvm.cigars
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import com.akellolcc.cigars.databases.createRepository
+import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.History
-import dev.icerock.moko.resources.desc.StringDesc
+import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
+import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
+import com.akellolcc.cigars.utils.ObjectFactory
 
 
-abstract class HistoryScreenViewModel :
-    BaseListViewModel<History, HistoryScreenViewModel.CigarsAction>() {
+class CigarHistoryScreenViewModel(val cigar: Cigar) : HistoryScreenViewModel() {
+    override val repository: CigarHistoryRepository = createRepository(CigarHistoryRepository::class, cigar.rowid)
 
-    var name by mutableStateOf("")
+    override fun entitySelected(entity: History) {
+    }
 
-    sealed interface CigarsAction {
-        data class ShowError(val error: StringDesc) : CigarsAction
+    init {
+        name = cigar.name
+    }
+
+    companion object Factory : ObjectFactory<CigarHistoryScreenViewModel>() {
+        override fun factory(data: Any?): CigarHistoryScreenViewModel {
+            return CigarHistoryScreenViewModel(data as Cigar)
+        }
+
     }
 }

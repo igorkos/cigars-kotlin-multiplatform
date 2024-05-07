@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/7/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,9 @@ package com.akellolcc.cigars.screens
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import com.akellolcc.cigars.mvvm.CigarHistoryScreenViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.cigars.CigarHistoryScreenViewModel
+import com.akellolcc.cigars.screens.base.HistoryScreen
 import com.akellolcc.cigars.screens.navigation.NavRoute
 
 class CigarHistoryScreen(route: NavRoute) : HistoryScreen<CigarHistoryScreenViewModel>(route) {

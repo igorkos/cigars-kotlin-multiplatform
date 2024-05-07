@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 11:08 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,9 +31,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.CigarsSearchFieldBaseViewModel
-import com.akellolcc.cigars.mvvm.CigarsSearchFieldViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images

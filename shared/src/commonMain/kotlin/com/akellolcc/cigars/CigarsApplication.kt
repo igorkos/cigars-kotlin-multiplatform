@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/2/24, 1:27 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,22 +20,22 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.mvvm.CigarHistoryScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarImagesViewScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarsBrandsSearchViewModel
-import com.akellolcc.cigars.mvvm.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarsScreenViewModel
-import com.akellolcc.cigars.mvvm.CigarsSearchControlViewModel
-import com.akellolcc.cigars.mvvm.CigarsSearchFieldViewModel
-import com.akellolcc.cigars.mvvm.FavoritesScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorHistoryScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorImagesViewScreenViewModel
-import com.akellolcc.cigars.mvvm.HumidorsViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
-import com.akellolcc.cigars.mvvm.ViewModelRegistry
+import com.akellolcc.cigars.mvvm.base.CigarImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel
+import com.akellolcc.cigars.mvvm.base.ViewModelRegistry
+import com.akellolcc.cigars.mvvm.cigars.CigarHistoryScreenViewModel
+import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
+import com.akellolcc.cigars.mvvm.cigars.CigarsScreenViewModel
+import com.akellolcc.cigars.mvvm.cigars.FavoritesScreenViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorCigarsScreenViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorHistoryScreenViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorsViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsBrandsSearchViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldViewModel
+import com.akellolcc.cigars.mvvm.search.SearchCigarScreenViewModel
 import com.akellolcc.cigars.screens.Home
 import com.akellolcc.cigars.screens.navigation.mainScreenModule
 

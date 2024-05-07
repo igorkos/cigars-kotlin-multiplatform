@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 12:36 AM
+ * Last modified 5/7/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens
+package com.akellolcc.cigars.screens.base
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.History
 import com.akellolcc.cigars.databases.extensions.HistoryType
-import com.akellolcc.cigars.mvvm.HistoryScreenViewModel
+import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize

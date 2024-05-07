@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/7/24, 12:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,9 +32,10 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorCigarsScreenViewModel
+import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute

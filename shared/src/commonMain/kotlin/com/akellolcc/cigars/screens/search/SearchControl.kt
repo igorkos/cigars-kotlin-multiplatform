@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/6/24, 1:16 PM
+ * Last modified 5/7/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.CigarsSearchControlViewModel
-import com.akellolcc.cigars.mvvm.createViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
 import com.akellolcc.cigars.screens.components.LinkButton
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.search.data.FilterCollection
