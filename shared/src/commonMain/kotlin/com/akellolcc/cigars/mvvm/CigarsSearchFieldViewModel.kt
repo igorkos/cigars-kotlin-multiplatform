@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:42 AM
+ * Last modified 5/6/24, 12:37 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,48 +16,19 @@
 
 package com.akellolcc.cigars.mvvm
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardType
-import cafe.adriel.voyager.core.model.screenModelScope
-import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 
-@OptIn(FlowPreview::class)
-class CigarsSearchFieldViewModel(private val parameter: FilterParameter<*>) :
-    DatabaseViewModel<Cigar, CigarsSearchFieldViewModel.Action>() {
+class CigarsSearchFieldViewModel(parameter: FilterParameter<*>) :
+    CigarsSearchFieldBaseViewModel(parameter) {
 
-    //Input flow
-    private val _inputValue = Channel<String>(Channel.BUFFERED)
-    private val inputValue: Flow<String> get() = _inputValue.receiveAsFlow()
-    private var input by mutableStateOf("")
-
-    var isError by mutableStateOf(false)
-
-    init {
-        disposables.value += screenModelScope.launch {
-            inputValue.debounce(500).collectLatest { value ->
-                parameter.set(value)
-            }
-        }
-    }
-
-    fun validate(): Boolean {
-        val valid = input.isNotEmpty() && input.length >= 3
+    override fun validate(): Boolean {
+        val valid = value.isNotEmpty() && value.length >= 3
         isError = !valid
         return valid
     }
 
-    val annotation: String?
+    override val annotation: String?
         get() {
             return if (validate()) {
                 null
@@ -66,37 +37,6 @@ class CigarsSearchFieldViewModel(private val parameter: FilterParameter<*>) :
             }
         }
 
-    /**
-     * Control data
-     */
-    private var lastFocus = false
-    fun onFocusChange(focused: Boolean) {
-        if (lastFocus == focused) return
-        lastFocus = focused
-        if (!focused) {
-            parameter.set(value)
-            sendEvent(Action.Selected())
-        }
-    }
-
-    fun onCompleted() {
-        parameter.set(value.trim())
-        validate()
-        sendEvent(Action.Selected())
-    }
-
-    /**
-     * Input value change
-     */
-    var value: String
-        get() = input
-        set(value) {
-            input = value
-            _inputValue.trySend(value.trim())
-        }
-
-    val keyboardType: KeyboardType = parameter.keyboardType
-
     @Suppress("UNCHECKED_CAST")
     companion object Factory : ObjectFactory<CigarsSearchFieldViewModel>() {
         override fun factory(data: Any?): CigarsSearchFieldViewModel {
@@ -104,8 +44,4 @@ class CigarsSearchFieldViewModel(private val parameter: FilterParameter<*>) :
         }
     }
 
-    sealed interface Action {
-        data class Selected(val value: String = "") : Action
-        data class Error(val value: String = "") : Action
-    }
 }

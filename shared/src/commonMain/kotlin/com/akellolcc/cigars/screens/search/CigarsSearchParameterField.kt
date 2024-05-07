@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:42 AM
+ * Last modified 5/5/24, 11:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -33,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.mvvm.CigarsSearchFieldViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
@@ -48,8 +47,9 @@ class CigarsSearchParameterField<T : Comparable<T>>(
     onAction: ((SearchParameterAction, FilterParameter<T>) -> Unit)? = null
 ) : SearchParameterField<T>(parameter, showLeading, enabled, onAction) {
     override fun handleAction(event: Any, navigator: Navigator?) {
+        Log.debug("Handle action: $event")
         when (event) {
-            is CigarsSearchFieldViewModel.Action.Selected -> {
+            is CigarsSearchFieldBaseViewModel.Action.Selected -> {
                 onAction(SearchParameterAction.Completed)
             }
 
@@ -67,12 +67,13 @@ class CigarsSearchParameterField<T : Comparable<T>>(
 
     @Composable
     override fun Content() {
-        Log.debug("isErorr: ${viewModel.isError}")
-        val state by viewModel.state.collectAsState()
+        Log.debug("Compose: error: ${viewModel.isError} ")
 
-        LaunchedEffect(state) {
-            Log.debug("LaunchedEffect: $state")
-            state?.let { handleAction(it, null) }
+        LaunchedEffect(Unit) {
+            viewModel.observeEvents {
+                Log.debug("Control state: $it")
+                handleAction(it, null)
+            }
         }
 
         Row(

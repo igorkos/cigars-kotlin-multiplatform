@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 11:33 AM
+ * Last modified 5/6/24, 10:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,12 @@
 
 package com.akellolcc.cigars.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
@@ -27,15 +29,16 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.SearchCigarScreenViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
@@ -61,8 +64,7 @@ class SearchScreen(
 
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel { createViewModel(SearchCigarScreenViewModel::class, route.data) }
+        viewModel = rememberScreenModel { createViewModel(SearchCigarScreenViewModel::class, route.data) }
         Navigator(SearchCigarScreen(route, viewModel))
     }
 }
@@ -71,9 +73,7 @@ class SearchCigarScreen(
     route: NavRoute,
     @Transient
     override var viewModel: SearchCigarScreenViewModel
-) :
-    BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar, SearchCigarScreenViewModel>(route) {
-
+) : BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar, SearchCigarScreenViewModel>(route) {
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
         viewModel.sortingFields?.selected?.map {
@@ -89,6 +89,7 @@ class SearchCigarScreen(
                     )
                 },
                 onClick = {
+                    @Suppress("UNCHECKED_CAST")
                     viewModel.sorting = it as FilterParameter<Boolean>
                     onDismiss()
                 }
@@ -99,26 +100,29 @@ class SearchCigarScreen(
     @Composable
     override fun ContentHeader(modifier: Modifier) {
         val fields = remember { CigarSearchParameters() }
-        LaunchedEffect(fields.selected) {
-            viewModel.searchingFields = fields.selected
-        }
-
-        val searchComponent = remember {
-            SearchComponent(
-                modifier = modifier,
-                loading = viewModel.loading,
-                fields = fields,
-            ) { action ->
-                when (action) {
-                    SearchParameterAction.Completed -> {
-                        viewModel.reload()
-                    }
-
-                    else -> {}
+        SearchComponent(
+            modifier = modifier,
+            fields = fields,
+        ) { action ->
+            Log.debug("Received action: $action")
+            when (action) {
+                SearchParameterAction.Completed -> {
+                    viewModel.searchingFields = fields.selected
+                    viewModel.reload()
                 }
+
+                else -> {}
             }
         }
-        searchComponent.Content()
+
+        if (viewModel.loading) {
+            Box(
+                modifier = modifier.fillMaxWidth().height(24.dp).background(Color.Red),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
     }
 
     @Composable
@@ -134,7 +138,6 @@ class SearchCigarScreen(
             }
         }
     }
-
 
     @Composable
     override fun EntityListRow(entity: Cigar, modifier: Modifier) {

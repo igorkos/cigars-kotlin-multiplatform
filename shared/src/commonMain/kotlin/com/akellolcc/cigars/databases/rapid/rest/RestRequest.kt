@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/5/24, 10:12 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,18 +84,16 @@ data class RestRequest(
     fun execute(): Flow<RestResponse> {
         return flow {
             val encoded = url.encodeURLQueryComponent()
-            val response =
-                (if (cache) clientPermanent else clientMemory).get(encoded) {
-                    headers {
-                        append("X-RapidAPI-Key", RAPID_KEY)
-                        append("X-RapidAPI-Host", RAPID_HOST)
-                    }
+            val response = (if (cache) clientPermanent else clientMemory).get(encoded) {
+                headers {
+                    append("X-RapidAPI-Key", RAPID_KEY)
+                    append("X-RapidAPI-Host", RAPID_HOST)
                 }
-            val reqCount =
-                response.headers["x-ratelimit-requests-remaining"]?.toLong() ?: Long.MAX_VALUE
+            }
+            val reqCount = response.headers["x-ratelimit-requests-remaining"]?.toLong() ?: Long.MAX_VALUE
             if (reqCount < remaining) {
                 remaining = min(reqCount, remaining)
-                Log.debug("Rapid request left -> $remaining")
+                Log.debug("Rapid request quota remaining -> $remaining")
             }
             emit(RestResponse(response.status.value, response.bodyAsText()))
         }

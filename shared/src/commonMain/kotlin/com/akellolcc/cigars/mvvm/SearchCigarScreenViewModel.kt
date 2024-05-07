@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:18 AM
+ * Last modified 5/6/24, 10:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,14 +21,12 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
 import com.akellolcc.cigars.databases.extensions.emptyCigar
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
-import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.search.data.CigarSortingParameters
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
-
 
 class SearchCigarScreenViewModel :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
@@ -76,7 +74,6 @@ class SearchCigarScreenViewModel :
         entities = listOf()
     }
 
-
     override fun loadEntities(reload: Boolean) {
         searchingFields?.let {
             if (request == null || request!!.fields != it) {
@@ -85,8 +82,8 @@ class SearchCigarScreenViewModel :
             execute(request!!.next()) { cigars ->
                 Log.debug("Cigars: ${cigars.size}")
                 if (cigars.isNotEmpty()) {
-                    val list = entities + it
-                    sortEntities(cigars)
+                    val list = entities + cigars
+                    sortEntities(list)
                 } else {
                     if (entities.isEmpty()) {
                         entities = listOf(emptyCigar.copy(name = "No results"))
@@ -108,7 +105,6 @@ class SearchCigarScreenViewModel :
     }
 
     sealed interface Actions {
-        data class BrandSelected(val brand: RapidCigarBrand) : Actions
         data class ShowError(val error: StringDesc) : Actions
     }
 }

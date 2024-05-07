@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/3/24, 1:39 PM
+ * Last modified 5/6/24, 12:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,35 +21,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-@OptIn(FlowPreview::class)
-class CigarsBrandsSearchViewModel(private val parameter: FilterParameter<String>) :
-    DatabaseViewModel<Cigar, CigarsBrandsSearchViewModel.Action>() {
+class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
+    CigarsSearchFieldBaseViewModel(parameter) {
 
     //Brand request
     private var brandRequest: GetCigarsBrands? = null
     private var brandJob: Job? = null
 
     //Input flow
-    private val _inputValue = Channel<String>(Channel.BUFFERED)
-    private val inputValue: Flow<String> get() = _inputValue.receiveAsFlow()
-    private var input by mutableStateOf("")
     var inputSelection by mutableStateOf<TextRange?>(null)
 
     // Brands list
@@ -57,45 +46,30 @@ class CigarsBrandsSearchViewModel(private val parameter: FilterParameter<String>
 
     //Selected brand
     private var selectedBrand by mutableStateOf<RapidCigarBrand?>(null)
-
     var expanded by mutableStateOf(false)
 
-
-    init {
-        disposables.value += screenModelScope.launch {
-            inputValue.debounce(500).collectLatest { value ->
-                getBrands(value)
-            }
-        }
-        disposables.value += screenModelScope.launch {
-            state.collect {
-                Log.debug("Control state: $it")
-            }
-        }
+    override fun processInput(value: String) {
+        getBrands(value)
     }
 
-    fun validate(): Boolean {
+    override fun updateInput(value: String) {
+        if (value != selectedBrand?.name) {
+            sendEvent(Action.Input())
+            brands = listOf()
+            selectedBrand = null
+            expanded = false
+        }
+        inputSelection = null
+        loading = true
+        super.updateInput(value)
+    }
+
+    override fun validate(): Boolean {
+        isError = !loading && value.length > 2 && brands.isEmpty()
         return selectedBrand != null
     }
 
-    /**
-     * Input value change
-     */
-    var value: String
-        get() = input
-        set(value) {
-            if (value != selectedBrand?.name) {
-                sendEvent(Action.Input())
-                brands = listOf()
-                selectedBrand = null
-                expanded = false
-            }
-            inputSelection = null
-            input = value
-            loading = true
-            _inputValue.trySend(value.trim())
-        }
-    val annotation: String?
+    override val annotation: String?
         get() {
             return when (state.value) {
                 is Action.Input -> null
@@ -108,13 +82,11 @@ class CigarsBrandsSearchViewModel(private val parameter: FilterParameter<String>
                 else -> null
             }
         }
-    val isError: Boolean
-        get() = !loading && value.length > 2 && brands.isEmpty()
 
     /**
      * Get focus state
      */
-    fun onFocusChange(focused: Boolean) {
+    override fun onFocusChange(focused: Boolean) {
         if (focused) {
             sendEvent(Action.Input())
         }
@@ -139,7 +111,7 @@ class CigarsBrandsSearchViewModel(private val parameter: FilterParameter<String>
         value = brand.name ?: ""
         inputSelection = TextRange(value.length)
         expanded = false
-        parameter.value = brand.brandId.toString()
+        parameter.set(brand.brandId.toString())
         sendEvent(Action.Selected())
     }
 
@@ -181,18 +153,8 @@ class CigarsBrandsSearchViewModel(private val parameter: FilterParameter<String>
     @Suppress("UNCHECKED_CAST")
     companion object Factory : ObjectFactory<CigarsBrandsSearchViewModel>() {
         override fun factory(data: Any?): CigarsBrandsSearchViewModel {
-            return CigarsBrandsSearchViewModel(data as FilterParameter<String>)
+            return CigarsBrandsSearchViewModel(data as FilterParameter<Long>)
         }
 
-    }
-
-    sealed interface Action {
-        data class Idle(val value: String = "") : Action
-        data class Input(val value: String = "") : Action
-        data class DropDown(val value: String = "") : Action
-        data class Loading(val value: String = "") : Action
-        data class Loaded(val value: String = "") : Action
-        data class Selected(val value: String = "") : Action
-        data class Error(val value: String = "") : Action
     }
 }

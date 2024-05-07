@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:35 AM
+ * Last modified 5/6/24, 1:16 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,22 +16,17 @@
 
 package com.akellolcc.cigars.screens.search
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsSearchControlViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
@@ -42,9 +37,8 @@ import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 
-data class SearchComponent(
+private data class SearchComponentImplement(
     val modifier: Modifier = Modifier,
-    val loading: Boolean,
     val fields: FilterCollection,
     val onAction: (SearchParameterAction) -> Unit
 ) {
@@ -53,20 +47,18 @@ data class SearchComponent(
 
     @Composable
     fun Content() {
-        val state by viewModel.state.collectAsState()
 
-        LaunchedEffect(state) {
-            state?.let {
-                when (state) {
+        LaunchedEffect(Unit) {
+            viewModel.observeEvents {
+                Log.debug("Control event: $it")
+                when (it) {
                     is CigarsSearchControlViewModel.Action.Completed -> {
                         if (viewModel.isAllValid) {
                             onAction(SearchParameterAction.Completed)
                         }
                     }
 
-                    else -> {
-                        Log.debug("SearchComponent state: $state")
-                    }
+                    else -> {}
                 }
             }
         }
@@ -77,7 +69,6 @@ data class SearchComponent(
                 it.onAction = { action, parameter ->
                     viewModel.onFieldAction(action, parameter)
                 }
-                it.enabled = !loading
                 it.Content()
             }
             if (fields.availableFields.isNotEmpty()) {
@@ -111,18 +102,23 @@ data class SearchComponent(
                     }
                 }
             }
-
-            if (loading) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.width(32.dp),
-                    )
-                }
-
-            }
         }
     }
+}
+
+@Composable
+fun SearchComponent(
+    modifier: Modifier = Modifier,
+    fields: FilterCollection,
+    onAction: (SearchParameterAction) -> Unit
+) {
+    val field = remember { fields }
+    val searchComponent = remember {
+        mutableStateOf<SearchComponentImplement?>(null)
+    }
+
+    LaunchedEffect(fields, onAction, modifier) {
+        searchComponent.value = SearchComponentImplement(modifier, field, onAction)
+    }
+    searchComponent.value?.Content()
 }

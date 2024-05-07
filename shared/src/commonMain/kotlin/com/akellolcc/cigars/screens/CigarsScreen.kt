@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:35 AM
+ * Last modified 5/6/24, 1:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -107,23 +107,19 @@ open class CigarsListScreen<V : ScreenModel>(
                 viewModel.searchingFields = fields.selected
             }
 
-            val searchComponent = remember {
-                SearchComponent(
-                    modifier = modifier,
-                    loading = viewModel.loading,
-                    fields = fields,
-                ) { action ->
-                    when (action) {
-                        SearchParameterAction.Completed -> {
-                            viewModel.reload()
-                        }
-
-                        else -> {}
+            SearchComponent(
+                modifier = modifier,
+                fields = fields,
+            ) { action ->
+                when (action) {
+                    SearchParameterAction.Completed -> {
+                        viewModel.reload()
                     }
+
+                    else -> {}
                 }
             }
 
-            searchComponent.Content()
         }
     }
 

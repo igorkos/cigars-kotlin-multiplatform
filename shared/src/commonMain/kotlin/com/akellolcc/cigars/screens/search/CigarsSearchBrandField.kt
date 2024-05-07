@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 11:33 AM
+ * Last modified 5/5/24, 11:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.CigarsBrandsSearchViewModel
+import com.akellolcc.cigars.mvvm.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.mvvm.createViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.search.data.FilterParameter
@@ -50,7 +51,7 @@ class CigarsSearchBrandField(
 
     override fun handleAction(event: Any, navigator: Navigator?) {
         when (event) {
-            is CigarsBrandsSearchViewModel.Action.Selected -> {
+            is CigarsSearchFieldBaseViewModel.Action.Selected -> {
                 onAction(SearchParameterAction.Completed)
             }
         }

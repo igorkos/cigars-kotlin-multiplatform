@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 10:29 PM
+ * Last modified 5/6/24, 1:39 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,24 +21,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.StateScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.akellolcc.cigars.utils.ObservableValue
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 
-open class ActionsViewModel<E> : StateScreenModel<E?>(null) {
+open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
 
     private var eventCallback: ((E) -> Unit)? by mutableStateOf(null)
     private var job = mutableStateOf<Job?>(null)
     protected var disposables = mutableStateOf<List<Job>>(mutableListOf())
 
+    private val events = ObservableValue<E?>(null)
+
     init {
-        job.value = screenModelScope.launch {
-            state.collect {
-                eventCallback?.let { callback ->
-                    it?.let {
-                        callback(it)
-                        mutableState.value = null
-                    }
+        job.value = events.observe(screenModelScope) {
+            eventCallback?.let { callback ->
+                it?.let {
+                    callback(it)
                 }
             }
         }
@@ -49,7 +48,7 @@ open class ActionsViewModel<E> : StateScreenModel<E?>(null) {
     }
 
     fun sendEvent(event: E) {
-        mutableState.value = event
+        events.value = event
     }
 
     override fun onDispose() {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 11:33 AM
+ * Last modified 5/5/24, 2:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@ package com.akellolcc.cigars.screens.search
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 
 enum class SearchParameterAction {
@@ -42,6 +43,7 @@ abstract class SearchParameterField<T : Comparable<T>>(
     abstract fun handleAction(event: Any, navigator: Navigator?)
 
     protected fun onAction(action: SearchParameterAction) {
+        Log.debug("Send action: $action")
         onAction?.invoke(action, parameter)
     }
 }

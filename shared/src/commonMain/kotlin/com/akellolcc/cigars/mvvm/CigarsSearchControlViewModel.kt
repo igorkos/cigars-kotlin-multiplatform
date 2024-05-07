@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:35 AM
+ * Last modified 5/6/24, 10:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,11 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.search.SearchParameterAction
 import com.akellolcc.cigars.screens.search.data.FilterCollection
 import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-
 
 class CigarsSearchControlViewModel(val fields: FilterCollection) :
     DatabaseViewModel<Cigar, CigarsSearchControlViewModel.Action>() {
@@ -34,6 +34,7 @@ class CigarsSearchControlViewModel(val fields: FilterCollection) :
      * Control data
      */
     fun onFieldAction(action: SearchParameterAction, field: FilterParameter<*>) {
+        Log.debug("onFieldAction $action")
         when (action) {
             SearchParameterAction.Add -> {
                 fields.add(field)
@@ -57,7 +58,6 @@ class CigarsSearchControlViewModel(val fields: FilterCollection) :
 
     val isAllValid: Boolean
         get() = fields.controls.all { it.validate() }
-
 
     companion object Factory : ObjectFactory<CigarsSearchControlViewModel>() {
         override fun factory(data: Any?): CigarsSearchControlViewModel {
