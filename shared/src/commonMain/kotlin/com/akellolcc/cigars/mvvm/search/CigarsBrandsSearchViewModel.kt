@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 4:05 PM
+ * Last modified 5/8/24, 4:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,6 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -125,8 +124,6 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
                             brandRequest = GetCigarsBrands(brand = query)
                         }
                         Log.debug("Brand request: $query")
-                        delay(5000)
-                        //callback(listOf())
                         brandRequest!!.next().cancellable().collect {
                             Log.debug("Get Brands: $it")
                             brands = it
