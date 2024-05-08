@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 8:41 PM
+ * Last modified 5/7/24, 12:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,7 @@ import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.extensions.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.repository.impl.queries.DatabaseQueries
-import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +48,6 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
     private fun queryAll(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Query<ENTITY> {
         val accenting = sorting?.value ?: true
         val sortKey = sorting?.key ?: "name"
-        Log.debug("queryAll: $filter")
         return if (accenting)
             wrapper.allAsc(sortKey, filter)
         else

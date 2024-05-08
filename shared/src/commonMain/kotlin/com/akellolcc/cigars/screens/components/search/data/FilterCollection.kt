@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 10:44 AM
+ * Last modified 5/8/24, 3:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,12 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search.data
+package com.akellolcc.cigars.screens.components.search.data
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.screens.search.SearchParameterField
+import com.akellolcc.cigars.screens.components.search.SearchParameterField
 
 
 abstract class FilterCollection {
@@ -34,6 +34,10 @@ abstract class FilterCollection {
     var controls: List<SearchParameterField<*>> by mutableStateOf(listOf())
 
     abstract fun build(param: FilterParameter<*>): SearchParameterField<*>
+
+    fun validate(): Boolean {
+        return controls.all { it.validate() }
+    }
 
     val showLeading: Boolean
         get() = selectedParams.size > 1
@@ -63,4 +67,19 @@ abstract class FilterCollection {
         controls = listOf()
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FilterCollection) return false
+        return compareFilterParameters(selectedParams, other.selectedParams)
+    }
+
+    override fun hashCode(): Int {
+        var result = params.hashCode()
+        result = 31 * result + selectedParams.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "FilterCollection(selectedParams=$selectedParams)"
+    }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:18 AM
+ * Last modified 5/8/24, 3:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,10 @@ import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.CigarStrength
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.fraction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
@@ -53,7 +54,7 @@ data class RapidCigar(
             brand,
             country,
             null,
-            "Toro",
+            "",
             wrapper ?: "",
             wrapper ?: "",
             ringGauge ?: 0,
@@ -115,6 +116,7 @@ class GetCigarsRequest(val fields: List<FilterParameter<*>>) {
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun call(): Flow<List<Cigar>> {
         return flow {
+            delay(5000)
             val list = restRequest.execute().flatMapConcat { restResponse ->
                 if (restResponse.status == 200) {
                     val response = json.decodeFromString<GetCigarsResponse>(restResponse.body)

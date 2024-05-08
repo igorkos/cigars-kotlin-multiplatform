@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 3:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.mvvm.base.ActionsViewModel
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObservableValue
 
 abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterParameter<*>) :
@@ -42,11 +42,13 @@ abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterPar
     open var isError by mutableStateOf(false)
     var loading by mutableStateOf(false)
 
-    open val annotation: String? = null
+    open var annotation by mutableStateOf<String?>(null)
 
     init {
-        disposables.value += valueFlow.observe(screenModelScope) {
-            processInput(it)
+        runOnDispose {
+            valueFlow.observe(screenModelScope) {
+                processInput(it)
+            }
         }
     }
 
@@ -83,6 +85,10 @@ abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterPar
 
 
     sealed interface Action {
+        data class AddField(val field: FilterParameter<*>) : Action
+        data class RemoveField(val field: FilterParameter<*>) : Action
+        data class FieldSearch(val field: FilterParameter<*>) : Action
+        data class ExecuteSearch(val value: String = "") : Action
         data class Idle(val value: String = "") : Action
         data class Input(val value: String = "") : Action
         data class DropDown(val value: String = "") : Action

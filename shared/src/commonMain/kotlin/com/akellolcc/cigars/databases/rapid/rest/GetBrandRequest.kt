@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/8/24, 3:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,6 @@ class GetCigarsBrand(val cigar: RapidCigar) {
             restRequest.execute().map { restResponse ->
                 if (restResponse.status == 200) {
                     val response = Json.decodeFromString<GetCigarsBrandResponse>(restResponse.body)
-                    Log.debug("Got brand=${response.brand.brandId} name=${response.brand.name}")
                     cigar.brand = response.brand.name
                     emit(cigar)
                 } else {

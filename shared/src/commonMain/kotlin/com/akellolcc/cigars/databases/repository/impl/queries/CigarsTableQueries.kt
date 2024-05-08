@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 10:56 AM
+ * Last modified 5/7/24, 12:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,7 @@ import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.extensions.emptyCigar
-import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 
 class CigarsTableQueries(override val queries: CigarsDatabaseQueries) : DatabaseQueries<Cigar> {
     override fun get(id: Long, where: Long?): Query<Cigar> {
@@ -35,7 +34,6 @@ class CigarsTableQueries(override val queries: CigarsDatabaseQueries) : Database
         filter?.forEach {
             search[it.key] = "%${it.value}%"
         }
-        Log.debug("allAsc: $search")
         return queries.allAsc(
             search["name"] as? String ?: "%%",
             search["brand"] as? String ?: "%%",

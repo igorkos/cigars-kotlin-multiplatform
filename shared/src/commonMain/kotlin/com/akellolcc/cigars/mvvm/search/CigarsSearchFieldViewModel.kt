@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 3:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 package com.akellolcc.cigars.mvvm.search
 
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 
 class CigarsSearchFieldViewModel(parameter: FilterParameter<*>) :
@@ -24,18 +24,14 @@ class CigarsSearchFieldViewModel(parameter: FilterParameter<*>) :
 
     override fun validate(): Boolean {
         val valid = value.isNotEmpty() && value.length >= 3
+        annotation = if (valid) {
+            null
+        } else {
+            "Please enter at least 3 characters to narrow down your search"
+        }
         isError = !valid
         return valid
     }
-
-    override val annotation: String?
-        get() {
-            return if (validate()) {
-                null
-            } else {
-                "Please enter at least 3 characters to narrow down your search"
-            }
-        }
 
     @Suppress("UNCHECKED_CAST")
     companion object Factory : ObjectFactory<CigarsSearchFieldViewModel>() {

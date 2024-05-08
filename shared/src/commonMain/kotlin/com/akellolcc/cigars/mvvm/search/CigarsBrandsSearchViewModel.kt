@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 4:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,10 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
 import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -49,19 +50,16 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     var expanded by mutableStateOf(false)
 
     override fun processInput(value: String) {
-        getBrands(value)
-    }
-
-    override fun updateInput(value: String) {
         if (value != selectedBrand?.name) {
-            sendEvent(Action.Input())
             brands = listOf()
             selectedBrand = null
             expanded = false
+            setState(Action.Input())
+
         }
         inputSelection = null
         loading = true
-        super.updateInput(value)
+        getBrands(value)
     }
 
     override fun validate(): Boolean {
@@ -69,26 +67,26 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
         return selectedBrand != null
     }
 
-    override val annotation: String?
-        get() {
-            return when (state.value) {
-                is Action.Input -> null
-                is Action.DropDown -> null
-                is Action.Loading -> "Loading..."
-                is Action.Selected -> null
-                is Action.Error -> "No brands match your search"
-                is Action.Idle -> null
-                is Action.Loaded -> "Select brand from list"
-                else -> null
-            }
+    override fun setState(value: Any?) {
+        annotation = when (value) {
+            is Action.Input -> null
+            is Action.DropDown -> null
+            is Action.Loading -> "Loading..."
+            is Action.Selected -> null
+            is Action.Error -> "No brands match your search"
+            is Action.Idle -> null
+            is Action.Loaded -> "Select brand from list"
+            else -> null
         }
+        super.setState(value)
+    }
 
     /**
      * Get focus state
      */
     override fun onFocusChange(focused: Boolean) {
         if (focused) {
-            sendEvent(Action.Input())
+            setState(Action.Input())
         }
     }
 
@@ -98,10 +96,9 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     fun onDropDown(dismiss: Boolean) {
         expanded = !dismiss
         if (!dismiss) {
-            sendEvent(Action.DropDown())
+            setState(Action.DropDown())
         }
     }
-
 
     /**
      * Brand selected
@@ -115,13 +112,12 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
         sendEvent(Action.Selected())
     }
 
-
     private fun getBrands(query: String) {
         if (selectedBrand == null) {
             brandJob?.cancel()
             brandJob = null
             if (query.isNotBlank()) {
-                sendEvent(Action.Loading())
+                setState(Action.Loading())
                 brandJob = screenModelScope.launch {
                     if (this.isActive) {
                         loading = true
@@ -129,20 +125,20 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
                             brandRequest = GetCigarsBrands(brand = query)
                         }
                         Log.debug("Brand request: $query")
-                        //delay(100)
+                        delay(5000)
                         //callback(listOf())
                         brandRequest!!.next().cancellable().collect {
                             Log.debug("Get Brands: $it")
                             brands = it
                             loading = false
                             if (it.isEmpty()) {
-                                sendEvent(Action.Error())
+                                setState(Action.Error())
                             } else {
-                                sendEvent(Action.Loaded())
+                                setState(Action.Loaded())
                             }
                         }
                     } else {
-                        sendEvent(Action.Input())
+                        setState(Action.Input())
                         Log.debug("Brand request cancelled")
                     }
                 }

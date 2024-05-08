@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 3:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,10 +24,11 @@ import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
-import com.akellolcc.cigars.screens.search.data.CigarSortingParameters
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.CigarSearchParameters
+import com.akellolcc.cigars.screens.components.search.data.CigarSortingParameters
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.compareFilterParameters
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 
 class SearchCigarScreenViewModel :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
@@ -38,6 +39,7 @@ class SearchCigarScreenViewModel :
     init {
         sortField = FilterParameter(CigarSortingFields.Name.value, false)
         sortingFields = CigarSortingParameters()
+        searchingFields = CigarSearchParameters()
     }
 
     override fun entitySelected(entity: Cigar) {
@@ -70,32 +72,32 @@ class SearchCigarScreenViewModel :
         }
     }
 
-    fun searchFieldsChanged(fields: List<FilterParameter<*>>?) {
-        searchingFields = fields
-        entities = listOf()
-    }
-
     override fun loadEntities(reload: Boolean) {
-        searchingFields?.let {
-            if (request == null || request!!.fields != it) {
-                request = GetCigarsRequest(it)
-            }
-            execute(request!!.next()) { cigars ->
-                Log.debug("Cigars: ${cigars.size}")
-                if (cigars.isNotEmpty()) {
-                    val list = entities + cigars
-                    sortEntities(list)
-                } else {
-                    if (entities.isEmpty()) {
-                        entities = listOf(emptyCigar.copy(name = "No results"))
+        searchingFields?.let { fields ->
+            if (fields.validate()) {
+                Log.debug("Load entities searching fields: $fields")
+                if (request == null || !compareFilterParameters(fields.selected, request!!.fields)) {
+                    entities = listOf()
+                    request = GetCigarsRequest(fields.selected.map { it.copy() })
+                }
+                loading = true
+                execute(request!!.next()) { cigars ->
+                    Log.debug("Cigars: ${cigars.size}")
+                    if (cigars.isNotEmpty()) {
+                        val list = entities + cigars
+                        sortEntities(list)
+                    } else {
+                        if (entities.isEmpty()) {
+                            entities = listOf(emptyCigar.copy(name = "No results"))
+                        }
                     }
+                    loading = false
                 }
             }
         }
     }
 
     override fun loadMore() {
-        Log.debug("loadMore")
         loadEntities(false)
     }
 
@@ -105,7 +107,5 @@ class SearchCigarScreenViewModel :
         }
     }
 
-    sealed interface Actions {
-        data class ShowError(val error: StringDesc) : Actions
-    }
+    sealed interface Actions {}
 }

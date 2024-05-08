@@ -22,7 +22,7 @@ import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
 import com.akellolcc.cigars.databases.repository.impl.queries.cigarFactory
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

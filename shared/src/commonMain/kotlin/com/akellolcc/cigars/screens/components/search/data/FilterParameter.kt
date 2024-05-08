@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:55 AM
+ * Last modified 5/8/24, 11:52 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search.data
+package com.akellolcc.cigars.screens.components.search.data
 
 import androidx.compose.ui.text.input.KeyboardType
 import com.akellolcc.cigars.theme.Images
@@ -95,4 +95,16 @@ data class FilterParameter<T>(val key: String, var value: T, val label: String, 
         result = 31 * result + (value.hashCode())
         return result
     }
+
+    override fun toString(): String {
+        return "FilterParameter(key='$key', value=$value)"
+    }
+
+}
+
+fun compareFilterParameters(list1: List<FilterParameter<*>>, list2: List<FilterParameter<*>>): Boolean {
+    if (list1.size != list2.size) return false
+    val sorted1 = list1.sortedBy { it.key }
+    val sorted2 = list2.sortedBy { it.key }
+    return sorted1.zip(sorted2).all { (p1, p2) -> p1 == p2 }
 }

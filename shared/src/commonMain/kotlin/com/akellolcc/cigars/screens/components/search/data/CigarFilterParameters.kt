@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 11:18 AM
+ * Last modified 5/8/24, 3:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,12 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search.data
+package com.akellolcc.cigars.screens.components.search.data
 
 import com.akellolcc.cigars.databases.extensions.CigarSortingFields
-import com.akellolcc.cigars.screens.search.CigarsSearchBrandField
-import com.akellolcc.cigars.screens.search.CigarsSearchParameterField
-import com.akellolcc.cigars.screens.search.SearchParameterField
+import com.akellolcc.cigars.screens.components.search.CigarsSearchBrandField
+import com.akellolcc.cigars.screens.components.search.CigarsSearchParameterField
+import com.akellolcc.cigars.screens.components.search.SearchParameterField
 import com.akellolcc.cigars.theme.Images
 
 class CigarFilterParameters : FilterCollection() {
@@ -27,8 +27,6 @@ class CigarFilterParameters : FilterCollection() {
         params = CigarSortingFields.enumValues().map {
             FilterParameter(it.first.value, it.first.value, it.second, Images.icon_menu_sort)
         }
-        selectedParams = selectedParams + params[0]
-        controls = selectedParams.map { build(it) }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -65,7 +63,7 @@ class CigarSearchParameters : FilterCollection() {
                 FilterParameter(it.first.value, 0L, it.second, Images.icon_menu_sort)
             }
         }
-        selectedParams = selectedParams + params[0]
+        selectedParams = params.filter { it.key == CigarSortingFields.Brand.value }
         controls = selectedParams.map { build(it) }
     }
 

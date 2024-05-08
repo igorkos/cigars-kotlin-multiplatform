@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 2:20 PM
+ * Last modified 5/7/24, 10:51 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,25 +14,19 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search
+package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterParameter
-
-enum class SearchParameterAction {
-    Add,
-    Remove,
-    Completed,
-    LoadData
-}
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 
 abstract class SearchParameterField<T : Comparable<T>>(
     val parameter: FilterParameter<T>,
     var showLeading: Boolean = false,
     var enabled: Boolean = true,
-    var onAction: ((SearchParameterAction, FilterParameter<T>) -> Unit)? = null
+    var onAction: ((CigarsSearchFieldBaseViewModel.Action) -> Unit)? = null
 ) {
 
     abstract fun validate(): Boolean
@@ -42,8 +36,8 @@ abstract class SearchParameterField<T : Comparable<T>>(
 
     abstract fun handleAction(event: Any, navigator: Navigator?)
 
-    protected fun onAction(action: SearchParameterAction) {
+    protected fun onAction(action: CigarsSearchFieldBaseViewModel.Action) {
         Log.debug("Send action: $action")
-        onAction?.invoke(action, parameter)
+        onAction?.invoke(action)
     }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 3:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search
+package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +25,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -37,7 +41,7 @@ import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsBrandsSearchViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -46,13 +50,14 @@ class CigarsSearchBrandField(
     parameter: FilterParameter<String>,
     showLeading: Boolean = false,
     enabled: Boolean = true,
-    onAction: ((SearchParameterAction, FilterParameter<String>) -> Unit)? = null
+    onAction: ((CigarsSearchFieldBaseViewModel.Action) -> Unit)? = null
 ) : SearchParameterField<String>(parameter, showLeading, enabled, onAction) {
 
     override fun handleAction(event: Any, navigator: Navigator?) {
+        Log.debug("Handle action: $event")
         when (event) {
             is CigarsSearchFieldBaseViewModel.Action.Selected -> {
-                onAction(SearchParameterAction.Completed)
+                onAction(CigarsSearchFieldBaseViewModel.Action.FieldSearch(parameter))
             }
         }
     }
@@ -62,10 +67,17 @@ class CigarsSearchBrandField(
         return viewModel.validate()
     }
 
-
     @Composable
     override fun Content() {
-        Log.debug("Render Brand field: ${viewModel.value} ${viewModel.expanded} ${viewModel.brands.size}")
+        val state by viewModel.state.collectAsState()
+        LaunchedEffect(Unit) {
+            viewModel.observeEvents {
+                handleAction(it, null)
+            }
+        }
+        SideEffect {
+            Log.debug("Render Brand field:$state ${viewModel.value} ${viewModel.expanded} ${viewModel.brands.size}")
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -74,7 +86,7 @@ class CigarsSearchBrandField(
             if (showLeading) {
                 IconButton(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = { onAction(SearchParameterAction.Remove) }
+                    onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }
@@ -123,7 +135,6 @@ class CigarsSearchBrandField(
                 DropdownMenu(expanded = viewModel.expanded,
                     onDismissRequest = { viewModel.onDropDown(true) }) {
                     viewModel.brands.map {
-                        Log.debug("Brand: $it")
                         DropdownMenuItem(
                             leadingIcon = {
                                 loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))

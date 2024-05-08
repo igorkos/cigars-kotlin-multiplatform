@@ -20,7 +20,7 @@ import app.cash.sqldelight.ExecutableQuery
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.extensions.BaseEntity
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 
 interface DatabaseQueries<T : BaseEntity> {
     val queries: Any

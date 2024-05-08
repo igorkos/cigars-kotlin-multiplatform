@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:10 PM
+ * Last modified 5/7/24, 11:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
@@ -107,14 +108,18 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
     override fun Content() {
         val navigator = LocalNavigator.current
         val sharedViewModel = createViewModel(MainScreenViewModel::class)
+
         LaunchedEffect(navigator) {
+            Log.debug("${this@BaseTabListScreen::class.simpleName} load data")
             viewModel.loadMore()
             if (sharedViewModel.isTabsVisible != route.isTabsVisible)
                 sharedViewModel.isTabsVisible = route.isTabsVisible
         }
 
-        viewModel.observeEvents {
-            handleAction(it, navigator)
+        LaunchedEffect(viewModel) {
+            viewModel.observeEvents {
+                handleAction(it, navigator)
+            }
         }
 
         val scrollBehavior =

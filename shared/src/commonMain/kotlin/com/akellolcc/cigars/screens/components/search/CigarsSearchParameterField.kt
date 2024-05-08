@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/7/24, 4:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search
+package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +35,7 @@ import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -44,13 +44,13 @@ class CigarsSearchParameterField<T : Comparable<T>>(
     parameter: FilterParameter<T>,
     showLeading: Boolean = false,
     enabled: Boolean = true,
-    onAction: ((SearchParameterAction, FilterParameter<T>) -> Unit)? = null
+    onAction: ((CigarsSearchFieldBaseViewModel.Action) -> Unit)? = null
 ) : SearchParameterField<T>(parameter, showLeading, enabled, onAction) {
     override fun handleAction(event: Any, navigator: Navigator?) {
         Log.debug("Handle action: $event")
         when (event) {
             is CigarsSearchFieldBaseViewModel.Action.Selected -> {
-                onAction(SearchParameterAction.Completed)
+                onAction(CigarsSearchFieldBaseViewModel.Action.FieldSearch(parameter))
             }
 
             else -> {}
@@ -67,11 +67,8 @@ class CigarsSearchParameterField<T : Comparable<T>>(
 
     @Composable
     override fun Content() {
-        Log.debug("Compose: error: ${viewModel.isError} ")
-
         LaunchedEffect(Unit) {
             viewModel.observeEvents {
-                Log.debug("Control state: $it")
                 handleAction(it, null)
             }
         }
@@ -83,7 +80,7 @@ class CigarsSearchParameterField<T : Comparable<T>>(
             if (showLeading) {
                 IconButton(
                     modifier = Modifier.wrapContentSize(),
-                    onClick = { onAction(SearchParameterAction.Remove) }
+                    onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:10 PM
+ * Last modified 5/8/24, 12:39 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,6 @@
 
 package com.akellolcc.cigars.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -29,26 +28,23 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.mvvm.search.SearchCigarScreenViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.components.search.SearchComponent
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.screens.search.SearchComponent
-import com.akellolcc.cigars.screens.search.SearchParameterAction
-import com.akellolcc.cigars.screens.search.data.CigarSearchParameters
-import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -100,28 +96,26 @@ class SearchCigarScreen(
 
     @Composable
     override fun ContentHeader(modifier: Modifier) {
-        val fields = remember { CigarSearchParameters() }
         SearchComponent(
             modifier = modifier,
-            fields = fields,
+            fields = viewModel.searchingFields!!,
         ) { action ->
             Log.debug("Received action: $action")
             when (action) {
-                SearchParameterAction.Completed -> {
-                    viewModel.searchingFields = fields.selected
+                is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
                     viewModel.reload()
                 }
 
                 else -> {}
             }
         }
-
-        if (viewModel.loading) {
+        Log.debug("Searching: ${viewModel.loading}")
+        if (viewModel.entities.isEmpty() && viewModel.loading) {
             Box(
-                modifier = modifier.fillMaxWidth().height(24.dp).background(Color.Red),
+                modifier = modifier.fillMaxWidth().height(32.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.width(24.dp))
             }
         }
     }

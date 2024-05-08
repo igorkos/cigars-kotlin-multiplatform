@@ -21,7 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 
 class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : DatabaseQueries<History> {
     override fun get(id: Long, where: Long?): Query<History> {

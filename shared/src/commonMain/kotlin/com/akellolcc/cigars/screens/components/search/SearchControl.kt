@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 11:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-package com.akellolcc.cigars.screens.search
+package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.wrapContentSize
@@ -30,9 +30,10 @@ import androidx.compose.ui.geometry.Size
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.components.LinkButton
 import com.akellolcc.cigars.screens.components.TextStyled
-import com.akellolcc.cigars.screens.search.data.FilterCollection
+import com.akellolcc.cigars.screens.components.search.data.FilterCollection
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -40,7 +41,7 @@ import com.akellolcc.cigars.theme.loadIcon
 private data class SearchComponentImplement(
     val modifier: Modifier = Modifier,
     val fields: FilterCollection,
-    val onAction: (SearchParameterAction) -> Unit
+    val onAction: (CigarsSearchFieldBaseViewModel.Action) -> Unit
 ) {
 
     val viewModel = createViewModel(CigarsSearchControlViewModel::class, fields)
@@ -50,11 +51,11 @@ private data class SearchComponentImplement(
 
         LaunchedEffect(Unit) {
             viewModel.observeEvents {
-                Log.debug("Control event: $it")
+                Log.debug("Search control get event: $it")
                 when (it) {
-                    is CigarsSearchControlViewModel.Action.Completed -> {
+                    is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
                         if (viewModel.isAllValid) {
-                            onAction(SearchParameterAction.Completed)
+                            onAction(it)
                         }
                     }
 
@@ -66,8 +67,8 @@ private data class SearchComponentImplement(
         Column() {
             viewModel.fields.controls.map {
                 it.showLeading = fields.showLeading
-                it.onAction = { action, parameter ->
-                    viewModel.onFieldAction(action, parameter)
+                it.onAction = { action ->
+                    viewModel.onFieldAction(action)
                 }
                 it.Content()
             }
@@ -94,7 +95,7 @@ private data class SearchComponentImplement(
                                     )
                                 },
                                 onClick = {
-                                    viewModel.onFieldAction(SearchParameterAction.Add, it)
+                                    viewModel.onFieldAction(CigarsSearchFieldBaseViewModel.Action.AddField(it))
                                     viewModel.expanded = false
                                 }
                             )
@@ -110,14 +111,14 @@ private data class SearchComponentImplement(
 fun SearchComponent(
     modifier: Modifier = Modifier,
     fields: FilterCollection,
-    onAction: (SearchParameterAction) -> Unit
+    onAction: (CigarsSearchFieldBaseViewModel.Action) -> Unit
 ) {
     val field = remember { fields }
     val searchComponent = remember {
         mutableStateOf<SearchComponentImplement?>(null)
     }
 
-    LaunchedEffect(fields, onAction, modifier) {
+    LaunchedEffect(Unit) {
         searchComponent.value = SearchComponentImplement(modifier, field, onAction)
     }
     searchComponent.value?.Content()

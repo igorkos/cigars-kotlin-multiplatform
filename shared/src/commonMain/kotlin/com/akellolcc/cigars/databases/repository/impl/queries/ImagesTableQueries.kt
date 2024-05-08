@@ -21,7 +21,7 @@ import app.cash.sqldelight.Query
 import app.cash.sqldelight.SuspendingTransactionWithReturn
 import com.akellolcc.cigars.databases.ImagesDatabaseQueries
 import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 
 class ImagesTableQueries(override val queries: ImagesDatabaseQueries) :
     DatabaseQueries<CigarImage> {

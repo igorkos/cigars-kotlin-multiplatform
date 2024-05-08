@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/8/24, 3:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,8 +23,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.extensions.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.search.data.FilterCollection
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FilterCollection
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     var search by mutableStateOf(false)
 
     var sortingFields by mutableStateOf<FilterCollection?>(null)
-    var searchingFields by mutableStateOf<List<FilterParameter<*>>?>(null)
+    var searchingFields by mutableStateOf<FilterCollection?>(null)
 
     abstract fun entitySelected(entity: T)
 
@@ -75,9 +75,11 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     protected open fun loadEntities(reload: Boolean = false) {
         if (_entities == null || reload) {
             loading = true
-            Log.debug("Load all: $searchingFields")
+            Log.debug("Load entries with sort: $sortField and search: $searchingFields")
             _entities = screenModelScope.launch {
-                repository.all(sortField, searchingFields).cancellable()
+                val filters =
+                    if (searchingFields?.selected != null && searchingFields?.selected?.isNotEmpty() == true) searchingFields?.selected else null
+                repository.all(sortField, filters).cancellable()
                     .collect {
                         entities = it
                         loading = false

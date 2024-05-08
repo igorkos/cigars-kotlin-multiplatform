@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:10 PM
+ * Last modified 5/8/24, 12:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +18,6 @@ package com.akellolcc.cigars.screens
 
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -30,16 +28,15 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.cigars.CigarsScreenViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.components.search.SearchComponent
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.screens.search.SearchComponent
-import com.akellolcc.cigars.screens.search.SearchParameterAction
-import com.akellolcc.cigars.screens.search.data.CigarFilterParameters
-import com.akellolcc.cigars.screens.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -102,18 +99,12 @@ open class CigarsListScreen<V : ScreenModel>(
     @Composable
     override fun ListHeader(modifier: Modifier) {
         if (viewModel.search) {
-            val fields = remember { CigarFilterParameters() }
-
-            LaunchedEffect(fields.selected) {
-                viewModel.searchingFields = fields.selected
-            }
-
             SearchComponent(
                 modifier = modifier,
-                fields = fields,
+                fields = viewModel.searchingFields!!,
             ) { action ->
                 when (action) {
-                    SearchParameterAction.Completed -> {
+                    is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
                         viewModel.reload()
                     }
 

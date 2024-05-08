@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/7/24, 3:46 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,37 +19,32 @@ package com.akellolcc.cigars.mvvm.search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.databases.extensions.Cigar
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.base.DatabaseViewModel
-import com.akellolcc.cigars.screens.search.SearchParameterAction
-import com.akellolcc.cigars.screens.search.data.FilterCollection
-import com.akellolcc.cigars.screens.search.data.FilterParameter
+import com.akellolcc.cigars.mvvm.base.ActionsViewModel
+import com.akellolcc.cigars.screens.components.search.data.FilterCollection
 import com.akellolcc.cigars.utils.ObjectFactory
 
 class CigarsSearchControlViewModel(val fields: FilterCollection) :
-    DatabaseViewModel<Cigar, CigarsSearchControlViewModel.Action>() {
+    ActionsViewModel<CigarsSearchFieldBaseViewModel.Action>() {
     var expanded by mutableStateOf(false)
 
     /**
      * Control data
      */
-    fun onFieldAction(action: SearchParameterAction, field: FilterParameter<*>) {
+    fun onFieldAction(action: CigarsSearchFieldBaseViewModel.Action) {
         Log.debug("onFieldAction $action")
         when (action) {
-            SearchParameterAction.Add -> {
-                fields.add(field)
-                sendEvent(Action.FieldsUpdate())
+            is CigarsSearchFieldBaseViewModel.Action.AddField -> {
+                fields.add(action.field)
             }
 
-            SearchParameterAction.Remove -> {
-                fields.remove(field)
-                sendEvent(Action.FieldsUpdate())
+            is CigarsSearchFieldBaseViewModel.Action.RemoveField -> {
+                fields.remove(action.field)
             }
 
-            SearchParameterAction.Completed -> {
+            is CigarsSearchFieldBaseViewModel.Action.FieldSearch -> {
                 if (isAllValid) {
-                    sendEvent(Action.Completed())
+                    sendEvent(CigarsSearchFieldBaseViewModel.Action.ExecuteSearch())
                 }
             }
 
@@ -66,9 +61,4 @@ class CigarsSearchControlViewModel(val fields: FilterCollection) :
         }
     }
 
-    sealed interface Action {
-        data class Completed(val value: String = "") : Action
-        data class FieldsUpdate(val value: String = "") : Action
-        data class Error(val value: String = "") : Action
-    }
 }
