@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/5/24, 10:12 PM
+ * Last modified 5/15/24, 1:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 
 package com.akellolcc.cigars.databases.rapid.rest
 
+import com.akellolcc.cigars.databases.rapid.rest.cache.HttpCacheStorage
 import com.akellolcc.cigars.logging.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.cache.HttpCache
@@ -28,6 +29,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.encodeURLQueryComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlin.math.min
 
 
@@ -83,20 +85,31 @@ data class RestRequest(
 
     fun execute(): Flow<RestResponse> {
         return flow {
-            val encoded = url.encodeURLQueryComponent()
-            val response = (if (cache) clientPermanent else clientMemory).get(encoded) {
-                headers {
-                    append("X-RapidAPI-Key", RAPID_KEY)
-                    append("X-RapidAPI-Host", RAPID_HOST)
-                }
-            }
-            val reqCount = response.headers["x-ratelimit-requests-remaining"]?.toLong() ?: Long.MAX_VALUE
-            if (reqCount < remaining) {
-                remaining = min(reqCount, remaining)
-                Log.debug("Rapid request quota remaining -> $remaining")
-            }
-            emit(RestResponse(response.status.value, response.bodyAsText()))
+            val resp = run()
+            emit(resp)
         }
+    }
+
+    fun executeSync(): RestResponse {
+        return runBlocking {
+            run()
+        }
+    }
+
+    private suspend fun run(): RestResponse {
+        val encoded = url.encodeURLQueryComponent()
+        val response = (if (cache) clientPermanent else clientMemory).get(encoded) {
+            headers {
+                append("X-RapidAPI-Key", RAPID_KEY)
+                append("X-RapidAPI-Host", RAPID_HOST)
+            }
+        }
+        val reqCount = response.headers["x-ratelimit-requests-remaining"]?.toLong() ?: Long.MAX_VALUE
+        if (reqCount < remaining) {
+            remaining = min(reqCount, remaining)
+            Log.debug("Rapid request quota remaining -> $remaining")
+        }
+        return RestResponse(response.status.value, response.bodyAsText())
     }
 }
 

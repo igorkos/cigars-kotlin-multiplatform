@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 11:52 AM
+ * Last modified 5/14/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 package com.akellolcc.cigars.screens.components.search.data
 
-import androidx.compose.ui.text.input.KeyboardType
+import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
 
@@ -25,12 +25,12 @@ data class FilterParameter<T>(val key: String, var value: T, val label: String, 
 
     constructor(key: String, value: T) : this(key, value, "", Images.tab_icon_search)
 
-    val keyboardType: KeyboardType
+    val keyboardType: InputMode
         get() = when (value) {
-            is Long -> KeyboardType.Number
-            is Double -> KeyboardType.Decimal
-            is Boolean -> KeyboardType.Decimal
-            else -> KeyboardType.Text
+            is Long -> InputMode.Number
+            is Double -> InputMode.Inches
+            is Boolean -> InputMode.Number
+            else -> InputMode.Text
         }
 
     @Suppress("UNCHECKED_CAST")

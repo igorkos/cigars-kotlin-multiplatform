@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 4:08 PM
+ * Last modified 5/15/24, 1:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,31 +21,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.akellolcc.cigars.databases.rapid.rest.GetCigarsBrands
-import com.akellolcc.cigars.databases.rapid.rest.RapidCigarBrand
+import com.akellolcc.cigars.databases.createRepository
+import com.akellolcc.cigars.databases.models.Brand
+import com.akellolcc.cigars.databases.repository.BrandsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     CigarsSearchFieldBaseViewModel(parameter) {
 
     //Brand request
-    private var brandRequest: GetCigarsBrands? = null
-    private var brandJob: Job? = null
+    val repository: BrandsRepository = createRepository(BrandsRepository::class)
 
     //Input flow
     var inputSelection by mutableStateOf<TextRange?>(null)
 
     // Brands list
-    var brands by mutableStateOf(listOf<RapidCigarBrand>())
+    var brands by mutableStateOf(listOf<Brand>())
 
     //Selected brand
-    private var selectedBrand by mutableStateOf<RapidCigarBrand?>(null)
+    private var selectedBrand by mutableStateOf<Brand?>(null)
     var expanded by mutableStateOf(false)
 
     override fun processInput(value: String) {
@@ -102,45 +101,36 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     /**
      * Brand selected
      */
-    fun onBrandSelected(brand: RapidCigarBrand) {
+    fun onBrandSelected(brand: Brand) {
         selectedBrand = brand
         value = brand.name ?: ""
         inputSelection = TextRange(value.length)
         expanded = false
-        parameter.set(brand.brandId.toString())
+        parameter.set(brand.rowid.toString())
         sendEvent(Action.Selected())
     }
 
     private fun getBrands(query: String) {
         if (selectedBrand == null) {
-            brandJob?.cancel()
-            brandJob = null
-            if (query.isNotBlank()) {
-                setState(Action.Loading())
-                brandJob = screenModelScope.launch {
-                    if (this.isActive) {
-                        loading = true
-                        if (brandRequest == null || brandRequest?.brand != query) {
-                            brandRequest = GetCigarsBrands(brand = query)
-                        }
-                        Log.debug("Brand request: $query")
-                        brandRequest!!.next().cancellable().collect {
-                            Log.debug("Get Brands: $it")
-                            brands = it
-                            loading = false
-                            if (it.isEmpty()) {
-                                setState(Action.Error())
-                            } else {
-                                setState(Action.Loaded())
-                            }
-                        }
-                    } else {
+            onDispose()
+            runOnDispose {
+                screenModelScope.launch {
+                    repository.all(null, listOf(parameter)).cancellable().catch {
                         setState(Action.Input())
                         Log.debug("Brand request cancelled")
+                    }.collect {
+                        brands = it
+                        loading = false
+                        if (it.isEmpty()) {
+                            setState(Action.Error())
+                        } else {
+                            setState(Action.Loaded())
+                        }
                     }
                 }
             }
         }
+
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -37,8 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.databases.extensions.History
-import com.akellolcc.cigars.databases.extensions.HistoryType
+import com.akellolcc.cigars.databases.models.History
+import com.akellolcc.cigars.databases.models.HistoryType
 import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.NavRoute

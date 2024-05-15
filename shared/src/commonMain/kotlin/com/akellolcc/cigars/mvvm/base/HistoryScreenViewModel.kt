@@ -19,7 +19,7 @@ package com.akellolcc.cigars.mvvm.base
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.akellolcc.cigars.databases.extensions.History
+import com.akellolcc.cigars.databases.models.History
 import dev.icerock.moko.resources.desc.StringDesc
 
 

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 12:32 AM
+ * Last modified 5/9/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,16 +17,18 @@
 package com.akellolcc.cigars.screens.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -38,9 +40,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
-import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -76,36 +79,45 @@ fun <T : Comparable<T>> ValuePicker(
         }
     }
     Column(
-        modifier = modifier.fillMaxWidth().clickable(onClick = {
-            expanded = true
-        }).height(60.dp).background(
+        modifier = modifier.fillMaxWidth().height(60.dp).background(
             materialColor(backgroundColor ?: MaterialColors.color_surfaceVariant),
             TextFieldDefaults.shape
         ).onSizeChanged {
             with = it.width
-            Log.debug("width ${it.width.dp} $screenWidth")
         },
         horizontalAlignment = Alignment.Start
     ) {
-        Column(
-            modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
-                .wrapContentWidth()
-                .onSizeChanged {
-                    Log.debug("1 width ${it.width.dp}")
-                    // with = it.width.dp
-                }) {
-            CompositionLocalProvider(
-                LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp, start = 16.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+
             ) {
+                CompositionLocalProvider(
+                    LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)
+                ) {
+                    TextStyled(
+                        label,
+                        TextStyles.Description,
+                    )
+                }
                 TextStyled(
-                    label,
-                    TextStyles.Description,
+                    selected?.label,
+                    TextStyles.Subhead,
                 )
             }
-            TextStyled(
-                selected?.label,
-                TextStyles.Subhead,
-            )
+            Column {
+                IconButton(
+                    modifier = Modifier.wrapContentSize(),
+                    onClick = {
+                        expanded = !expanded
+                    }
+                ) {
+                    loadIcon(Images.icon_drop_down, Size(12.0F, 12.0F), tint = materialColor(MaterialColors.color_onSurfaceVariant))
+                }
+            }
         }
         if (items.size > 1) {
             DropdownMenu(

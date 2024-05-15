@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:22 PM
+ * Last modified 5/15/24, 2:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,25 +16,23 @@
 
 package com.akellolcc.cigars.mvvm.search
 
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarSortingFields
-import com.akellolcc.cigars.databases.extensions.emptyCigar
-import com.akellolcc.cigars.databases.rapid.rest.GetCigarsRequest
-import com.akellolcc.cigars.databases.repository.CigarsRepository
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.CigarSortingFields
+import com.akellolcc.cigars.databases.repository.CigarsSearchRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.screens.components.search.data.CigarSearchParameters
 import com.akellolcc.cigars.screens.components.search.data.CigarSortingParameters
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
-import com.akellolcc.cigars.screens.components.search.data.compareFilterParameters
 import com.akellolcc.cigars.utils.ObjectFactory
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.launch
 
 class SearchCigarScreenViewModel :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
-    override val repository: CigarsRepository = createRepository(CigarsRepository::class)
-
-    private var request: GetCigarsRequest? = null
+    override val repository: CigarsSearchRepository = createRepository(CigarsSearchRepository::class)
 
     init {
         sortField = FilterParameter(CigarSortingFields.Name.value, false)
@@ -43,6 +41,7 @@ class SearchCigarScreenViewModel :
     }
 
     override fun entitySelected(entity: Cigar) {
+        sendEvent(Actions.RouteToCigar(entity))
     }
 
     override fun sortingOrder(ascending: Boolean) {
@@ -76,22 +75,16 @@ class SearchCigarScreenViewModel :
         searchingFields?.let { fields ->
             if (fields.validate()) {
                 Log.debug("Load entities searching fields: $fields")
-                if (request == null || !compareFilterParameters(fields.selected, request!!.fields)) {
-                    entities = listOf()
-                    request = GetCigarsRequest(fields.selected.map { it.copy() })
-                }
                 loading = true
-                execute(request!!.next()) { cigars ->
-                    Log.debug("Cigars: ${cigars.size}")
-                    if (cigars.isNotEmpty()) {
-                        val list = entities + cigars
-                        sortEntities(list)
-                    } else {
-                        if (entities.isEmpty()) {
-                            entities = listOf(emptyCigar.copy(name = "No results"))
+                onDispose()
+                runOnDispose {
+                    screenModelScope.launch {
+                        repository.all(null, fields.selected).cancellable().collect {
+                            val list = entities + it
+                            sortEntities(list)
+                            loading = false
                         }
                     }
-                    loading = false
                 }
             }
         }
@@ -107,5 +100,7 @@ class SearchCigarScreenViewModel :
         }
     }
 
-    sealed interface Actions {}
+    sealed interface Actions {
+        data class RouteToCigar(val cigar: Cigar) : Actions
+    }
 }

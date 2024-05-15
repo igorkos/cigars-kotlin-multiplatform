@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.Database
-import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.models.BaseEntity
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow

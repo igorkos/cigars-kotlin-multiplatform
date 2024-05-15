@@ -21,7 +21,8 @@ CREATE TABLE CigarsTable (
     shopping INTEGER AS Boolean NOT NULL,
     favorites INTEGER AS Boolean  NOT NULL,
     price REAL,
-    other INTEGER
+    other INTEGER,
+    relations TEXT
 );
 
 
@@ -79,8 +80,8 @@ allDesc:
 
 
 add:
-INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites, relations)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 update:
 UPDATE CigarsTable SET name = :name,
@@ -100,7 +101,8 @@ UPDATE CigarsTable SET name = :name,
     link= :link,
     count= :count,
     shopping= :shopping,
-    favorites= :favorites WHERE rowid = :id;
+    favorites= :favorites,
+    relations=:relations WHERE rowid = :id;
 
 remove:
 DELETE FROM CigarsTable WHERE rowid = :rowid;

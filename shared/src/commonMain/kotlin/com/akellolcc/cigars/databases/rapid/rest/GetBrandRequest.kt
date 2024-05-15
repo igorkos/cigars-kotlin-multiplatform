@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:42 PM
+ * Last modified 5/15/24, 12:51 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,98 +16,50 @@
 
 package com.akellolcc.cigars.databases.rapid.rest
 
+import com.akellolcc.cigars.databases.models.Brand
+import com.akellolcc.cigars.databases.rapid.models.GetCigarsBrandResponse
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-@Serializable
-data class RapidCigarBrand(val brandId: Long, val name: String?)
-
-@Serializable
-class GetCigarsBrandResponse(val brand: RapidCigarBrand)
-
-class GetCigarsBrand(val cigar: RapidCigar) {
+class GetCigarsBrand(val brand: Long) : RestRequestInterface<Brand> {
     companion object {
         private const val BASE_URL = "https://cigars.p.rapidapi.com/brands/"
     }
 
     private val restRequest: RestRequest
         get() {
-            val url = BASE_URL + cigar.brandId
+            val url = BASE_URL + brand
             return RestRequest(GET, url, cache = true)
         }
 
-    fun execute(): Flow<RapidCigar> {
+    override fun execute(): Flow<Brand> {
         return flow {
             restRequest.execute().map { restResponse ->
-                if (restResponse.status == 200) {
-                    val response = Json.decodeFromString<GetCigarsBrandResponse>(restResponse.body)
-                    cigar.brand = response.brand.name
-                    emit(cigar)
-                } else {
-                    Log.error("GetCigarsBrand got response ${restResponse.status}")
-                    throw Exception("Got response ${restResponse.status}")
-                }
+                val brand = process(restResponse)
+                emit(brand)
             }.single()
         }
     }
 
+    override fun executeSync(): Brand {
+        val restResponse = restRequest.executeSync()
+        return process(restResponse)
+    }
+
+    private fun process(restResponse: RestResponse): Brand {
+        if (restResponse.status == 200) {
+            val response = Json.decodeFromString<GetCigarsBrandResponse>(restResponse.body)
+            return response.brand.toBrand()
+        } else {
+            Log.error("GetCigarsBrand got response ${restResponse.status}")
+            throw Exception("Got response ${restResponse.status}")
+        }
+    }
 }
 
-@Serializable
-class GetCigarsBrandsResponse(val brands: List<RapidCigarBrand>, val count: Int, val page: Int)
 
-
-class GetCigarsBrands(val brand: String?) {
-    private var page = 0
-    private var totalItems = 0
-    private var receivedItems = 0
-    private val isLastPage: Boolean
-        get() = if (page == 0) false else receivedItems >= totalItems
-
-    companion object {
-        private const val BASE_URL = "https://cigars.p.rapidapi.com/brands?"
-    }
-
-    private val restRequest: RestRequest
-        get() {
-            val url = BASE_URL + "page=$page" +
-                    if (brand != null) "&search=$brand" else ""
-            //TODO: remove on production cache
-            return RestRequest(GET, url, cache = true)
-        }
-    private val json = Json { ignoreUnknownKeys = true }
-
-    fun next(): Flow<List<RapidCigarBrand>> {
-        if (isLastPage) {
-            return flowOf(emptyList())
-        }
-        page++
-        return call()
-    }
-
-    private fun call(): Flow<List<RapidCigarBrand>> {
-        return flow {
-            restRequest.execute().map { restResponse ->
-                if (restResponse.status == 200) {
-                    val response = json.decodeFromString<GetCigarsBrandsResponse>(restResponse.body)
-                    Log.debug("GetCigarsRequest got page=${response.page} count=${response.count} get=${response.brands.size}")
-                    totalItems = response.count
-                    receivedItems += response.brands.size
-                    page = response.page
-                    emit(response.brands)
-                } else {
-                    Log.error("GetCigarsRequest got response ${restResponse.status}")
-                    throw Exception("Got response ${restResponse.status}")
-                }
-            }.single()
-        }
-    }
-
-}

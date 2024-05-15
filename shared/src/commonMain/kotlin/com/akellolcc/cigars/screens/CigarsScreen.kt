@@ -23,7 +23,7 @@ import androidx.compose.ui.geometry.Size
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel

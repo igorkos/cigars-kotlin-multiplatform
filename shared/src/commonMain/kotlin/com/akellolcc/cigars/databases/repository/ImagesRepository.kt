@@ -16,7 +16,7 @@
 
 package com.akellolcc.cigars.databases.repository
 
-import com.akellolcc.cigars.databases.extensions.CigarImage
+import com.akellolcc.cigars.databases.models.CigarImage
 
 interface ImagesRepository : Repository<CigarImage>
 

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 4:08 PM
+ * Last modified 5/15/24, 3:16 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,15 @@
 
 package com.akellolcc.cigars.databases.rapid.rest
 
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarStrength
+import app.cash.paging.PagingSourceLoadParams
+import app.cash.paging.PagingSourceLoadResult
+import app.cash.paging.PagingSourceLoadResultPage
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.rapid.models.GetCigarsResponse
+import com.akellolcc.cigars.databases.rapid.models.RapidCigar
 import com.akellolcc.cigars.databases.rapid.rest.RestRequest.Companion.GET
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
-import com.akellolcc.cigars.utils.fraction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -29,53 +32,10 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-@Serializable
-data class RapidCigar(
-    val cigarId: Long,
-    val brandId: Long,
-    val name: String?,
-    val length: Double?,
-    val ringGauge: Long?,
-    val country: String?,
-    val filler: String?,
-    val wrapper: String?,
-    val color: String?,
-    val strength: String?,
-) {
-    var brand: String? = null
-    fun toCigar(): Cigar {
-        return Cigar(
-            cigarId,
-            name ?: "Unknown",
-            brand,
-            country,
-            null,
-            "",
-            wrapper ?: "",
-            wrapper ?: "",
-            ringGauge ?: 0,
-            length?.fraction ?: "0",
-            CigarStrength.fromString(strength) ?: CigarStrength.Mild,
-            null,
-            null,
-            null,
-            filler ?: "",
-            null,
-            1,
-            shopping = false,
-            favorites = false,
-            price = null
-        )
-    }
-}
-
-@Serializable
-class GetCigarsResponse(val cigars: List<RapidCigar>, val page: Int, val count: Int)
-class GetCigarsRequest(val fields: List<FilterParameter<*>>) {
-    private var page = 0
+class GetCigarsRequest(val fields: List<FilterParameter<*>>) : RestRequestInterface<List<Cigar>> {
+    var page = 0
     private var totalItems = 0
     private var receivedItems = 0
     private val isLastPage: Boolean
@@ -104,35 +64,73 @@ class GetCigarsRequest(val fields: List<FilterParameter<*>>) {
         }
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun next(): Flow<List<Cigar>> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun execute(): Flow<List<Cigar>> {
         if (isLastPage) {
             return flowOf(emptyList())
         }
         page++
-        return call()
+        return flow {
+            val list = restRequest.execute().flatMapConcat { restResponse ->
+                process(restResponse).asFlow()
+            }.flatMapConcat { rapid ->
+                GetCigarsBrand(rapid.brandId).execute().flatMapConcat {
+                    val cigar = rapid.toCigar()
+                    cigar.brand = it.name
+                    flowOf(cigar)
+                }
+            }.toList()
+            emit(list)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun call(): Flow<List<Cigar>> {
-        return flow {
-            val list = restRequest.execute().flatMapConcat { restResponse ->
-                if (restResponse.status == 200) {
-                    val response = json.decodeFromString<GetCigarsResponse>(restResponse.body)
-                    Log.debug("GetCigarsRequest got page=${response.page} count=${response.count} get=${response.cigars.size}")
-                    totalItems = response.count
-                    receivedItems += response.cigars.size
-                    page = response.page
-                    response.cigars.asFlow()
-                } else {
-                    Log.error("GetCigarsRequest got response ${restResponse.status}")
-                    throw Exception("Got response ${restResponse.status}")
-                }
-            }.flatMapConcat {
-                GetCigarsBrand(it).execute()
-            }.flatMapConcat {
-                flowOf(it.toCigar())
-            }.toList()
-            emit(list)
+    fun paged(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Cigar> {
+        val reqPage = params.key ?: 1
+        if (isLastPage) {
+            return PagingSourceLoadResultPage(
+                data = emptyList(),
+                prevKey = (reqPage - 1).takeIf { it > 0 },
+                nextKey = null
+            )
+        }
+        val list = restRequest.execute().flatMapConcat { restResponse ->
+            process(restResponse).asFlow()
+        }.flatMapConcat { rapid ->
+            GetCigarsBrand(rapid.brandId).execute().flatMapConcat {
+                val cigar = rapid.toCigar()
+                cigar.brand = it.name
+                flowOf(cigar)
+            }
+        }
+    }
+
+    override fun executeSync(): List<Cigar> {
+        if (isLastPage) {
+            return emptyList()
+        }
+        page++
+        val restResponse = restRequest.executeSync()
+        val rapidCigars = process(restResponse)
+        return rapidCigars.map {
+            val brand = GetCigarsBrand(it.brandId).executeSync()
+            val cigar = it.toCigar()
+            cigar.brand = brand.name
+            cigar
+        }
+    }
+
+    private fun process(restResponse: RestResponse): List<RapidCigar> {
+        if (restResponse.status == 200) {
+            val response = json.decodeFromString<GetCigarsResponse>(restResponse.body)
+            Log.debug("GetCigarsRequest got page=${response.page} count=${response.count} get=${response.cigars.size}")
+            totalItems = response.count
+            receivedItems += response.cigars.size
+            page = response.page
+            return response.cigars
+        } else {
+            Log.error("GetCigarsRequest got response ${restResponse.status}")
+            throw Exception("Got response ${restResponse.status}")
         }
     }
 }

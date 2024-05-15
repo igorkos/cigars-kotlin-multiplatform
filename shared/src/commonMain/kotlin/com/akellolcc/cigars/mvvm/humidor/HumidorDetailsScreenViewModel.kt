@@ -20,9 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.models.CigarImage
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.mvvm.base.DatabaseViewModel

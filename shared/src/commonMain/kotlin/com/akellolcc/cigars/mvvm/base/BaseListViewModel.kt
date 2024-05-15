@@ -20,7 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterCollection

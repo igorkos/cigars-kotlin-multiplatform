@@ -46,7 +46,7 @@ import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
 import com.akellolcc.cigars.camera.rememberCameraManager
-import com.akellolcc.cigars.databases.extensions.Cigar
+import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.mvvm.base.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel

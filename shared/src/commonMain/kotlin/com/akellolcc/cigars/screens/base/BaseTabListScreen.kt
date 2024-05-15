@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 11:22 PM
+ * Last modified 5/14/24, 2:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -54,7 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
@@ -64,6 +66,7 @@ import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -161,10 +164,8 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             ContentHeader(Modifier)
-                            if (viewModel.entities.isNotEmpty()) {
-                                entitiesList(viewModel.entities, listState) {
-                                    loadMore()
-                                }
+                            entitiesList(viewModel.entities, listState) {
+                                loadMore()
                             }
                             ContentFooter(Modifier)
                         }
@@ -186,28 +187,45 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
         LaunchedEffect(reachedBottom) {
             if (reachedBottom) loadMore?.invoke()
         }
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.Top,
-        )
-        {
-            item {
-                ListHeader(Modifier.fillMaxWidth())
-            }
-            items(entities, key = { item -> item.key }) {
-                val clickableModifier = remember(it.key) {
-                    Modifier.clickable { viewModel.entitySelected(it) }
-                }
-                EntityListRow(it, clickableModifier)
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                        .background(Color.Transparent)
+
+        if (entities.isEmpty() && !viewModel.loading) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = materialColor(MaterialColors.color_transparent),
+                    contentColor = materialColor(MaterialColors.color_onSurfaceVariant)
+                ),
+            ) {
+                TextStyled(
+                    modifier = Modifier.fillMaxWidth(),
+                    center = true,
+                    text = Localize.list_is_empty,
+                    style = TextStyles.Subhead
                 )
             }
-            item {
-                ListFooter(Modifier.fillMaxWidth())
+        } else {
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.Top,
+            )
+            {
+                item {
+                    ListHeader(Modifier.fillMaxWidth())
+                }
+                items(entities, key = { item -> item.key }) {
+                    val clickableModifier = remember(it.key) {
+                        Modifier.clickable { viewModel.entitySelected(it) }
+                    }
+                    EntityListRow(it, clickableModifier)
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .background(Color.Transparent)
+                    )
+                }
+                item {
+                    ListFooter(Modifier.fillMaxWidth())
+                }
             }
         }
     }

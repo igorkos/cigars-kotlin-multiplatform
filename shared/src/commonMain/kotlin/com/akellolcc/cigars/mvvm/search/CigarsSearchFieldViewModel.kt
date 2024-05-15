@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:56 PM
+ * Last modified 5/14/24, 2:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,11 @@ class CigarsSearchFieldViewModel(parameter: FilterParameter<*>) :
         } else {
             "Please enter at least 3 characters to narrow down your search"
         }
-        isError = !valid
+        isError = if (valid) {
+            false
+        } else {
+            value.isNotEmpty()
+        }
         return valid
     }
 

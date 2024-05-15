@@ -16,9 +16,9 @@
 
 package com.akellolcc.cigars.databases.repository
 
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.HumidorCigar
 import kotlinx.coroutines.flow.Flow
 
 

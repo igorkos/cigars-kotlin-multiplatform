@@ -1,12 +1,12 @@
 [versions]
 agp = "8.4.0"
-firebaseBom = "32.8.1"
+firebaseBom = "33.0.0"
 kotlin = "1.9.20"
 
 kotlin-dateTime = "0.5.0"
 kotlin-serialization = "1.6.3"
 
-compose = "1.6.6"
+compose = "1.6.7"
 compose-compiler = "1.5.4"
 compose-material3 = "1.2.1"
 androidx-activityCompose = "1.9.0"
@@ -20,6 +20,7 @@ moko-compose-version = "0.23.0"
 moko-resources-version = "0.22.2"
 
 sqldelight-version = "2.0.1"
+sqldelight-paging = "3.3.0-alpha02-0.5.1"
 sqldelight-version-test = "1.5.5"
 
 voyagerNavigator = "1.0.0-rc08"
@@ -37,9 +38,9 @@ ktor = "2.3.10"
 coroutines = "1.8.0"
 atomicfu-version = "0.23.2"
 firebase-version = "1.12.0"
-firebase-plugin-version = "2.9.9"
+firebase-plugin-version = "3.0.1"
 google-gms-services-version = "4.4.1"
-datastoreCoreAndroid = "1.1.0"
+datastoreCoreAndroid = "1.1.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -74,6 +75,8 @@ sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.re
 sqldelight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight-version" }
 sqldelight-android-test = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight-version" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight-version" }
+sqldelight-paging = { module = "app.cash.paging:paging-compose-common", version.ref = "sqldelight-paging" }
+sqldelight-paging-ios = { module = "app.cash.paging:paging-runtime-uikit", version.ref = "sqldelight-paging" }
 
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings-version" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
@@ -119,6 +122,6 @@ google-gms-services = { id = "com.google.gms.google-services", version.ref = "go
 ktor-common = ["ktor-client-core", "ktor-client-serialization", "kotlinx-coroutines-core", "ktor-client-logging"]
 moko-common = ["moko-resources-compose", "moko-resources"]
 voyager-common = ["voyager-bottom-sheet-navigator", "voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
-sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines"]
+sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines", "sqldelight-paging"]
 android-firebase = ["firebase-analytics", "firebase-bom", "google-firebase-crashlytics"]
 multiplatform-firebase = ["firebase-realtime-database", "firebase-installations", "firebase-performance", "firebase-crashlytics"]

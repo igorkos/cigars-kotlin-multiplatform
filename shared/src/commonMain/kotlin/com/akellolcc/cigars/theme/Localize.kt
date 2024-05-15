@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/20/24, 11:55 AM
+ * Last modified 5/14/24, 3:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,12 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.theme
 
 import Strings
-import com.akellolcc.cigars.databases.extensions.HistoryType
+import com.akellolcc.cigars.databases.models.HistoryType
 import com.vanniktech.locale.Locales
 import de.comahe.i18n4k.Locale
 import de.comahe.i18n4k.config.I18n4kConfigDefault
@@ -41,6 +41,9 @@ object Localize {
 
     val button_cancel = Strings.button_cancel.toString()
     val button_save = Strings.button_save.toString()
+    val button_add = Strings.button_add.toString()
+
+    val list_is_empty = Strings.list_is_empty.toString()
 
     val cigar_details_name = Strings.cigar_details_name.toString()
     val cigar_details_company = Strings.cigar_details_company.toString()
@@ -70,6 +73,10 @@ object Localize {
     val cigar_details_move_to = Strings.cigar_details_move_to.toString()
     val cigar_details_move_select = Strings.cigar_details_move_select.toString()
     val cigar_details_count = Strings.cigar_details_count.toString()
+
+    val cigar_search_details_add_dialog = Strings.cigar_search_details_add_dialog.toString()
+    val cigar_search_details_add_count_dialog = Strings.cigar_search_details_add_count_dialog.toString()
+    val cigar_search_details_add_price_dialog = Strings.cigar_search_details_add_price_dialog.toString()
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()
     val cigar_shape_petit_corona = Strings.cigar_shape_petit_corona.toString()

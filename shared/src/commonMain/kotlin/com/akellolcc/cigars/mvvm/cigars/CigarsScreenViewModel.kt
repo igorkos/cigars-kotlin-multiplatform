@@ -17,8 +17,8 @@
 package com.akellolcc.cigars.mvvm.cigars
 
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarSortingFields
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.screens.components.search.data.CigarFilterParameters

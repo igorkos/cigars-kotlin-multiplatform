@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 9:08 PM
+ * Last modified 5/15/24, 2:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,10 @@
 
 package com.akellolcc.cigars.databases
 
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.CigarImage
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.rapid.RapidDatabase
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
@@ -27,7 +28,7 @@ import com.akellolcc.cigars.databases.repository.DatabaseInterface
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
-import com.akellolcc.cigars.databases.repository.impl.SqlDelightDatabase
+import com.akellolcc.cigars.databases.sqldelight.SqlDelightDatabase
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
@@ -40,12 +41,14 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 
 enum class DatabaseType {
-    SqlDelight;
+    SqlDelight,
+    Rapid;
 
     companion object {
         fun getDatabase(type: DatabaseType, inMemory: Boolean): DatabaseInterface {
             return when (type) {
                 SqlDelight -> SqlDelightDatabase.createInstance(inMemory)
+                Rapid -> RapidDatabase.createInstance(inMemory)
             }
         }
     }
@@ -55,7 +58,8 @@ expect fun <T> loadDemoSet(resource: FileResource, inMemory: Boolean): List<T>
 
 class Database(override val inMemory: Boolean) : DatabaseInterface {
 
-    private val database: DatabaseInterface = DatabaseType.getDatabase(DatabaseType.SqlDelight, inMemory)
+    private val sqlDelightDatabase: DatabaseInterface = DatabaseType.getDatabase(DatabaseType.SqlDelight, inMemory)
+    private val rapidDatabase: DatabaseInterface = DatabaseType.getDatabase(DatabaseType.Rapid, inMemory)
 
     companion object {
         private var _instance: Database? = null
@@ -75,7 +79,8 @@ class Database(override val inMemory: Boolean) : DatabaseInterface {
     }
 
     override fun reset() {
-        database.reset()
+        sqlDelightDatabase.reset()
+        rapidDatabase.reset()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

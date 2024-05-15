@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/28/24, 11:58 PM
+ * Last modified 5/15/24, 1:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 package com.akellolcc.cigars.databases.repository
 
-import com.akellolcc.cigars.databases.extensions.BaseEntity
+import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import kotlinx.coroutines.flow.Flow
 
@@ -26,11 +26,11 @@ interface Repository<ENTITY : BaseEntity> {
      */
     fun getSync(id: Long, where: Long? = null): ENTITY
 
-    fun allSync(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null): List<ENTITY>
+    fun allSync(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null, page: Int = 0): List<ENTITY>
 
     fun observe(id: Long): Flow<ENTITY>
 
-    fun all(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null): Flow<List<ENTITY>>
+    fun all(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null, page: Int = 0): Flow<List<ENTITY>>
 
     fun add(entity: ENTITY): Flow<ENTITY>
 

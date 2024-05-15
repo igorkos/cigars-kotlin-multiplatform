@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/30/24, 12:26 PM
+ * Last modified 5/9/24, 3:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,6 +72,12 @@ val SearchCigarRoute = NavRoute(
     Images.tab_icon_search,
     isTabsVisible = true,
 )
+val CigarSearchDetailsRoute = NavRoute(
+    "CigarSearchDetailsScreen",
+    Localize.title_cigars,
+    Images.tab_icon_cigars,
+)
+
 val CigarsDetailsRoute = NavRoute(
     "CigarDetailsScreen",
     Localize.title_cigars,

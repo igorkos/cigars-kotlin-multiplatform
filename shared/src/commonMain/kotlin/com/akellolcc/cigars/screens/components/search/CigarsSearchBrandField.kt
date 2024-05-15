@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:36 PM
+ * Last modified 5/8/24, 11:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,13 @@
 
 package com.akellolcc.cigars.screens.components.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,10 +32,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
@@ -43,8 +50,11 @@ import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import com.akellolcc.cigars.theme.materialColor
+import com.akellolcc.cigars.utils.ui.pxToDp
 
 class CigarsSearchBrandField(
     parameter: FilterParameter<String>,
@@ -70,6 +80,8 @@ class CigarsSearchBrandField(
     @Composable
     override fun Content() {
         val state by viewModel.state.collectAsState()
+        var with by remember { mutableStateOf(0) }
+
         LaunchedEffect(Unit) {
             viewModel.observeEvents {
                 handleAction(it, null)
@@ -80,7 +92,9 @@ class CigarsSearchBrandField(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().onSizeChanged {
+                with = it.width
+            },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (showLeading) {
@@ -133,6 +147,8 @@ class CigarsSearchBrandField(
                 )
 
                 DropdownMenu(expanded = viewModel.expanded,
+                    modifier = Modifier.width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
+                        .background(materialColor(MaterialColors.color_surfaceVariant)),
                     onDismissRequest = { viewModel.onDropDown(true) }) {
                     viewModel.brands.map {
                         DropdownMenuItem(

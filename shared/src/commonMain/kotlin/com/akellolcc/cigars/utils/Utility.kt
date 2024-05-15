@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/21/24, 1:51 PM
+ * Last modified 5/14/24, 3:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.utils
 
@@ -38,7 +38,7 @@ val Double.fraction: String
                 }
             }
         }
-        return "$whole"
+        return "$whole'"
     }
 
 val Float.fraction: String
@@ -63,6 +63,7 @@ private val fractions = arrayOf(
     "1/16",        //
     ""                            // 0/16
 )
+
 
 private val fractionValues = arrayOf(
     1.0,

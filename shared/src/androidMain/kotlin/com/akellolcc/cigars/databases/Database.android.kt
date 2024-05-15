@@ -16,9 +16,9 @@
 
 package com.akellolcc.cigars.databases
 
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.CigarImage
+import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.test.DemoTestSets
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.readTextFile

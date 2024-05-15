@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/4/24, 5:33 PM
+ * Last modified 5/14/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,17 +37,15 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.textStyle
-
 
 @Composable
 fun TextStyled(
@@ -55,14 +53,14 @@ fun TextStyled(
     style: TextStyles = TextStyles.Headline,
     label: String? = null,
     labelSuffix: String = ":",
-    labelStyle: TextStyles = TextStyles.Subhead,
+    labelStyle: TextStyles = TextStyles.Description,
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
     editable: Boolean = false,
     modifier: Modifier = Modifier,
     onValueChange: ((String) -> Unit)? = null,
     onKeyboardAction: ((ImeAction) -> Unit)? = null,
-    inputMode: KeyboardType = KeyboardType.Text,
+    inputMode: InputMode = InputMode.Text,
     center: Boolean = false,
     vertical: Boolean = false,
     enabled: Boolean = true,
@@ -71,9 +69,10 @@ fun TextStyled(
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
     selection: TextRange? = null,
+    prefix: String? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val textStyle = textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Start)
+    val textStyle = textStyle(style).copy(textAlign = if (center) TextAlign.Center else TextAlign.Justify)
     val styleLabel = textStyle(labelStyle)
     var hide by remember { mutableStateOf(false) }
 
@@ -99,9 +98,9 @@ fun TextStyled(
         }
 
         textFieldState = if (selection != null) {
-            textFieldState.copy(text = text ?: "", selection = selection)
+            textFieldState.copy(text = inputMode.fromTransformed(text), selection = selection)
         } else {
-            textFieldState.copy(text = text ?: "")
+            textFieldState.copy(text = inputMode.fromTransformed(text))
         }
 
 
@@ -109,7 +108,7 @@ fun TextStyled(
             modifier = modifier,
             value = textFieldState,
             trailingIcon = trailingIcon ?: {
-                if (inputMode == KeyboardType.Text) {
+                if (inputMode == InputMode.Text) {
                     IconButton(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
@@ -122,16 +121,24 @@ fun TextStyled(
                 }
             },
             label = {
-                TextStyled(
-                    text = label ?: "",
-                    style = TextStyles.Description,
-                    maxLines = 1,
-                    minLines = 1
-                )
+                if (label != null) {
+                    Text(
+                        text = label,
+                        color = styleLabel.color,
+                        fontSize = styleLabel.fontSize,
+                        fontStyle = styleLabel.fontStyle,
+                        fontFamily = styleLabel.fontFamily,
+                        textAlign = styleLabel.textAlign,
+                        maxLines = 1,
+                        minLines = 1
+                    )
+                }
             },
             onValueChange = {
-                textFieldState = it
-                onValueChange?.invoke(it.text)
+                if (inputMode.validate(it.text)) {
+                    textFieldState = it
+                    onValueChange?.invoke(inputMode.toTransformed(it.text))
+                }
             },
             keyboardActions = KeyboardActions(
                 onDone = {
@@ -169,15 +176,29 @@ fun TextStyled(
             singleLine = maxLines == 1,
             textStyle = textStyle,
             isError = isError,
+            prefix = if (prefix.isNullOrEmpty()) null else {
+                @Composable {
+                    Text(
+                        modifier = Modifier.wrapContentSize(),
+                        text = prefix,
+                        color = textStyle.color,
+                        fontSize = textStyle.fontSize,
+                        fontStyle = textStyle.fontStyle,
+                        fontFamily = textStyle.fontFamily,
+                        textAlign = textStyle.textAlign,
+                        maxLines = 1,
+                    )
+                }
+            },
             supportingText = supportingText,
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = inputMode,
+                keyboardType = inputMode.toKeyboardType(),
                 autoCorrect = true,
                 capitalization = Sentences,
                 imeAction = imeAction
             ),
             enabled = enabled,
-            visualTransformation = VisualTransformation.None
+            visualTransformation = inputMode.visualTransformation()
         )
     } else {
         @Composable

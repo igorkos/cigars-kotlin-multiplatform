@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/14/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,12 +46,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
@@ -60,6 +59,7 @@ import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.ValueCard
 import com.akellolcc.cigars.screens.components.ValuesCard
+import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.screens.navigation.HumidorImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -249,7 +249,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                             viewModel.holds =
                                                 if (it.isNotBlank()) it.toLong() else 0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Number
                                     )
                                 }
                             }
@@ -287,7 +287,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                             viewModel.temperature =
                                                 if (it.isNotBlank()) it.toLong() else 0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Temperature
                                     )
                                     TextStyled(
                                         if (viewModel.humidity == null || viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
@@ -300,7 +300,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                             viewModel.humidity =
                                                 if (it.isNotBlank()) it.toDouble() else 0.0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Humidity
                                     )
                                 }
                                 //Cigar Notes and Link

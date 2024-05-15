@@ -17,8 +17,8 @@
 package com.akellolcc.cigars.mvvm.cigars
 
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.History
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.History
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
 import com.akellolcc.cigars.utils.ObjectFactory

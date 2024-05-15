@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:54 PM
+ * Last modified 5/14/24, 2:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,10 +19,10 @@ package com.akellolcc.cigars.mvvm.search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.input.KeyboardType
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.utils.ObservableValue
 
 abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterParameter<*>) :
@@ -37,7 +37,7 @@ abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterPar
             updateInput(value)
         }
 
-    val keyboardType: KeyboardType = parameter.keyboardType
+    val keyboardType: InputMode = parameter.keyboardType
 
     open var isError by mutableStateOf(false)
     var loading by mutableStateOf(false)

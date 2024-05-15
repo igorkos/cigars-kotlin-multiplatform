@@ -17,9 +17,9 @@
 package com.akellolcc.cigars.mvvm.humidor
 
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorCigarsRepository
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.utils.ObjectFactory

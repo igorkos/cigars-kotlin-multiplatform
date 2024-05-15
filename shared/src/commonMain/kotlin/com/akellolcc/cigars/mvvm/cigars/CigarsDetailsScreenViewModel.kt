@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/15/24, 10:35 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,10 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.databases.createRepository
-import com.akellolcc.cigars.databases.extensions.Cigar
-import com.akellolcc.cigars.databases.extensions.CigarImage
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.HumidorCigar
+import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.CigarImage
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
@@ -47,7 +47,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     private var cigarHistoryRepository: CigarHistoryRepository? = null
     private var disposable: List<Job> = mutableListOf()
 
-    var editing by mutableStateOf(cigar.rowid < 0)
+    var editing by mutableStateOf(false)//cigar.rowid < 0)
     var name by mutableStateOf(cigar.name)
     var brand by mutableStateOf(cigar.brand)
     var country by mutableStateOf(cigar.country)
@@ -112,6 +112,8 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             disposable += execute(cigarHumidorRepository!!.all()) {
                 humidors = it
             }
+        } else {
+            loading = false
         }
     }
 
@@ -153,6 +155,15 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         )
         executeQuery(cigarsRepository.update(updated)) {
             editing = false
+        }
+    }
+
+    fun addCigar(humidor: Humidor, count: Long, price: Double? = null) {
+        cigar.count = count
+        cigar.price = price
+        executeQuery(cigarsRepository.add(cigar, humidor)) {
+            editing = false
+            moveCigarDialog = false
         }
     }
 
@@ -208,7 +219,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
-    fun moveToHumidors(selected: Humidor?): List<ValuePickerItem<Humidor>> {
+    fun moveToHumidors(): List<ValuePickerItem<Humidor>> {
         return humidorsRepository.allSync()
             .map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
     }
@@ -269,6 +280,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     sealed interface CigarsDetailsAction {
         data class OnBackAction(val dummy: Int) : CigarsDetailsAction
         data class AddToHumidor(val humidor: HumidorCigar) : CigarsDetailsAction
+        data class AddCigarToHumidor(val humidor: Humidor, val count: Long, val price: Double? = null) : CigarsDetailsAction
         data class OpenHumidor(val humidor: Humidor) : CigarsDetailsAction
         data class OpenHistory(val cigar: Cigar) : CigarsDetailsAction
         data class MoveCigar(val dummy: Int) : CigarsDetailsAction
