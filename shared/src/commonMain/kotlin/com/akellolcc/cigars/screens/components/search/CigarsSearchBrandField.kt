@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 11:15 PM
+ * Last modified 5/17/24, 1:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,20 +17,22 @@
 package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import app.cash.paging.LoadStateNotLoading
+import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
@@ -79,22 +83,33 @@ class CigarsSearchBrandField(
 
     @Composable
     override fun Content() {
-        val state by viewModel.state.collectAsState()
         var with by remember { mutableStateOf(0) }
+        var menuHeight by remember { mutableStateOf(0) }
+        val listState = rememberLazyListState()
+        val pagingItems = viewModel.brands?.collectAsLazyPagingItems()
 
         LaunchedEffect(Unit) {
             viewModel.observeEvents {
                 handleAction(it, null)
             }
         }
-        SideEffect {
-            Log.debug("Render Brand field:$state ${viewModel.value} ${viewModel.expanded} ${viewModel.brands.size}")
+
+        LaunchedEffect(pagingItems?.itemCount) {
+            if (viewModel.hasBrands(pagingItems)) {
+                menuHeight = minOf(pagingItems!!.itemCount * 40, 200)
+                if (pagingItems.loadState.refresh is LoadStateNotLoading) {
+                    viewModel.setState(CigarsSearchFieldBaseViewModel.Action.Loaded())
+                }
+                if (pagingItems.itemCount == 0) {
+                    viewModel.setState(CigarsSearchFieldBaseViewModel.Action.Error())
+                }
+            } else {
+                viewModel.setState(CigarsSearchFieldBaseViewModel.Action.Input())
+            }
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().onSizeChanged {
-                with = it.width
-            },
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (showLeading) {
@@ -106,7 +121,9 @@ class CigarsSearchBrandField(
                 }
             }
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).onSizeChanged {
+                    with = it.width
+                },
             ) {
                 TextStyled(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
@@ -122,7 +139,7 @@ class CigarsSearchBrandField(
                         viewModel.value = it
                     },
                     imeAction = ImeAction.Search,
-                    trailingIcon = if (viewModel.brands.isNotEmpty()) {
+                    trailingIcon = if (viewModel.hasBrands(pagingItems)) {
                         @Composable {
                             IconButton(
                                 modifier = Modifier.wrapContentSize(),
@@ -146,25 +163,36 @@ class CigarsSearchBrandField(
                     selection = viewModel.inputSelection
                 )
 
-                DropdownMenu(expanded = viewModel.expanded,
+
+                DropdownMenu(expanded = viewModel.expanded && viewModel.hasBrands(pagingItems),
                     modifier = Modifier.width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
                         .background(materialColor(MaterialColors.color_surfaceVariant)),
                     onDismissRequest = { viewModel.onDropDown(true) }) {
-                    viewModel.brands.map {
-                        DropdownMenuItem(
-                            leadingIcon = {
-                                loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
-                            },
-                            text = {
-                                TextStyled(
-                                    it.name,
-                                    TextStyles.Subhead
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier.width(with.pxToDp()).height(menuHeight.dp)
+                    ) {
+                        pagingItems?.let { items ->
+                            items(count = items.itemCount) { index ->
+                                val it = items[index]
+                                DropdownMenuItem(
+                                    leadingIcon = {
+                                        loadIcon(Images.tab_icon_search, Size(24.0F, 24.0F))
+                                    },
+                                    text = {
+                                        TextStyled(
+                                            it?.name,
+                                            TextStyles.Subhead,
+                                            maxLines = 1
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.onBrandSelected(it!!)
+                                    }
                                 )
-                            },
-                            onClick = {
-                                viewModel.onBrandSelected(it)
                             }
-                        )
+                        }
                     }
                 }
             }

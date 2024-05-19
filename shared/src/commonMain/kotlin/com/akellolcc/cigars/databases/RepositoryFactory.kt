@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 8:49 PM
+ * Last modified 5/17/24, 6:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,8 +22,8 @@ import kotlin.reflect.KClass
 
 object RepositoryRegistry : ObjectRegistry<Repository<*>>()
 
-inline fun <reified T : Repository<*>> createRepository(
-    modelKClass: KClass<out T>,
+inline fun <T : Repository<*>> createRepository(
+    modelKClass: KClass<T>,
     data: Any? = null
 ): T = RepositoryRegistry.create(modelKClass, data) as T
 

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:30 PM
+ * Last modified 5/19/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,7 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
-import app.cash.sqldelight.Query
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
-import com.akellolcc.cigars.databases.CigarHumidorTable
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.Cigar
@@ -29,17 +26,14 @@ import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
-import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
-import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.sqldelight.queries.CigarHumidorTableQueries
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
-import kotlinx.coroutines.Dispatchers
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapConcat
@@ -50,24 +44,9 @@ import kotlinx.datetime.Clock
 import kotlin.math.absoluteValue
 
 abstract class SqlDelightBaseCigarHumidorRepository(
-    protected val queries: HumidorCigarsDatabaseQueries
+    protected val queries: HumidorCigarsDatabaseQueries,
+    protected val id: Pair<String, Long>
 ) : SQLDelightBaseRepository<HumidorCigar>(CigarHumidorTableQueries(queries)), CigarHumidorRepository {
-
-    abstract fun observeAllQuery(): Query<CigarHumidorTable>
-
-    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?, page: Int): Flow<List<HumidorCigar>> {
-        val hRepo = createRepository(HumidorsRepository::class)
-        val cRepo = createRepository(CigarsRepository::class)
-        return observeAllQuery().asFlow().mapToList(Dispatchers.IO).map {
-            it.map { humidorCigar ->
-                val humidor = hRepo.getSync(humidorCigar.humidorId)
-                val cigar = (cRepo as Repository<Cigar>).getSync(humidorCigar.cigarId)
-                HumidorCigar(humidorCigar.count, humidor, cigar)
-            }
-        }.catch {
-            Log.error("Error while getting all humidor cigars $it")
-        }
-    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun updateCount(
@@ -172,34 +151,41 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         }
     }
 
-    override fun doUpsert(entity: HumidorCigar, add: Boolean): Flow<HumidorCigar> {
-        return flow {
-            if (add) {
-                queries.add(
-                    entity.count,
-                    entity.humidor.rowid,
-                    entity.cigar.rowid
-                )
-            } else {
-                queries.update(
-                    entity.count,
-                    entity.humidor.rowid,
-                    entity.cigar.rowid
-                )
-            }
-            emit(entity)
-        }
+    override fun allSync(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?
+    ): List<HumidorCigar> {
+        return allSync(sorting, filter, id)
+    }
+
+    override fun all(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?
+    ): Flow<List<HumidorCigar>> {
+        return all(sorting, filter, id)
+    }
+
+    override fun paging(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?
+    ): Flow<PagingData<HumidorCigar>> {
+        return paging(sorting, filter, id)
+    }
+
+
+    override fun count(): Long {
+        return count(id)
     }
 
     override fun add(cigar: Cigar, humidor: Humidor, count: Long): Flow<HumidorCigar> {
-        return super.add(HumidorCigar(count, humidor, cigar))
+        return add(HumidorCigar(count, humidor, cigar))
     }
 
     override fun remove(cigar: Cigar, from: Humidor): Flow<Boolean> {
-        return super.remove(from.rowid, cigar.rowid)
+        return remove(cigar.rowid, from.rowid)
     }
 
     override fun find(cigar: Cigar, humidor: Humidor): HumidorCigar? {
-        return super.find(humidor.rowid, cigar.rowid)
+        return find(cigar.rowid, humidor.rowid)
     }
 }

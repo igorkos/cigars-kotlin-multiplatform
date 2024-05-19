@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 12:48 PM
+ * Last modified 5/17/24, 8:35 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,10 +40,13 @@ import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import kotlinx.serialization.Transient
+
 
 class CigarsScreen(
     override val route: NavRoute
 ) : ITabItem<CigarsScreenViewModel> {
+    @Transient
     @kotlin.jvm.Transient
     override lateinit var viewModel: CigarsScreenViewModel
 
@@ -56,9 +59,11 @@ class CigarsScreen(
 
 open class CigarsListScreen<V : ScreenModel>(
     route: NavRoute,
+    @Transient
     @kotlin.jvm.Transient
     override var viewModel: CigarsScreenViewModel
 ) : BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
+    @Suppress("UNCHECKED_CAST")
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
         viewModel.sortingFields?.selected?.map {
@@ -105,7 +110,7 @@ open class CigarsListScreen<V : ScreenModel>(
             ) { action ->
                 when (action) {
                     is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
-                        viewModel.reload()
+                        viewModel.paging()
                     }
 
                     else -> {}

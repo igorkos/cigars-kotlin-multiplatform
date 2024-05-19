@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/17/24, 6:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel
@@ -41,7 +42,7 @@ import com.akellolcc.cigars.screens.navigation.mainScreenModule
 
 @Composable
 fun CigarsApplication() {
-    //Register ViewModels
+    Log.debug("Register ViewModels")
     ViewModelRegistry.register(
         CigarsDetailsScreenViewModel::class,
         CigarsDetailsScreenViewModel.Factory
@@ -103,11 +104,9 @@ fun CigarsApplication() {
         CigarsSearchControlViewModel::class,
         CigarsSearchControlViewModel.Factory
     )
+    Log.debug("Init Database")
 
-    //Init Database
     Database.createInstance(false)
-
-
     ScreenRegistry {
         mainScreenModule()
     }

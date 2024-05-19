@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/17/24, 8:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,7 +69,7 @@ import kotlin.jvm.Transient
 import kotlin.math.roundToInt
 
 class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewScreenViewModel> {
-
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: BaseImagesViewScreenViewModel
 
@@ -144,8 +144,9 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
         imageActions()
 
         LaunchedEffect(Unit) {
-            viewModel.loadMore()
+            viewModel.paging()
         }
+
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -192,7 +193,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                             modifier = Modifier.fillMaxSize()
                         ) {
                             PagedCarousel(
-                                viewModel.entities,
+                                viewModel.items,
                                 loading = viewModel.loading,
                                 scale = ContentScale.Fit,
                                 select = viewModel.select,

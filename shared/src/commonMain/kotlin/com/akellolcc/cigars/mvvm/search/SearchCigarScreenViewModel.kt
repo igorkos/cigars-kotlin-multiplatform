@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 2:29 PM
+ * Last modified 5/17/24, 8:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,19 +16,15 @@
 
 package com.akellolcc.cigars.mvvm.search
 
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.databases.repository.CigarsSearchRepository
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.screens.components.search.data.CigarSearchParameters
 import com.akellolcc.cigars.screens.components.search.data.CigarSortingParameters
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.launch
 
 class SearchCigarScreenViewModel :
     BaseListViewModel<Cigar, SearchCigarScreenViewModel.Actions>() {
@@ -46,52 +42,6 @@ class SearchCigarScreenViewModel :
 
     override fun sortingOrder(ascending: Boolean) {
         sortField?.value = ascending
-        sortEntities(entities)
-    }
-
-    private fun sortEntities(list: List<Cigar>) {
-        val field = when (sortField?.key) {
-            CigarSortingFields.Name.value -> CigarSortingFields.Name
-            CigarSortingFields.Brand.value -> CigarSortingFields.Brand
-            CigarSortingFields.Country.value -> CigarSortingFields.Country
-            else -> CigarSortingFields.Name
-        }
-
-        entities = list.sortedWith(compareBy {
-            when (field) {
-                CigarSortingFields.Name -> it.name
-                CigarSortingFields.Brand -> it.brand
-                CigarSortingFields.Country -> it.country
-                else -> CigarSortingFields.Name
-            }
-        }).also {
-            if (sortField?.value == false) {
-                it.reversed()
-            }
-        }
-    }
-
-    override fun loadEntities(reload: Boolean) {
-        searchingFields?.let { fields ->
-            if (fields.validate()) {
-                Log.debug("Load entities searching fields: $fields")
-                loading = true
-                onDispose()
-                runOnDispose {
-                    screenModelScope.launch {
-                        repository.all(null, fields.selected).cancellable().collect {
-                            val list = entities + it
-                            sortEntities(list)
-                            loading = false
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    override fun loadMore() {
-        loadEntities(false)
     }
 
     companion object Factory : ObjectFactory<SearchCigarScreenViewModel>() {

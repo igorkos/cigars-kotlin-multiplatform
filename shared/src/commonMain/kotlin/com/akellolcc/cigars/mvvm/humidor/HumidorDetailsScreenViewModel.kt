@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/17/24, 10:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ package com.akellolcc.cigars.mvvm.humidor
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.CigarImage
 import com.akellolcc.cigars.databases.models.Humidor
@@ -29,6 +30,7 @@ import com.akellolcc.cigars.mvvm.base.DatabaseViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
@@ -46,7 +48,8 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     var notes by mutableStateOf(humidor.notes)
     var link by mutableStateOf(humidor.link)
     var type by mutableStateOf(humidor.type)
-    var images by mutableStateOf(listOf<CigarImage>())
+
+    var images by mutableStateOf<Flow<PagingData<CigarImage>>?>(null)
     var humidors by mutableStateOf(listOf<HumidorCigar>())
 
 
@@ -66,9 +69,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
             }
         }
 
-        disposable += execute(imagesDatabase!!.all()) {
-            images = it
-        }
+        images = imagesDatabase!!.paging(null, null)
     }
 
     fun verifyFields(): Boolean {

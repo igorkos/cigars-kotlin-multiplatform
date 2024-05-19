@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/23/24, 11:56 PM
+ * Last modified 5/18/24, 12:14 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens.components
 
@@ -42,6 +42,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import app.cash.paging.compose.collectAsLazyPagingItems
 import com.akellolcc.cigars.databases.models.CigarImage
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
@@ -49,6 +52,7 @@ import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.ui.toImageBitmap
 import dev.icerock.moko.resources.ImageResource
 import dev.icerock.moko.resources.compose.painterResource
+import kotlinx.coroutines.flow.Flow
 
 // Shadow and shape values for the card
 private val shadowElevation = 15.dp
@@ -58,16 +62,16 @@ private val shape = RoundedCornerShape(topStart = borderRadius, topEnd = borderR
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagedCarousel(
-    images: List<CigarImage>?,
+    images: Flow<PagingData<CigarImage>>?,
     modifier: Modifier = Modifier,
     scale: ContentScale = ContentScale.FillHeight,
     loading: Boolean = false,
     select: Int = 0,
     onClick: ((page: Int) -> Unit)? = null
 ) {
-    val pagerState = rememberPagerState(select) {
-        if (!images.isNullOrEmpty()) images.size else 1
-    }
+    val pagingItems = images?.collectAsLazyPagingItems()
+
+    val pagerState = rememberPagerState(select) { pagingItems?.itemCount ?: 1 }
 
     LaunchedEffect(loading, select) {
         if (!loading) {
@@ -77,7 +81,7 @@ fun PagedCarousel(
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // HorizontalPager composable: Swiping through images
-        if (loading) {
+        if (pagingItems == null || pagingItems.loadState.refresh is LoadState.Loading) {
             CircularProgressIndicator()
         } else {
             HorizontalPager(
@@ -85,9 +89,11 @@ fun PagedCarousel(
                 modifier = Modifier.fillMaxSize(),
             ) { page ->
                 //Log.debug("Images1: ${images?.size}")
-                if (!images.isNullOrEmpty()) {
-                    CarouselItem(images[page].bytes, scale) {
-                        onClick?.invoke(page)
+                if (pagingItems.itemCount > 0) {
+                    pagingItems[page]?.let {
+                        CarouselItem(it.bytes, scale) {
+                            onClick?.invoke(page)
+                        }
                     }
                 } else {
                     CarouselItem(null, scale, Images.default_cigar_image) {
@@ -96,7 +102,7 @@ fun PagedCarousel(
                 }
             }
             // Bottom row of indicators
-            if (!images.isNullOrEmpty()) {
+            if (pagingItems.itemCount > 1) {
                 Row(
                     Modifier
                         .wrapContentHeight()

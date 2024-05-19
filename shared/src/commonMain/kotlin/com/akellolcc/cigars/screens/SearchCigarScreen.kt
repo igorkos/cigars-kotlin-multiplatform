@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/9/24, 3:17 PM
+ * Last modified 5/17/24, 8:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
@@ -58,6 +57,7 @@ import kotlin.jvm.Transient
 class SearchScreen(
     override val route: NavRoute
 ) : ITabItem<SearchCigarScreenViewModel> {
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: SearchCigarScreenViewModel
 
@@ -70,6 +70,7 @@ class SearchScreen(
 
 class SearchCigarScreen(
     route: NavRoute,
+    @kotlinx.serialization.Transient
     @Transient
     override var viewModel: SearchCigarScreenViewModel
 ) : BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar, SearchCigarScreenViewModel>(route) {
@@ -105,19 +106,10 @@ class SearchCigarScreen(
             Log.debug("Received action: $action")
             when (action) {
                 is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
-                    viewModel.reload()
+                    viewModel.paging()
                 }
 
                 else -> {}
-            }
-        }
-        Log.debug("Searching: ${viewModel.loading}")
-        if (viewModel.entities.isEmpty() && viewModel.loading) {
-            Box(
-                modifier = modifier.fillMaxWidth().height(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(modifier = Modifier.width(24.dp))
             }
         }
     }

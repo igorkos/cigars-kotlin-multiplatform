@@ -17,13 +17,6 @@ CREATE TABLE HistoryTable (
 get:
 SELECT * FROM HistoryTable WHERE rowid = :id;
 
-allAsc:
-    SELECT * FROM HistoryTable ORDER BY date ASC;
-
-allDesc:
-    SELECT * FROM HistoryTable ORDER BY date DESC;
-
-
 add:
 INSERT INTO HistoryTable (count, date, left, price, type, cigarId, humidorTo, humidorFrom)
 VALUES (?, ?, ?, ?, ?,?,?, ?);
@@ -58,10 +51,30 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 cigarHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date ASC;
+
+cigarHistoryDesc:
 SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
 
+pagedCigarHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date ASC LIMIT :limit OFFSET :offset;
+
+pagedCigarHistoryDesc:
+SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC LIMIT :limit OFFSET :offset;
+
+
 humidorHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor OR humidorFrom = :humidor ORDER BY date ASC;
+
+humidorHistoryDesc:
 SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor OR humidorFrom = :humidor ORDER BY date DESC;
+
+pagedHumidorHistory:
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor OR humidorFrom = :humidor ORDER BY date ASC LIMIT :limit OFFSET :offset;
+
+pagedHumidorHistoryDesc:
+SELECT HistoryTable.*  FROM HistoryTable WHERE humidorTo = :humidor OR humidorFrom = :humidor ORDER BY date DESC LIMIT :limit OFFSET :offset;
+
 
 humidorName:
 SELECT HumidorsTable.name FROM HumidorsTable WHERE rowid = :id;

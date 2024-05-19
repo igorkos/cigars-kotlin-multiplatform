@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:22 PM
+ * Last modified 5/19/24, 1:32 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +21,49 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.screens.components.search.SearchParameterField
 
+open class FiltersList(val list: List<FilterParameter<*>> = emptyList()) : List<FilterParameter<*>> by list {
+    companion object {
+        inline fun <reified T> getSQLWhere(list: FiltersList?, key: String): T {
+            var entry: FilterParameter<*>? = list?.find { it.key == key }
+            if (entry != null) {
+                return when (entry.value) {
+                    is Int -> entry.value as T
+                    is Long -> entry.value as T
+                    is Double -> entry.value as T
+                    is Boolean -> entry.value as T
+                    else -> "%${entry.value}%" as T
+                }
+            }
+            return when (T::class) {
+                Int::class -> 0 as T
+                Long::class -> 0L as T
+                Double::class -> 0.0 as T
+                Boolean::class -> false as T
+                else -> "%%" as T
+            }
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FiltersList) return false
+        return compareFilterParameters(list, other.list)
+    }
+
+    override fun hashCode(): Int {
+        return list.hashCode()
+    }
+
+    override fun toString(): String {
+        return "FiltersList(list=$list)"
+    }
+}
 
 abstract class FilterCollection {
-    protected lateinit var params: List<FilterParameter<*>>
-    protected var selectedParams: List<FilterParameter<*>> = mutableListOf()
+    protected var params = FiltersList()
+    protected var selectedParams = FiltersList()
 
-    val selected: List<FilterParameter<*>>
+    val selected: FiltersList
         get() {
             return selectedParams
         }
@@ -50,11 +87,11 @@ abstract class FilterCollection {
 
     fun add(value: FilterParameter<*>) {
         controls = controls + build(value)
-        selectedParams = selectedParams + value
+        selectedParams = (selectedParams + value) as FiltersList
     }
 
     fun remove(value: FilterParameter<*>) {
-        selectedParams = selectedParams - value
+        selectedParams = (selectedParams - value) as FiltersList
 
         val control = controls.firstOrNull { it.parameter == value }
         control?.let {
@@ -63,7 +100,7 @@ abstract class FilterCollection {
     }
 
     fun clear() {
-        selectedParams = mutableListOf()
+        selectedParams = FiltersList()
         controls = listOf()
     }
 
@@ -83,3 +120,4 @@ abstract class FilterCollection {
         return "FilterCollection(selectedParams=$selectedParams)"
     }
 }
+

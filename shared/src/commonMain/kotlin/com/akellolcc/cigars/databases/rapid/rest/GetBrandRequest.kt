@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 12:51 PM
+ * Last modified 5/16/24, 11:07 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.serialization.json.Json
 
-class GetCigarsBrand(val brand: Long) : RestRequestInterface<Brand> {
+class GetCigarsBrand(val brand: Long) : RestRequestInterface<Brand, Any>() {
     companion object {
         private const val BASE_URL = "https://cigars.p.rapidapi.com/brands/"
     }
@@ -37,7 +37,7 @@ class GetCigarsBrand(val brand: Long) : RestRequestInterface<Brand> {
             return RestRequest(GET, url, cache = true)
         }
 
-    override fun execute(): Flow<Brand> {
+    override fun flow(): Flow<Brand> {
         return flow {
             restRequest.execute().map { restResponse ->
                 val brand = process(restResponse)
@@ -46,10 +46,11 @@ class GetCigarsBrand(val brand: Long) : RestRequestInterface<Brand> {
         }
     }
 
-    override fun executeSync(): Brand {
+    override fun sync(): Brand {
         val restResponse = restRequest.executeSync()
         return process(restResponse)
     }
+
 
     private fun process(restResponse: RestResponse): Brand {
         if (restResponse.status == 200) {

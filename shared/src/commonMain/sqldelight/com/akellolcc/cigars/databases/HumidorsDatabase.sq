@@ -36,6 +36,24 @@ allDesc:
         ELSE NULL
     END DESC;
 
+pagedAsc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END ASC
+    LIMIT :limit OFFSET :offset;
+
+pagedDesc:
+    SELECT * FROM HumidorsTable ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'count' THEN count
+        WHEN :sort = 'holds' THEN holds
+        ELSE NULL
+    END DESC
+    LIMIT :limit OFFSET :offset;
+
 
 add:
 INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)

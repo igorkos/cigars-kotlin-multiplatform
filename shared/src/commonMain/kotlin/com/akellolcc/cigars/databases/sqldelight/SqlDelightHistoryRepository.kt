@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 8:41 PM
+ * Last modified 5/19/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,46 +16,33 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.HistoryDatabaseQueries
 import com.akellolcc.cigars.databases.models.History
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.sqldelight.queries.HistoryTableQueries
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 abstract class SqlDelightHistoryRepository(
-    protected open var id: Long,
-    protected val queries: HistoryDatabaseQueries
+    protected val queries: HistoryDatabaseQueries,
+    protected val id: Pair<String, Long>
 ) : SQLDelightBaseRepository<History>(HistoryTableQueries(queries)), HistoryRepository {
+    override fun allSync(sorting: FilterParameter<Boolean>?, filter: FiltersList?): List<History> {
+        return allSync(sorting, filter, id)
+    }
 
-    override fun doUpsert(entity: History, add: Boolean): Flow<History> {
-        return flow {
-            if (add) {
-                queries.add(
-                    entity.count,
-                    entity.date,
-                    entity.left,
-                    entity.price,
-                    entity.type.type,
-                    entity.cigar?.rowid,
-                    entity.humidorFrom.rowid,
-                    entity.humidorTo.rowid
-                )
-            } else {
-                queries.update(
-                    entity.count,
-                    entity.date,
-                    entity.left,
-                    entity.price,
-                    entity.type.type,
-                    entity.cigar?.rowid,
-                    entity.humidorFrom.rowid,
-                    entity.humidorTo.rowid,
-                    entity.rowid
-                )
-            }
-            emit(entity)
-        }
+    override fun all(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<List<History>> {
+        return all(sorting, filter, id)
+    }
+
+    override fun paging(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<PagingData<History>> {
+        return paging(sorting, filter, id)
+    }
+
+    override fun count(): Long {
+        return count(id)
     }
 
     override fun humidorName(id: Long): String = queries.humidorName(id).executeAsOne()

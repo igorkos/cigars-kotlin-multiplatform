@@ -15,12 +15,6 @@ CREATE TABLE ImagesTable (
 get:
 SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
 
-allAsc:
-SELECT * FROM ImagesTable;
-
-allDesc:
-SELECT * FROM ImagesTable;
-
 add:
 INSERT INTO ImagesTable (data,  type, image, notes,cigarId,humidorId)
 VALUES (?, ?, ?, ?,?,?);
@@ -49,10 +43,23 @@ SELECT last_insert_rowid();
 cigarImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
 
+pagedCigarImages:
+    SELECT * FROM ImagesTable  WHERE cigarId = :cigar
+    LIMIT :limit OFFSET :offset;
+
+cigarImagesCount:
+SELECT COUNT(*) FROM ImagesTable WHERE cigarId = :cigar;
+
+
 humidorImages:
 SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
 
+pagedHumidorImages:
+    SELECT * FROM ImagesTable  WHERE humidorId = :humidor
+    LIMIT :limit OFFSET :offset;
 
+humidorImagesCount:
+SELECT COUNT(*) FROM ImagesTable WHERE humidorId = :humidor;
 
 
 

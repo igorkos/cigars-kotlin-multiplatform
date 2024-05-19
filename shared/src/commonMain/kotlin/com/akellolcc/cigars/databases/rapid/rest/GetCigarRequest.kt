@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:22 PM
+ * Last modified 5/16/24, 11:24 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.Json
 
-class GetCigarRequest(val cigarId: Long) : RestRequestInterface<Cigar> {
+class GetCigarRequest(val cigarId: Long) : RestRequestInterface<Cigar, Any>() {
     companion object {
         private const val BASE_URL = "https://cigars.p.rapidapi.com/cigars/"
     }
@@ -41,12 +41,12 @@ class GetCigarRequest(val cigarId: Long) : RestRequestInterface<Cigar> {
     private val json = Json { ignoreUnknownKeys = true }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun execute(): Flow<Cigar> {
+    override fun flow(): Flow<Cigar> {
         return flow {
             restRequest.execute().flatMapConcat { restResponse ->
                 flowOf(process(restResponse))
             }.flatMapConcat { rapid ->
-                GetCigarsBrand(rapid.brandId).execute().flatMapConcat {
+                GetCigarsBrand(rapid.brandId).flow().flatMapConcat {
                     val cigar = rapid.toCigar()
                     cigar.brand = it.name
                     flowOf(cigar)
@@ -57,10 +57,10 @@ class GetCigarRequest(val cigarId: Long) : RestRequestInterface<Cigar> {
         }
     }
 
-    override fun executeSync(): Cigar {
+    override fun sync(): Cigar {
         val restResponse = restRequest.executeSync()
         val rapidCigar = process(restResponse)
-        val brand = GetCigarsBrand(rapidCigar.brandId).executeSync()
+        val brand = GetCigarsBrand(rapidCigar.brandId).sync()
         val cigar = rapidCigar.toCigar()
         cigar.brand = brand.name
         return cigar

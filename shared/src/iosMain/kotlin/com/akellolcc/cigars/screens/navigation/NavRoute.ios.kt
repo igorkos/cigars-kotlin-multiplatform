@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/30/24, 12:20 PM
+ * Last modified 5/17/24, 5:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 package com.akellolcc.cigars.screens.navigation
 
 import dev.icerock.moko.resources.ImageResource
+import kotlinx.serialization.Transient
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class NavRoute {
@@ -42,7 +43,11 @@ actual class NavRoute {
 
     actual val route: String
     actual val title: String
+
+    @Transient
     actual val icon: ImageResource
+
+    @Transient
     actual var data: Any?
     actual val isTabsVisible: Boolean
     actual val isDrawerVisible: Boolean

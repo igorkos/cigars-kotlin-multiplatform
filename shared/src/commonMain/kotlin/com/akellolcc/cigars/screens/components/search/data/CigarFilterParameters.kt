@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 11:37 AM
+ * Last modified 5/19/24, 1:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,9 @@ import com.akellolcc.cigars.theme.Images
 
 class CigarFilterParameters : FilterCollection() {
     init {
-        params = CigarSortingFields.enumValues().map {
+        params = FiltersList(CigarSortingFields.enumValues().map {
             FilterParameter(it.first.value, it.first.value, it.second, Images.icon_menu_sort)
-        }
+        })
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -41,9 +41,9 @@ class CigarFilterParameters : FilterCollection() {
 
 class CigarSortingParameters : FilterCollection() {
     init {
-        params = CigarSortingFields.enumValues().map {
+        params = FiltersList(CigarSortingFields.enumValues().map {
             FilterParameter(it.first.value, true, it.second, Images.icon_menu_sort)
-        }
+        })
         selectedParams = params
     }
 
@@ -54,7 +54,7 @@ class CigarSortingParameters : FilterCollection() {
 
 class CigarSearchParameters : FilterCollection() {
     init {
-        params = CigarSortingFields.enumValues().filter {
+        params = FiltersList(CigarSortingFields.enumValues().filter {
             it.first != CigarSortingFields.Shape
         }.map {
             if (it.first == CigarSortingFields.Brand || it.first == CigarSortingFields.Name || it.first == CigarSortingFields.Country) {
@@ -62,8 +62,8 @@ class CigarSearchParameters : FilterCollection() {
             } else {
                 FilterParameter(it.first.value, 0L, it.second, Images.icon_menu_sort)
             }
-        }
-        selectedParams = params.filter { it.key == CigarSortingFields.Name.value }
+        })
+        selectedParams = FiltersList(params.filter { it.key == CigarSortingFields.Name.value })
         controls = selectedParams.map { build(it) }
     }
 

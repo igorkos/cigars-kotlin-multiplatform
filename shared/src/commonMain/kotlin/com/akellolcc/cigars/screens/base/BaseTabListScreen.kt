@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:42 PM
+ * Last modified 5/18/24, 12:37 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -44,7 +42,6 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +51,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.models.BaseEntity
@@ -71,10 +70,10 @@ import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import com.akellolcc.cigars.utils.ui.reachedBottom
 
 abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>>(override val route: NavRoute) :
     ITabItem<VM> {
+    @kotlinx.serialization.Transient
     @kotlin.jvm.Transient
     override lateinit var viewModel: VM
     abstract fun handleAction(event: A, navigator: Navigator?)
@@ -102,9 +101,6 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
     open fun ContentHeader(modifier: Modifier) {
     }
 
-    open fun loadMore() {
-        viewModel.loadMore()
-    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -113,22 +109,20 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
         val sharedViewModel = createViewModel(MainScreenViewModel::class)
 
         LaunchedEffect(navigator) {
-            Log.debug("${this@BaseTabListScreen::class.simpleName} load data")
-            viewModel.loadMore()
             if (sharedViewModel.isTabsVisible != route.isTabsVisible)
                 sharedViewModel.isTabsVisible = route.isTabsVisible
         }
 
-        LaunchedEffect(viewModel) {
-            viewModel.observeEvents {
-                handleAction(it, navigator)
-            }
+        fun eventsObserver(event: A) {
+            handleAction(event, navigator)
         }
 
-        val scrollBehavior =
-            TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+        LaunchedEffect(viewModel) {
+            viewModel.observeEvents(::eventsObserver)
+        }
 
-        val listState = rememberLazyListState()
+        val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -141,34 +135,18 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
                 },
                 content = {
                     val padding by remember { mutableStateOf(it.calculateTopPadding() + 16.dp to it.calculateBottomPadding() + 16.dp) }
-                    if (viewModel.loading && route.isLoadingCover) {
-                        Box(
-                            modifier = Modifier.fillMaxSize().background(
-                                materialColor(
-                                    MaterialColors.color_transparent
-                                )
-                            ), contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.width(64.dp),
-                            )
-                        }
-                    } else {
-                        Column(
-                            modifier = Modifier.padding(
-                                top = padding.first,
-                                bottom = padding.second,
-                                start = 16.dp,
-                                end = 16.dp
-                            ),
-                            verticalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            ContentHeader(Modifier)
-                            entitiesList(viewModel.entities, listState) {
-                                loadMore()
-                            }
-                            ContentFooter(Modifier)
-                        }
+                    Column(
+                        modifier = Modifier.padding(
+                            top = padding.first,
+                            bottom = padding.second,
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        ContentHeader(Modifier)
+                        entitiesList()
+                        ContentFooter(Modifier)
                     }
                 }
             )
@@ -176,55 +154,74 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
     }
 
     @Composable
-    private fun entitiesList(
-        entities: List<E>,
-        listState: LazyListState,
-        loadMore: (() -> Unit)? = null
-    ) {
-        val reachedBottom: Boolean by remember { derivedStateOf { listState.reachedBottom() } }
+    open fun entitiesList() {
+        val listState = rememberLazyListState()
+        val pagingItems = viewModel.items?.collectAsLazyPagingItems()
 
-        // load more if scrolled to bottom
-        LaunchedEffect(reachedBottom) {
-            if (reachedBottom) loadMore?.invoke()
+        LaunchedEffect(Unit) {
+            viewModel.paging()
         }
 
-        if (entities.isEmpty() && !viewModel.loading) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = materialColor(MaterialColors.color_transparent),
-                    contentColor = materialColor(MaterialColors.color_onSurfaceVariant)
-                ),
-            ) {
-                TextStyled(
-                    modifier = Modifier.fillMaxWidth(),
-                    center = true,
-                    text = Localize.list_is_empty,
-                    style = TextStyles.Subhead
-                )
+        when (pagingItems?.loadState?.refresh) {
+            is LoadState.Error -> {
+
             }
-        } else {
-            LazyColumn(
-                state = listState,
-                verticalArrangement = Arrangement.Top,
-            )
-            {
-                item {
-                    ListHeader(Modifier.fillMaxWidth())
-                }
-                items(entities, key = { item -> item.key }) {
-                    val clickableModifier = remember(it.key) {
-                        Modifier.clickable { viewModel.entitySelected(it) }
+
+            is LoadState.NotLoading -> {
+                if (pagingItems.itemCount == 0) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = materialColor(MaterialColors.color_transparent),
+                            contentColor = materialColor(MaterialColors.color_onSurfaceVariant)
+                        ),
+                    ) {
+                        TextStyled(
+                            modifier = Modifier.fillMaxWidth(),
+                            center = true,
+                            text = Localize.list_is_empty,
+                            style = TextStyles.Subhead
+                        )
                     }
-                    EntityListRow(it, clickableModifier)
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .background(Color.Transparent)
+                } else {
+                    // Log.debug("${this::class.simpleName} items count: ${pagingItems.itemCount}")
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.Top,
                     )
+                    {
+                        item {
+                            ListHeader(Modifier.fillMaxWidth())
+                        }
+                        items(count = pagingItems.itemCount, key = { index -> pagingItems[index]?.key ?: "NoN" }) { index ->
+                            pagingItems[index]?.let {
+                                val clickableModifier = remember(it.key) {
+                                    Modifier.clickable { viewModel.entitySelected(it) }
+                                }
+                                EntityListRow(it, clickableModifier)
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(4.dp)
+                                        .background(Color.Transparent)
+                                )
+                            }
+                        }
+                        item {
+                            ListFooter(Modifier.fillMaxWidth())
+                        }
+                    }
                 }
-                item {
-                    ListFooter(Modifier.fillMaxWidth())
+            }
+
+            else -> {
+                Log.debug("${this::class.simpleName} load data state: ${pagingItems?.loadState?.refresh}")
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(32.dp),
+                    )
                 }
             }
         }

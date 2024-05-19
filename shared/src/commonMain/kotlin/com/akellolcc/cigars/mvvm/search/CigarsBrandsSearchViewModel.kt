@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:57 PM
+ * Last modified 5/19/24, 1:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,16 +20,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.paging.PagingData
+import app.cash.paging.compose.LazyPagingItems
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.Brand
 import com.akellolcc.cigars.databases.repository.BrandsRepository
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     CigarsSearchFieldBaseViewModel(parameter) {
@@ -41,7 +40,7 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
     var inputSelection by mutableStateOf<TextRange?>(null)
 
     // Brands list
-    var brands by mutableStateOf(listOf<Brand>())
+    var brands by mutableStateOf<Flow<PagingData<Brand>>?>(null)
 
     //Selected brand
     private var selectedBrand by mutableStateOf<Brand?>(null)
@@ -49,19 +48,17 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
 
     override fun processInput(value: String) {
         if (value != selectedBrand?.name) {
-            brands = listOf()
+            brands = null
             selectedBrand = null
             expanded = false
             setState(Action.Input())
-
         }
         inputSelection = null
-        loading = true
         getBrands(value)
     }
 
     override fun validate(): Boolean {
-        isError = !loading && value.length > 2 && brands.isEmpty()
+        isError = !loading && value.length > 2
         return selectedBrand != null
     }
 
@@ -98,6 +95,10 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
         }
     }
 
+    fun hasBrands(items: LazyPagingItems<Brand>?): Boolean {
+        return items != null && items.itemCount > 0
+    }
+
     /**
      * Brand selected
      */
@@ -112,25 +113,8 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
 
     private fun getBrands(query: String) {
         if (selectedBrand == null) {
-            onDispose()
-            runOnDispose {
-                screenModelScope.launch {
-                    repository.all(null, listOf(parameter)).cancellable().catch {
-                        setState(Action.Input())
-                        Log.debug("Brand request cancelled")
-                    }.collect {
-                        brands = it
-                        loading = false
-                        if (it.isEmpty()) {
-                            setState(Action.Error())
-                        } else {
-                            setState(Action.Loaded())
-                        }
-                    }
-                }
-            }
+            brands = repository.paging(null, FiltersList(listOf(FilterParameter(parameter.key, query))))
         }
-
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 12:51 PM
+ * Last modified 5/17/24, 11:07 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,13 +19,9 @@ package com.akellolcc.cigars.databases.rapid.rest
 import com.akellolcc.cigars.databases.models.Brand
 import com.akellolcc.cigars.databases.rapid.models.GetCigarsBrandsResponse
 import com.akellolcc.cigars.logging.Log
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 
-class GetCigarsBrands(val brand: String?) : RestRequestInterface<List<Brand>> {
+class GetCigarsBrands(val brand: String?) : RestRequestInterface<List<Brand>, Brand>() {
     private var page = 0
     private var totalItems = 0
     private var receivedItems = 0
@@ -45,19 +41,23 @@ class GetCigarsBrands(val brand: String?) : RestRequestInterface<List<Brand>> {
         }
     private val json = Json { ignoreUnknownKeys = true }
 
-    override fun execute(): Flow<List<Brand>> {
-        if (isLastPage) {
-            return flowOf(emptyList())
-        }
-        page++
-        return flow {
-            restRequest.execute().map {
-                emit(process(it))
-            }
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Brand> {
+        page = params.key ?: 1
+        return try {
+            val list = sync()
+            LoadResult.Page(
+                data = list,
+                prevKey = if (page == 1) null else page - 1,
+                nextKey = if (list.isEmpty()) null else page + 1
+            )
+        } catch (e: Exception) {
+            Log.error("GetCigarsRequest failed with ${e.message}")
+            LoadResult.Error(e)
         }
     }
 
-    override fun executeSync(): List<Brand> {
+
+    override fun sync(): List<Brand> {
         val restResponse = restRequest.executeSync()
         return process(restResponse)
     }

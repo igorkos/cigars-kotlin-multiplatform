@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:06 PM
+ * Last modified 5/18/24, 12:37 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,15 +19,14 @@ package com.akellolcc.cigars.mvvm.base
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterCollection
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 
 abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() {
@@ -35,7 +34,8 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
     protected abstract val repository: Repository<T>
     protected var sortField by mutableStateOf<FilterParameter<Boolean>?>(null)
 
-    var entities by mutableStateOf(listOf<T>())
+    var items by mutableStateOf<Flow<PagingData<T>>?>(null)
+
 
     var search by mutableStateOf(false)
 
@@ -51,12 +51,12 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
         get() = sortField
         set(value) {
             sortField = value
-            loadEntities(true)
+            paging(true)
         }
 
     open fun sortingOrder(ascending: Boolean) {
         sortField?.value = ascending
-        loadEntities(true)
+        paging(true)
     }
 
     open fun updateSearch(value: Boolean) {
@@ -64,29 +64,13 @@ abstract class BaseListViewModel<T : BaseEntity, A> : DatabaseViewModel<T, A>() 
         search = value
     }
 
-    open fun loadMore() {
-        loadEntities()
-    }
-
-    open fun reload() {
-        loadEntities(true)
-    }
-
-    protected open fun loadEntities(reload: Boolean = false) {
-        if (_entities == null || reload) {
-            loading = true
-            Log.debug("Load entries with sort: $sortField and search: $searchingFields")
-            _entities = screenModelScope.launch {
-                val filters =
-                    if (searchingFields?.selected != null && searchingFields?.selected?.isNotEmpty() == true) searchingFields?.selected else null
-                repository.all(sortField, filters).cancellable()
-                    .collect {
-                        entities = it
-                        loading = false
-                    }
-            }
+    fun paging(reset: Boolean = false) {
+        if (reset || items == null) {
+            Log.debug("${this::class.simpleName} reload paging")
+            items = repository.paging(sortField, searchingFields?.selected)
         }
     }
+
 
     override fun onDispose() {
         super.onDispose()

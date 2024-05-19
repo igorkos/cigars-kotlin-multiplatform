@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:28 PM
+ * Last modified 5/19/24, 11:00 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,25 +16,15 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import com.akellolcc.cigars.databases.ImagesDatabaseQueries
-import com.akellolcc.cigars.databases.models.CigarImage
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
-import com.akellolcc.cigars.databases.sqldelight.queries.imageFactory
-import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.databases.sqldelight.queries.CIGAR_ID
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
 
 class SqlDelightCigarImagesRepository(
     private val cigarId: Long,
     queries: ImagesDatabaseQueries
-) : SqlDelightImagesRepository(queries), CigarImagesRepository {
-    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?, page: Int): Flow<List<CigarImage>> {
-        return queries.cigarImages(cigarId, ::imageFactory).asFlow().mapToList(Dispatchers.IO)
-    }
+) : SqlDelightImagesRepository(queries, Pair(CIGAR_ID, cigarId)), CigarImagesRepository {
 
     companion object Factory : ObjectFactory<SqlDelightCigarImagesRepository>() {
         override fun factory(data: Any?): SqlDelightCigarImagesRepository {

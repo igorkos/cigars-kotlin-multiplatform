@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 10:35 AM
+ * Last modified 5/17/24, 10:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ package com.akellolcc.cigars.mvvm.cigars
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.CigarImage
@@ -36,6 +37,7 @@ import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.utils.ObjectFactory
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
 
 class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
@@ -65,7 +67,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
     var link by mutableStateOf(cigar.link)
     var count by mutableStateOf(cigar.count)
 
-    var images by mutableStateOf(listOf<CigarImage>())
+    var images by mutableStateOf<Flow<PagingData<CigarImage>>?>(null)
     var humidors by mutableStateOf(listOf<HumidorCigar>())
 
 
@@ -104,10 +106,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
                 }
             }
 
-            disposable += execute(imagesRepository!!.all()) {
-                images = it
-                loading = false
-            }
+            images = imagesRepository!!.paging(null, null)
 
             disposable += execute(cigarHumidorRepository!!.all()) {
                 humidors = it

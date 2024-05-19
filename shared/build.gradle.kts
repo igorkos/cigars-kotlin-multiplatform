@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 2:41 PM
+ * Last modified 5/17/24, 5:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,9 +108,8 @@ kotlin {
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation(libs.sqldelight.ios)
+                implementation(libs.bundles.sqldelight.ios.bundle)
                 implementation(libs.ktor.client.ios)
-                implementation(libs.sqldelight.paging.ios)
             }
         }
 

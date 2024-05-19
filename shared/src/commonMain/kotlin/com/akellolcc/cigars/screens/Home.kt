@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 4:08 PM
+ * Last modified 5/17/24, 6:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.screens
 
@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,6 +46,7 @@ import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 
 class Home : Screen {
+    @kotlinx.serialization.Transient
     @Transient
     val database = Database.instance
 
@@ -54,20 +56,23 @@ class Home : Screen {
 
     @Composable
     override fun Content() {
-        val initialized = remember { mutableStateOf(false) }
+        val initialized = remember { mutableStateOf(!Pref.isFirstStart) }
         val navigator = LocalNavigator.currentOrThrow
 
-        //
-        if (!initialized.value && Pref.isFirstStart) {
-            database.reset()
-            CoroutineScope(Dispatchers.IO).launch {
-                database.createDemoSet().collect {
-                    Log.debug("Created demo set")
-                    Pref.isFirstStart = false
-                    initialized.value = true
+        LaunchedEffect(Unit) {
+            if (Pref.isFirstStart) {
+                database.reset()
+                CoroutineScope(Dispatchers.IO).launch {
+                    database.createDemoSet().collect {
+                        Log.debug("Created demo set")
+                        Pref.isFirstStart = false
+                        initialized.value = true
+                    }
                 }
             }
+        }
 
+        if (!initialized.value) {
             Box(
                 modifier = Modifier.fillMaxSize().background(
                     materialColor(
@@ -80,7 +85,6 @@ class Home : Screen {
                 )
             }
         } else {
-            initialized.value = true
             val postMainScreen = rememberScreen(SharedScreen.MainScreen)
             navigator.push(postMainScreen)
         }

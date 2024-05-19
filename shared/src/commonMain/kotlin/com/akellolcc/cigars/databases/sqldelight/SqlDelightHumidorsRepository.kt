@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 8:54 PM
+ * Last modified 5/19/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.HumidorsDatabaseQueries
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.History
@@ -24,6 +25,8 @@ import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.sqldelight.queries.HumidorsTableQueries
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.ObjectFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -59,47 +62,27 @@ class SqlDelightHumidorsRepository(val queries: HumidorsDatabaseQueries) :
         }
     }
 
-    override fun doUpsert(entity: Humidor, add: Boolean): Flow<Humidor> {
-        return flow {
-            if (add) {
-                queries.add(
-                    entity.name,
-                    entity.brand,
-                    entity.holds,
-                    entity.count,
-                    entity.temperature,
-                    entity.humidity,
-                    entity.notes,
-                    entity.link,
-                    entity.autoOpen,
-                    entity.sorting,
-                    entity.type
-                )
-            } else {
-                queries.update(
-                    entity.name,
-                    entity.brand,
-                    entity.holds,
-                    entity.count,
-                    entity.temperature,
-                    entity.humidity,
-                    entity.notes,
-                    entity.link,
-                    entity.autoOpen,
-                    entity.sorting,
-                    entity.type,
-                    entity.rowid
-                )
-            }
-            emit(entity)
-        }
-    }
-
     override fun updateCigarsCount(humidor: Long, count: Long): Flow<Long> {
         return flow {
             queries.updateCigarsCount(count, humidor)
             emit(humidor)
         }
+    }
+
+    override fun allSync(sorting: FilterParameter<Boolean>?, filter: FiltersList?): List<Humidor> {
+        return super.allSync(sorting, filter, Pair("rowid", "DESC"))
+    }
+
+    override fun all(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<List<Humidor>> {
+        return super.all(sorting, filter, Pair("rowid", "DESC"))
+    }
+
+    override fun paging(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<PagingData<Humidor>> {
+        return super.paging(sorting, filter, Pair("rowid", "DESC"))
+    }
+
+    override fun count(): Long {
+        return super.count(Pair("rowid", "DESC"))
     }
 
     companion object Factory : ObjectFactory<SqlDelightHumidorsRepository>() {

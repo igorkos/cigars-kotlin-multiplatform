@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/9/24, 1:49 PM
+ * Last modified 5/19/24, 1:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,10 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.createRepository
 import com.akellolcc.cigars.databases.models.Cigar
-import com.akellolcc.cigars.databases.models.CigarStrength
 import com.akellolcc.cigars.databases.models.History
 import com.akellolcc.cigars.databases.models.HistoryType
 import com.akellolcc.cigars.databases.models.Humidor
@@ -28,6 +28,8 @@ import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.sqldelight.queries.CigarsTableQueries
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.ObjectFactory
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,8 +39,6 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueries) :
     SQLDelightBaseRepository<Cigar>(CigarsTableQueries(queries)), CigarsRepository {
@@ -111,60 +111,20 @@ open class SqlDelightCigarsRepository(protected val queries: CigarsDatabaseQueri
         }
     }
 
-    //BaseRepository
-    override fun doUpsert(entity: Cigar, add: Boolean): Flow<Cigar> {
-        return flow {
-            val rel = if (entity.relations != null) {
-                Json.encodeToString(entity.relations!!)
-            } else null
-            if (add) {
-                queries.add(
-                    entity.name,
-                    entity.brand,
-                    entity.country,
-                    entity.date,
-                    entity.cigar,
-                    entity.wrapper,
-                    entity.binder,
-                    entity.gauge,
-                    entity.length,
-                    CigarStrength.toLong(entity.strength),
-                    entity.rating,
-                    entity.myrating,
-                    entity.notes,
-                    entity.filler,
-                    entity.link,
-                    entity.count,
-                    entity.shopping,
-                    entity.favorites,
-                    rel
-                )
-            } else {
-                queries.update(
-                    entity.name,
-                    entity.brand,
-                    entity.country,
-                    entity.date,
-                    entity.cigar,
-                    entity.wrapper,
-                    entity.binder,
-                    entity.gauge,
-                    entity.length,
-                    CigarStrength.toLong(entity.strength),
-                    entity.rating,
-                    entity.myrating,
-                    entity.notes,
-                    entity.filler,
-                    entity.link,
-                    entity.count,
-                    entity.shopping,
-                    entity.favorites,
-                    rel,
-                    entity.rowid,
-                )
-            }
-            emit(entity)
-        }
+    override fun allSync(sorting: FilterParameter<Boolean>?, filter: FiltersList?): List<Cigar> {
+        return super.allSync(sorting, filter, Pair("", null))
+    }
+
+    override fun all(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<List<Cigar>> {
+        return super.all(sorting, filter, Pair("", null))
+    }
+
+    override fun paging(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<PagingData<Cigar>> {
+        return super.paging(sorting, filter, Pair("", null))
+    }
+
+    override fun count(): Long {
+        return super.count(Pair("favorites", false))
     }
 
     companion object Factory : ObjectFactory<SqlDelightCigarsRepository>() {

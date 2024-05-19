@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:28 PM
+ * Last modified 5/19/24, 1:12 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,26 +16,45 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.CigarsDatabaseQueries
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.repository.FavoriteCigarsRepository
-import com.akellolcc.cigars.databases.sqldelight.queries.cigarFactory
+import com.akellolcc.cigars.databases.sqldelight.queries.FAVORITES_ID
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 
 class SqlDelightFavoriteCigarsRepository(queries: CigarsDatabaseQueries) :
     SqlDelightCigarsRepository(queries), FavoriteCigarsRepository {
-    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?, page: Int): Flow<List<Cigar>> {
-        return queries.favoriteCigars(::cigarFactory).asFlow().mapToList(Dispatchers.IO)
+
+    override fun allSync(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?
+    ): List<Cigar> {
+        val filterFav = FiltersList((filter ?: emptyList()) + FilterParameter(FAVORITES_ID, true))
+        return super.allSync(sorting, filterFav)
+    }
+
+    override fun all(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?
+    ): Flow<List<Cigar>> {
+        val filterFav = FiltersList((filter ?: emptyList()) + FilterParameter(FAVORITES_ID, true))
+        return super.all(sorting, filterFav)
+    }
+
+    override fun paging(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+    ): Flow<PagingData<Cigar>> {
+        val filterFav = FiltersList((filter ?: emptyList()) + FilterParameter(FAVORITES_ID, true))
+        return super.paging(sorting, filterFav, Pair(FAVORITES_ID, true))
     }
 
     override fun count(): Long {
-        return queries.favoriteCount().executeAsOne()
+        return super.count(Pair(FAVORITES_ID, true))
     }
 
     companion object Factory : ObjectFactory<SqlDelightFavoriteCigarsRepository>() {

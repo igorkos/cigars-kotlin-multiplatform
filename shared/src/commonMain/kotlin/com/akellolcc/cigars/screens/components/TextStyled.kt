@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:56 PM
+ * Last modified 5/17/24, 1:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -224,6 +224,7 @@ fun TextStyled(
                 fontStyle = textStyle.fontStyle,
                 fontFamily = textStyle.fontFamily,
                 textAlign = textStyle.textAlign,
+                softWrap = maxLines > 1,
                 maxLines = maxLines,
             )
         }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:02 PM
+ * Last modified 5/19/24, 1:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,21 +16,62 @@
 
 package com.akellolcc.cigars.databases.repository
 
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import kotlinx.coroutines.flow.Flow
 
-interface Repository<ENTITY : BaseEntity> {
+interface InternalRepository<ENTITY : BaseEntity> {
     /**
-     * Get the entity from the database.
+     * Protected methods
      */
-    fun getSync(id: Long, where: Long? = null): ENTITY
+    fun allSync(
+        sorting: FilterParameter<Boolean>? = null,
+        filter: FiltersList? = null,
+        vararg args: Pair<String, Any?>
+    ): List<ENTITY>
 
-    fun allSync(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null, page: Int = 0): List<ENTITY>
+
+    fun all(
+        sorting: FilterParameter<Boolean>? = null,
+        filter: FiltersList? = null,
+        vararg args: Pair<String, Any?>
+    ): Flow<List<ENTITY>>
+
+    fun paging(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+        vararg args: Pair<String, Any?>
+    ): Flow<PagingData<ENTITY>>
+
+    fun count(vararg args: Pair<String, Any?>): Long
+}
+
+interface Repository<ENTITY : BaseEntity> : InternalRepository<ENTITY> {
+    /**
+     * Public methods
+     */
+    fun allSync(
+        sorting: FilterParameter<Boolean>? = null,
+        filter: FiltersList? = null
+    ): List<ENTITY>
+
+    fun all(
+        sorting: FilterParameter<Boolean>? = null,
+        filter: FiltersList? = null,
+    ): Flow<List<ENTITY>>
+
+    fun paging(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+    ): Flow<PagingData<ENTITY>>
+
+    fun count(): Long
 
     fun observe(id: Long): Flow<ENTITY>
 
-    fun all(sorting: FilterParameter<Boolean>? = null, filter: List<FilterParameter<*>>? = null, page: Int = 0): Flow<List<ENTITY>>
+    fun getSync(id: Long, where: Long? = null): ENTITY
 
     fun add(entity: ENTITY): Flow<ENTITY>
 
@@ -46,7 +87,6 @@ interface Repository<ENTITY : BaseEntity> {
 
     fun contains(id: Long, where: Long? = null): Boolean
 
-    fun count(): Long
 
     fun lastInsertRowId(): Long
 }

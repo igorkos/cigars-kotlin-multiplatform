@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:10 PM
+ * Last modified 5/17/24, 6:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,6 +53,7 @@ import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class HumidorsScreen(override val route: NavRoute) : ITabItem<HumidorsViewModel> {
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: HumidorsViewModel
 
@@ -66,6 +67,7 @@ class HumidorsScreen(override val route: NavRoute) : ITabItem<HumidorsViewModel>
 
 class HumidorsListScreen(
     route: NavRoute,
+    @kotlinx.serialization.Transient
     @Transient
     override var viewModel: HumidorsViewModel
 ) :

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 3:16 PM
+ * Last modified 5/16/24, 1:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,9 @@
 
 package com.akellolcc.cigars.databases.rapid.rest
 
-import app.cash.paging.PagingSourceLoadParams
-import app.cash.paging.PagingSourceLoadResult
-import app.cash.paging.PagingSourceLoadResultPage
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.rapid.models.GetCigarsResponse
 import com.akellolcc.cigars.databases.rapid.models.RapidCigar
@@ -29,12 +29,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.serialization.json.Json
 
-class GetCigarsRequest(val fields: List<FilterParameter<*>>) : RestRequestInterface<List<Cigar>> {
+class GetCigarsRequest(val fields: List<FilterParameter<*>>) : RestRequestInterface<List<Cigar>, Cigar>() {
     var page = 0
     private var totalItems = 0
     private var receivedItems = 0
@@ -65,59 +64,44 @@ class GetCigarsRequest(val fields: List<FilterParameter<*>>) : RestRequestInterf
     private val json = Json { ignoreUnknownKeys = true }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun execute(): Flow<List<Cigar>> {
-        if (isLastPage) {
-            return flowOf(emptyList())
-        }
-        page++
-        return flow {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Cigar> {
+        page = params.key ?: 1
+        return try {
             val list = restRequest.execute().flatMapConcat { restResponse ->
                 process(restResponse).asFlow()
             }.flatMapConcat { rapid ->
-                GetCigarsBrand(rapid.brandId).execute().flatMapConcat {
+                GetCigarsBrand(rapid.brandId).flow().flatMapConcat {
                     val cigar = rapid.toCigar()
                     cigar.brand = it.name
                     flowOf(cigar)
                 }
             }.toList()
-            emit(list)
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun paged(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Cigar> {
-        val reqPage = params.key ?: 1
-        if (isLastPage) {
-            return PagingSourceLoadResultPage(
-                data = emptyList(),
-                prevKey = (reqPage - 1).takeIf { it > 0 },
-                nextKey = null
+            LoadResult.Page(
+                data = list,
+                prevKey = if (page == 1) null else page - 1,
+                nextKey = if (list.isEmpty()) null else page + 1
             )
-        }
-        val list = restRequest.execute().flatMapConcat { restResponse ->
-            process(restResponse).asFlow()
-        }.flatMapConcat { rapid ->
-            GetCigarsBrand(rapid.brandId).execute().flatMapConcat {
-                val cigar = rapid.toCigar()
-                cigar.brand = it.name
-                flowOf(cigar)
-            }
+        } catch (e: Exception) {
+            Log.error("GetCigarsRequest failed with ${e.message}")
+            LoadResult.Error(e)
         }
     }
 
-    override fun executeSync(): List<Cigar> {
-        if (isLastPage) {
-            return emptyList()
-        }
-        page++
-        val restResponse = restRequest.executeSync()
-        val rapidCigars = process(restResponse)
-        return rapidCigars.map {
-            val brand = GetCigarsBrand(it.brandId).executeSync()
-            val cigar = it.toCigar()
-            cigar.brand = brand.name
-            cigar
-        }
+    override fun paging(): Flow<PagingData<Cigar>> {
+        Log.debug("GetCigarsRequest paging")
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false,
+                initialLoadSize = 20,
+                prefetchDistance = 2
+            ),
+            pagingSourceFactory = {
+                Log.debug("GetCigarsRequest pagingSourceFactory")
+                this
+            },
+            initialKey = 1
+        ).flow
     }
 
     private fun process(restResponse: RestResponse): List<RapidCigar> {

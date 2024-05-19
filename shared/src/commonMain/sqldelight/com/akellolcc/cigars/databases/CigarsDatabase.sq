@@ -38,7 +38,8 @@ allAsc:
         cigar LIKE :cigar AND
         gauge >= :gauge AND
         length >= :length AND
-        strength >= :strength
+        strength >= :strength AND
+        favorites == :favorites
      ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
@@ -63,7 +64,8 @@ allDesc:
                cigar LIKE :cigar AND
                gauge >= :gauge AND
                length >= :length AND
-               strength >= :strength
+               strength >= :strength AND
+               favorites == :favorites
        ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
@@ -78,10 +80,61 @@ allDesc:
         ELSE NULL
     END DESC;
 
+pagedAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength AND
+        favorites == :favorites
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC
+    LIMIT :limit OFFSET :offset;
+
+pagedDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength AND
+               favorites == :favorites
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC
+    LIMIT :limit OFFSET :offset;
 
 add:
-INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites, relations)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites, price, other,relations)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
 
 update:
 UPDATE CigarsTable SET name = :name,
@@ -102,6 +155,8 @@ UPDATE CigarsTable SET name = :name,
     count= :count,
     shopping= :shopping,
     favorites= :favorites,
+    price= :price,
+    other= :other,
     relations=:relations WHERE rowid = :id;
 
 remove:
@@ -114,7 +169,7 @@ find:
 SELECT * FROM CigarsTable WHERE rowid = :rowid;
 
 count:
-SELECT COUNT(*) FROM CigarsTable ;
+SELECT COUNT(*) FROM CigarsTable  WHERE favorites = :favorites;
 
 contains:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
@@ -124,9 +179,6 @@ UPDATE CigarsTable SET myrating= :myrating WHERE rowid = :id;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
-
-favoriteCigars:
-SELECT * FROM CigarsTable WHERE favorites = 1;
 
 favoriteCount:
 SELECT COUNT(*) FROM CigarsTable WHERE favorites = 1;

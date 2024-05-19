@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 3:54 PM
+ * Last modified 5/17/24, 11:46 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
     init {
         disposables.value += (events.observe(screenModelScope) {
             eventListeners.forEach { callback ->
-                Log.debug("${this::class.simpleName} Propagate event: ${it?.id} -> ${it?.value} ")
+                Log.debug("${this::class.simpleName} Propagate event: ${it?.id} -> ${if (it?.value != null) it.value!!::class.simpleName else "null"}  ")
                 it?.let {
                     callback(it.value)
                 }
@@ -74,7 +74,7 @@ open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
 
     fun sendEvent(event: E) {
         val ev = Event(id = randomString(), value = event)
-        Log.debug("${this::class.simpleName} Send event: ${ev.id} -> $event ")
+        Log.debug("${this::class.simpleName} Send event: ${ev.id} -> ${if (event != null) event!!::class.simpleName else "null"} ")
         events.value = ev
     }
 

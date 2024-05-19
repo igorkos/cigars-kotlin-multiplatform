@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/17/24, 6:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ import com.akellolcc.cigars.screens.navigation.NavRoute
 import kotlin.jvm.Transient
 
 class FavoritesScreen(override val route: NavRoute) : ITabItem<FavoritesScreenViewModel> {
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: FavoritesScreenViewModel
 

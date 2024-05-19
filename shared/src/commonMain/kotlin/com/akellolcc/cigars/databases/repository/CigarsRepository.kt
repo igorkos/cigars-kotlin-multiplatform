@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:34 PM
+ * Last modified 5/19/24, 11:13 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,15 +21,15 @@ import com.akellolcc.cigars.databases.models.Humidor
 import kotlinx.coroutines.flow.Flow
 
 interface CigarsRepository : Repository<Cigar> {
-    fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar>
+    abstract fun add(cigar: Cigar, humidor: Humidor): Flow<Cigar>
 
-    fun addAll(cigars: List<Cigar>, humidor: Humidor): Flow<List<Cigar>>
+    abstract fun addAll(cigars: List<Cigar>, humidor: Humidor): Flow<List<Cigar>>
 
-    override fun update(entity: Cigar): Flow<Cigar>
+    abstract override fun update(entity: Cigar): Flow<Cigar>
 
-    fun updateFavorite(value: Boolean, cigar: Cigar): Flow<Boolean>
+    abstract fun updateFavorite(value: Boolean, cigar: Cigar): Flow<Boolean>
 
-    fun updateRating(value: Long, cigar: Cigar): Flow<Long>
+    abstract fun updateRating(value: Long, cigar: Cigar): Flow<Long>
 }
 
 interface CigarsSearchRepository : CigarsRepository

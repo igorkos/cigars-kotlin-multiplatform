@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:56 PM
+ * Last modified 5/17/24, 10:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Humidor
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
 import com.akellolcc.cigars.screens.components.DialogButton
@@ -73,7 +72,7 @@ import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetailsScreenViewModel> {
-
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: HumidorDetailsScreenViewModel
 
@@ -89,7 +88,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
             }
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
-        Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
+
         viewModel.observeEvents {
             when (it) {
                 is HumidorDetailsScreenViewModel.Action.OnBackAction -> navigator.pop()

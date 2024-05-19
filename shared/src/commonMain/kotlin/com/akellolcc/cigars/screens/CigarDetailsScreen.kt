@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 4:00 PM
+ * Last modified 5/18/24, 12:03 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,18 +99,14 @@ import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
 open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsScreenViewModel> {
+    @kotlinx.serialization.Transient
     @Transient
     override lateinit var viewModel: CigarsDetailsScreenViewModel
 
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel {
-            createViewModel(CigarsDetailsScreenViewModel::class, route.data ?: emptyCigar).apply {
-                loading = true
-            }
-        }
+        viewModel = rememberScreenModel { createViewModel(CigarsDetailsScreenViewModel::class, route.data ?: emptyCigar) }
         val navigator = LocalNavigator.currentOrThrow
-        // Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
 
         LaunchedEffect(Unit) {
             viewModel.observeEvents {
@@ -165,7 +161,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         }
     }
 
-    protected open fun handleAction(
+    open fun handleAction(
         event: CigarsDetailsScreenViewModel.CigarsDetailsAction,
         navigator: Navigator
     ) {
@@ -205,7 +201,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    protected open fun topTabBar() {
+    open fun topTabBar() {
         val topColors = centerAlignedTopAppBarColors(
             containerColor = materialColor(MaterialColors.color_transparent),
             navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
@@ -244,7 +240,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
     }
 
     @Composable
-    protected open fun bottomTabBar() {
+    open fun bottomTabBar() {
         if (viewModel.editing) {
             BottomAppBar(
                 actions = {
@@ -264,7 +260,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
     }
 
     @Composable
-    protected open fun dialogs() {
+    open fun dialogs() {
         HumidorCigarsCountDialog {
             viewModel.onCancelEdit()
         }

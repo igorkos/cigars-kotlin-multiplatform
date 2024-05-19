@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 1:28 PM
+ * Last modified 5/19/24, 1:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,9 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import app.cash.sqldelight.Query
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
@@ -25,6 +28,7 @@ import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.sqldelight.queries.DatabaseQueries
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.collectFirst
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,35 +39,70 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 
 abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val wrapper: DatabaseQueries<ENTITY>) :
     Repository<ENTITY> {
 
+    override fun allSync(sorting: FilterParameter<Boolean>?, filter: FiltersList?): List<ENTITY> {
+        throw IllegalArgumentException("Must override allSync")
+    }
+
+    override fun all(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<List<ENTITY>> {
+        throw IllegalArgumentException("Must override all")
+    }
+
+    override fun paging(sorting: FilterParameter<Boolean>?, filter: FiltersList?): Flow<PagingData<ENTITY>> {
+        throw IllegalArgumentException("Must override paging")
+    }
+
+    override fun count(): Long {
+        throw IllegalArgumentException("Must override count")
+    }
+
     override fun getSync(id: Long, where: Long?): ENTITY {
         return wrapper.get(id, where).executeAsOne()
     }
 
-    private fun queryAll(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?): Query<ENTITY> {
-        val accenting = sorting?.value ?: true
-        val sortKey = sorting?.key ?: "name"
-        return if (accenting)
-            wrapper.allAsc(sortKey, filter)
-        else
-            wrapper.allDesc(sortKey, filter)
+    private fun queryAll(
+        sorting: FilterParameter<Boolean>?, filter: FiltersList?,
+        vararg args: Pair<String, Any?>
+    ): Query<ENTITY> {
+        return wrapper.all(sorting, filter, *args)
     }
 
-    override fun allSync(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?, page: Int): List<ENTITY> =
-        queryAll(sorting, filter).executeAsList()
+    override fun allSync(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+        vararg args: Pair<String, Any?>
+    ): List<ENTITY> =
+        queryAll(sorting, filter, *args).executeAsList()
 
 
-    override fun all(sorting: FilterParameter<Boolean>?, filter: List<FilterParameter<*>>?, page: Int): Flow<List<ENTITY>> =
-        queryAll(sorting, filter).asFlow().mapToList(Dispatchers.IO)
+    override fun all(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+        vararg args: Pair<String, Any?>
+    ): Flow<List<ENTITY>> = queryAll(sorting, filter, *args).asFlow().mapToList(Dispatchers.IO)
 
     override fun observe(id: Long): Flow<ENTITY> {
         if (id < 0) return MutableStateFlow(wrapper.empty())
         return wrapper.get(id).asFlow().mapToOne(Dispatchers.IO)
+    }
+
+    override fun paging(
+        sorting: FilterParameter<Boolean>?,
+        filter: FiltersList?,
+        vararg args: Pair<String, Any?>
+    ): Flow<PagingData<ENTITY>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 5,
+                enablePlaceholders = false,
+            ),
+            pagingSourceFactory = { wrapper.paging(sorting, filter, *args) },
+            initialKey = 0
+        ).flow
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,7 +125,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
         return flow {
             if (entity.rowid < 0 || !contains(entity)) {
                 wrapper.transactionWithResult {
-                    doUpsert(entity).single()
+                    wrapper.add(entity)
                     val id = lastInsertRowId()
                     entity.rowid = id
                     emit(entity)
@@ -100,9 +139,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
     override fun update(entity: ENTITY): Flow<ENTITY> {
         return flow {
             if (contains(entity)) {
-                doUpsert(entity, false).collect {
-                    emit(entity)
-                }
+                wrapper.update(entity)
             } else {
                 throw Exception("Can't update entity: $entity which doesn't exist in the database.")
             }
@@ -125,9 +162,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
         return flow {
             val idExists = contains(id, where)
             if (idExists) {
-                doDelete(id, where).collect {
-                    emit(true)
-                }
+                wrapper.remove(id, where)
             } else {
                 throw Exception("Can't remove entity with id: $id which doesn't exist in the database.")
             }
@@ -145,16 +180,13 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
         return wrapper.contains(id, where).executeAsOne() != 0L
     }
 
-    override fun count(): Long {
-        return wrapper.count().executeAsOne()
+    override fun count(vararg args: Pair<String, Any?>): Long {
+        return wrapper.count(*args).executeAsOne()
     }
 
     override fun lastInsertRowId(): Long {
         return wrapper.lastInsertRowId().executeAsOne()
     }
-
-
-    protected abstract fun doUpsert(entity: ENTITY, add: Boolean = true): Flow<ENTITY>
 
     protected open fun doDelete(id: Long, where: Long? = null): Flow<Unit> {
         return flow {

@@ -12,11 +12,9 @@ CREATE TABLE CigarHumidorTable (
 get:
 SELECT CigarHumidorTable.* FROM CigarHumidorTable WHERE humidorId = :humidorId AND cigarId = :cigarId;
 
-allAsc:
+all:
 SELECT * FROM CigarHumidorTable;
 
-allDesc:
-SELECT * FROM CigarHumidorTable;
 
 add:
 INSERT INTO CigarHumidorTable (count, humidorId, cigarId)
@@ -43,7 +41,6 @@ SELECT COUNT(*) FROM CigarHumidorTable WHERE cigarId=:id;
 cigarsCount:
 SELECT COUNT(*) FROM CigarHumidorTable WHERE humidorId=:id;
 
-
 contains:
 SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :rowid AND cigarId = :cigarId;
 
@@ -53,5 +50,14 @@ SELECT last_insert_rowid();
 cigarHumidors:
 SELECT *  FROM CigarHumidorTable WHERE cigarId = :cigar;
 
+pagedCigarHumidors:
+    SELECT * FROM CigarHumidorTable WHERE cigarId = :cigar
+    LIMIT :limit OFFSET :offset;
+
+
 humidorCigars:
 SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
+
+pagedHumidorCigars:
+    SELECT * FROM CigarHumidorTable WHERE humidorId = :humidor
+    LIMIT :limit OFFSET :offset;

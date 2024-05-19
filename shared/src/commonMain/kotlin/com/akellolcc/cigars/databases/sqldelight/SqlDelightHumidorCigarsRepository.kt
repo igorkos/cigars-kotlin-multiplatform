@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/29/24, 8:54 PM
+ * Last modified 5/19/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,24 +16,15 @@
 
 package com.akellolcc.cigars.databases.sqldelight
 
-import app.cash.sqldelight.Query
-import com.akellolcc.cigars.databases.CigarHumidorTable
 import com.akellolcc.cigars.databases.HumidorCigarsDatabaseQueries
 import com.akellolcc.cigars.databases.repository.HumidorCigarsRepository
+import com.akellolcc.cigars.databases.sqldelight.queries.HUMIDOR_ID
 import com.akellolcc.cigars.utils.ObjectFactory
 
 class SqlDelightHumidorCigarsRepository(
     private val humidorId: Long,
     queries: HumidorCigarsDatabaseQueries
-) : SqlDelightBaseCigarHumidorRepository(queries), HumidorCigarsRepository {
-
-    override fun observeAllQuery(): Query<CigarHumidorTable> {
-        return queries.humidorCigars(humidorId)
-    }
-
-    override fun count(): Long {
-        return queries.cigarsCount(humidorId).executeAsOne()
-    }
+) : SqlDelightBaseCigarHumidorRepository(queries, Pair(HUMIDOR_ID, humidorId)), HumidorCigarsRepository {
 
     companion object Factory : ObjectFactory<SqlDelightHumidorCigarsRepository>() {
         override fun factory(data: Any?): SqlDelightHumidorCigarsRepository {
