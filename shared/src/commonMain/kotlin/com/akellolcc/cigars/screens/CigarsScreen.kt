@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 8:35 PM
+ * Last modified 5/22/24, 11:37 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,7 +102,7 @@ open class CigarsListScreen<V : ScreenModel>(
     }
 
     @Composable
-    override fun ListHeader(modifier: Modifier) {
+    override fun ContentHeader(modifier: Modifier) {
         if (viewModel.search) {
             SearchComponent(
                 modifier = modifier,

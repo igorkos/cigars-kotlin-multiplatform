@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/18/24, 12:37 PM
+ * Last modified 5/22/24, 9:43 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import app.cash.paging.compose.collectAsLazyPagingItems
@@ -185,6 +186,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
                 } else {
                     // Log.debug("${this::class.simpleName} items count: ${pagingItems.itemCount}")
                     LazyColumn(
+                        modifier = Modifier.testTag("${route.route}-List"),
                         state = listState,
                         verticalArrangement = Arrangement.Top,
                     )
@@ -242,22 +244,30 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
             },
             actions = {
                 if (route.isSearchEnabled) {
-                    IconButton(onClick = { viewModel.updateSearch(!viewModel.search) }) {
+                    IconButton(
+                        modifier = Modifier.testTag("${route.route}-Filter"),
+                        onClick = { viewModel.updateSearch(!viewModel.search) }) {
                         loadIcon(
                             Images.tab_icon_search,
                             Size(24.0F, 24.0F)
                         )
                     }
                 }
-                IconButton(onClick = { viewModel.sortingOrder(!viewModel.accenting) }) {
+                IconButton(
+                    modifier = Modifier.testTag("${route.route}-Sort"),
+                    onClick = { viewModel.sortingOrder(!viewModel.accenting) }) {
                     loadIcon(
                         if (viewModel.accenting) Images.icon_menu_sort_alpha_asc else Images.icon_menu_sort_alpha_desc,
                         Size(24.0F, 24.0F)
                     )
                 }
-                IconButton(onClick = { expanded = !expanded }) {
+                IconButton(modifier = Modifier.testTag("${route.route}-SortField"),
+                    onClick = { expanded = !expanded }) {
                     loadIcon(Images.icon_menu, Size(24.0F, 24.0F))
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    DropdownMenu(
+                        modifier = Modifier.testTag("${route.route}-Menu"),
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }) {
                         RightActionMenu {
                             expanded = false
                         }

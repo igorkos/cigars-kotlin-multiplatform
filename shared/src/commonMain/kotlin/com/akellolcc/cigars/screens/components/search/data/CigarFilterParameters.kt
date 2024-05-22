@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:02 PM
+ * Last modified 5/22/24, 10:05 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,13 +20,11 @@ import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.screens.components.search.CigarsSearchBrandField
 import com.akellolcc.cigars.screens.components.search.CigarsSearchParameterField
 import com.akellolcc.cigars.screens.components.search.SearchParameterField
-import com.akellolcc.cigars.theme.Images
 
 class CigarFilterParameters : FilterCollection() {
     init {
-        params = FiltersList(CigarSortingFields.enumValues().map {
-            FilterParameter(it.first.value, it.first.value, it.second, Images.icon_menu_sort)
-        })
+        params = CigarSortingFields.filterList()
+        selectedParams = FiltersList(params.filter { it.key == CigarSortingFields.Name.value })
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -41,9 +39,7 @@ class CigarFilterParameters : FilterCollection() {
 
 class CigarSortingParameters : FilterCollection() {
     init {
-        params = FiltersList(CigarSortingFields.enumValues().map {
-            FilterParameter(it.first.value, true, it.second, Images.icon_menu_sort)
-        })
+        params = CigarSortingFields.sortingList()
         selectedParams = params
     }
 
@@ -54,15 +50,7 @@ class CigarSortingParameters : FilterCollection() {
 
 class CigarSearchParameters : FilterCollection() {
     init {
-        params = FiltersList(CigarSortingFields.enumValues().filter {
-            it.first != CigarSortingFields.Shape
-        }.map {
-            if (it.first == CigarSortingFields.Brand || it.first == CigarSortingFields.Name || it.first == CigarSortingFields.Country) {
-                FilterParameter(it.first.value, "", it.second, Images.icon_menu_sort)
-            } else {
-                FilterParameter(it.first.value, 0L, it.second, Images.icon_menu_sort)
-            }
-        })
+        params = CigarSortingFields.filterList()
         selectedParams = FiltersList(params.filter { it.key == CigarSortingFields.Name.value })
         controls = selectedParams.map { build(it) }
     }

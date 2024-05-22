@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/18/24, 6:22 PM
+ * Last modified 5/22/24, 11:37 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,8 @@ package com.akellolcc.cigars.databases.models
 
 import androidx.compose.runtime.Stable
 import com.akellolcc.cigars.databases.CigarsTable
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.theme.Localize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -264,7 +266,22 @@ enum class CigarSortingFields(val value: String) {
             }.toTypedArray()
         }
 
-        private fun localized(value: CigarSortingFields): String {
+        fun filterList(): FiltersList {
+            return FiltersList(CigarSortingFields.entries.map {
+                when (it) {
+                    Name, Brand, Country, Shape -> FilterParameter(it.value, "")
+                    Gauge, Length -> FilterParameter(it.value, 0L)
+                }
+            })
+        }
+
+        fun sortingList(): FiltersList {
+            return FiltersList(CigarSortingFields.entries.map {
+                FilterParameter(it.value, true, localized(it))
+            })
+        }
+
+        fun localized(value: CigarSortingFields): String {
             return when (value) {
                 Name -> Localize.cigar_details_name
                 Brand -> Localize.cigar_details_company

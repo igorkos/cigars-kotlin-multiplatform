@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 12:57 PM
+ * Last modified 5/22/24, 11:37 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,8 @@ data class FilterParameter<T>(val key: String, var value: T, val label: String, 
     Comparable<FilterParameter<T>> {
 
     constructor(key: String, value: T) : this(key, value, "", Images.tab_icon_search)
+
+    constructor(key: String, value: T, label: String) : this(key, value, label, Images.tab_icon_search)
 
     val keyboardType: InputMode
         get() = when (value) {

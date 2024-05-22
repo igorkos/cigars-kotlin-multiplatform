@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 7:26 PM
+ * Last modified 5/21/24, 11:34 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -140,14 +140,14 @@ class Database(override val inMemory: Boolean) : DatabaseInterface {
                     it.rowid = -1
                     it
                 }
-                var multiply = listOf<Cigar>()
+                /*var multiply = listOf<Cigar>()
                 for (i in 0..10) {
                     multiply = multiply + cigars
                 }
                 multiply = multiply.map {
                     it.copy(rowid = -1)
-                }
-                cigarsDatabase.addAll(multiply, humidor)
+                }*/
+                cigarsDatabase.addAll(cigars, humidor)
             }.flatMapConcat {
                 it.asFlow()
             }.flatMapConcat { cigar ->
