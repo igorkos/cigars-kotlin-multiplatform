@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 6:03 PM
+ * Last modified 5/28/24, 2:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,9 +38,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.logging.AnalyticsEvents
 import com.akellolcc.cigars.logging.AnalyticsParams
@@ -60,12 +62,12 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient
 
-private var tabs: List<ITabItem<*>> = listOf(
+/*private var tabs: List<ITabItem<*>> = listOf(
     CigarsScreen(CigarsRoute),
     HumidorsScreen(HumidorsRoute),
     FavoritesScreen(FavoritesRoute),
     SearchScreen(SearchCigarRoute)
-)
+)*/
 
 class MainScreen :
     ITabItem<MainScreenViewModel> {
@@ -75,8 +77,10 @@ class MainScreen :
     @Transient
     override lateinit var viewModel: MainScreenViewModel
 
+    @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
+
         viewModel =
             rememberScreenModel { createViewModel(MainScreenViewModel::class) }
 
@@ -121,7 +125,21 @@ class MainScreen :
                 },
                 gesturesEnabled = viewModel.isTabsVisible,
             ) {
-                TabNavigator(tabs[0]) {
+                TabNavigator(
+                    CigarsScreen(CigarsRoute),
+                    tabDisposable = {
+                        TabDisposable(
+                            navigator = it,
+                            tabs = listOf(
+                                CigarsScreen(CigarsRoute),
+                                HumidorsScreen(HumidorsRoute),
+                                FavoritesScreen(FavoritesRoute),
+                                SearchScreen(SearchCigarRoute)
+                            )
+                        )
+                    }
+
+                ) {
                     Scaffold(
                         bottomBar = {
                             AnimatedVisibility(
@@ -133,9 +151,11 @@ class MainScreen :
                                     height
                                 }) {
                                 NavigationBar {
-                                    tabs.forEach {
-                                        TabNavigationItem(it.route, tabs)
-                                    }
+                                    TabNavigationItem(CigarsScreen(CigarsRoute))
+                                    TabNavigationItem(HumidorsScreen(HumidorsRoute))
+                                    TabNavigationItem(FavoritesScreen(FavoritesRoute))
+                                    TabNavigationItem(SearchScreen(SearchCigarRoute))
+
                                 }
                             }
                         },
@@ -149,22 +169,19 @@ class MainScreen :
 }
 
 @Composable
-fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem<*>>) {
+fun RowScope.TabNavigationItem(tab: ITabItem<*>) {
     val tabNavigator = LocalTabNavigator.current
-    val selected = (tabNavigator.current as ITabItem<*>).route.route == tab.route
     NavigationBarItem(
-        selected = selected,
+        selected = tabNavigator.current == tab,
         onClick = {
-            tabNavigator.current = tabs.first {
-                it.route.route == tab.route
-            }
+            tabNavigator.current = tab
             Log.debug(
-                "Selected tab ${tab.route}", AnalyticsEvents.ScreenEnter, mapOf(
-                    AnalyticsParams.ContentId.parm to tab.route
+                "Selected tab ${tab.route.route}", AnalyticsEvents.ScreenEnter, mapOf(
+                    AnalyticsParams.ContentId.parm to tab.route.route
                 )
             )
         },
-        icon = { loadIcon(tab.icon, Size(width = 24f, height = 24f)) },
-        label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
+        icon = { loadIcon(tab.route.icon, Size(width = 24f, height = 24f)) },
+        label = { TextStyled(text = tab.route.title, style = TextStyles.BarItemTitle) },
     )
 }

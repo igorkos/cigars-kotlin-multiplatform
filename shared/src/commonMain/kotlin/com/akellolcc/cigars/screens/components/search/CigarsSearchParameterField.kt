@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 4:11 PM
+ * Last modified 5/27/24, 11:33 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
@@ -74,19 +75,19 @@ class CigarsSearchParameterField<T : Comparable<T>>(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("SearchParameterField-${parameter.key}"),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (showLeading) {
                 IconButton(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier.testTag("SearchParameterField-${parameter.key}-leading").wrapContentSize(),
                     onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }
             }
             TextStyled(
-                modifier = Modifier.weight(1f).onFocusChanged {
+                modifier = Modifier.testTag("SearchParameterField-${parameter.key}-input").weight(1f).onFocusChanged {
                     viewModel.onFocusChange(it.isFocused)
                 },
                 label = parameter.label,

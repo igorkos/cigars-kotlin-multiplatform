@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:24 PM
+ * Last modified 5/29/24, 2:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -140,6 +140,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
         return flow {
             if (contains(entity)) {
                 wrapper.update(entity)
+                emit(entity)
             } else {
                 throw Exception("Can't update entity: $entity which doesn't exist in the database.")
             }
@@ -163,6 +164,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
             val idExists = contains(id, where)
             if (idExists) {
                 wrapper.remove(id, where)
+                emit(true)
             } else {
                 throw Exception("Can't remove entity with id: $id which doesn't exist in the database.")
             }

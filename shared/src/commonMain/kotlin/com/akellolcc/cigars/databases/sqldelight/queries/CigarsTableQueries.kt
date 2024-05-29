@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:30 PM
+ * Last modified 5/28/24, 1:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,32 +39,59 @@ class CigarsTableQueries(override val queries: CigarsDatabaseQueries) : Database
 
     override fun all(sorting: FilterParameter<Boolean>?, filter: FiltersList?, vararg args: Pair<String, Any?>): Query<Cigar> {
         val sortBy = sorting?.key ?: "name"
+        FiltersList
         return if (sorting?.value != false) {
-            return queries.allAsc(
-                FiltersList.getSQLWhere<String>(filter, "name"),
-                FiltersList.getSQLWhere<String>(filter, "brand"),
-                FiltersList.getSQLWhere<String>(filter, "country"),
-                FiltersList.getSQLWhere<Long>(filter, "date"),
-                FiltersList.getSQLWhere<String>(filter, "cigar"),
-                FiltersList.getSQLWhere<Long>(filter, "gauge"),
-                FiltersList.getSQLWhere<String>(filter, "length"),
-                FiltersList.getSQLWhere<Long>(filter, "strength"),
-                FiltersList.getSQLWhere<Boolean>(filter, "favorites"),
-                sortBy, ::cigarFactory
-            )
+            if (filter?.hasParameter(FAVORITES_ID) == true) {
+                queries.favoritesAllAsc(
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    FiltersList.getSQLWhere<String>(filter, "country"),
+                    FiltersList.getSQLWhere<Long>(filter, "date"),
+                    FiltersList.getSQLWhere<String>(filter, "cigar"),
+                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                    FiltersList.getSQLWhere<String>(filter, "length"),
+                    FiltersList.getSQLWhere<Long>(filter, "strength"),
+                    sortBy, ::cigarFactory
+                )
+            } else {
+                queries.allAsc(
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    FiltersList.getSQLWhere<String>(filter, "country"),
+                    FiltersList.getSQLWhere<Long>(filter, "date"),
+                    FiltersList.getSQLWhere<String>(filter, "cigar"),
+                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                    FiltersList.getSQLWhere<String>(filter, "length"),
+                    FiltersList.getSQLWhere<Long>(filter, "strength"),
+                    sortBy, ::cigarFactory
+                )
+            }
         } else {
-            queries.allDesc(
-                FiltersList.getSQLWhere<String>(filter, "name"),
-                FiltersList.getSQLWhere<String>(filter, "brand"),
-                FiltersList.getSQLWhere<String>(filter, "country"),
-                FiltersList.getSQLWhere<Long>(filter, "date"),
-                FiltersList.getSQLWhere<String>(filter, "cigar"),
-                FiltersList.getSQLWhere<Long>(filter, "gauge"),
-                FiltersList.getSQLWhere<String>(filter, "length"),
-                FiltersList.getSQLWhere<Long>(filter, "strength"),
-                FiltersList.getSQLWhere<Boolean>(filter, "favorites"),
-                sortBy, ::cigarFactory
-            )
+            if (filter?.hasParameter(FAVORITES_ID) == true) {
+                queries.favoritesAllDesc(
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    FiltersList.getSQLWhere<String>(filter, "country"),
+                    FiltersList.getSQLWhere<Long>(filter, "date"),
+                    FiltersList.getSQLWhere<String>(filter, "cigar"),
+                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                    FiltersList.getSQLWhere<String>(filter, "length"),
+                    FiltersList.getSQLWhere<Long>(filter, "strength"),
+                    sortBy, ::cigarFactory
+                )
+            } else {
+                queries.allDesc(
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    FiltersList.getSQLWhere<String>(filter, "country"),
+                    FiltersList.getSQLWhere<Long>(filter, "date"),
+                    FiltersList.getSQLWhere<String>(filter, "cigar"),
+                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                    FiltersList.getSQLWhere<String>(filter, "length"),
+                    FiltersList.getSQLWhere<Long>(filter, "strength"),
+                    sortBy, ::cigarFactory
+                )
+            }
         }
     }
 
@@ -78,37 +105,69 @@ class CigarsTableQueries(override val queries: CigarsDatabaseQueries) : Database
         fun queryProvider(limit: Long, offset: Long): Query<Cigar> {
             Log.debug("Querying sort acs: $accenting filter:$filter sort:$sortKey offset->  from:$offset count:$limit")
             return if (accenting) {
-                queries.pagedAsc(
-                    FiltersList.getSQLWhere<String>(filter, "name"),
-                    FiltersList.getSQLWhere<String>(filter, "brand"),
-                    FiltersList.getSQLWhere<String>(filter, "country"),
-                    FiltersList.getSQLWhere<Long>(filter, "date"),
-                    FiltersList.getSQLWhere<String>(filter, "cigar"),
-                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
-                    FiltersList.getSQLWhere<String>(filter, "length"),
-                    FiltersList.getSQLWhere<Long>(filter, "strength"),
-                    FiltersList.getSQLWhere<Boolean>(filter, "favorites"),
-                    sortKey,
-                    limit,
-                    offset,
-                    ::cigarFactory
-                )
+                if (filter?.hasParameter(FAVORITES_ID) == true) {
+                    queries.favoritesPagedAsc(
+                        FiltersList.getSQLWhere<String>(filter, "name"),
+                        FiltersList.getSQLWhere<String>(filter, "brand"),
+                        FiltersList.getSQLWhere<String>(filter, "country"),
+                        FiltersList.getSQLWhere<Long>(filter, "date"),
+                        FiltersList.getSQLWhere<String>(filter, "cigar"),
+                        FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                        FiltersList.getSQLWhere<String>(filter, "length"),
+                        FiltersList.getSQLWhere<Long>(filter, "strength"),
+                        sortKey,
+                        limit,
+                        offset,
+                        ::cigarFactory
+                    )
+                } else {
+                    queries.pagedAsc(
+                        FiltersList.getSQLWhere<String>(filter, "name"),
+                        FiltersList.getSQLWhere<String>(filter, "brand"),
+                        FiltersList.getSQLWhere<String>(filter, "country"),
+                        FiltersList.getSQLWhere<Long>(filter, "date"),
+                        FiltersList.getSQLWhere<String>(filter, "cigar"),
+                        FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                        FiltersList.getSQLWhere<String>(filter, "length"),
+                        FiltersList.getSQLWhere<Long>(filter, "strength"),
+                        sortKey,
+                        limit,
+                        offset,
+                        ::cigarFactory
+                    )
+                }
             } else {
-                queries.pagedDesc(
-                    FiltersList.getSQLWhere<String>(filter, "name"),
-                    FiltersList.getSQLWhere<String>(filter, "brand"),
-                    FiltersList.getSQLWhere<String>(filter, "country"),
-                    FiltersList.getSQLWhere<Long>(filter, "date"),
-                    FiltersList.getSQLWhere<String>(filter, "cigar"),
-                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
-                    FiltersList.getSQLWhere<String>(filter, "length"),
-                    FiltersList.getSQLWhere<Long>(filter, "strength"),
-                    FiltersList.getSQLWhere<Boolean>(filter, "favorites"),
-                    sortKey,
-                    limit,
-                    offset,
-                    ::cigarFactory
-                )
+                if (filter?.hasParameter(FAVORITES_ID) == true) {
+                    queries.favoritesPagedDesc(
+                        FiltersList.getSQLWhere<String>(filter, "name"),
+                        FiltersList.getSQLWhere<String>(filter, "brand"),
+                        FiltersList.getSQLWhere<String>(filter, "country"),
+                        FiltersList.getSQLWhere<Long>(filter, "date"),
+                        FiltersList.getSQLWhere<String>(filter, "cigar"),
+                        FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                        FiltersList.getSQLWhere<String>(filter, "length"),
+                        FiltersList.getSQLWhere<Long>(filter, "strength"),
+                        sortKey,
+                        limit,
+                        offset,
+                        ::cigarFactory
+                    )
+                } else {
+                    queries.pagedDesc(
+                        FiltersList.getSQLWhere<String>(filter, "name"),
+                        FiltersList.getSQLWhere<String>(filter, "brand"),
+                        FiltersList.getSQLWhere<String>(filter, "country"),
+                        FiltersList.getSQLWhere<Long>(filter, "date"),
+                        FiltersList.getSQLWhere<String>(filter, "cigar"),
+                        FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                        FiltersList.getSQLWhere<String>(filter, "length"),
+                        FiltersList.getSQLWhere<Long>(filter, "strength"),
+                        sortKey,
+                        limit,
+                        offset,
+                        ::cigarFactory
+                    )
+                }
             }
         }
         return QueryPagingSource(

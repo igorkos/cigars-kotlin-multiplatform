@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:21 PM
+ * Last modified 5/27/24, 11:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 
 package com.akellolcc.cigars.mvvm.search
 
+import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
 
@@ -23,7 +24,16 @@ class CigarsSearchFieldViewModel(parameter: FilterParameter<*>) :
     CigarsSearchFieldBaseViewModel(parameter) {
 
     override fun validate(): Boolean {
-        val valid = value.isNotEmpty() && value.length >= 3
+        val valid = when (parameter.key) {
+            CigarSortingFields.Gauge.value, CigarSortingFields.Length.value -> {
+                true
+            }
+
+            else -> {
+                value.isEmpty() || value.length >= 3
+            }
+        }
+
         annotation = if (valid) {
             null
         } else {

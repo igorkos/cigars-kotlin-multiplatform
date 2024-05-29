@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 10:15 PM
+ * Last modified 5/29/24, 2:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -218,9 +218,10 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
         }
     }
 
-    fun moveToHumidors(): List<ValuePickerItem<Humidor>> {
-        return humidorsRepository.allSync()
-            .map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
+    fun moveToHumidors(from: Humidor?): List<ValuePickerItem<Humidor>> {
+        val allHumidors = humidorsRepository.allSync()
+        val to = if (from == null) allHumidors else allHumidors - from
+        return to.map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }
     }
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long) {

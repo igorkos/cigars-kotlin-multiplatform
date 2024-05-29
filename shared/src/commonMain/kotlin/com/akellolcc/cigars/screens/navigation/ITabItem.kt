@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 1:16 AM
+ * Last modified 5/28/24, 10:25 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,4 +40,9 @@ interface ITabItem<VM : ScreenModel> : Tab {
                 )
             }
         }
+
+    fun tag(component: String? = null): String {
+        if (component == null) return route.route
+        return "${route.route}-$component"
+    }
 }

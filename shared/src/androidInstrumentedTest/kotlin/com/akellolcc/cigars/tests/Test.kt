@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 12:09 AM
+ * Last modified 5/29/24, 4:18 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  ******************************************************************************************************************************************/
 
 
-package com.akellolcc.cigars
+package com.akellolcc.cigars.tests
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +23,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
+import com.akellolcc.cigars.CigarsApplication
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.pressButton
 import com.akellolcc.cigars.utils.setAppContext
@@ -48,7 +49,7 @@ class CigarsAppTest : BaseUiTest() {
             }
             waitForText("Cigars")
             sleep(500)
-            onNodeWithTag("CigarsListScreen-List").onChildren().assertCountEquals(5)
+            onNodeWithTag("CigarsScreen-List").onChildren().assertCountEquals(5)
             textIsDisplayed("#1", true)
             textIsDisplayed("#2", true)
             textIsDisplayed("#3", true)
@@ -58,14 +59,14 @@ class CigarsAppTest : BaseUiTest() {
             pressButton("Humidors")
             waitForText("Humidors")
             sleep(500)
-            onNodeWithTag("HumidorsListScreen-List").onChildren().assertCountEquals(2)
+            onNodeWithTag("HumidorsScreen-List").onChildren().assertCountEquals(2)
             textIsDisplayed("Case Elegance Renzo Humidor")
             textIsDisplayed("Second")
 
             pressButton("Favorites")
             waitForText("Favorites")
             sleep(500)
-            onNodeWithTag("FavoritesListScreen-List").assertDoesNotExist()
+            onNodeWithTag("FavoritesScreen-List").assertDoesNotExist()
             textIsDisplayed("Nothing to show")
 
             pressButton("Search")

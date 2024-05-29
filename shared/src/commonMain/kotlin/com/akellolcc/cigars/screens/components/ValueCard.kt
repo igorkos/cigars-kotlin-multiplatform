@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 12:32 AM
+ * Last modified 5/27/24, 1:21 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
@@ -86,7 +87,7 @@ fun ValuesCard(
     onAction: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    Box {
+    Box(modifier = Modifier.testTag("ValuesCard-Container")) {
         OutlinedCard(
             colors = CardDefaults.cardColors(
                 materialColor(MaterialColors.color_transparent),
@@ -98,14 +99,14 @@ fun ValuesCard(
         ) {
             if (vertical) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("ValuesCard-Vertical"),
                     horizontalAlignment = Alignment.Start
                 ) {
                     content()
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("ValuesCard-Horizontal"),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -117,7 +118,7 @@ fun ValuesCard(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)
-                    .background(materialColor(MaterialColors.color_transparent))
+                    .background(materialColor(MaterialColors.color_transparent)).testTag("ValuesCard-Header")
             ) {
                 TextStyled(
                     label,
@@ -135,7 +136,7 @@ fun ValuesCard(
                         )
                         IconButton(
                             modifier = Modifier.size(24.dp)
-                                .background(materialColor(MaterialColors.color_transparent)),
+                                .background(materialColor(MaterialColors.color_transparent)).testTag("ValuesCard-Action"),
                             onClick = { onAction?.invoke() }) {
                             loadIcon(
                                 actionIcon,

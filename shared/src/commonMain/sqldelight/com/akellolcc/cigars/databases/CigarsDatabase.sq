@@ -38,8 +38,7 @@ allAsc:
         cigar LIKE :cigar AND
         gauge >= :gauge AND
         length >= :length AND
-        strength >= :strength AND
-        favorites == :favorites
+        strength >= :strength
      ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
@@ -64,8 +63,7 @@ allDesc:
                cigar LIKE :cigar AND
                gauge >= :gauge AND
                length >= :length AND
-               strength >= :strength AND
-               favorites == :favorites
+               strength >= :strength
        ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
@@ -89,8 +87,7 @@ pagedAsc:
         cigar LIKE :cigar AND
         gauge >= :gauge AND
         length >= :length AND
-        strength >= :strength AND
-        favorites == :favorites
+        strength >= :strength
      ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
@@ -115,8 +112,110 @@ pagedDesc:
                cigar LIKE :cigar AND
                gauge >= :gauge AND
                length >= :length AND
+               strength >= :strength
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC
+    LIMIT :limit OFFSET :offset;
+
+favoritesAllAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength AND
+        favorites == 1
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC;
+
+
+favoritesAllDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
                strength >= :strength AND
-               favorites == :favorites
+               favorites == 1
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC;
+
+favoritesPagedAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength AND
+        favorites == 1
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC
+    LIMIT :limit OFFSET :offset;
+
+favoritesPagedDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength AND
+               favorites == 1
        ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand

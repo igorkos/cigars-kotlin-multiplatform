@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:08 PM
+ * Last modified 5/29/24, 4:14 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.CigarHistoryRepository
 import com.akellolcc.cigars.databases.repository.CigarHumidorRepository
+import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorHistoryRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
@@ -59,8 +60,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         var updated: HumidorCigar? = null
         return super.update(entity.copy(count = count)).flatMapConcat {
             updated = it
-            val cigarsHistoryDatabase: HistoryRepository =
-                createRepository(CigarHistoryRepository::class, entity.cigar.rowid)
+            val cigarsHistoryDatabase: HistoryRepository = createRepository(CigarHistoryRepository::class, entity.cigar.rowid)
             Log.info("UpdateCount: Add Cigar History item ${HistoryType.localized(type)}")
             cigarsHistoryDatabase.add(
                 History(
@@ -75,6 +75,9 @@ abstract class SqlDelightBaseCigarHumidorRepository(
                     entity.humidor
                 )
             )
+        }.flatMapConcat {
+            val cigarsRepository: CigarsRepository = createRepository(CigarsRepository::class)
+            cigarsRepository.update(entity.cigar.copy(count = count))
         }.map { updated!! }.catch {
             Log.error("Error while updating humidor cigars count $it")
         }
@@ -100,14 +103,14 @@ abstract class SqlDelightBaseCigarHumidorRepository(
             //update count of cigars left in humidor from we move
             //else remove cigar from humidor
             if (from.count > count) {
-                //Log.info("Update count of cigars left in humidor from we move")
+                Log.info("Update count of cigars left in humidor from we move")
                 humidorsRepository.updateCigarsCount(from.humidor.rowid, count = from.humidor.count - count).collect {
                     update(from.copy(count = from.count - count)).collect {
                         emit(true)
                     }
                 }
             } else {
-                //Log.info("All Cigars is moved from humidor")
+                Log.info("All Cigars is moved from humidor")
                 remove(from.cigar, from.humidor).collect { emit(it) }
             }
         }.flatMapConcat {
@@ -117,19 +120,19 @@ abstract class SqlDelightBaseCigarHumidorRepository(
             //else update count of cigar in existing entry
             val toEntry = find(from.cigar, to)
             if (toEntry == null) {
-                //Log.info("Add cigar to humidor")
+                Log.info("Add cigar to humidor")
                 add(from.cigar, to, count)
             } else {
-                //Log.info("Update count of cigar we moved to humidor")
+                Log.info("Update count of cigar we moved to humidor")
                 update(toEntry.copy(count = toEntry.count + count))
             }
         }.flatMapConcat {
             // Update total count of cigars in humidor where we move
-            //Log.info("Update total count of cigars left in humidor from we move $to")
+            Log.info("Update total count of cigars left in humidor from we move $to")
             val humidor = humidorsRepository.getSync(to.rowid)
             humidorsRepository.updateCigarsCount(to.rowid, humidor.count + count)
         }.flatMapConcat {
-            //Log.info("Add history item Move From")
+            Log.info("Add history item Move From")
             humidorHistoryRepository.add(
                 History(
                     -1L,
@@ -146,7 +149,7 @@ abstract class SqlDelightBaseCigarHumidorRepository(
         }.catch {
             Log.error("Error while moving cigars $it")
         }.flatMapConcat {
-            //Log.info("Finished moving cigar")
+            Log.info("Finished moving cigar")
             flowOf(true)
         }
     }
@@ -182,10 +185,10 @@ abstract class SqlDelightBaseCigarHumidorRepository(
     }
 
     override fun remove(cigar: Cigar, from: Humidor): Flow<Boolean> {
-        return remove(cigar.rowid, from.rowid)
+        return remove(from.rowid, cigar.rowid)
     }
 
     override fun find(cigar: Cigar, humidor: Humidor): HumidorCigar? {
-        return find(cigar.rowid, humidor.rowid)
+        return find(humidor.rowid, cigar.rowid)
     }
 }

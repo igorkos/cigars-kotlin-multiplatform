@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/18/24, 12:14 AM
+ * Last modified 5/27/24, 12:30 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -86,17 +87,17 @@ fun PagedCarousel(
         } else {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().testTag("ImagesCarousel"),
             ) { page ->
                 //Log.debug("Images1: ${images?.size}")
                 if (pagingItems.itemCount > 0) {
                     pagingItems[page]?.let {
-                        CarouselItem(it.bytes, scale) {
+                        CarouselItem(it.bytes, scale, page) {
                             onClick?.invoke(page)
                         }
                     }
                 } else {
-                    CarouselItem(null, scale, Images.default_cigar_image) {
+                    CarouselItem(null, scale, -1, Images.default_cigar_image) {
                         onClick?.invoke(page)
                     }
                 }
@@ -136,6 +137,7 @@ fun PagedCarousel(
 fun CarouselItem(
     image: ByteArray?,
     scale: ContentScale,
+    index: Int,
     default: ImageResource? = null,
     onClick: () -> Unit
 ) {
@@ -148,7 +150,7 @@ fun CarouselItem(
     Column(
         modifier = Modifier.fillMaxSize().clickable {
             onClick()
-        },
+        }.testTag("ImagesCarouselItem-$index"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

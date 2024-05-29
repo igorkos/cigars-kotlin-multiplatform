@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/8/24, 11:16 AM
+ * Last modified 5/22/24, 3:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.testTag
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
@@ -64,8 +65,8 @@ private data class SearchComponentImplement(
             }
         }
 
-        Column() {
-            viewModel.fields.controls.map {
+        Column(modifier = modifier) {
+            viewModel.fields.controls.mapIndexed { index, it ->
                 it.showLeading = fields.showLeading
                 it.onAction = { action ->
                     viewModel.onFieldAction(action)
@@ -81,7 +82,9 @@ private data class SearchComponentImplement(
                         title = Localize.button_title_add_search_field,
                         onClick = { viewModel.expanded = true }
                     )
-                    DropdownMenu(expanded = viewModel.expanded,
+                    DropdownMenu(
+                        modifier = Modifier.testTag("SearchComponent-FieldsMenu"),
+                        expanded = viewModel.expanded,
                         onDismissRequest = { viewModel.expanded = false }) {
                         fields.availableFields.map {
                             DropdownMenuItem(

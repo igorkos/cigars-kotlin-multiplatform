@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 9:43 AM
+ * Last modified 5/28/24, 3:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,17 +109,12 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
         val navigator = LocalNavigator.current
         val sharedViewModel = createViewModel(MainScreenViewModel::class)
 
-        LaunchedEffect(navigator) {
+        LaunchedEffect(navigator, viewModel) {
             if (sharedViewModel.isTabsVisible != route.isTabsVisible)
                 sharedViewModel.isTabsVisible = route.isTabsVisible
-        }
-
-        fun eventsObserver(event: A) {
-            handleAction(event, navigator)
-        }
-
-        LaunchedEffect(viewModel) {
-            viewModel.observeEvents(::eventsObserver)
+            viewModel.observeEvents {
+                handleAction(it, navigator)
+            }
         }
 
         val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 11:37 AM
+ * Last modified 5/22/24, 2:26 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -269,8 +269,8 @@ enum class CigarSortingFields(val value: String) {
         fun filterList(): FiltersList {
             return FiltersList(CigarSortingFields.entries.map {
                 when (it) {
-                    Name, Brand, Country, Shape -> FilterParameter(it.value, "")
-                    Gauge, Length -> FilterParameter(it.value, 0L)
+                    Name, Brand, Country, Shape -> FilterParameter(it.value, "", localized(it))
+                    Gauge, Length -> FilterParameter(it.value, 0L, localized(it))
                 }
             })
         }

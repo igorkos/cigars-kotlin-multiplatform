@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/9/24, 1:08 PM
+ * Last modified 5/28/24, 9:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,12 +20,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
@@ -49,7 +50,6 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.ui.pxToDp
-import com.akellolcc.cigars.utils.ui.screenWidth
 import dev.icerock.moko.resources.ColorResource
 import dev.icerock.moko.resources.ImageResource
 
@@ -71,13 +71,14 @@ fun <T : Comparable<T>> ValuePicker(
     var expanded by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf(value) }
     var with by remember { mutableStateOf(0) }
-    val screenWidth = screenWidth()
+
     LaunchedEffect(items) {
         if (items.size == 1 && items[0].value != null && selected?.value?.compareTo(items[0].value!!) != 0) {
             selected = items[0]
             onClick?.invoke(items[0])
         }
     }
+
     Column(
         modifier = modifier.fillMaxWidth().height(60.dp).background(
             materialColor(backgroundColor ?: MaterialColors.color_surfaceVariant),
@@ -93,7 +94,7 @@ fun <T : Comparable<T>> ValuePicker(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-
+                modifier = Modifier.weight(0.8f).testTag("value_picker_value")
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)
@@ -106,45 +107,55 @@ fun <T : Comparable<T>> ValuePicker(
                 TextStyled(
                     selected?.label,
                     TextStyles.Subhead,
+                    maxLines = 1,
+                    minLines = 1
                 )
             }
-            Column {
+            Column(
+                modifier = Modifier.weight(0.2f)
+            ) {
                 IconButton(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier.fillMaxSize().testTag("value_picker_drop_down"),
                     onClick = {
                         expanded = !expanded
                     }
                 ) {
-                    loadIcon(Images.icon_drop_down, Size(12.0F, 12.0F), tint = materialColor(MaterialColors.color_onSurfaceVariant))
-                }
-            }
-        }
-        if (items.size > 1) {
-            DropdownMenu(
-                expanded = expanded,
-                modifier = Modifier.width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
-                    .background(materialColor(MaterialColors.color_surfaceVariant)),
-                onDismissRequest = { expanded = false }
-            ) {
-                items.forEach {
-                    DropdownMenuItem(
-                        modifier = Modifier.width(with.pxToDp()),
-                        leadingIcon = { if (it.icon != null) loadIcon(it.icon) },
-                        text = {
-                            TextStyled(
-                                it.label,
-                                TextStyles.Subhead
-                            )
-                        },
-                        onClick = {
-                            expanded = false
-                            selected = it
-                            onClick?.invoke(it)
-                        }
+                    loadIcon(
+                        Images.icon_drop_down,
+                        Size(12.0F, 12.0F),
+                        tint = materialColor(if (items.size > 1) MaterialColors.color_onSurfaceVariant else MaterialColors.color_transparent)
                     )
                 }
             }
         }
+        //if (items.size > 1) {
+        DropdownMenu(
+            expanded = expanded,
+            modifier = Modifier.testTag("value_picker_list").width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
+                .background(materialColor(MaterialColors.color_surfaceVariant)),
+            onDismissRequest = { expanded = false }
+        ) {
+            items.forEach {
+                DropdownMenuItem(
+                    modifier = Modifier.width(with.pxToDp()),
+                    leadingIcon = { if (it.icon != null) loadIcon(it.icon) },
+                    text = {
+                        TextStyled(
+                            it.label,
+                            TextStyles.Subhead,
+                            maxLines = 1,
+                            minLines = 1
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        selected = it
+                        onClick?.invoke(it)
+                    }
+                )
+            }
+        }
+        // }
     }
 }
 

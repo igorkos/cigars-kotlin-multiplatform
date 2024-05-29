@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 1:09 PM
+ * Last modified 5/28/24, 12:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -107,8 +107,8 @@ fun TextStyled(
         TextField(
             modifier = modifier,
             value = textFieldState,
-            trailingIcon = trailingIcon ?: {
-                if (inputMode == InputMode.Text) {
+            trailingIcon = trailingIcon ?: if (inputMode == InputMode.Text) {
+                {
                     IconButton(
                         modifier = Modifier.wrapContentSize(),
                         onClick = {
@@ -119,9 +119,9 @@ fun TextStyled(
                         loadIcon(Images.icon_menu_delete, Size(8.0F, 8.0F))
                     }
                 }
-            },
-            label = {
-                if (label != null) {
+            } else null,
+            label = if (label != null) {
+                {
                     Text(
                         text = label,
                         color = styleLabel.color,
@@ -133,7 +133,7 @@ fun TextStyled(
                         minLines = 1
                     )
                 }
-            },
+            } else null,
             onValueChange = {
                 if (inputMode.validate(it.text)) {
                     textFieldState = it

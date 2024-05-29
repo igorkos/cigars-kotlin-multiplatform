@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 11:37 AM
+ * Last modified 5/28/24, 1:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.testTag
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
@@ -91,10 +92,10 @@ open class CigarsListScreen<V : ScreenModel>(
         when (event) {
             is CigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
-                mainModel.isTabsVisible = false
                 navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
                 }))
+                mainModel.isTabsVisible = false
             }
 
             is CigarsScreenViewModel.CigarsAction.ShowError -> TODO()
@@ -105,12 +106,13 @@ open class CigarsListScreen<V : ScreenModel>(
     override fun ContentHeader(modifier: Modifier) {
         if (viewModel.search) {
             SearchComponent(
-                modifier = modifier,
+                modifier = modifier.testTag("${route.route}-Search"),
                 fields = viewModel.searchingFields!!,
             ) { action ->
+                Log.debug("Search control action $action")
                 when (action) {
                     is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
-                        viewModel.paging()
+                        viewModel.paging(true)
                     }
 
                     else -> {}

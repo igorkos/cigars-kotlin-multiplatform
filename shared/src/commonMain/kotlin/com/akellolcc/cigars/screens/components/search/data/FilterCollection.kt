@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:32 PM
+ * Last modified 5/28/24, 1:07 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,10 @@ open class FiltersList(val list: List<FilterParameter<*>> = emptyList()) : List<
         }
     }
 
+    fun hasParameter(key: String): Boolean {
+        return list.find { it.key == key } != null
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is FiltersList) return false
@@ -56,6 +60,14 @@ open class FiltersList(val list: List<FilterParameter<*>> = emptyList()) : List<
 
     override fun toString(): String {
         return "FiltersList(list=$list)"
+    }
+
+    internal infix operator fun plus(other: FilterParameter<*>): FiltersList {
+        return FiltersList(list + other)
+    }
+
+    internal infix operator fun minus(other: FilterParameter<*>): FiltersList {
+        return FiltersList(list - other)
     }
 }
 
