@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 11:20 AM
+ * Last modified 5/31/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,13 +21,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -36,10 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.models.History
 import com.akellolcc.cigars.databases.models.HistoryType
 import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
@@ -50,17 +46,11 @@ import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.formatDate
 
 abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: NavRoute) :
-    BaseTabListScreen<HistoryScreenViewModel.CigarsAction, History, VM>(route) {
-
-    override fun handleAction(
-        event: HistoryScreenViewModel.CigarsAction,
-        navigator: Navigator?
-    ) {
-    }
+    BaseTabListScreen<History, VM>(route) {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
         val topColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = materialColor(MaterialColors.color_transparent),
             navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
@@ -75,13 +65,8 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
             },
             colors = topColors,
             navigationIcon = {
-                IconButton(onClick = {
-                    navigator?.pop()
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null
-                    )
+                BackButton {
+                    viewModel.onBackPress()
                 }
             })
     }

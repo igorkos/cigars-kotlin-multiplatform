@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,9 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 
-class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActions>() {
+class MainScreenViewModel : ActionsViewModel() {
     var isTabsVisible by mutableStateOf(true)
     var isDrawerVisible by mutableStateOf(false)
 
@@ -33,7 +32,5 @@ class MainScreenViewModel : ActionsViewModel<MainScreenViewModel.MainScreenActio
         }
     }
 
-    sealed interface MainScreenActions {
-        data class ShowError(val error: StringDesc) : MainScreenActions
-    }
+    sealed interface MainScreenActions : CommonAction
 }

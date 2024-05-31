@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 3:04 PM
+ * Last modified 5/30/24, 2:01 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,18 @@
 
 package com.akellolcc.cigars.utils
 
+import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasAnySibling
@@ -33,6 +38,8 @@ import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onAncestors
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -40,6 +47,7 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import androidx.test.platform.app.InstrumentationRegistry
+import com.akellolcc.cigars.logging.Log
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import junit.framework.TestCase.assertEquals
@@ -54,9 +62,10 @@ object UiTestUtils {
 @OptIn(ExperimentalTestApi::class)
 fun ComposeTestRule.waitForText(
     text: String,
-    timeoutMillis: Long = 5000
+    substring: Boolean = false,
+    timeoutMillis: Long = 10000
 ) {
-    waitUntilAtLeastOneExists(hasText(text), timeoutMillis = timeoutMillis)
+    waitUntilAtLeastOneExists(hasText(text, substring = substring), timeoutMillis = timeoutMillis)
 }
 
 @OptIn(ExperimentalTestApi::class)
@@ -108,13 +117,39 @@ fun SemanticsNodeInteractionsProvider.assertNodeText(
     ).assertExists()
 }
 
+internal fun textMatcher(node: SemanticsNode, text: String, substring: Boolean): Boolean {
+    val nodeText = node.config.getOrNull(SemanticsProperties.EditableText)?.text
+    var isFindText = if (substring) {
+        nodeText?.contains(text, false) ?: false
+    } else {
+        nodeText.equals(text, false)
+    }
+    if (!isFindText) {
+        isFindText = node.config.getOrNull(SemanticsProperties.Text)
+            ?.any { item ->
+                if (substring) {
+                    item.text.contains(text, false)
+                } else {
+                    item.text.equals(text, false)
+                }
+            } ?: false
+    }
+    return isFindText
+}
+
 fun SemanticsNodeInteractionsProvider.childWithText(
     parentTag: String,
     text: String,
     substring: Boolean = false,
     useUnmergedTree: Boolean = false
 ): SemanticsNodeInteraction {
-    val matcher = (if (substring) hasText(text) else hasTextExactly(text)).and(hasAnyAncestor(hasTestTag(parentTag)))
+    Log.debug("-------------childWithText  '${text}' -------------")
+    val matcher = SemanticsMatcher("Search node with text: $text and parent tag: $parentTag") {
+        if (textMatcher(it, text, substring)) {
+            return@SemanticsMatcher hasAnyAncestor(hasTestTag(parentTag)).matches(it)
+        }
+        return@SemanticsMatcher false
+    }
     return onNode(matcher, useUnmergedTree = useUnmergedTree)
 }
 
@@ -125,9 +160,46 @@ fun SemanticsNodeInteractionsProvider.childWithTextLabel(
     substring: Boolean = false,
     useUnmergedTree: Boolean = false
 ): SemanticsNodeInteraction {
-    val matcher = ((if (substring) hasText(label) else hasTextExactly(label))
-        .and(hasAnySibling((if (substring) hasText(text) else hasTextExactly(text))))).and(hasAnyAncestor(hasTestTag(parentTag)))
+    // Log.debug("-------------childWithTextLabel  '${label}'  '${text}' -------------")
+    val matcher = SemanticsMatcher("Search node with text: $text, label $label  and parent tag: $parentTag") { node ->
+        if (textMatcher(node, text, substring)) {
+            //  Log.debug("nodeText matches '${text}'")
+            if (!hasAnySibling(SemanticsMatcher("") {
+                    textMatcher(it, label, true)
+                }).matches(node)) {
+                if (hasAnyDescendant(SemanticsMatcher("") {
+                        Log.debug("Match Descendant '$label'")
+                        textMatcher(it, label, true)
+                    }).matches(node)) {
+                    //       Log.debug("nodeLabel child matches '${label}'")
+                    return@SemanticsMatcher hasAnyAncestor(hasTestTag(parentTag)).matches(node)
+                }
+                return@SemanticsMatcher false
+            }
+            //    Log.debug("nodeLabel sibling matches '${label}'")
+            return@SemanticsMatcher hasAnyAncestor(hasTestTag(parentTag)).matches(node)
+        }
+        return@SemanticsMatcher false
+    }
     return onNode(matcher, useUnmergedTree = useUnmergedTree)
+}
+
+fun SemanticsNodeInteractionsProvider.assertPickerValues(
+    parentTag: String,
+    label: String,
+    text: String,
+    values: List<String>,
+    sleep: (Long) -> Unit,
+    substring: Boolean = false,
+    useUnmergedTree: Boolean = false
+) {
+    var node = childWithTextLabel(parentTag, label, text, substring, useUnmergedTree).assertExists()
+    node = node.onAncestors().filterToOne(hasTestTag("value_picker")).assertExists()
+    node = node.onChildren().filterToOne(hasTestTag("value_picker_drop_down")).assertExists().performClick()
+    sleep(500)
+    onNodeWithTag("value_picker_list").assertExists().onChildren().assertListOrder(values.size, values)
+    node.performClick()
+    sleep(500)
 }
 
 fun SemanticsNodeInteractionsProvider.dialogWithTag(tag: String): SemanticsNodeInteraction {
@@ -206,6 +278,6 @@ fun SemanticsNodeInteractionCollection.getListRow(index: Int): SemanticsNodeInte
     return get(index).assertExists()
 }
 
-fun SemanticsNodeInteraction.assertHasChildWithText(text: String) {
-    assert(hasAnyDescendant(hasText(text)))
+fun SemanticsNodeInteraction.assertHasChildWithText(text: String, substring: Boolean = false) {
+    assert(hasAnyDescendant(hasText(text, substring = substring)))
 }

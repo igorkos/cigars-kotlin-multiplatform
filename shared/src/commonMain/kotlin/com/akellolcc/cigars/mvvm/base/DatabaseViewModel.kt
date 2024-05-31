@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/31/24, 10:36 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 
-open class DatabaseViewModel<T : BaseEntity, A> : ActionsViewModel<A>() {
+open class DatabaseViewModel<T : BaseEntity> : ActionsViewModel() {
     protected val database: Database = Database.instance
     var loading by mutableStateOf(false)
 

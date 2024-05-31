@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 3:46 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,7 @@ import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.screens.components.search.data.FilterCollection
 import com.akellolcc.cigars.utils.ObjectFactory
 
-class CigarsSearchControlViewModel(val fields: FilterCollection) :
-    ActionsViewModel<CigarsSearchFieldBaseViewModel.Action>() {
+class CigarsSearchControlViewModel(val fields: FilterCollection) : ActionsViewModel() {
     var expanded by mutableStateOf(false)
 
     /**

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 6:03 PM
+ * Last modified 5/31/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,11 +71,11 @@ class HumidorsListScreen(
     @Transient
     override var viewModel: HumidorsViewModel
 ) :
-    BaseTabListScreen<HumidorsViewModel.Action, Humidor, HumidorsViewModel>(route) {
+    BaseTabListScreen<Humidor, HumidorsViewModel>(route) {
 
     @ExperimentalMaterial3Api
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
         CenterAlignedTopAppBar(
             navigationIcon = {
                 IconButton(onClick = {
@@ -134,21 +134,20 @@ class HumidorsListScreen(
         }
     }
 
-    override fun handleAction(event: HumidorsViewModel.Action, navigator: Navigator?) {
+    override fun handleAction(event: Any, navigator: Navigator) {
         val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is HumidorsViewModel.Action.RouteToHumidor -> {
                 Log.debug("Selected humidor ${event.humidor.rowid}")
                 mainModel.isTabsVisible = false
-                navigator?.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
+                navigator.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
                     this.data = event.humidor
                 }))
             }
 
-            is HumidorsViewModel.Action.ShowError -> TODO()
             is HumidorsViewModel.Action.AddHumidor -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(
+                navigator.push(
                     HumidorDetailsScreen(
                         HumidorDetailsRoute
                             .apply {
@@ -156,6 +155,8 @@ class HumidorsListScreen(
                             })
                 )
             }
+
+            else -> super.handleAction(event, navigator)
         }
     }
 

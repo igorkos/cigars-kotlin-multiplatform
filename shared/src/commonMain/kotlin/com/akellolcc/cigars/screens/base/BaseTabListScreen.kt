@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 3:28 PM
+ * Last modified 5/31/24, 12:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
@@ -72,12 +72,11 @@ import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 
-abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>>(override val route: NavRoute) :
+abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(override val route: NavRoute) :
     ITabItem<VM> {
     @kotlinx.serialization.Transient
     @kotlin.jvm.Transient
     override lateinit var viewModel: VM
-    abstract fun handleAction(event: A, navigator: Navigator?)
 
     @Composable
     open fun RightActionMenu(onDismiss: () -> Unit) {
@@ -106,13 +105,13 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
         val sharedViewModel = createViewModel(MainScreenViewModel::class)
 
         LaunchedEffect(navigator, viewModel) {
             if (sharedViewModel.isTabsVisible != route.isTabsVisible)
                 sharedViewModel.isTabsVisible = route.isTabsVisible
-            viewModel.observeEvents {
+            viewModel.observeEvents(tag()) {
                 handleAction(it, navigator)
             }
         }
@@ -122,7 +121,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
         DefaultTheme {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
-                topBar = { topTabBar(scrollBehavior, navigator) },
+                topBar = { topTabBar(scrollBehavior) },
                 bottomBar = {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(64.dp)
@@ -227,7 +226,7 @@ abstract class BaseTabListScreen<A, E : BaseEntity, VM : BaseListViewModel<E, A>
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
+    open fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
         var expanded by remember { mutableStateOf(false) }
 
         CenterAlignedTopAppBar(

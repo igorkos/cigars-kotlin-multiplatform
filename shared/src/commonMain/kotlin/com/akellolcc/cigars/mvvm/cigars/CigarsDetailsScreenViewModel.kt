@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 2:02 PM
+ * Last modified 5/31/24, 11:25 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,13 +35,11 @@ import com.akellolcc.cigars.mvvm.base.DatabaseViewModel
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 
-class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
-    DatabaseViewModel<Cigar, CigarsDetailsScreenViewModel.CigarsDetailsAction>() {
+class CigarsDetailsScreenViewModel(private val cigar: Cigar) : DatabaseViewModel<Cigar>() {
     private var cigarsRepository: CigarsRepository = createRepository(CigarsRepository::class)
     private var humidorsRepository: HumidorsRepository = createRepository(HumidorsRepository::class)
     private var imagesRepository: CigarImagesRepository? = null
@@ -174,7 +172,7 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
             disposable = mutableListOf()
             observeCigar()
         } else {
-            sendEvent(CigarsDetailsAction.OnBackAction(0))
+            onBackPress()
         }
         editing = false
     }
@@ -277,14 +275,12 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) :
 
     }
 
-    sealed interface CigarsDetailsAction {
-        data class OnBackAction(val dummy: Int) : CigarsDetailsAction
+    sealed interface CigarsDetailsAction : CommonAction {
         data class AddToHumidor(val humidor: HumidorCigar) : CigarsDetailsAction
         data class AddCigarToHumidor(val humidor: Humidor, val count: Long, val price: Double? = null) : CigarsDetailsAction
         data class OpenHumidor(val humidor: Humidor) : CigarsDetailsAction
         data class OpenHistory(val cigar: Cigar) : CigarsDetailsAction
         data class MoveCigar(val dummy: Int) : CigarsDetailsAction
         data class ShowImages(val cigar: Cigar, val selected: Int) : CigarsDetailsAction
-        data class ShowError(val error: StringDesc) : CigarsDetailsAction
     }
 }

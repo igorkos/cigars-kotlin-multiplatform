@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:03 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,11 +23,9 @@ import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.HumidorCigarsRepository
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 
 
-class HumidorCigarsScreenViewModel(val humidor: Humidor) :
-    BaseListViewModel<HumidorCigar, HumidorCigarsScreenViewModel.CigarsAction>() {
+class HumidorCigarsScreenViewModel(val humidor: Humidor) : BaseListViewModel<HumidorCigar>() {
     override val repository: HumidorCigarsRepository =
         createRepository(HumidorCigarsRepository::class, humidor.rowid)
 
@@ -54,11 +52,10 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) :
 
     }
 
-    sealed interface CigarsAction {
+    sealed interface CigarsAction : CommonAction {
         data class RouteToHumidorDetails(val humidor: Humidor) : CigarsAction
         data class RouteToCigar(val cigar: Cigar) : CigarsAction
         data class AddCigar(val cigar: Cigar? = null) : CigarsAction
         data class OpenHistory(val dummy: Int) : CigarsAction
-        data class ShowError(val error: StringDesc) : CigarsAction
     }
 }

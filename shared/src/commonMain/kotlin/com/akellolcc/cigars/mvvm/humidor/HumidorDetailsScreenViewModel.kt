@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 10:17 PM
+ * Last modified 5/31/24, 11:25 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,12 +28,11 @@ import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.mvvm.base.DatabaseViewModel
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
-    DatabaseViewModel<Humidor, HumidorDetailsScreenViewModel.Action>() {
+    DatabaseViewModel<Humidor>() {
     private var imagesDatabase: HumidorImagesRepository? = null
     private var humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
     private var disposable: List<Job> = mutableListOf()
@@ -104,7 +103,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
     fun cancelEdit() {
         editing = false
         if (humidorsDatabase == null) {
-            sendEvent(Action.OnBackAction(0))
+            onBackPress()
         }
     }
 
@@ -124,8 +123,5 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
         }
     }
 
-    sealed interface Action {
-        data class OnBackAction(val dummy: Int) : Action
-        data class ShowError(val error: StringDesc) : Action
-    }
+    sealed interface HumidorDetailsAction : CommonAction
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:24 PM
+ * Last modified 5/30/24, 2:19 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,13 +40,13 @@ class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : Databa
     ): Query<History> {
         val accenting = sorting?.value ?: true
         args.find { it.first == CIGAR_ID }?.let {
-            return if (accenting) queries.cigarHistory(it.second as Long, ::historyFactory) else queries.cigarHistoryDesc(
+            return if (!accenting) queries.cigarHistory(it.second as Long, ::historyFactory) else queries.cigarHistoryDesc(
                 it.second as Long,
                 ::historyFactory
             )
         }
         args.find { it.first == HUMIDOR_ID }?.let {
-            return if (accenting) queries.humidorHistory(
+            return if (!accenting) queries.humidorHistory(
                 it.second as Long,
                 ::historyFactory
             ) else queries.humidorHistoryDesc(it.second as Long, ::historyFactory)
@@ -62,7 +62,7 @@ class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : Databa
         val accenting = sorting?.value ?: true
         fun queryProvider(limit: Long, offset: Long): Query<History> {
             args.find { it.first == CIGAR_ID }?.let {
-                return if (accenting) queries.pagedCigarHistory(
+                return if (!accenting) queries.pagedCigarHistory(
                     it.second as Long,
                     limit,
                     offset,
@@ -73,7 +73,7 @@ class HistoryTableQueries(override val queries: HistoryDatabaseQueries) : Databa
                 )
             }
             args.find { it.first == HUMIDOR_ID }?.let {
-                return if (accenting) queries.pagedHumidorHistory(
+                return if (!accenting) queries.pagedHumidorHistory(
                     it.second as Long,
                     limit,
                     offset,

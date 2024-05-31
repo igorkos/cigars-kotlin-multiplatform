@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 4:18 PM
+ * Last modified 5/30/24, 10:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.printToLog
+import com.akellolcc.cigars.databases.models.CigarShapes
+import com.akellolcc.cigars.databases.models.CigarStrength
+import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.theme.Localize
@@ -38,6 +41,7 @@ import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasChildWithText
 import com.akellolcc.cigars.utils.assertListOrder
 import com.akellolcc.cigars.utils.assertNodeText
+import com.akellolcc.cigars.utils.assertPickerValues
 import com.akellolcc.cigars.utils.childButtonWithText
 import com.akellolcc.cigars.utils.childWithTag
 import com.akellolcc.cigars.utils.childWithText
@@ -53,6 +57,7 @@ import com.akellolcc.cigars.utils.waitForText
 import org.junit.Rule
 import kotlin.test.Test
 
+@Suppress("SameParameterValue")
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
 class CigarDetailsTests : BaseUiTest() {
 
@@ -115,25 +120,25 @@ class CigarDetailsTests : BaseUiTest() {
             dialogWithTag("InfoImageDialog").assertDoesNotExist()
             childWithTextLabel(
                 tag("cigar_tobacco"),
-                "Wrapper:", "Dominican",
+                "Wrapper", "Dominican",
                 substring = true,
                 useUnmergedTree = true
             ).assertExists()
             childWithTextLabel(
                 tag("cigar_tobacco"),
-                "Binder:", "Dominican",
+                "Binder", "Dominican",
                 substring = true,
                 useUnmergedTree = true
             ).assertExists()
             childWithTextLabel(
                 tag("cigar_tobacco"),
-                "Filler:", "Dominican",
+                "Filler", "Dominican",
                 substring = true,
                 useUnmergedTree = true
             ).assertExists()
             childWithTextLabel(
                 tag("cigar_tobacco"),
-                "Strength:", "Medium-Full",
+                "Strength", "Medium-Full",
                 substring = true,
                 useUnmergedTree = true
             ).assertExists()
@@ -288,7 +293,7 @@ class CigarDetailsTests : BaseUiTest() {
                 CigarsAppContent()
             }
             //Wait for app to load
-            waitForText("Cigars", 10000)
+            waitForText("Cigars")
             sleep(500)
             //Check items displayed
             onNodeWithTag("${CigarsRoute.route}-List").onChildren().assertCountEquals(5)
@@ -433,7 +438,7 @@ class CigarDetailsTests : BaseUiTest() {
                 CigarsAppContent()
             }
             //Wait for app to load
-            waitForText("Cigars", 10000)
+            waitForText("Cigars")
             sleep(500)
             //Check items displayed
             onNodeWithTag("${CigarsRoute.route}-List").onChildren().assertCountEquals(5)
@@ -447,39 +452,215 @@ class CigarDetailsTests : BaseUiTest() {
             onNodeWithTag(tag("cigar_humidors_list")).assertExists().onChildren()
                 .assertListOrder(2, listOf("Total number of cigars: 10", "Case"))
 
-            //Move 5 cigars from Case to Second
-            onNodeWithTag(tag("cigar_humidors_list"), true).assertExists().onChildren().getListRow(1).let {
-                it.assertHasChildWithText("Case Elegance Renzo Humidor")
-                it.assertHasChildWithText("10")
-                it.onChildren().filterToOne(hasAnyDescendant(hasText("10"))).performClick()
+            changeCigarsCount("Case Elegance Renzo Humidor", 1, 10, 5)
+            changeCigarsCount("Case Elegance Renzo Humidor", 1, 5, 10)
+        }
+
+    }
+
+    private fun changeCigarsCount(humidor: String, index: Int, from: Int, to: Int) {
+        with(composeTestRule) {
+            onNodeWithTag(tag("cigar_humidors")).performScrollTo()
+            onNodeWithTag(tag("cigar_humidors_list"), true).assertExists().onChildren().getListRow(index).let {
+                it.assertHasChildWithText(humidor)
+                it.assertHasChildWithText(from.toString())
+                it.onChildren().filterToOne(hasAnyDescendant(hasText(from.toString()))).performClick()
                 sleep(500)
                 onNodeWithTag(tag("humidor_cigar_count_dialog")).assertExists()
-                onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(10.toString())
+                onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(from.toString())
 
-                onNodeWithTag(tag("cigar_count_minus")).assertExists().performClick()
-                onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(9.toString())
-                onNodeWithTag(tag("cigar_count_price")).assertDoesNotExist()
-
-                onNodeWithTag(tag("cigar_count_plus")).assertExists().performClick()
-                onNodeWithTag(tag("cigar_count_plus")).assertExists().performClick()
-                onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(11.toString())
-                onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("0.00")
-
-                onNodeWithTag(tag("cigar_count_price")).replaceText("100")
-                onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("1.00")
+                if (from > to) {
+                    //Minus
+                    for (i in to..<from) {
+                        onNodeWithTag(tag("cigar_count_minus")).assertExists().performClick()
+                    }
+                    onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(to.toString())
+                    onNodeWithTag(tag("cigar_count_price")).assertDoesNotExist()
+                } else {
+                    //Plus
+                    for (i in from..<to) {
+                        onNodeWithTag(tag("cigar_count_plus")).assertExists().performClick()
+                    }
+                    onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(to.toString())
+                    onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("0.00")
+                    onNodeWithTag(tag("cigar_count_price")).replaceText("100")
+                    onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("1.00")
+                }
 
                 childButtonWithText(tag("humidor_cigar_count_dialog"), Localize.button_save).assertExists().assertIsEnabled().performClick()
                 sleep(500)
                 onNodeWithTag(tag("humidor_cigar_count_dialog")).assertDoesNotExist()
             }
 
-            onNodeWithTag(tag("cigar_humidors_list"), true).assertExists().onChildren().getListRow(1).let {
-                it.assertHasChildWithText("Case Elegance Renzo Humidor")
-                it.assertHasChildWithText("11")
+            onNodeWithTag(tag("cigar_humidors_list"), true).assertExists().onChildren().getListRow(index).let {
+                it.assertHasChildWithText(humidor)
+                it.assertHasChildWithText(to.toString())
             }
             onNodeWithTag(tag("cigar_humidors_list")).assertExists().onChildren()
-                .assertListOrder(2, listOf("Total number of cigars: 11", "Case"))
+                .assertListOrder(2, listOf("Total number of cigars: $to", humidor))
         }
-
     }
+
+    @Test
+    fun editCigarDetailsTest() {
+        with(composeTestRule) {
+            setContent {
+                CigarsAppContent()
+            }
+            //Wait for app to load
+            waitForText("Cigars")
+            sleep(500)
+            //Check items displayed
+            onNodeWithTag("${CigarsRoute.route}-List").onChildren().assertCountEquals(5)
+            textIsDisplayed("#1", true)
+            onNodeWithText("#1", true).performClick()
+            sleep(500)
+            onNodeWithTag(CigarsDetailsRoute.route).assertExists()
+
+            onNodeWithTag(tag("edit_button")).assertExists().performClick()
+
+            //Check images carousel
+            onNodeWithTag("ImagesCarousel").assertDoesNotExist()
+
+            //Check cigar details
+            childWithText(tag("cigar_origin"), "#1 Fuente Fuente OpusX Reserva d’Chateau", useUnmergedTree = true).assertExists()
+            childWithText(tag("cigar_origin"), "Fabrica de Tabacos Raices Cubanas S. de R.L.", useUnmergedTree = true).assertExists()
+            childWithText(tag("cigar_origin"), "Dominican", useUnmergedTree = true).assertExists()
+
+            //Check cigar size
+            onNodeWithTag(tag("cigar_size")).performScrollTo()
+            childWithText(tag("cigar_size"), "Churchill", useUnmergedTree = true).assertExists()
+            assertPickerValues(
+                tag("cigar_size"),
+                Localize.cigar_details_shape,
+                "Churchill",
+                CigarShapes.enumValues().map { it.second },
+                ::sleep,
+                true,
+                useUnmergedTree = true
+            )
+
+            childWithText(tag("cigar_size"), "48", useUnmergedTree = true).assertExists()
+            childWithText(tag("cigar_size"), "7'", true, useUnmergedTree = true).assertExists()
+
+            //Check cigar tobacco
+            onNodeWithTag(tag("cigar_ratings")).performScrollTo()
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                "Wrapper", "Dominican",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                "Binder", "Dominican",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                "Filler", "Dominican",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                Localize.cigar_details_strength, "Medium-Full",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+            assertPickerValues(
+                tag("cigar_tobacco"),
+                Localize.cigar_details_strength,
+                CigarStrength.localized(CigarStrength.MediumToFull),
+                CigarStrength.enumValues().map { it.second },
+                ::sleep,
+                true,
+                useUnmergedTree = true
+            )
+            //Check cigar ratings
+            onNodeWithTag(tag("cigar_notes")).performScrollTo()
+            childWithTextLabel(
+                tag("cigar_ratings"),
+                "Rating", "97",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+            childWithTextLabel(
+                tag("cigar_ratings"),
+                Localize.cigar_details_myrating, "0",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+
+
+            //Check cigar Humidors
+            onNodeWithTag(tag("cigar_humidors")).assertDoesNotExist()
+
+            //Check cigar notes
+            onNodeWithTag(tag("cigar_notes")).assertExists().onChildren().assertCountEquals(2)
+
+            //Change wrapper
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                "Wrapper", "Dominican",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists().replaceText("Nicaragua")
+
+            pressButton("Save")
+
+            sleep(1000)
+
+            childWithTextLabel(
+                tag("cigar_tobacco"),
+                "Wrapper", "Nicaragua",
+                substring = true,
+                useUnmergedTree = true
+            ).assertExists()
+
+        }
+    }
+
+    @Test
+    fun cigarHistoryTest() {
+        with(composeTestRule) {
+            setContent {
+                CigarsAppContent()
+            }
+            //Wait for app to load
+            waitForText("Cigars")
+            sleep(500)
+            //Check items displayed
+            onNodeWithTag("${CigarsRoute.route}-List").onChildren().assertCountEquals(5)
+            textIsDisplayed("#1", true)
+            onNodeWithText("#1", true).performClick()
+            sleep(500)
+
+            onNodeWithTag(tag("history_button")).assertExists().performClick()
+            sleep(500)
+            var nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
+            nodes.assertCountEquals(1)
+            nodes.getListRow(0).assertHasChildWithText("Added 10 cigars")
+
+            pressBackButton()
+            sleep(1500)
+            changeCigarsCount("Case Elegance Renzo Humidor", 1, 10, 11)
+            onNodeWithTag(tag("history_button")).assertExists().performClick()
+            sleep(500)
+            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
+            nodes.assertCountEquals(2)
+            nodes.getListRow(0).assertHasChildWithText("Added 1 cigar")
+
+            pressBackButton()
+            sleep(1500)
+            changeCigarsCount("Case Elegance Renzo Humidor", 1, 11, 10)
+            onNodeWithTag(tag("history_button")).assertExists().performClick()
+            sleep(500)
+            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
+            nodes.assertCountEquals(3)
+            nodes.getListRow(0).assertHasChildWithText("Removed 1 cigar")
+        }
+    }
+
 }

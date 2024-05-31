@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 2:04 PM
+ * Last modified 5/31/24, 11:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,14 +24,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
@@ -46,6 +43,7 @@ import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.TextStyled
@@ -63,7 +61,7 @@ import com.akellolcc.cigars.theme.materialColor
 class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScreen(route) {
 
     override fun handleAction(
-        event: CigarsDetailsScreenViewModel.CigarsDetailsAction,
+        event: Any,
         navigator: Navigator
     ) {
         when (event) {
@@ -88,15 +86,8 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
             colors = topColors,
             navigationIcon = {
                 if (!viewModel.editing) {
-                    IconButton(onClick = {
-                        viewModel.sendEvent(
-                            CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction(0)
-                        )
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
+                    BackButton {
+                        viewModel.onBackPress()
                     }
                 }
             },

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 8:27 PM
+ * Last modified 5/31/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +21,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
@@ -40,8 +37,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
@@ -51,6 +46,7 @@ import com.akellolcc.cigars.mvvm.base.BaseImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.CigarImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -139,8 +135,6 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                 }
             }
 
-        val navigator = LocalNavigator.currentOrThrow
-
         imageActions()
 
         LaunchedEffect(Unit) {
@@ -153,13 +147,8 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                 topBar = {
                     CenterAlignedTopAppBar(
                         navigationIcon = {
-                            IconButton(onClick = {
-                                navigator.pop()
-                            }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = null
-                                )
+                            BackButton {
+                                viewModel.onBackPress()
                             }
                         },
                         actions = {

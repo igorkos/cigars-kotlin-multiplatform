@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 8:27 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,15 +31,13 @@ import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 
-abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) :
-    BaseListViewModel<CigarImage, BaseImagesViewScreenViewModel.Action>(), PermissionCallback {
+abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) : BaseListViewModel<CigarImage>(), PermissionCallback {
     var launchCamera by mutableStateOf(false)
     var launchGallery by mutableStateOf(false)
     private var lastSelect by mutableStateOf(select)
@@ -87,9 +85,7 @@ abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) :
         }
     }
 
-    sealed interface Action {
-        data class ShowError(val error: StringDesc) : Action
-    }
+    sealed interface ImageScreenAction : CommonAction
 }
 
 class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :

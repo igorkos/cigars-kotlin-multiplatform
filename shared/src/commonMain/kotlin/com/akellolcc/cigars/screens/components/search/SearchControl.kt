@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 3:07 PM
+ * Last modified 5/31/24, 12:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,7 @@ private data class SearchComponentImplement(
     fun Content() {
 
         LaunchedEffect(Unit) {
-            viewModel.observeEvents {
+            viewModel.observeEvents("SearchComponentImplement") {
                 Log.debug("Search control get event: $it")
                 when (it) {
                     is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {

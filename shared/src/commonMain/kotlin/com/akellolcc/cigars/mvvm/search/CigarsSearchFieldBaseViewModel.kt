@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:56 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,7 @@ import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.utils.ObservableValue
 
-abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterParameter<*>) :
-    ActionsViewModel<CigarsSearchFieldBaseViewModel.Action>() {
+abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterParameter<*>) : ActionsViewModel() {
     private var lastFocus by mutableStateOf(false)
 
     //Input flow

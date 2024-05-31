@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/15/24, 11:20 AM
+ * Last modified 5/31/24, 11:21 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,10 +17,7 @@
 package com.akellolcc.cigars.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -36,6 +33,7 @@ import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorCigarsScreenViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
@@ -50,7 +48,7 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 
 class HumidorCigarsScreen(override val route: NavRoute) :
-    BaseTabListScreen<HumidorCigarsScreenViewModel.CigarsAction, HumidorCigar, HumidorCigarsScreenViewModel>(
+    BaseTabListScreen<HumidorCigar, HumidorCigarsScreenViewModel>(
         route
     ) {
 
@@ -62,30 +60,29 @@ class HumidorCigarsScreen(override val route: NavRoute) :
     }
 
     override fun handleAction(
-        event: HumidorCigarsScreenViewModel.CigarsAction,
-        navigator: Navigator?
+        event: Any,
+        navigator: Navigator
     ) {
         val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
-                navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
                 }))
             }
 
-            is HumidorCigarsScreenViewModel.CigarsAction.ShowError -> TODO()
             is HumidorCigarsScreenViewModel.CigarsAction.AddCigar -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     this.data = null
                 }))
             }
 
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToHumidorDetails -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(
+                navigator.push(
                     HumidorDetailsScreen(
                         HumidorDetailsRoute
                             .apply {
@@ -96,7 +93,7 @@ class HumidorCigarsScreen(override val route: NavRoute) :
 
             is HumidorCigarsScreenViewModel.CigarsAction.OpenHistory -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(
+                navigator.push(
                     HumidorHistoryScreen(
                         HumidorHistoryRoute
                             .apply {
@@ -104,12 +101,14 @@ class HumidorCigarsScreen(override val route: NavRoute) :
                             })
                 )
             }
+
+            else -> super.handleAction(event, navigator)
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?, navigator: Navigator?) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
         val topColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = materialColor(MaterialColors.color_transparent),
             navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
@@ -129,13 +128,8 @@ class HumidorCigarsScreen(override val route: NavRoute) :
             },
             colors = topColors,
             navigationIcon = {
-                IconButton(onClick = {
-                    navigator?.pop()
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = null
-                    )
+                BackButton {
+                    viewModel.onBackPress()
                 }
             },
             actions = {

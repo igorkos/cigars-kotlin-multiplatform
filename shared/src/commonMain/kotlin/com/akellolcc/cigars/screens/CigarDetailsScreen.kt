@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 3:59 PM
+ * Last modified 5/31/24, 12:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,14 +36,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
@@ -76,6 +73,7 @@ import com.akellolcc.cigars.databases.models.emptyCigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.InfoImageDialog
@@ -111,7 +109,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         val navigator = LocalNavigator.currentOrThrow
 
         LaunchedEffect(Unit) {
-            viewModel.observeEvents {
+            viewModel.observeEvents(tag()) {
                 handleAction(it, navigator)
             }
         }
@@ -163,12 +161,11 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         }
     }
 
-    open fun handleAction(
-        event: CigarsDetailsScreenViewModel.CigarsDetailsAction,
+    override fun handleAction(
+        event: Any,
         navigator: Navigator
     ) {
         when (event) {
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowError -> TODO()
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> viewModel.humidorCigarsCount = event.humidor
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHumidor -> navigator.push(
@@ -178,7 +175,6 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                     })
             )
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction -> navigator.pop()
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHistory -> navigator.push(
                 CigarHistoryScreen(
                     CigarHistoryRoute.apply {
@@ -197,6 +193,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             }
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddCigarToHumidor -> TODO()
+            else -> super.handleAction(event, navigator)
         }
     }
 
@@ -213,24 +210,21 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             colors = topColors,
             navigationIcon = {
                 if (!viewModel.editing) {
-                    IconButton(
-                        modifier = Modifier.testTag("back_button"),
-                        onClick = {
-                            viewModel.sendEvent(CigarsDetailsScreenViewModel.CigarsDetailsAction.OnBackAction(0))
-                        }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
+                    BackButton {
+                        viewModel.onBackPress()
                     }
                 }
             },
             actions = {
                 if (!viewModel.editing) {
-                    IconButton(onClick = { viewModel.historyOpen() }) {
+                    IconButton(
+                        modifier = Modifier.testTag(tag("history_button")),
+                        onClick = { viewModel.historyOpen() }) {
                         loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
                     }
-                    IconButton(onClick = { viewModel.editing = !viewModel.editing }) {
+                    IconButton(
+                        modifier = Modifier.testTag(tag("edit_button")),
+                        onClick = { viewModel.editing = !viewModel.editing }) {
                         loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
                     }
                 }

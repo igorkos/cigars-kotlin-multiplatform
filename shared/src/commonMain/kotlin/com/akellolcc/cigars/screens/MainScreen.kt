@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 2:41 PM
+ * Last modified 5/31/24, 12:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,7 @@ import com.akellolcc.cigars.logging.AnalyticsEvents
 import com.akellolcc.cigars.logging.AnalyticsParams
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
+import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
@@ -81,17 +82,16 @@ class MainScreen :
     @Composable
     override fun Content() {
 
-        viewModel =
-            rememberScreenModel { createViewModel(MainScreenViewModel::class) }
+        viewModel = rememberScreenModel { createViewModel(MainScreenViewModel::class) }
 
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) {
             viewModel.isDrawerVisible = it == DrawerValue.Open
             true
         }
 
-        viewModel.observeEvents {
+        viewModel.observeEvents(tag()) {
             when (it) {
-                is MainScreenViewModel.MainScreenActions.ShowError -> TODO()
+                is ActionsViewModel.CommonAction.ShowError -> TODO()
             }
         }
 

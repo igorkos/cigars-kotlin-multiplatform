@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 10:17 PM
+ * Last modified 5/31/24, 12:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,12 +25,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
@@ -53,6 +50,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.components.TextStyled
@@ -89,11 +87,8 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
 
-        viewModel.observeEvents {
-            when (it) {
-                is HumidorDetailsScreenViewModel.Action.OnBackAction -> navigator.pop()
-                is HumidorDetailsScreenViewModel.Action.ShowError -> TODO()
-            }
+        viewModel.observeEvents(tag()) {
+            handleAction(it, navigator)
         }
 
         LaunchedEffect(viewModel.editing) {
@@ -114,17 +109,8 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                         colors = topColors,
                         navigationIcon = {
                             if (!viewModel.editing) {
-                                IconButton(onClick = {
-                                    viewModel.sendEvent(
-                                        HumidorDetailsScreenViewModel.Action.OnBackAction(
-                                            0
-                                        )
-                                    )
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null
-                                    )
+                                BackButton {
+                                    viewModel.onBackPress()
                                 }
                             }
                         },

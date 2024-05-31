@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 2:33 PM
+ * Last modified 5/31/24, 10:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,10 +25,9 @@ import com.akellolcc.cigars.screens.components.search.data.CigarFilterParameters
 import com.akellolcc.cigars.screens.components.search.data.CigarSortingParameters
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.utils.ObjectFactory
-import dev.icerock.moko.resources.desc.StringDesc
 
 
-open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewModel.CigarsAction>() {
+open class CigarsScreenViewModel : BaseListViewModel<Cigar>() {
     override val repository: CigarsRepository = createRepository(CigarsRepository::class)
 
     init {
@@ -52,8 +51,7 @@ open class CigarsScreenViewModel : BaseListViewModel<Cigar, CigarsScreenViewMode
         }
     }
 
-    sealed interface CigarsAction {
+    sealed interface CigarsAction : CommonAction {
         data class RouteToCigar(val cigar: Cigar) : CigarsAction
-        data class ShowError(val error: StringDesc) : CigarsAction
     }
 }

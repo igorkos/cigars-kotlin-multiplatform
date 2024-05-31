@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 8:20 PM
+ * Last modified 5/31/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,7 +73,7 @@ class SearchCigarScreen(
     @kotlinx.serialization.Transient
     @Transient
     override var viewModel: SearchCigarScreenViewModel
-) : BaseTabListScreen<SearchCigarScreenViewModel.Actions, Cigar, SearchCigarScreenViewModel>(route) {
+) : BaseTabListScreen<Cigar, SearchCigarScreenViewModel>(route) {
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
         viewModel.sortingFields?.selected?.map {
@@ -173,16 +173,18 @@ class SearchCigarScreen(
         }
     }
 
-    override fun handleAction(event: SearchCigarScreenViewModel.Actions, navigator: Navigator?) {
+    override fun handleAction(event: Any, navigator: Navigator) {
         val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is SearchCigarScreenViewModel.Actions.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
-                navigator?.push(CigarSearchDetailsScreen(CigarSearchDetailsRoute.apply {
+                navigator.push(CigarSearchDetailsScreen(CigarSearchDetailsRoute.apply {
                     data = event.cigar
                 }))
             }
+
+            else -> super.handleAction(event, navigator)
         }
     }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 11:46 PM
+ * Last modified 5/31/24, 12:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,47 +24,53 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.utils.ObservableValue
 import com.akellolcc.cigars.utils.randomString
+import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.Job
 
 
-private data class Event<E>(val id: String, val value: E) {
+private data class Event<E>(val value: E, private val id: String = randomString()) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is Event<*>) return false
-        return id == (other as Event<E>).id
+        return id == other.id
     }
 
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
+    override fun toString(): String {
+        return "Event(id='$id', value=${value?.let { it::class.simpleName } ?: "null"})"
+    }
 }
 
-open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
+open class ActionsViewModel : StateScreenModel<Any?>(null) {
 
-    private val events = ObservableValue<Event<E>?>(null)
-    private var eventListeners: List<((E) -> Unit)> by mutableStateOf(listOf())
+    private val events = ObservableValue<Event<Any>?>(null)
+    private var eventListeners: MutableMap<String, ((Any) -> Unit)> by mutableStateOf(mutableMapOf())
     private var disposables = mutableStateOf<List<Job>>(mutableListOf())
 
     init {
         disposables.value += (events.observe(screenModelScope) {
-            eventListeners.forEach { callback ->
-                Log.debug("${this::class.simpleName} Propagate event: ${it?.id} -> ${if (it?.value != null) it.value!!::class.simpleName else "null"}  ")
+            eventListeners.forEach { entry ->
+                Log.debug("${this::class.simpleName} Propagate event: $it")
                 it?.let {
-                    callback(it.value)
+                    entry.value(it.value)
                 }
             }
         })
     }
 
-    fun observeEvents(onEach: (E) -> Unit) {
-        if (!eventListeners.contains(onEach)) {
-            eventListeners = eventListeners + onEach
+    fun observeEvents(tag: String, onEach: (Any) -> Unit) {
+        if (!eventListeners.contains(tag)) {
+            Log.debug("${this::class.simpleName} observeEvents $tag")
+            eventListeners[tag] = onEach
         }
     }
 
-    fun removeObserver(onEach: (E) -> Unit) {
-        Log.debug("${this::class.simpleName} removeObserver $onEach")
-        eventListeners = eventListeners - onEach
+    fun removeObserver(tag: String) {
+        Log.debug("${this::class.simpleName} removeObserver $tag")
+        eventListeners.remove(tag)
     }
 
     fun runOnDispose(block: () -> Job) {
@@ -72,15 +78,19 @@ open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
         disposables.value += block()
     }
 
-    fun sendEvent(event: E) {
-        val ev = Event(id = randomString(), value = event)
-        Log.debug("${this::class.simpleName} Send event: ${ev.id} -> ${if (event != null) event!!::class.simpleName else "null"} ")
+    fun sendEvent(event: Any) {
+        val ev = Event(event)
+        Log.debug("${this::class.simpleName} Send event: $ev")
         events.value = ev
     }
 
     open fun setState(value: Any?) {
         Log.debug("${this::class.simpleName} setState $value")
         mutableState.value = value
+    }
+
+    fun onBackPress() {
+        sendEvent(CommonAction.OnBackPressed())
     }
 
     override fun onDispose() {
@@ -90,4 +100,10 @@ open class ActionsViewModel<E> : StateScreenModel<Any?>(null) {
             it.cancel()
         }
     }
+
+    interface CommonAction {
+        data class OnBackPressed(val dummy: Boolean = false) : CommonAction
+        data class ShowError(val error: StringDesc) : CommonAction
+    }
 }
+

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 1:42 PM
+ * Last modified 5/31/24, 11:20 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,7 +63,7 @@ open class CigarsListScreen<V : ScreenModel>(
     @Transient
     @kotlin.jvm.Transient
     override var viewModel: CigarsScreenViewModel
-) : BaseTabListScreen<CigarsScreenViewModel.CigarsAction, Cigar, CigarsScreenViewModel>(route) {
+) : BaseTabListScreen<Cigar, CigarsScreenViewModel>(route) {
     @Suppress("UNCHECKED_CAST")
     @Composable
     override fun RightActionMenu(onDismiss: () -> Unit) {
@@ -87,18 +87,18 @@ open class CigarsListScreen<V : ScreenModel>(
         }
     }
 
-    override fun handleAction(event: CigarsScreenViewModel.CigarsAction, navigator: Navigator?) {
+    override fun handleAction(event: Any, navigator: Navigator) {
         val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is CigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
-                navigator?.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
                     data = event.cigar
                 }))
                 mainModel.isTabsVisible = false
             }
 
-            is CigarsScreenViewModel.CigarsAction.ShowError -> TODO()
+            else -> super.handleAction(event, navigator)
         }
     }
 
@@ -118,7 +118,6 @@ open class CigarsListScreen<V : ScreenModel>(
                     else -> {}
                 }
             }
-
         }
     }
 

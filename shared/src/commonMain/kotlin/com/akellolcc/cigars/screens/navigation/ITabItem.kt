@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 10:25 AM
+ * Last modified 5/31/24, 11:16 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,13 @@ package com.akellolcc.cigars.screens.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.theme.imagePainter
 
-interface ITabItem<VM : ScreenModel> : Tab {
+interface ITabItem<VM : ActionsViewModel> : Tab {
     val route: NavRoute
 
     var viewModel: VM
@@ -44,5 +45,11 @@ interface ITabItem<VM : ScreenModel> : Tab {
     fun tag(component: String? = null): String {
         if (component == null) return route.route
         return "${route.route}-$component"
+    }
+
+    fun handleAction(event: Any, navigator: Navigator) {
+        if (event is ActionsViewModel.CommonAction.OnBackPressed) {
+            navigator.pop()
+        }
     }
 }
