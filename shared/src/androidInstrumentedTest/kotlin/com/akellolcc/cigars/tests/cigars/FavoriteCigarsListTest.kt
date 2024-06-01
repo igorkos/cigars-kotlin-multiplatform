@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 4:26 PM
+ * Last modified 6/1/24, 4:35 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,6 @@ import com.akellolcc.cigars.utils.pressBackButton
 import com.akellolcc.cigars.utils.pressButton
 import com.akellolcc.cigars.utils.waitForTag
 import org.junit.Before
-import kotlin.test.Test
 
 class FavoriteCigarsListTest : CigarsListTests() {
 
@@ -45,16 +44,11 @@ class FavoriteCigarsListTest : CigarsListTests() {
             waitForTag(tag(route = CigarsRoute))
             onNodeWithTag(tag("List", CigarsRoute)).onChildren()
                 .assertListOrder(5, listOf("#1", "#2", "#3", "#4", "#5"))
-            onNodeWithText("#1", true).performClick()
-            setFavorite(true)
-            onNodeWithText("#2", true).performClick()
-            setFavorite(true)
-            onNodeWithText("#3", true).performClick()
-            setFavorite(true)
-            onNodeWithText("#4", true).performClick()
-            setFavorite(true)
-            onNodeWithText("#5", true).performClick()
-            setFavorite(true)
+            setFavorite("#1")
+            setFavorite("#2")
+            setFavorite("#3")
+            setFavorite("#4")
+            setFavorite("#5")
 
             pressButton(FavoritesRoute.title)
             route = FavoritesRoute
@@ -62,23 +56,28 @@ class FavoriteCigarsListTest : CigarsListTests() {
         }
 
     }
-    
-    private fun setFavorite(favorite: Boolean) {
-        route = CigarsDetailsRoute
+
+    private fun setFavorite(cigar: String) {
+
         with(composeTestRule) {
+            onNodeWithText(cigar, true).performClick()
+            route = CigarsDetailsRoute
+            waitForTag(tag())
             onNodeWithTag(tag("cigar_ratings")).performScrollTo()
             childWithTag(
                 tag("cigar_ratings"),
-                tag("cigar_favorite_${!favorite}")
+                tag("cigar_favorite_false")
             ).assertExists().performClick()
 
             childWithTag(
                 tag("cigar_ratings"),
-                tag("cigar_favorite_${favorite}")
+                tag("cigar_favorite_true")
             ).assertExists()
 
             pressBackButton()
+            route = CigarsRoute
+            waitForTag(tag())
         }
-        route = CigarsRoute
+
     }
 }
