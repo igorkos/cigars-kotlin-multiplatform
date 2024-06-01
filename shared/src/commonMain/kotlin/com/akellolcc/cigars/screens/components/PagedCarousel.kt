@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/27/24, 12:30 PM
+ * Last modified 5/31/24, 6:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -47,6 +46,7 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import app.cash.paging.compose.collectAsLazyPagingItems
 import com.akellolcc.cigars.databases.models.CigarImage
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
@@ -74,8 +74,9 @@ fun PagedCarousel(
 
     val pagerState = rememberPagerState(select) { pagingItems?.itemCount ?: 1 }
 
-    LaunchedEffect(loading, select) {
-        if (!loading) {
+    LaunchedEffect(loading, select, pagingItems?.itemCount) {
+        Log.debug("Loading: $loading select: $select from ${pagingItems?.itemCount}")
+        if (!loading && (pagingItems?.itemCount ?: 0) > select) {
             pagerState.scrollToPage(select)
         }
     }
@@ -83,7 +84,7 @@ fun PagedCarousel(
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // HorizontalPager composable: Swiping through images
         if (pagingItems == null || pagingItems.loadState.refresh is LoadState.Loading) {
-            CircularProgressIndicator()
+            ProgressIndicator()
         } else {
             HorizontalPager(
                 state = pagerState,

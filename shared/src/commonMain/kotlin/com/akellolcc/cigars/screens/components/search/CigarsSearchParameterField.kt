@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:05 PM
+ * Last modified 6/1/24, 3:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
@@ -75,19 +76,19 @@ class CigarsSearchParameterField<T : Comparable<T>>(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().testTag("SearchParameterField-${parameter.key}"),
+            modifier = Modifier.fillMaxWidth().testTag(testTag(CigarSortingFields.fromString(parameter.key))),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (showLeading) {
                 IconButton(
-                    modifier = Modifier.testTag("SearchParameterField-${parameter.key}-leading").wrapContentSize(),
+                    modifier = Modifier.testTag(testTag(CigarSortingFields.fromString(parameter.key), "leading")).wrapContentSize(),
                     onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
                 }
             }
             TextStyled(
-                modifier = Modifier.testTag("SearchParameterField-${parameter.key}-input").weight(1f).onFocusChanged {
+                modifier = Modifier.testTag(testTag(CigarSortingFields.fromString(parameter.key), "input")).weight(1f).onFocusChanged {
                     viewModel.onFocusChange(it.isFocused)
                 },
                 label = parameter.label,

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:20 AM
+ * Last modified 6/1/24, 12:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,9 +20,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -35,8 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.camera.PermissionType
 import com.akellolcc.cigars.camera.SharedImage
 import com.akellolcc.cigars.camera.createPermissionsManager
@@ -48,6 +48,7 @@ import com.akellolcc.cigars.mvvm.base.HumidorImagesViewScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.components.ProgressIndicator
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.DefaultTheme
@@ -125,6 +126,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
         viewModel =
             rememberScreenModel {
                 val params = route.data as Pair<*, *>
@@ -135,6 +137,9 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                 }
             }
 
+        viewModel.observeEvents(route.route) {
+            handleAction(it, navigator)
+        }
         imageActions()
 
         LaunchedEffect(Unit) {
@@ -143,7 +148,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().testTag(route.route),
                 topBar = {
                     CenterAlignedTopAppBar(
                         navigationIcon = {
@@ -152,10 +157,14 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                             }
                         },
                         actions = {
-                            IconButton(onClick = { viewModel.launchCamera = true }) {
+                            IconButton(
+                                modifier = Modifier.testTag("camera_button"),
+                                onClick = { viewModel.launchCamera = true }) {
                                 loadIcon(Images.icon_menu_camera, Size(24.0F, 24.0F))
                             }
-                            IconButton(onClick = { viewModel.launchGallery = true }) {
+                            IconButton(
+                                modifier = Modifier.testTag("gallery_button"),
+                                onClick = { viewModel.launchGallery = true }) {
                                 loadIcon(Images.icon_menu_image, Size(24.0F, 24.0F))
                             }
                         },
@@ -164,17 +173,14 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
-                )
-                {
+                ) {
                     if (viewModel.loading) {
                         Box(
                             modifier = Modifier.fillMaxSize()
                                 .background(materialColor(MaterialColors.color_transparent)),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.width(64.dp),
-                            )
+                            ProgressIndicator(size = 64f)
                         }
                     } else {
                         Column(

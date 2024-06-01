@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:05 PM
+ * Last modified 6/1/24, 3:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,11 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import app.cash.paging.LoadStateNotLoading
 import app.cash.paging.compose.collectAsLazyPagingItems
 import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsBrandsSearchViewModel
@@ -114,7 +116,7 @@ class CigarsSearchBrandField(
         ) {
             if (showLeading) {
                 IconButton(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier.wrapContentSize().testTag(testTag(CigarSortingFields.Brand, "leading")),
                     onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
@@ -128,7 +130,7 @@ class CigarsSearchBrandField(
                 TextStyled(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
                         viewModel.onFocusChange(it.isFocused)
-                    },
+                    }.testTag(testTag(CigarSortingFields.Brand, "input")),
                     label = parameter.label,
                     text = viewModel.value,
                     enabled = enabled,
@@ -142,7 +144,7 @@ class CigarsSearchBrandField(
                     trailingIcon = if (viewModel.hasBrands(pagingItems)) {
                         @Composable {
                             IconButton(
-                                modifier = Modifier.wrapContentSize(),
+                                modifier = Modifier.wrapContentSize().testTag(testTag(CigarSortingFields.Brand, "drop_down")),
                                 onClick = {
                                     viewModel.onDropDown(viewModel.expanded)
                                 }
@@ -171,7 +173,7 @@ class CigarsSearchBrandField(
                     LazyColumn(
                         state = listState,
                         verticalArrangement = Arrangement.Top,
-                        modifier = Modifier.width(with.pxToDp()).height(menuHeight.dp)
+                        modifier = Modifier.width(with.pxToDp()).height(menuHeight.dp).testTag(testTag(CigarSortingFields.Brand, "list"))
                     ) {
                         pagingItems?.let { items ->
                             items(count = items.itemCount) { index ->

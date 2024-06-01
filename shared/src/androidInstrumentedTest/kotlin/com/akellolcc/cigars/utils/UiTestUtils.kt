@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/30/24, 2:01 PM
+ * Last modified 6/1/24, 3:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,6 +69,14 @@ fun ComposeTestRule.waitForText(
 }
 
 @OptIn(ExperimentalTestApi::class)
+fun ComposeTestRule.waitForTag(
+    tag: String,
+    timeoutMillis: Long = 10000
+) {
+    waitUntilAtLeastOneExists(hasTestTag(tag), timeoutMillis = timeoutMillis)
+}
+
+@OptIn(ExperimentalTestApi::class)
 fun ComposeTestRule.sleep(
     timeoutMillis: Long
 ) {
@@ -103,6 +111,19 @@ fun SemanticsNodeInteractionsProvider.childWithTag(
         useUnmergedTree = useUnmergedTree
     )
 }
+
+fun SemanticsNodeInteractionsProvider.assertHasNodesWithTag(expected: List<String>) {
+    for (tag in expected) {
+        onNodeWithTag(tag).assertExists()
+    }
+}
+
+fun SemanticsNodeInteractionsProvider.assertNoNodesWithTag(expected: List<String>) {
+    for (tag in expected) {
+        onNodeWithTag(tag).assertDoesNotExist()
+    }
+}
+
 
 fun SemanticsNodeInteractionsProvider.assertNodeText(
     tag: String,

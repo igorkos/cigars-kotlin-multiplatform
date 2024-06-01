@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/30/24, 10:36 PM
+ * Last modified 5/31/24, 5:34 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@ import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
+import com.akellolcc.cigars.screens.navigation.CigarImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.theme.Localize
@@ -660,6 +661,45 @@ class CigarDetailsTests : BaseUiTest() {
             nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
             nodes.assertCountEquals(3)
             nodes.getListRow(0).assertHasChildWithText("Removed 1 cigar")
+
+            pressBackButton()
+            sleep(1500)
+            moveCigars(
+                "Case Elegance Renzo Humidor",
+                10,
+                "Second",
+                5,
+                listOf("Case Elegance Renzo Humidor"),
+                listOf("Second"),
+                listOf("Total number of cigars: 10", "Case Elegance Renzo Humidor", "Second"),
+                listOf("5", "5"),
+            )
+            onNodeWithTag(tag("history_button")).assertExists().performClick()
+            sleep(500)
+            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
+            nodes.assertCountEquals(4)
+            nodes.getListRow(0).assertHasChildWithText("Moved 5 cigars")
+        }
+    }
+
+    @Test
+    fun cigarImagesTest() {
+        with(composeTestRule) {
+            setContent {
+                CigarsAppContent()
+            }
+            //Wait for app to load
+            waitForText("Cigars")
+            sleep(500)
+            //Check items displayed
+            onNodeWithTag("${CigarsRoute.route}-List").onChildren().assertCountEquals(5)
+            textIsDisplayed("#1", true)
+            onNodeWithText("#1", true).performClick()
+            sleep(500)
+
+            onNodeWithTag("ImagesCarousel").assertExists().performClick()
+            sleep(500)
+            onNodeWithTag(CigarImagesViewRoute.route).assertExists()
         }
     }
 

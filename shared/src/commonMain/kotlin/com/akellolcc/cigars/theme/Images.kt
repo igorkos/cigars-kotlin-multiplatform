@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/30/24, 3:52 PM
+ * Last modified 5/31/24, 1:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,7 +86,7 @@ class Images {
         val icon_star_empty = MR.images.icon_star_empty
         val icon_star_filled = MR.images.icon_star_full
         val icon_menu_history = MR.images.icon_menu_history
-
+        val icon_cigars = MR.images.icon_cigars
         val icon_arrow_left = MR.images.arrow_left
         val icon_arrow_right = MR.images.arrow_right
         val icon_bin = MR.images.icon_bin

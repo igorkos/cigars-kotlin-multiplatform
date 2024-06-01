@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:03 PM
+ * Last modified 6/1/24, 2:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,13 +26,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
@@ -61,6 +59,7 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.screens.components.ProgressIndicator
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -120,7 +119,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().testTag(tag()),
                 topBar = { topTabBar(scrollBehavior) },
                 bottomBar = {
                     Box(
@@ -180,7 +179,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                 } else {
                     // Log.debug("${this::class.simpleName} items count: ${pagingItems.itemCount}")
                     LazyColumn(
-                        modifier = Modifier.testTag("${route.route}-List"),
+                        modifier = Modifier.testTag(tag("List")),
                         state = listState,
                         verticalArrangement = Arrangement.Top,
                     )
@@ -215,9 +214,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.width(32.dp),
-                    )
+                    ProgressIndicator()
                 }
             }
         }

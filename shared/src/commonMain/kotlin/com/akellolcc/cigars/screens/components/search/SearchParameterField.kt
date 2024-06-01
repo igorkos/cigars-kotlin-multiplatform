@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 10:51 PM
+ * Last modified 6/1/24, 3:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@ package com.akellolcc.cigars.screens.components.search
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
+import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
@@ -39,5 +40,11 @@ abstract class SearchParameterField<T : Comparable<T>>(
     protected fun onAction(action: CigarsSearchFieldBaseViewModel.Action) {
         Log.debug("Send action: $action")
         onAction?.invoke(action)
+    }
+
+    companion object {
+        fun testTag(type: CigarSortingFields, component: String? = null): String {
+            return "SearchParameterField-${type.value}${if (component != null) "-$component" else ""}"
+        }
     }
 }

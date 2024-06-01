@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/21/24, 11:18 PM
+ * Last modified 5/31/24, 12:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,15 +19,12 @@ package com.akellolcc.cigars
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.registry.rememberScreen
 import cafe.adriel.voyager.navigator.Navigator
@@ -49,6 +46,7 @@ import com.akellolcc.cigars.mvvm.search.CigarsBrandsSearchViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldViewModel
 import com.akellolcc.cigars.mvvm.search.SearchCigarScreenViewModel
+import com.akellolcc.cigars.screens.components.ProgressIndicator
 import com.akellolcc.cigars.screens.navigation.SharedScreen
 import com.akellolcc.cigars.screens.navigation.mainScreenModule
 import com.akellolcc.cigars.theme.DefaultTheme
@@ -163,10 +161,7 @@ fun CigarsApplication() {
                     )
                 ), contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(64.dp),
-                    color = materialColor(MaterialColors.color_primary)
-                )
+                ProgressIndicator(size = 64f)
             }
         } else {
             val postMainScreen = rememberScreen(SharedScreen.MainScreen)

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:20 AM
+ * Last modified 5/31/24, 12:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,6 +38,7 @@ import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.mvvm.search.SearchCigarScreenViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
+import com.akellolcc.cigars.screens.components.ProgressIndicator
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.search.SearchComponent
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
@@ -121,9 +120,7 @@ class SearchCigarScreen(
                 modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.width(32.dp),
-                )
+                ProgressIndicator()
             }
         }
     }

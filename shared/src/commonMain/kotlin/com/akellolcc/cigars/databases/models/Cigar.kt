@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 2:26 PM
+ * Last modified 6/1/24, 3:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -264,6 +264,12 @@ enum class CigarSortingFields(val value: String) {
             return CigarSortingFields.entries.map {
                 it to localized(it)
             }.toTypedArray()
+        }
+
+        fun fromString(value: String): CigarSortingFields {
+            return CigarSortingFields.entries.firstOrNull {
+                it.value == value
+            } ?: Name
         }
 
         fun filterList(): FiltersList {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 9:38 PM
+ * Last modified 6/1/24, 2:39 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.akellolcc.cigars.CigarsApplication
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import dev.icerock.moko.resources.FileResource
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -32,6 +33,8 @@ import java.net.HttpURLConnection
 typealias MockRequestHandler = (request: RecordedRequest) -> MockResponse
 
 open class BaseUiTest() {
+
+    var route: NavRoute? = null
 
     companion object {
         const val MOCK_SERVER_PORT = 47777
@@ -83,4 +86,10 @@ open class BaseUiTest() {
         httpMethod: String = "GET",
 
         ) = dispatcher.addResponse(pathPattern, requestHandler, httpMethod)
+
+    fun tag(component: String? = null, route: NavRoute? = null): String {
+        val root = route?.route ?: this.route?.route ?: ""
+        if (component == null) return root
+        return "${root}-$component"
+    }
 }

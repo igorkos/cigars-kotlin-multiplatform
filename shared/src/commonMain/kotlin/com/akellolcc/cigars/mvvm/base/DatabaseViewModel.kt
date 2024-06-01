@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 10:36 AM
+ * Last modified 5/31/24, 1:44 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,10 +36,10 @@ open class DatabaseViewModel<T : BaseEntity> : ActionsViewModel() {
         screenModelScope.launch {
             loading = true
             query.cancellable().collect {
+                loading = false
                 onCompletion?.invoke(it)
                 this.cancel()
             }
-            loading = false
         }
     }
 

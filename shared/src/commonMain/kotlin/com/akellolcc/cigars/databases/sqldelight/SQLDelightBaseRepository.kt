@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/29/24, 2:21 PM
+ * Last modified 5/31/24, 8:18 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,7 @@ import com.akellolcc.cigars.databases.models.BaseEntity
 import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.databases.sqldelight.queries.DatabaseQueries
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.components.search.data.FiltersList
 import com.akellolcc.cigars.utils.collectFirst
@@ -128,6 +129,7 @@ abstract class SQLDelightBaseRepository<ENTITY : BaseEntity>(protected open val 
                     wrapper.add(entity)
                     val id = lastInsertRowId()
                     entity.rowid = id
+                    Log.debug("Added entity: $entity")
                     emit(entity)
                 }
             } else {

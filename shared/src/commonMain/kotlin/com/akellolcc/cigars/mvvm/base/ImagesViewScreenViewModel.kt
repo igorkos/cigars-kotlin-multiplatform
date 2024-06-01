@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 10:41 AM
+ * Last modified 5/31/24, 6:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,16 +31,10 @@ import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.utils.ObjectFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
 
 abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) : BaseListViewModel<CigarImage>(), PermissionCallback {
     var launchCamera by mutableStateOf(false)
     var launchGallery by mutableStateOf(false)
-    private var lastSelect by mutableStateOf(select)
     var select by mutableStateOf(select)
 
     var permissionCamera by mutableStateOf(false)
@@ -50,15 +44,11 @@ abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) : BaseLi
 
     abstract fun getImage(bytes: ByteArray): CigarImage
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun addImages(images: List<SharedImage>) {
-        //lastSelect = entities.size
-        executeQuery(
-            images.asFlow().map {
-                it.toByteArray()
-            }.filterNotNull().flatMapConcat {
-                repository.add(getImage(it))
-            })
+        val list = images.map { getImage(it.toByteArray()!!) }
+        executeQuery(repository.addAll(list)) {
+            select = repository.count().toInt() - 1
+        }
     }
 
     override fun entitySelected(entity: CigarImage) {}
@@ -85,7 +75,9 @@ abstract class BaseImagesViewScreenViewModel(val id: Long, select: Int) : BaseLi
         }
     }
 
-    sealed interface ImageScreenAction : CommonAction
+    sealed interface ImageScreenAction : CommonAction {
+        data class AddImages(val images: List<SharedImage>) : ImageScreenAction
+    }
 }
 
 class CigarImagesViewScreenViewModel(val cigar: Cigar, select: Int) :
