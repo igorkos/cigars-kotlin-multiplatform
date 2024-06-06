@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 8:16 PM
+ * Last modified 6/6/24, 2:26 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.screenListContentDescription
-import pressButton
+import selectTab
 import textIsDisplayed
 import waitForScreen
 import kotlin.test.Test
@@ -40,16 +40,16 @@ class CigarsAppTest() : BaseUiTest() {
             waitForScreen(CigarsRoute)
             assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
 
-            pressButton(HumidorsRoute.title)
+            selectTab(HumidorsRoute)
             waitForScreen(HumidorsRoute)
             assertListOrder(screenListContentDescription(HumidorsRoute), listOf("Case Elegance Renzo Humidor", "Second"))
 
-            pressButton(FavoritesRoute.title)
+            selectTab(FavoritesRoute)
             waitForScreen(FavoritesRoute)
             onNodeWithTag(screenListContentDescription(FavoritesRoute)).assertDoesNotExist()
             textIsDisplayed(Localize.list_is_empty)
 
-            pressButton(Localize.title_search)
+            selectTab(SearchCigarRoute)
             waitForScreen(SearchCigarRoute)
         }
     }
