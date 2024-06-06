@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:05 PM
+ * Last modified 6/6/24, 11:12 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchControlViewModel
@@ -66,24 +67,28 @@ private data class SearchComponentImplement(
         }
 
         Column(modifier = modifier) {
-            viewModel.fields.controls.mapIndexed { index, it ->
-                it.showLeading = fields.showLeading
-                it.onAction = { action ->
-                    viewModel.onFieldAction(action)
-                }
-                it.Content()
+            //Field controls
+            viewModel.fields.controls.map {
+                it.apply {
+                    showLeading = fields.showLeading
+                    onAction = { action ->
+                        viewModel.onFieldAction(action)
+                    }
+                }.Content()
             }
+            //Add field button
             if (fields.availableFields.isNotEmpty()) {
                 Column(
                     modifier = Modifier.wrapContentSize(),
                     horizontalAlignment = Alignment.End
                 ) {
                     LinkButton(
+                        modifier = Modifier.semantics { contentDescription = Localize.filter_control_add_field_descr },
                         title = Localize.button_title_add_search_field,
                         onClick = { viewModel.expanded = true }
                     )
                     DropdownMenu(
-                        modifier = Modifier.testTag("SearchComponent-FieldsMenu"),
+                        modifier = Modifier.semantics { contentDescription = Localize.filter_control_add_field_menu_descr },
                         expanded = viewModel.expanded,
                         onDismissRequest = { viewModel.expanded = false }) {
                         fields.availableFields.map {
@@ -94,7 +99,9 @@ private data class SearchComponentImplement(
                                 text = {
                                     TextStyled(
                                         it.label,
-                                        TextStyles.Subhead
+                                        it.label,
+                                        TextStyles.Subhead,
+                                        labelStyle = TextStyles.None
                                     )
                                 },
                                 onClick = {
@@ -125,4 +132,10 @@ fun SearchComponent(
         searchComponent.value = SearchComponentImplement(modifier, field, onAction)
     }
     searchComponent.value?.Content()
+}
+
+class SearchComponent {
+    companion object {
+        const val MENU_TAG = "SearchComponent-FieldsMenu"
+    }
 }

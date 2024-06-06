@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:05 PM
+ * Last modified 6/5/24, 3:01 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,7 @@ import com.akellolcc.cigars.screens.navigation.MainRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.DefaultTheme
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import kotlin.jvm.Transient
@@ -182,6 +183,13 @@ fun RowScope.TabNavigationItem(tab: ITabItem<*>) {
             )
         },
         icon = { loadIcon(tab.route.icon, Size(width = 24f, height = 24f)) },
-        label = { TextStyled(text = tab.route.title, style = TextStyles.BarItemTitle) },
+        label = {
+            TextStyled(
+                tab.route.title,
+                Localize.nav_tab_title_desc,
+                TextStyles.BarItemTitle,
+                labelStyle = TextStyles.None
+            )
+        },
     )
 }

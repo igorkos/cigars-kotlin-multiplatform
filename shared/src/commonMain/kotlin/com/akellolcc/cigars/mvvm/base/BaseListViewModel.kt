@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 10:41 AM
+ * Last modified 6/5/24, 9:26 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,8 +44,7 @@ abstract class BaseListViewModel<T : BaseEntity> : DatabaseViewModel<T>() {
 
     abstract fun entitySelected(entity: T)
 
-    val accenting: Boolean
-        get() = sortField?.value == true
+    var accenting by mutableStateOf(true)
 
     var sorting: FilterParameter<Boolean>?
         get() = sortField
@@ -55,8 +54,7 @@ abstract class BaseListViewModel<T : BaseEntity> : DatabaseViewModel<T>() {
         }
 
     open fun sortingOrder(ascending: Boolean) {
-        sortField?.value = ascending
-        paging(true)
+        accenting = ascending
     }
 
     open fun updateSearch(value: Boolean) {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:20 AM
+ * Last modified 6/5/24, 1:12 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,7 +88,14 @@ class HumidorsListScreen(
                     loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
                 }
             },
-            title = { TextStyled(text = route.title, style = TextStyles.ScreenTitle) },
+            title = {
+                TextStyled(
+                    text = route.title,
+                    Localize.nav_header_title_desc,
+                    TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
+                )
+            },
             scrollBehavior = scrollBehavior
         )
     }
@@ -110,10 +117,12 @@ class HumidorsListScreen(
 
             ) {
                 TextStyled(
-                    maxLines = 2,
-                    minLines = 2,
                     text = entity.name,
+                    Localize.cigar_details_name,
                     style = TextStyles.Headline,
+                    labelStyle = TextStyles.None,
+                    maxLines = 2,
+                    minLines = 2
                 )
             }
             Row(
@@ -128,7 +137,9 @@ class HumidorsListScreen(
                         entity.count,
                         entity.holds - entity.count
                     ),
-                    style = TextStyles.Subhead
+                    Localize.cigar_details_notes,
+                    style = TextStyles.Subhead,
+                    labelStyle = TextStyles.None,
                 )
             }
         }

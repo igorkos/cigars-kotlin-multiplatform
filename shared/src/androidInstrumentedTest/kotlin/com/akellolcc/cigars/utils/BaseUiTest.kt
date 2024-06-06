@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 2:39 PM
+ * Last modified 6/5/24, 8:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,9 @@
 
 package com.akellolcc.cigars.utils
 
-import androidx.compose.runtime.Composable
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.akellolcc.cigars.CigarsApplication
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.logging.Log
@@ -27,14 +28,55 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Rule
 import java.net.HttpURLConnection
 
 typealias MockRequestHandler = (request: RecordedRequest) -> MockResponse
 
 open class BaseUiTest() {
 
+    @get:Rule(order = 0)
+    val composeTestRule = createAndroidComposeRule(ComponentActivity::class.java)
+
     var route: NavRoute? = null
+
+    @Before
+    fun before() {
+        with(composeTestRule) {
+            setContent {
+                setAppContext(LocalContext.current)
+                Database.createInstance(false)
+                Database.instance.reset()
+                Pref.isFirstStart = true
+                CigarsApplication()
+            }
+            setUp()
+        }
+    }
+
+    open fun setUp() {}
+
+    fun addResponse(
+        pathPattern: String,
+        filename: FileResource,
+        httpMethod: String = "GET",
+        status: Int = HttpURLConnection.HTTP_OK
+    ) = dispatcher.addResponse(pathPattern, filename, httpMethod, status)
+
+    fun addResponse(
+        pathPattern: String,
+        requestHandler: MockRequestHandler,
+        httpMethod: String = "GET",
+
+        ) = dispatcher.addResponse(pathPattern, requestHandler, httpMethod)
+
+    fun tag(component: String? = null, route: NavRoute? = null): String {
+        val root = route?.route ?: this.route?.route ?: ""
+        if (component == null) return root
+        return "${root}-$component"
+    }
 
     companion object {
         const val MOCK_SERVER_PORT = 47777
@@ -64,32 +106,4 @@ open class BaseUiTest() {
         }
     }
 
-    @Composable
-    fun CigarsAppContent() {
-        setAppContext(LocalContext.current)
-        Database.createInstance(false)
-        Database.instance.reset()
-        Pref.isFirstStart = true
-        CigarsApplication()
-    }
-
-    fun addResponse(
-        pathPattern: String,
-        filename: FileResource,
-        httpMethod: String = "GET",
-        status: Int = HttpURLConnection.HTTP_OK
-    ) = dispatcher.addResponse(pathPattern, filename, httpMethod, status)
-
-    fun addResponse(
-        pathPattern: String,
-        requestHandler: MockRequestHandler,
-        httpMethod: String = "GET",
-
-        ) = dispatcher.addResponse(pathPattern, requestHandler, httpMethod)
-
-    fun tag(component: String? = null, route: NavRoute? = null): String {
-        val root = route?.route ?: this.route?.route ?: ""
-        if (component == null) return root
-        return "${root}-$component"
-    }
 }

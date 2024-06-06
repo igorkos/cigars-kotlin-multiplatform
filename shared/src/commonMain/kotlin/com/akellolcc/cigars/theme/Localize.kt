@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 3:17 PM
+ * Last modified 6/5/24, 11:52 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,9 +34,29 @@ object Localize {
     val app_name: String = Strings.app_name.toString()
 
     val title_humidors: String = Strings.title_humidors.toString()
+    val title_humidors_desc: String = Strings.title_humidors_desc.toString()
     val title_cigars: String = Strings.title_cigars.toString()
+    val title_cigars_desc: String = Strings.title_cigars_desc.toString()
     val title_favorites: String = Strings.title_favorites.toString()
+    val title_favorites_desc: String = Strings.title_favorites_desc.toString()
     val title_search: String = Strings.title_search.toString()
+    val title_search_desc: String = Strings.title_search_desc.toString()
+    val title_cigars_details: String = Strings.title_cigars_details.toString()
+    val title_cigars_details_desc: String = Strings.title_cigars_details_desc.toString()
+    val title_cigars_search_details: String = Strings.title_cigars_search_details.toString()
+    val title_cigars_search_details_desc: String = Strings.title_cigars_search_details_desc.toString()
+    val title_cigar_history: String = Strings.title_cigar_history.toString()
+    val title_cigar_history_desc: String = Strings.title_cigar_history_desc.toString()
+    val title_humidor_details: String = Strings.title_humidor_details.toString()
+    val title_humidor_details_desc: String = Strings.title_humidor_details_desc.toString()
+    val title_humidor_history: String = Strings.title_humidor_history.toString()
+    val title_humidor_history_desc: String = Strings.title_humidor_history_desc.toString()
+    val title_cigar_images: String = Strings.title_cigar_images.toString()
+    val title_cigar_images_desc: String = Strings.title_cigar_images_desc.toString()
+    val title_humidor_images: String = Strings.title_humidor_images.toString()
+    val title_humidor_images_desc: String = Strings.title_humidor_images_desc.toString()
+    val title_humidor_cigars: String = Strings.title_humidor_cigars.toString()
+    val title_humidor_cigars_desc: String = Strings.title_humidor_cigars_desc.toString()
     val title_login: String = Strings.login.toString()
 
     val button_cancel = Strings.button_cancel.toString()
@@ -44,6 +64,16 @@ object Localize {
     val button_add = Strings.button_add.toString()
 
     val list_is_empty = Strings.list_is_empty.toString()
+    val list_sorting_item = Strings.list_sorting_item.toString()
+    val screen_list_descr = Strings.screen_list_descr.toString()
+    val screen_list_filter_action_descr = Strings.screen_list_filter_action_descr.toString()
+    val screen_list_filter_control_descr = Strings.screen_list_filter_control_descr.toString()
+    val filter_control_add_field_descr = Strings.filter_control_add_field_descr.toString()
+    val filter_control_add_field_menu_descr = Strings.filter_control_add_field_menu_descr.toString()
+
+    val screen_list_sort_action_descr = Strings.screen_list_sort_action_descr.toString()
+    val screen_list_sort_fields_action_descr = Strings.screen_list_sort_fields_action_descr.toString()
+    val screen_list_sort_fields_list_descr = Strings.screen_list_sort_fields_list_descr.toString()
 
     val cigar_details_name = Strings.cigar_details_name.toString()
     val cigar_details_company = Strings.cigar_details_company.toString()
@@ -64,6 +94,7 @@ object Localize {
     val cigar_details_rating = Strings.cigar_details_rating.toString()
     val cigar_details_myrating = Strings.cigar_details_myrating.toString()
     val cigar_details_humidors = Strings.cigar_details_humidors.toString()
+    val cigar_details_notes = Strings.cigar_details_notes.toString()
     val cigar_details_link = Strings.cigar_details_link.toString()
     val cigar_details_count_dialog = Strings.cigar_details_count_dialog.toString()
     val cigar_details_count_dialog_price = Strings.cigar_details_count_dialog_price.toString()
@@ -124,12 +155,17 @@ object Localize {
     val history_type_addition = Strings.history_type_addition.toString()
     val history_type_deletion = Strings.history_type_deletion.toString()
     val history_type_move = Strings.history_type_move.toString()
+    val history_date_desc = Strings.history_date_desc.toString()
+
+    val nav_header_title_desc = Strings.nav_header_title_desc.toString()
+    val nav_tab_title_desc = Strings.nav_tab_title_desc.toString()
 
     val button_title_add_search_field = Strings.button_title_add_search_field.toString()
     fun humidor_cigars(v: Long, v1: Long): String {
         return Strings.humidor_cigars.createLocalizedString(v, v1).toString()
     }
 
+    val cigar_details_total_desc = Strings.cigar_details_total_desc.toString()
     fun cigar_details_total(v: Long): String {
         return Strings.cigar_details_total.createLocalizedString(v).toString()
     }

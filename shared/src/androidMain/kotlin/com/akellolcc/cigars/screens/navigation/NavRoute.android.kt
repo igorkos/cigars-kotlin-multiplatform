@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/30/24, 12:20 PM
+ * Last modified 6/5/24, 2:43 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@ actual class NavRoute : java.io.Serializable {
     actual constructor(
         route: String,
         title: String,
+        semantics: String,
         icon: ImageResource,
         data: Any?,
         isTabsVisible: Boolean,
@@ -33,6 +34,7 @@ actual class NavRoute : java.io.Serializable {
     ) {
         this.route = route
         this.title = title
+        this.semantics = semantics
         this.icon = icon
         this.data = data
         this.isTabsVisible = isTabsVisible
@@ -43,6 +45,7 @@ actual class NavRoute : java.io.Serializable {
 
     actual val route: String
     actual val title: String
+    actual val semantics: String
 
     //Exclude from Java serialization
     @Transient

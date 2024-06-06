@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/30/24, 12:42 PM
+ * Last modified 6/5/24, 1:40 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,12 +101,16 @@ fun <T : Comparable<T>> ValuePicker(
                 ) {
                     TextStyled(
                         label,
+                        label ?: "",
                         TextStyles.Description,
+                        labelStyle = TextStyles.None
                     )
                 }
                 TextStyled(
                     selected?.label,
+                    selected?.label ?: "",
                     TextStyles.Subhead,
+                    labelStyle = TextStyles.None,
                     maxLines = 1,
                     minLines = 1
                 )
@@ -142,7 +146,9 @@ fun <T : Comparable<T>> ValuePicker(
                     text = {
                         TextStyled(
                             it.label,
+                            it.label,
                             TextStyles.Subhead,
+                            labelStyle = TextStyles.None,
                             maxLines = 1,
                             minLines = 1
                         )

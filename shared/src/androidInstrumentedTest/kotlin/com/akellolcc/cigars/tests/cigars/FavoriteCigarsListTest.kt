@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 4:35 PM
+ * Last modified 6/5/24, 8:43 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,34 +16,26 @@
 
 package com.akellolcc.cigars.tests.cigars
 
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import assertListOrder
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.FavoritesRoute
-import com.akellolcc.cigars.utils.assertListOrder
 import com.akellolcc.cigars.utils.childWithTag
-import com.akellolcc.cigars.utils.pressBackButton
-import com.akellolcc.cigars.utils.pressButton
-import com.akellolcc.cigars.utils.waitForTag
-import org.junit.Before
+import pressBackButton
+import pressButton
+import waitForScreen
+import waitForTag
 
 class FavoriteCigarsListTest : CigarsListTests() {
 
-    @Before
-    override fun before() {
-        route = CigarsRoute
+    override fun setUp() {
         with(composeTestRule) {
-            setContent {
-                CigarsAppContent()
-            }
-            //Wait for app to load
-            waitForTag(tag(route = CigarsRoute))
-            onNodeWithTag(tag("List", CigarsRoute)).onChildren()
-                .assertListOrder(5, listOf("#1", "#2", "#3", "#4", "#5"))
+            waitForScreen(CigarsRoute)
+            assertListOrder(tag("List", CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
             setFavorite("#1")
             setFavorite("#2")
             setFavorite("#3")
@@ -54,7 +46,6 @@ class FavoriteCigarsListTest : CigarsListTests() {
             route = FavoritesRoute
             waitForTag(tag())
         }
-
     }
 
     private fun setFavorite(cigar: String) {

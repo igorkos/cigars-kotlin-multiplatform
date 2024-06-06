@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 3:57 PM
+ * Last modified 6/6/24, 11:54 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,8 +43,13 @@ abstract class SearchParameterField<T : Comparable<T>>(
     }
 
     companion object {
-        fun testTag(type: CigarSortingFields, component: String? = null): String {
-            return "SearchParameterField-${type.value}${if (component != null) "-$component" else ""}"
+        const val INPUT_FIELD_TAG = "input field"
+        const val LEADING_TAG = "remove button"
+        const val DROP_DOWN_TAG = "DropDown"
+        const val DROP_DOWN_LIST = "List"
+
+        fun semantics(type: CigarSortingFields, component: String? = null): String {
+            return "Search field ${type.value}${if (component != null) " $component" else ""}"
         }
     }
 }

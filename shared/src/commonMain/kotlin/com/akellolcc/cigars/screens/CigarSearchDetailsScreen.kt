@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:16 AM
+ * Last modified 6/5/24, 12:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -159,7 +159,9 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
                     ) {
                         TextStyled(
                             Localize.cigar_search_details_add_dialog,
+                            Localize.nav_header_title_desc,
                             TextStyles.Headline,
+                            labelStyle = TextStyles.None,
                         )
                         Column(
                             modifier = Modifier.wrapContentSize().padding(top = 24.dp),
@@ -188,8 +190,8 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
                         ) {
                             TextStyled(
                                 if (count.value > 0) "${count.value}" else "",
+                                Localize.cigar_search_details_add_count_dialog,
                                 TextStyles.Headline,
-                                label = Localize.cigar_search_details_add_count_dialog,
                                 modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
                                 editable = true,
                                 inputMode = InputMode.Number,
@@ -201,8 +203,8 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
                             )
                             TextStyled(
                                 if (price.value > 0) "${price.value}" else "",
+                                Localize.cigar_search_details_add_price_dialog,
                                 TextStyles.Headline,
-                                label = Localize.cigar_search_details_add_price_dialog,
                                 modifier = Modifier.fillMaxWidth(),
                                 editable = true,
                                 inputMode = InputMode.Price,

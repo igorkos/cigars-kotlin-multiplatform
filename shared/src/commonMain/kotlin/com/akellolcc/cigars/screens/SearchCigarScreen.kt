@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:59 PM
+ * Last modified 6/5/24, 1:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,7 +84,9 @@ class SearchCigarScreen(
                 text = {
                     TextStyled(
                         it.label,
-                        TextStyles.Subhead
+                        Localize.list_sorting_item,
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.None
                     )
                 },
                 onClick = {
@@ -141,10 +143,12 @@ class SearchCigarScreen(
 
             ) {
                 TextStyled(
-                    maxLines = 2,
-                    minLines = 2,
                     text = entity.name,
+                    Localize.cigar_details_name,
                     style = TextStyles.Headline,
+                    labelStyle = TextStyles.None,
+                    maxLines = 2,
+                    minLines = 2
                 )
             }
             Row(

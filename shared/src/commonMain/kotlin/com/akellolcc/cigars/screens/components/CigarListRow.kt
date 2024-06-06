@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/1/24, 12:32 AM
+ * Last modified 6/5/24, 1:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,10 +63,12 @@ fun CigarListRow(entity: BaseEntity, modifier: Modifier) {
 
         ) {
             TextStyled(
+                cigar.name,
+                Localize.cigar_details_name,
+                style = TextStyles.Headline,
+                labelStyle = TextStyles.None,
                 maxLines = 2,
                 minLines = 2,
-                text = cigar.name,
-                style = TextStyles.Headline,
             )
         }
         Row(

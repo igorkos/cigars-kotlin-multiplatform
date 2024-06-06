@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:21 AM
+ * Last modified 6/5/24, 1:00 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -117,12 +117,20 @@ class HumidorCigarsScreen(override val route: NavRoute) :
         LargeTopAppBar(
             title = {
                 Column {
-                    TextStyled(text = viewModel.humidor.name, style = TextStyles.ScreenTitle)
+                    TextStyled(
+                        text = viewModel.humidor.name,
+                        Localize.nav_header_title_desc,
+                        TextStyles.ScreenTitle,
+                        labelStyle = TextStyles.None
+                    )
                     TextStyled(
                         text = Localize.humidor_cigars(
                             viewModel.humidor.count,
                             viewModel.humidor.holds - viewModel.humidor.count
-                        ), style = TextStyles.Subhead
+                        ),
+                        Localize.humidor_details_humidor,
+                        style = TextStyles.Subhead,
+                        labelStyle = TextStyles.None
                     )
                 }
             },

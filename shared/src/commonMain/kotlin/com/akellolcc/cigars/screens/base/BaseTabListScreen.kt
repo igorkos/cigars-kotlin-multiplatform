@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 2:11 PM
+ * Last modified 6/5/24, 9:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import app.cash.paging.compose.collectAsLazyPagingItems
@@ -119,7 +120,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().testTag(tag()),
+                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
                 topBar = { topTabBar(scrollBehavior) },
                 bottomBar = {
                     Box(
@@ -170,17 +171,20 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                         ),
                     ) {
                         TextStyled(
+                            Localize.list_is_empty,
+                            Localize.list_is_empty,
+                            style = TextStyles.Subhead,
+                            labelStyle = TextStyles.None,
                             modifier = Modifier.fillMaxWidth(),
                             center = true,
-                            text = Localize.list_is_empty,
-                            style = TextStyles.Subhead
                         )
                     }
                 } else {
                     // Log.debug("${this::class.simpleName} items count: ${pagingItems.itemCount}")
                     LazyColumn(
-                        modifier = Modifier.testTag(tag("List")),
+                        modifier = Modifier.semantics { contentDescription = "${route.title} ${Localize.screen_list_descr}" },
                         state = listState,
+                        reverseLayout = !viewModel.accenting,
                         verticalArrangement = Arrangement.Top,
                     )
                     {
@@ -236,7 +240,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
             actions = {
                 if (route.isSearchEnabled) {
                     IconButton(
-                        modifier = Modifier.testTag("${route.route}-Filter"),
+                        modifier = Modifier.semantics { contentDescription = Localize.screen_list_filter_action_descr },
                         onClick = { viewModel.updateSearch(!viewModel.search) }) {
                         loadIcon(
                             Images.tab_icon_search,
@@ -245,18 +249,18 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                     }
                 }
                 IconButton(
-                    modifier = Modifier.testTag("${route.route}-Sort"),
+                    modifier = Modifier.semantics { contentDescription = Localize.screen_list_sort_action_descr },
                     onClick = { viewModel.sortingOrder(!viewModel.accenting) }) {
                     loadIcon(
                         if (viewModel.accenting) Images.icon_menu_sort_alpha_asc else Images.icon_menu_sort_alpha_desc,
                         Size(24.0F, 24.0F)
                     )
                 }
-                IconButton(modifier = Modifier.testTag("${route.route}-SortField"),
+                IconButton(modifier = Modifier.semantics { contentDescription = Localize.screen_list_sort_fields_action_descr },
                     onClick = { expanded = !expanded }) {
                     loadIcon(Images.icon_menu, Size(24.0F, 24.0F))
                     DropdownMenu(
-                        modifier = Modifier.testTag("${route.route}-Menu"),
+                        modifier = Modifier.semantics { contentDescription = Localize.screen_list_sort_fields_list_descr },
                         expanded = expanded,
                         onDismissRequest = { expanded = false }) {
                         RightActionMenu {
@@ -265,9 +269,20 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                     }
                 }
             },
-            title = { TextStyled(text = route.title, style = TextStyles.ScreenTitle) },
+            title = {
+                TextStyled(
+                    route.title,
+                    Localize.nav_header_title_desc,
+                    TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
+                )
+            },
             scrollBehavior = scrollBehavior
         )
     }
 
+    companion object {
+        const val LIST_TAG = "List"
+        const val SEARCH_CONTROL = "SearchControl"
+    }
 }

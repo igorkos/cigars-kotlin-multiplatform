@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 12:06 PM
+ * Last modified 6/6/24, 12:12 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
@@ -50,8 +53,8 @@ import com.akellolcc.cigars.theme.textStyle
 @Composable
 fun TextStyled(
     text: String?,
+    label: String,
     style: TextStyles = TextStyles.Headline,
-    label: String? = null,
     labelSuffix: String = ":",
     labelStyle: TextStyles = TextStyles.Description,
     maxLines: Int = Int.MAX_VALUE,
@@ -83,47 +86,134 @@ fun TextStyled(
         }
     }
 
-    if (editable) {
-        var textFieldState by remember {
-            mutableStateOf(
-                TextFieldValue(
-                    text = text ?: "",
-                    selection = when {
-                        text.isNullOrEmpty() -> TextRange.Zero
-                        selection != null -> selection
-                        else -> TextRange(text.length, text.length)
-                    }
-                )
-            )
-        }
-
-        textFieldState = if (selection != null) {
-            textFieldState.copy(text = inputMode.fromTransformed(text), selection = selection)
-        } else {
-            textFieldState.copy(text = inputMode.fromTransformed(text))
-        }
-
-
-        TextField(
-            modifier = modifier,
-            value = textFieldState,
-            trailingIcon = trailingIcon ?: if (inputMode == InputMode.Text) {
-                {
-                    IconButton(
-                        modifier = Modifier.wrapContentSize(),
-                        onClick = {
-                            onValueChange?.invoke("")
-                            onKeyboardAction?.invoke(ImeAction.Default)
+    Column(modifier = Modifier.semantics(mergeDescendants = true) {
+        isTraversalGroup = true
+        contentDescription = label
+    }) {
+        if (editable) {
+            var textFieldState by remember {
+                mutableStateOf(
+                    TextFieldValue(
+                        text = text ?: "",
+                        selection = when {
+                            text.isNullOrEmpty() -> TextRange.Zero
+                            selection != null -> selection
+                            else -> TextRange(text.length, text.length)
                         }
-                    ) {
-                        loadIcon(Images.icon_menu_delete, Size(8.0F, 8.0F))
+                    )
+                )
+            }
+
+            textFieldState = if (selection != null) {
+                textFieldState.copy(text = inputMode.fromTransformed(text), selection = selection)
+            } else {
+                textFieldState.copy(text = inputMode.fromTransformed(text))
+            }
+
+
+            TextField(
+                modifier = modifier,
+                value = textFieldState,
+                trailingIcon = trailingIcon ?: if (inputMode == InputMode.Text) {
+                    {
+                        IconButton(
+                            modifier = Modifier.wrapContentSize(),
+                            onClick = {
+                                onValueChange?.invoke("")
+                                onKeyboardAction?.invoke(ImeAction.Default)
+                            }
+                        ) {
+                            loadIcon(Images.icon_menu_delete, Size(8.0F, 8.0F))
+                        }
                     }
-                }
-            } else null,
-            label = if (label != null) {
-                {
+                } else null,
+                label = if (labelStyle != TextStyles.None) {
+                    {
+                        Text(
+                            text = label,
+                            color = styleLabel.color,
+                            fontSize = styleLabel.fontSize,
+                            fontStyle = styleLabel.fontStyle,
+                            fontFamily = styleLabel.fontFamily,
+                            textAlign = styleLabel.textAlign,
+                            maxLines = 1,
+                            minLines = 1
+                        )
+                    }
+                } else null,
+                onValueChange = {
+                    if (inputMode.validate(it.text)) {
+                        textFieldState = it
+                        onValueChange?.invoke(inputMode.toTransformed(it.text))
+                    }
+                },
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        Log.debug("onDone")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Done)
+                    },
+                    onGo = {
+                        Log.debug("onGo")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Go)
+                    },
+                    onNext = {
+                        Log.debug("onNext")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Next)
+                    },
+                    onPrevious = {
+                        Log.debug("onPrevious")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Previous)
+                    },
+                    onSearch = {
+                        Log.debug("onSearch")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Search)
+                    },
+                    onSend = {
+                        Log.debug("onSend")
+                        hide = true
+                        onKeyboardAction?.invoke(ImeAction.Send)
+                    }),
+                minLines = minLines,
+                maxLines = maxLines,
+                singleLine = maxLines == 1,
+                textStyle = textStyle,
+                isError = isError,
+                prefix = if (prefix.isNullOrEmpty()) null else {
+                    @Composable {
+                        Text(
+                            modifier = Modifier.wrapContentSize(),
+                            text = prefix,
+                            color = textStyle.color,
+                            fontSize = textStyle.fontSize,
+                            fontStyle = textStyle.fontStyle,
+                            fontFamily = textStyle.fontFamily,
+                            textAlign = textStyle.textAlign,
+                            maxLines = 1,
+                        )
+                    }
+                },
+                supportingText = supportingText,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = inputMode.toKeyboardType(),
+                    autoCorrect = true,
+                    capitalization = Sentences,
+                    imeAction = imeAction
+                ),
+                enabled = enabled,
+                visualTransformation = inputMode.visualTransformation()
+            )
+        } else {
+            @Composable
+            fun context() {
+                if (labelStyle != TextStyles.None) {
                     Text(
-                        text = label,
+                        modifier = Modifier.padding(end = if (vertical) 0.dp else 8.dp),
+                        text = "$label$labelSuffix",
                         color = styleLabel.color,
                         fontSize = styleLabel.fontSize,
                         fontStyle = styleLabel.fontStyle,
@@ -133,108 +223,26 @@ fun TextStyled(
                         minLines = 1
                     )
                 }
-            } else null,
-            onValueChange = {
-                if (inputMode.validate(it.text)) {
-                    textFieldState = it
-                    onValueChange?.invoke(inputMode.toTransformed(it.text))
-                }
-            },
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    Log.debug("onDone")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Done)
-                },
-                onGo = {
-                    Log.debug("onGo")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Go)
-                },
-                onNext = {
-                    Log.debug("onNext")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Next)
-                },
-                onPrevious = {
-                    Log.debug("onPrevious")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Previous)
-                },
-                onSearch = {
-                    Log.debug("onSearch")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Search)
-                },
-                onSend = {
-                    Log.debug("onSend")
-                    hide = true
-                    onKeyboardAction?.invoke(ImeAction.Send)
-                }),
-            minLines = minLines,
-            maxLines = maxLines,
-            singleLine = maxLines == 1,
-            textStyle = textStyle,
-            isError = isError,
-            prefix = if (prefix.isNullOrEmpty()) null else {
-                @Composable {
-                    Text(
-                        modifier = Modifier.wrapContentSize(),
-                        text = prefix,
-                        color = textStyle.color,
-                        fontSize = textStyle.fontSize,
-                        fontStyle = textStyle.fontStyle,
-                        fontFamily = textStyle.fontFamily,
-                        textAlign = textStyle.textAlign,
-                        maxLines = 1,
-                    )
-                }
-            },
-            supportingText = supportingText,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = inputMode.toKeyboardType(),
-                autoCorrect = true,
-                capitalization = Sentences,
-                imeAction = imeAction
-            ),
-            enabled = enabled,
-            visualTransformation = inputMode.visualTransformation()
-        )
-    } else {
-        @Composable
-        fun context() {
-            label?.let {
                 Text(
-                    modifier = Modifier.padding(end = if (vertical) 0.dp else 8.dp),
-                    text = "$it$labelSuffix",
-                    color = styleLabel.color,
-                    fontSize = styleLabel.fontSize,
-                    fontStyle = styleLabel.fontStyle,
-                    fontFamily = styleLabel.fontFamily,
-                    textAlign = styleLabel.textAlign,
-                    maxLines = 1,
-                    minLines = 1
+                    modifier = modifier,
+                    text = text ?: "",
+                    color = textStyle.color,
+                    fontSize = textStyle.fontSize,
+                    fontStyle = textStyle.fontStyle,
+                    fontFamily = textStyle.fontFamily,
+                    textAlign = textStyle.textAlign,
+                    softWrap = maxLines > 1,
+                    maxLines = maxLines,
                 )
             }
-            Text(
-                modifier = modifier,
-                text = text ?: "",
-                color = textStyle.color,
-                fontSize = textStyle.fontSize,
-                fontStyle = textStyle.fontStyle,
-                fontFamily = textStyle.fontFamily,
-                textAlign = textStyle.textAlign,
-                softWrap = maxLines > 1,
-                maxLines = maxLines,
-            )
-        }
-        if (vertical) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                context()
-            }
-        } else {
-            Row {
-                context()
+            if (vertical) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    context()
+                }
+            } else {
+                Row {
+                    context()
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 4:22 PM
+ * Last modified 6/6/24, 2:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,52 +17,34 @@
 
 package com.akellolcc.cigars.tests.cigars
 
-import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onChildren
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToIndex
+import assertListOrder
 import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.screens.components.search.SearchParameterField
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
-import com.akellolcc.cigars.utils.assertHasNodesWithTag
-import com.akellolcc.cigars.utils.assertListOrder
-import com.akellolcc.cigars.utils.assertNoNodesWithTag
-import com.akellolcc.cigars.utils.pressButton
-import com.akellolcc.cigars.utils.replaceText
-import com.akellolcc.cigars.utils.sleep
-import com.akellolcc.cigars.utils.waitForTag
-import org.junit.Before
-import org.junit.Rule
+import com.akellolcc.cigars.utils.assertHasNodes
+import com.akellolcc.cigars.utils.assertNoNodes
+import com.akellolcc.cigars.utils.screenListContentDescription
+import pressButton
+import replaceText
+import selectMenuItem
+import sleep
+import waitForScreen
 import kotlin.test.Test
 
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
 open class CigarsListTests : BaseUiTest() {
-
-    @get:Rule(order = 0)
-    val composeTestRule = createAndroidComposeRule(ComponentActivity::class.java)
-
-    @Before
-    open fun before() {
-        route = CigarsRoute
+    override fun setUp() {
         with(composeTestRule) {
-            setContent {
-                CigarsAppContent()
-            }
-            //Wait for app to load
-            waitForTag(tag())
-        }
-    }
-
-    @Test
-    fun cigarsListTest() {
-        with(composeTestRule) {
+            waitForScreen(CigarsRoute)
             //Check items displayed
-            onNodeWithTag(tag("List")).onChildren()
-                .assertListOrder(5, listOf("#1", "#2", "#3", "#4", "#5"))
+            assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
         }
     }
 
@@ -70,18 +52,13 @@ open class CigarsListTests : BaseUiTest() {
     fun cigarsSortTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
-            onNodeWithTag(tag("List")).assertExists()
-            onNodeWithTag(tag("Sort"), true).assertExists()
-            onNodeWithTag(tag("SortField"), true).assertExists()
-            onNodeWithTag(tag("Filter"), true).assertExists()
-
+            onNodeWithContentDescription(Localize.screen_list_filter_action_descr).assertExists()
+            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).assertExists()
             //Check available sort fields menu
-            onNodeWithTag(tag("SortField"), true).performClick()
-            onNodeWithTag(tag("Menu"), true).assertExists()
-            onNodeWithTag(tag("Menu"), true).onChildren().assertCountEquals(6)
-            val menu = onNodeWithTag(tag("Menu")).onChildren()
-            menu.assertListOrder(
-                6, listOf(
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            assertListOrder(
+                Localize.screen_list_sort_fields_list_descr,
+                listOf(
                     CigarSortingFields.localized(CigarSortingFields.Name),
                     CigarSortingFields.localized(CigarSortingFields.Brand),
                     CigarSortingFields.localized(CigarSortingFields.Country),
@@ -91,30 +68,57 @@ open class CigarsListTests : BaseUiTest() {
                 )
             )
             //Closes menu
-            onNodeWithTag(tag("Menu"), true).onChildren()[0].performClick()
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             //Check sorting
             assertSortingBy(0, listOf("#1", "#2", "#3", "#4", "#5"))
-            assertSortingBy(1, listOf("#1", "#2", "#3", "#5", "#4"), listOf("#4", "#3", "#5", "#2", "#1"))
-            assertSortingBy(2, listOf("#1", "#2", "#3", "#4", "#5"), listOf("#2", "#3", "#4", "#5", "#1"))
-            assertSortingBy(3, listOf("#1", "#2", "#3", "#4", "#5"), listOf("#3", "#4", "#5", "#2", "#1"))
-            assertSortingBy(4, listOf("#1", "#3", "#4", "#5", "#2"), listOf("#2", "#3", "#4", "#5", "#1"))
-            assertSortingBy(5, listOf("#2", "#3", "#5", "#4", "#1"), listOf("#1", "#4", "#3", "#5", "#2"))
+            assertSortingBy(1, listOf("#1", "#2", "#3", "#5", "#4"))
+            assertSortingBy(2, listOf("#1", "#2", "#3", "#4", "#5"))
+            assertSortingBy(3, listOf("#1", "#2", "#3", "#4", "#5"))
+            assertSortingBy(4, listOf("#1", "#3", "#4", "#5", "#2"))
+            assertSortingBy(5, listOf("#2", "#3", "#5", "#4", "#1"))
 
         }
     }
 
-    private fun assertSortingBy(index: Int, expected: List<String>, reversed: List<String>? = null) {
+    private fun assertSortingBy(index: Int, expected: List<String>) {
         with(composeTestRule) {
-            onNodeWithTag(tag("SortField"), true).performClick()
-            onNodeWithTag(tag("Menu"), true).onChildren()[index].performClick()
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_list_descr).onChildren()[index].performClick()
             sleep(1000)
-            var sortedList = onNodeWithTag(tag("List")).onChildren()
-            sortedList.assertListOrder(5, expected)
+            assertListOrder(screenListContentDescription(CigarsRoute), expected)
             //reverse sort
-            onNodeWithTag(tag("Sort"), true).performClick()
+            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).performClick()
             sleep(1000)
-            sortedList = onNodeWithTag(tag("List")).onChildren()
-            sortedList.assertListOrder(5, reversed ?: expected.reversed())
+            assertListOrder(screenListContentDescription(CigarsRoute), expected.reversed(), true)
+        }
+    }
+
+    private fun assertSearchingBy(field: CigarSortingFields, menuIndex: Int, values: List<Pair<String, Int>>, remove: CigarSortingFields?) {
+        with(composeTestRule) {
+            if (menuIndex >= 0) {
+                pressButton(Localize.button_title_add_search_field)
+                selectMenuItem(Localize.filter_control_add_field_menu_descr, menuIndex, CigarSortingFields.localized(field))
+            }
+
+            if (remove != null) {
+                onNodeWithContentDescription(
+                    SearchParameterField.semantics(
+                        remove,
+                        SearchParameterField.LEADING_TAG
+                    )
+                ).performClick()
+            }
+
+            for (value in values) {
+                replaceText(
+                    Localize.screen_list_filter_control_descr,
+                    SearchParameterField.semantics(field, SearchParameterField.INPUT_FIELD_TAG),
+                    value.first
+                )
+                sleep(1000)
+                onNodeWithContentDescription(LIST_TAG).performScrollToIndex(value.second - 1)
+                onNodeWithContentDescription(LIST_TAG).onChildren().assertCountEquals(value.second)
+            }
         }
     }
 
@@ -122,25 +126,24 @@ open class CigarsListTests : BaseUiTest() {
     fun cigarsFilteringTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
-            onNodeWithTag(tag("List")).assertExists()
-            onNodeWithTag(tag("Sort"), true).assertExists()
-            onNodeWithTag(tag("SortField"), true).assertExists()
-            onNodeWithTag(tag("Filter"), true).assertExists()
+            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).assertExists()
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists()
+            onNodeWithContentDescription(Localize.screen_list_filter_action_descr).assertExists().performClick()
 
-            //Enable search filter with one element Name
-            onNodeWithTag(tag("Filter"), true).performClick()
-            onNodeWithTag(tag("Search")).assertExists()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Name)).assertExists()
+            onNodeWithContentDescription(Localize.screen_list_filter_control_descr).assertExists()
+            onNodeWithContentDescription(SearchParameterField.semantics(CigarSortingFields.Name)).assertExists()
             //When one no delete
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Name, "leading")).assertDoesNotExist()
+            onNodeWithContentDescription(
+                SearchParameterField.semantics(
+                    CigarSortingFields.Name,
+                    SearchParameterField.LEADING_TAG
+                )
+            ).assertDoesNotExist()
             //Check available fields menu
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu").assertExists()
-            onNodeWithTag("SearchComponent-FieldsMenu").onChildren().assertCountEquals(5)
-
-            var menu = onNodeWithTag("SearchComponent-FieldsMenu").onChildren()
-            menu.assertListOrder(
-                5, listOf(
+            pressButton(Localize.filter_control_add_field_descr)
+            assertListOrder(
+                Localize.filter_control_add_field_menu_descr,
+                listOf(
                     CigarSortingFields.localized(CigarSortingFields.Brand),
                     CigarSortingFields.localized(CigarSortingFields.Country),
                     CigarSortingFields.localized(CigarSortingFields.Shape),
@@ -148,68 +151,86 @@ open class CigarsListTests : BaseUiTest() {
                     CigarSortingFields.localized(CigarSortingFields.Length)
                 )
             )
-            onNodeWithTag("SearchComponent-FieldsMenu", true).onChildren()[0].performClick()
-            assertHasNodesWithTag(
+
+            //Select Brand
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Brand))
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Name),
-                    SearchParameterField.testTag(CigarSortingFields.Brand)
+                    SearchParameterField.semantics(CigarSortingFields.Name),
+                    SearchParameterField.semantics(CigarSortingFields.Brand)
                 )
             )
 
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu").assertExists().onChildren().assertCountEquals(4)[0].performClick()
-            assertHasNodesWithTag(
+            pressButton(Localize.button_title_add_search_field)
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Country))
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Name),
-                    SearchParameterField.testTag(CigarSortingFields.Brand),
-                    SearchParameterField.testTag(CigarSortingFields.Country)
+                    SearchParameterField.semantics(CigarSortingFields.Name),
+                    SearchParameterField.semantics(CigarSortingFields.Brand),
+                    SearchParameterField.semantics(CigarSortingFields.Country)
                 )
             )
 
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu").assertExists().onChildren().assertCountEquals(3)[1].performClick()
-            assertHasNodesWithTag(
+            pressButton(Localize.button_title_add_search_field)
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, 1, CigarSortingFields.localized(CigarSortingFields.Gauge))
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Name),
-                    SearchParameterField.testTag(CigarSortingFields.Brand),
-                    SearchParameterField.testTag(CigarSortingFields.Country),
-                    SearchParameterField.testTag(CigarSortingFields.Gauge)
+                    SearchParameterField.semantics(CigarSortingFields.Name),
+                    SearchParameterField.semantics(CigarSortingFields.Brand),
+                    SearchParameterField.semantics(CigarSortingFields.Country),
+                    SearchParameterField.semantics(CigarSortingFields.Gauge)
                 )
             )
-
+            //onNode(hasContentDescriptionExactly(Localize.screen_list_filter_control_descr)).printToLog("Filter")
+            //sleep(5000)
             //Check remove field button
-            assertHasNodesWithTag(
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Name, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Brand, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Country, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Gauge, "leading"),
+                    SearchParameterField.semantics(CigarSortingFields.Name, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Brand, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Country, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Gauge, SearchParameterField.LEADING_TAG),
                 )
             )
             //Remove last field
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Gauge, "leading")).performClick()
-            assertHasNodesWithTag(
+            onNodeWithContentDescription(
+                SearchParameterField.semantics(
+                    CigarSortingFields.Gauge,
+                    SearchParameterField.LEADING_TAG
+                )
+            ).performClick()
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Name, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Brand, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Country, "leading"),
+                    SearchParameterField.semantics(CigarSortingFields.Name, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Brand, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Country, SearchParameterField.LEADING_TAG),
                 )
             )
 
             //Remove first field
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Name, "leading")).performClick()
-            assertHasNodesWithTag(
+            onNodeWithContentDescription(
+                SearchParameterField.semantics(
+                    CigarSortingFields.Name,
+                    SearchParameterField.LEADING_TAG
+                )
+            ).performClick()
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Brand, "leading"),
-                    SearchParameterField.testTag(CigarSortingFields.Country, "leading"),
+                    SearchParameterField.semantics(CigarSortingFields.Brand, SearchParameterField.LEADING_TAG),
+                    SearchParameterField.semantics(CigarSortingFields.Country, SearchParameterField.LEADING_TAG),
                 )
             )
 
             //Check menu again
-            pressButton("Add more")
-            menu = onNodeWithTag("SearchComponent-FieldsMenu").onChildren()
-            menu.assertListOrder(
-                4, listOf(
+            pressButton(Localize.button_title_add_search_field)
+            assertListOrder(
+                Localize.filter_control_add_field_menu_descr, listOf(
                     CigarSortingFields.localized(CigarSortingFields.Name),
                     CigarSortingFields.localized(CigarSortingFields.Shape),
                     CigarSortingFields.localized(CigarSortingFields.Gauge),
@@ -217,108 +238,94 @@ open class CigarsListTests : BaseUiTest() {
                 )
             )
             //Add name remove other
-            onNodeWithTag("SearchComponent-FieldsMenu", true).onChildren()[0].performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Brand, "leading")).performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Country, "leading")).performClick()
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Name))
+            onNodeWithContentDescription(
+                SearchParameterField.semantics(
+                    CigarSortingFields.Brand,
+                    SearchParameterField.LEADING_TAG
+                )
+            ).performClick()
+            onNodeWithContentDescription(
+                SearchParameterField.semantics(
+                    CigarSortingFields.Country,
+                    SearchParameterField.LEADING_TAG
+                )
+            ).performClick()
 
             //Check fields
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Name)).assertExists()
-            assertNoNodesWithTag(
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
+                listOf(SearchParameterField.semantics(CigarSortingFields.Name))
+            )
+            assertNoNodes(
+                Localize.screen_list_filter_control_descr,
                 listOf(
-                    SearchParameterField.testTag(CigarSortingFields.Country),
-                    SearchParameterField.testTag(CigarSortingFields.Brand),
-                    SearchParameterField.testTag(CigarSortingFields.Shape),
-                    SearchParameterField.testTag(CigarSortingFields.Gauge),
-                    SearchParameterField.testTag(CigarSortingFields.Length)
+                    SearchParameterField.semantics(CigarSortingFields.Country),
+                    SearchParameterField.semantics(CigarSortingFields.Brand),
+                    SearchParameterField.semantics(CigarSortingFields.Shape),
+                    SearchParameterField.semantics(CigarSortingFields.Gauge),
+                    SearchParameterField.semantics(CigarSortingFields.Length)
                 )
             )
 
             //Check name search
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Name), "Fuente")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(1)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(1)
-
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Name), "")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(4)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(5)
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Name), "Serie")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(2)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(2)
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Name), "")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(4)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(5)
+            assertSearchingBy(CigarSortingFields.Name, -1, listOf(Pair("Fuente", 1), Pair("", 5), Pair("Serie", 2), Pair("", 5)), null)
 
             //Check brand search
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu", true).onChildren()[0].performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Name, "leading")).performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Brand)).assertExists()
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Brand), "Fabrica de")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(1)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(1)
-
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Brand), "")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(4)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(5)
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Brand), "Tabolisa")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(2)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(2)
+            assertSearchingBy(
+                CigarSortingFields.Brand,
+                0,
+                listOf(Pair("Fabrica de", 1), Pair("", 5), Pair("Tabolisa", 2), Pair("", 5)),
+                CigarSortingFields.Name
+            )
 
             //Check country search
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu", true).onChildren()[1].performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Brand, "leading")).performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Country)).assertExists()
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Country), "Dominican")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(1)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(1)
-
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Country), "")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(4)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(5)
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Country), "Nicaragua")
-            sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(3)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(4)
+            assertSearchingBy(
+                CigarSortingFields.Country,
+                1,
+                listOf(Pair("Dominican", 1), Pair("", 5), Pair("Nicaragua", 4), Pair("", 5)),
+                CigarSortingFields.Brand
+            )
 
             //Check country + gauge search
-            pressButton("Add more")
-            onNodeWithTag("SearchComponent-FieldsMenu", true).onChildren()[3].performClick()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Country)).assertExists()
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Gauge)).assertExists()
-
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Gauge, "input")).replaceText("52")
+            pressButton(Localize.button_title_add_search_field)
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, 3, CigarSortingFields.localized(CigarSortingFields.Gauge))
+            assertHasNodes(
+                Localize.screen_list_filter_control_descr,
+                listOf(
+                    SearchParameterField.semantics(CigarSortingFields.Country),
+                    SearchParameterField.semantics(CigarSortingFields.Gauge)
+                )
+            )
+            replaceText(
+                Localize.screen_list_filter_control_descr,
+                SearchParameterField.semantics(CigarSortingFields.Gauge, SearchParameterField.INPUT_FIELD_TAG),
+                "52"
+            )
             sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(3)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(4)
-
-            onNodeWithTag(SearchParameterField.testTag(CigarSortingFields.Gauge, "input")).replaceText("60")
+            onNodeWithContentDescription(LIST_TAG).performScrollToIndex(3)
+            onNodeWithContentDescription(LIST_TAG).onChildren().assertCountEquals(4)
+            replaceText(
+                Localize.screen_list_filter_control_descr,
+                SearchParameterField.semantics(CigarSortingFields.Gauge, SearchParameterField.INPUT_FIELD_TAG),
+                "60"
+            )
             sleep(1000)
-            onNodeWithTag(tag("List")).performScrollToIndex(0)
-            onNodeWithTag(tag("List")).onChildren().assertCountEquals(1)
+            onNodeWithContentDescription(LIST_TAG).performScrollToIndex(0)
+            onNodeWithContentDescription(LIST_TAG).onChildren().assertCountEquals(1)
 
-
-            replaceText(CigarSortingFields.localized(CigarSortingFields.Country), "Dominican")
+            replaceText(
+                Localize.screen_list_filter_control_descr,
+                SearchParameterField.semantics(CigarSortingFields.Country, SearchParameterField.INPUT_FIELD_TAG),
+                "Dominican"
+            )
             sleep(1000)
-            onNodeWithTag(tag("List")).assertDoesNotExist()
+            onNodeWithContentDescription(LIST_TAG).assertDoesNotExist()
+
         }
+    }
+
+    companion object {
+        val LIST_TAG = "${CigarsRoute.title} ${Localize.screen_list_descr}"
     }
 }

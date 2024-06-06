@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/30/24, 2:26 PM
+ * Last modified 6/5/24, 1:31 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,7 +82,9 @@ fun DefaultButton(
     ) {
         TextStyled(
             title,
+            title,
             TextStyles.Headline,
+            labelStyle = TextStyles.None,
         )
     }
 }
@@ -101,7 +103,9 @@ fun LinkButton(
     ) {
         TextStyled(
             title,
+            title,
             TextStyles.Subhead,
+            labelStyle = TextStyles.None,
         )
     }
 }
@@ -121,7 +125,9 @@ fun DialogButton(
     ) {
         TextStyled(
             title,
+            title,
             TextStyles.Headline,
+            labelStyle = TextStyles.None,
         )
     }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/30/24, 4:45 PM
+ * Last modified 6/5/24, 12:01 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,8 @@ enum class TextStyles {
     Subhead,
     Description,
     ErrorTitle,
-    Error
+    Error,
+    None
 }
 
 @Composable
@@ -42,5 +43,6 @@ fun textStyle(style: TextStyles, color: Color = Color(LocalContentColor.current.
         TextStyles.BarItemTitle -> MaterialTheme.typography.labelMedium.copy(color = color)
         TextStyles.Error -> MaterialTheme.typography.titleMedium.copy(color = materialColor(MaterialColors.color_error))
         TextStyles.ErrorTitle -> MaterialTheme.typography.titleLarge.copy(color = materialColor(MaterialColors.color_error))
+        TextStyles.None -> MaterialTheme.typography.titleSmall.copy(color = color)
     }
 }

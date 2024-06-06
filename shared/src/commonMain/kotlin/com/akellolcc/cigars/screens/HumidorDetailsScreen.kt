@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:05 PM
+ * Last modified 6/5/24, 1:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -183,8 +183,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                             Column {
                                 TextStyled(
                                     viewModel.name,
+                                    Localize.cigar_details_name,
                                     TextStyles.Headline,
-                                    label = if (viewModel.editing) Localize.cigar_details_name else null,
+                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
                                     editable = viewModel.editing,
                                     maxLines = 2,
                                     modifier = Modifier.padding(bottom = 4.dp),
@@ -194,8 +195,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                 )
                                 TextStyled(
                                     viewModel.brand,
+                                    label = Localize.cigar_details_company,
                                     TextStyles.Subhead,
-                                    label = if (viewModel.editing) Localize.cigar_details_company else null,
+                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
                                     editable = viewModel.editing,
                                     modifier = Modifier.padding(bottom = 4.dp),
                                     onValueChange = {
@@ -225,9 +227,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                 } else {
                                     TextStyled(
                                         if (viewModel.holds == 0L) "" else viewModel.holds.toString(),
+                                        Localize.humidor_details_holds,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_holds,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
@@ -263,9 +265,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                 } else if (viewModel.editing) {
                                     TextStyled(
                                         if (viewModel.temperature == null || viewModel.temperature == 0L) "" else viewModel.temperature.toString(),
+                                        Localize.humidor_details_temperature,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_temperature,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
@@ -276,9 +278,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                     )
                                     TextStyled(
                                         if (viewModel.humidity == null || viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
+                                        Localize.humidor_details_humidity,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_humidity,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
@@ -298,8 +300,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                 ) {
                                     TextStyled(
                                         viewModel.notes,
+                                        Localize.cigar_details_notes,
                                         TextStyles.Subhead,
-                                        //label = "Notes",
+                                        labelStyle = TextStyles.None,
                                         editable = viewModel.editing,
                                         onValueChange = {
                                             viewModel.notes = it
@@ -312,8 +315,8 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
                                     ) {
                                         TextStyled(
                                             viewModel.link,
+                                            Localize.cigar_details_link,
                                             TextStyles.Subhead,
-                                            label = Localize.cigar_details_link,
                                             labelStyle = TextStyles.Subhead,
                                             editable = viewModel.editing,
                                             maxLines = 1,

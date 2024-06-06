@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/27/24, 1:21 PM
+ * Last modified 6/5/24, 1:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_ACTION_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_HEADER_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_HORIZONTAL_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_VERTICAL_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_LABEL_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_TAG
+import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_VALUE_TAG
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -46,8 +53,9 @@ import com.akellolcc.cigars.theme.materialColor
 import dev.icerock.moko.resources.ImageResource
 
 @Composable
-fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
+fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     OutlinedCard(
+        modifier = modifier.testTag(VALUE_CARD_TAG),
         colors = CardDefaults.cardColors(
             materialColor(MaterialColors.color_primaryContainer),
             materialColor(MaterialColors.color_onPrimaryContainer)
@@ -68,12 +76,18 @@ fun ValueCard(label: String?, value: String?, onClick: (() -> Unit)? = null) {
             if (label != null) {
                 TextStyled(
                     label,
-                    TextStyles.Subhead
+                    label,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.None,
+                    modifier = Modifier.testTag(VALUE_CARD_LABEL_TAG)
                 )
             }
             TextStyled(
                 value,
+                label ?: "",
                 TextStyles.Subhead,
+                labelStyle = TextStyles.None,
+                modifier = Modifier.testTag(VALUE_CARD_VALUE_TAG)
             )
         }
     }
@@ -85,9 +99,10 @@ fun ValuesCard(
     vertical: Boolean = false,
     actionIcon: ImageResource? = null,
     onAction: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = Modifier.testTag("ValuesCard-Container")) {
+    Box(modifier = modifier) {
         OutlinedCard(
             colors = CardDefaults.cardColors(
                 materialColor(MaterialColors.color_transparent),
@@ -99,14 +114,14 @@ fun ValuesCard(
         ) {
             if (vertical) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("ValuesCard-Vertical"),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag(VALUES_CARD_VERTICAL_TAG),
                     horizontalAlignment = Alignment.Start
                 ) {
                     content()
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("ValuesCard-Horizontal"),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag(VALUES_CARD_HORIZONTAL_TAG),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -118,11 +133,13 @@ fun ValuesCard(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)
-                    .background(materialColor(MaterialColors.color_transparent)).testTag("ValuesCard-Header")
+                    .background(materialColor(MaterialColors.color_transparent)).testTag(VALUES_CARD_HEADER_TAG)
             ) {
                 TextStyled(
                     label,
+                    label,
                     TextStyles.Subhead,
+                    labelStyle = TextStyles.None,
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp)
                         .background(materialColor(MaterialColors.color_background))
                 )
@@ -136,7 +153,7 @@ fun ValuesCard(
                         )
                         IconButton(
                             modifier = Modifier.size(24.dp)
-                                .background(materialColor(MaterialColors.color_transparent)).testTag("ValuesCard-Action"),
+                                .background(materialColor(MaterialColors.color_transparent)).testTag(VALUES_CARD_ACTION_TAG),
                             onClick = { onAction?.invoke() }) {
                             loadIcon(
                                 actionIcon,
@@ -151,3 +168,14 @@ fun ValuesCard(
     }
 }
 
+sealed class ValuesCardTags {
+    companion object {
+        const val VALUES_CARD_VERTICAL_TAG = "ValuesCard-Vertical"
+        const val VALUES_CARD_HORIZONTAL_TAG = "ValuesCard-Horizontal"
+        const val VALUES_CARD_HEADER_TAG = "ValuesCard-Header"
+        const val VALUES_CARD_ACTION_TAG = "ValuesCard-Action"
+        const val VALUE_CARD_TAG = "ValueCard"
+        const val VALUE_CARD_LABEL_TAG = "ValueCard-Label"
+        const val VALUE_CARD_VALUE_TAG = "ValueCard-Value"
+    }
+}

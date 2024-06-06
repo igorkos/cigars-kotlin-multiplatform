@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:20 AM
+ * Last modified 6/5/24, 1:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,9 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
             title = {
                 TextStyled(
                     viewModel.name,
+                    Localize.nav_header_title_desc,
                     TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
                 )
             },
             colors = topColors,
@@ -92,12 +94,16 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                 ) {
                     Column {
                         TextStyled(
-                            text = entity.date.formatDate(),
+                            entity.date.formatDate(),
+                            Localize.history_date_desc,
                             style = TextStyles.Subhead,
+                            labelStyle = TextStyles.None
                         )
                         TextStyled(
-                            text = entity.cigar?.name ?: entity.humidorFrom.name,
+                            entity.cigar?.name ?: entity.humidorFrom.name,
+                            Localize.cigar_details_name,
                             style = TextStyles.Subhead,
+                            labelStyle = TextStyles.None
                         )
                         Row(
                             verticalAlignment = Alignment.Bottom,
@@ -105,16 +111,20 @@ abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: Na
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             TextStyled(
-                                text = if (entity.cigar == null) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
+                                if (entity.cigar == null) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
                                     entity.type,
                                     entity.count
                                 ),
-                                style = TextStyles.Subhead
+                                if (entity.cigar == null) Localize.history_type_addition else Localize.history_type_move,
+                                style = TextStyles.Subhead,
+                                labelStyle = TextStyles.None
                             )
                             if (entity.price != null) {
                                 TextStyled(
-                                    text = Localize.history_transaction_price(entity.price!!),
-                                    style = TextStyles.Subhead
+                                    Localize.history_transaction_price(entity.price!!),
+                                    Localize.cigar_search_details_add_price_dialog,
+                                    style = TextStyles.Subhead,
+                                    labelStyle = TextStyles.None
                                 )
                             }
                         }

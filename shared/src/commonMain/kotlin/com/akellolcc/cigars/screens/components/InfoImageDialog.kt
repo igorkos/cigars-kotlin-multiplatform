@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 12:11 AM
+ * Last modified 6/2/24, 11:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ fun InfoImageDialog(image: ImageResource, onDismissRequest: () -> Unit) {
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        Surface(modifier = Modifier.fillMaxSize().testTag("InfoImageDialog")) {
+        Surface(modifier = Modifier.fillMaxSize().testTag(INFO_IMAGE_DIALOG_TAG)) {
             loadImage(image)
             IconButton(
                 modifier = Modifier.size(24.dp),
@@ -45,3 +45,5 @@ fun InfoImageDialog(image: ImageResource, onDismissRequest: () -> Unit) {
     }
 
 }
+
+const val INFO_IMAGE_DIALOG_TAG = "InfoImageDialog"

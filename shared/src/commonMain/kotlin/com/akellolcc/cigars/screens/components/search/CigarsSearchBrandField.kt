@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 3:57 PM
+ * Last modified 6/6/24, 11:41 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,6 +56,7 @@ import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -116,7 +117,7 @@ class CigarsSearchBrandField(
         ) {
             if (showLeading) {
                 IconButton(
-                    modifier = Modifier.wrapContentSize().testTag(testTag(CigarSortingFields.Brand, "leading")),
+                    modifier = Modifier.wrapContentSize().testTag(semantics(CigarSortingFields.Brand, LEADING_TAG)),
                     onClick = { onAction(CigarsSearchFieldBaseViewModel.Action.RemoveField(parameter)) }
                 ) {
                     loadIcon(Images.icon_menu_delete, Size(12.0F, 12.0F))
@@ -130,7 +131,7 @@ class CigarsSearchBrandField(
                 TextStyled(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
                         viewModel.onFocusChange(it.isFocused)
-                    }.testTag(testTag(CigarSortingFields.Brand, "input")),
+                    }.testTag(semantics(CigarSortingFields.Brand, INPUT_FIELD_TAG)),
                     label = parameter.label,
                     text = viewModel.value,
                     enabled = enabled,
@@ -144,7 +145,7 @@ class CigarsSearchBrandField(
                     trailingIcon = if (viewModel.hasBrands(pagingItems)) {
                         @Composable {
                             IconButton(
-                                modifier = Modifier.wrapContentSize().testTag(testTag(CigarSortingFields.Brand, "drop_down")),
+                                modifier = Modifier.wrapContentSize().testTag(semantics(CigarSortingFields.Brand, DROP_DOWN_TAG)),
                                 onClick = {
                                     viewModel.onDropDown(viewModel.expanded)
                                 }
@@ -158,7 +159,9 @@ class CigarsSearchBrandField(
                             TextStyled(
                                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 4.dp),
                                 text = viewModel.annotation,
-                                style = if (viewModel.isError) TextStyles.Error else TextStyles.Description
+                                label = "",
+                                style = if (viewModel.isError) TextStyles.Error else TextStyles.Description,
+                                labelStyle = TextStyles.None
                             )
                         }
                     } else null,
@@ -173,7 +176,8 @@ class CigarsSearchBrandField(
                     LazyColumn(
                         state = listState,
                         verticalArrangement = Arrangement.Top,
-                        modifier = Modifier.width(with.pxToDp()).height(menuHeight.dp).testTag(testTag(CigarSortingFields.Brand, "list"))
+                        modifier = Modifier.width(with.pxToDp()).height(menuHeight.dp)
+                            .testTag(semantics(CigarSortingFields.Brand, DROP_DOWN_LIST))
                     ) {
                         pagingItems?.let { items ->
                             items(count = items.itemCount) { index ->
@@ -185,7 +189,9 @@ class CigarsSearchBrandField(
                                     text = {
                                         TextStyled(
                                             it?.name,
+                                            Localize.cigar_details_name,
                                             TextStyles.Subhead,
+                                            labelStyle = TextStyles.None,
                                             maxLines = 1
                                         )
                                     },
