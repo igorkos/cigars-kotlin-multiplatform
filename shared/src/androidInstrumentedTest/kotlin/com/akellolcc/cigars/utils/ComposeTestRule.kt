@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 2:17 PM
+ * Last modified 6/6/24, 2:27 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -35,6 +36,7 @@ import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.childWithTextLabel
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
@@ -106,6 +108,14 @@ fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String
     val node = childWithTextLabel(parent, inputLabel, "")
     node.performTextClearance()
     node.performTextInput(text)
+}
+
+/**
+ * Selects a tab in the bottom navigation bar.
+ * @param route The navigation route of the tab to select.
+ */
+fun ComposeTestRule.selectTab(route: NavRoute) {
+    onNode(hasContentDescription(Localize.nav_tab_title_desc).and(hasText(route.title))).performClick()
 }
 
 @OptIn(ExperimentalTestApi::class)

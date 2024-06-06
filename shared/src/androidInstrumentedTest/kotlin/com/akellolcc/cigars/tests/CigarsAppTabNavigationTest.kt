@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 2:26 PM
+ * Last modified 6/6/24, 2:30 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ import waitForScreen
 import kotlin.test.Test
 
 
-class CigarsAppTest() : BaseUiTest() {
+class CigarsAppTabNavigationTest() : BaseUiTest() {
 
     @Test
     fun tabNavigation() {
