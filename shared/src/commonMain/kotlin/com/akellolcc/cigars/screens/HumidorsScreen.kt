@@ -1,7 +1,21 @@
+/*******************************************************************************************************************************************
+ * Copyright (C) 2024 Igor Kosulin
+ * Last modified 6/5/24, 1:12 PM
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************************************************************************/
+
 package com.akellolcc.cigars.screens
 
-import TextStyled
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,16 +31,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
-import com.akellolcc.cigars.databases.extensions.Humidor
+import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.HumidorsViewModel
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.HumidorCigarsRoute
-import com.akellolcc.cigars.navigation.HumidorDetailsRoute
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorsViewModel
+import com.akellolcc.cigars.screens.base.BaseTabListScreen
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.navigation.HumidorCigarsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -35,29 +52,50 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class HumidorsScreen(override val route: NavRoute) : ITabItem {
-    private val screen = HumidorsListScreen(route)
+class HumidorsScreen(override val route: NavRoute) : ITabItem<HumidorsViewModel> {
+    @kotlinx.serialization.Transient
+    @Transient
+    override lateinit var viewModel: HumidorsViewModel
+
     @Composable
     override fun Content() {
-        Navigator(screen)
+        viewModel =
+            rememberScreenModel { createViewModel(HumidorsViewModel::class) }
+        Navigator(HumidorsListScreen(route, viewModel))
     }
 }
 
-class HumidorsListScreen(route: NavRoute) :
-    BaseTabListScreen<HumidorsViewModel.Action, Humidor>(route) {
-
+class HumidorsListScreen(
+    route: NavRoute,
+    @kotlinx.serialization.Transient
     @Transient
-    override val viewModel = HumidorsViewModel()
+    override var viewModel: HumidorsViewModel
+) :
+    BaseTabListScreen<Humidor, HumidorsViewModel>(route) {
 
     @ExperimentalMaterial3Api
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior, navigator: Navigator?) {
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
         CenterAlignedTopAppBar(
-            navigationIcon = { IconButton(onClick = { route.sharedViewModel?.isDrawerVisible = true }) {loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F))} },
-            actions = { IconButton(onClick = { viewModel.addHumidor() }) {
-                loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
-            }},
-            title = { TextStyled(text = route.title, style = TextStyles.ScreenTitle) },
+            navigationIcon = {
+                IconButton(onClick = {
+                    val mainModel = createViewModel(MainScreenViewModel::class)
+                    mainModel.isDrawerVisible = true
+                }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
+            },
+            actions = {
+                IconButton(onClick = { viewModel.addHumidor() }) {
+                    loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
+                }
+            },
+            title = {
+                TextStyled(
+                    text = route.title,
+                    Localize.nav_header_title_desc,
+                    TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
+                )
+            },
             scrollBehavior = scrollBehavior
         )
     }
@@ -79,11 +117,12 @@ class HumidorsListScreen(route: NavRoute) :
 
             ) {
                 TextStyled(
-                    maxLines = 2,
-                    minLines = 2,
                     text = entity.name,
+                    Localize.cigar_details_name,
                     style = TextStyles.Headline,
-                    keepHeight = true
+                    labelStyle = TextStyles.None,
+                    maxLines = 2,
+                    minLines = 2
                 )
             }
             Row(
@@ -95,37 +134,40 @@ class HumidorsListScreen(route: NavRoute) :
             ) {
                 TextStyled(
                     text = Localize.humidor_cigars(
-                        entity.count ?: 0,
-                        (entity.holds ?: 0) - (entity.count ?: 0)
+                        entity.count,
+                        entity.holds - entity.count
                     ),
-                    style = TextStyles.Subhead
+                    Localize.cigar_details_notes,
+                    style = TextStyles.Subhead,
+                    labelStyle = TextStyles.None,
                 )
             }
         }
     }
 
-    override fun handleAction(event: HumidorsViewModel.Action, navigator: Navigator?) {
-        val mainModel = route.sharedViewModel as MainScreenViewModel
+    override fun handleAction(event: Any, navigator: Navigator) {
+        val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is HumidorsViewModel.Action.RouteToHumidor -> {
                 Log.debug("Selected humidor ${event.humidor.rowid}")
                 mainModel.isTabsVisible = false
-                navigator?.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
+                navigator.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
                     this.data = event.humidor
-                    this.sharedViewModel = mainModel
                 }))
             }
 
-            is HumidorsViewModel.Action.ShowError -> TODO()
             is HumidorsViewModel.Action.AddHumidor -> {
                 mainModel.isTabsVisible = false
-                navigator?.push(HumidorDetailsScreen(
-                    HumidorDetailsRoute
-                    .apply {
-                        this.data = null
-                        sharedViewModel = mainModel
-                    }))
+                navigator.push(
+                    HumidorDetailsScreen(
+                        HumidorDetailsRoute
+                            .apply {
+                                this.data = null
+                            })
+                )
             }
+
+            else -> super.handleAction(event, navigator)
         }
     }
 

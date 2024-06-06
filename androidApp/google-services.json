@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888991141757",
+    "project_id": "cigars-e3746",
+    "storage_bucket": "cigars-e3746.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888991141757:android:0cd490d7b772d358724614",
+        "android_client_info": {
+          "package_name": "com.akellolcc.cigars.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqCjCheBkbj1soAiMcA_i-SoiZCdP93cs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

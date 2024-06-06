@@ -20,62 +20,26 @@ CREATE TABLE CigarsTable (
     count INTEGER NOT NULL,
     shopping INTEGER AS Boolean NOT NULL,
     favorites INTEGER AS Boolean  NOT NULL,
-    price REAL
-);
-
-CREATE TABLE HumidorsTable (
-    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    brand TEXT NOT NULL,
-    holds INTEGER NOT NULL,
-    count INTEGER NOT NULL,
-    temperature INTEGER,
-    humidity REAL,
-    notes TEXT,
-    link TEXT,
     price REAL,
-    autoOpen INTEGER AS Boolean,
-    sorting INTEGER,
-    type INTEGER NOT NULL
+    other INTEGER,
+    relations TEXT
 );
 
-CREATE TABLE CigarHumidorTable (
-    count INTEGER NOT NULL,
-    humidorId INTEGER NOT NULL,
-    cigarId INTEGER  NOT NULL,
-    PRIMARY KEY (humidorId, cigarId),
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid),
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid)
-);
 
-CREATE TABLE HistoryTable (
-    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    count INTEGER NOT NULL,
-    date INTEGER NOT NULL,
-    left INTEGER NOT NULL,
-    price REAL,
-    type INTEGER NOT NULL,
-    cigarId  INTEGER NOT NULL,
-    humidorId  INTEGER NOT NULL,
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION ,
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
-);
+get:
+SELECT * FROM CigarsTable WHERE rowid = :id;
 
-CREATE TABLE ImagesTable (
-    rowid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    image TEXT,
-    data BLOB NOT NULL,
-    notes TEXT,
-    type INTEGER,
-    cigarId  INTEGER,
-    humidorId  INTEGER,
-    FOREIGN KEY (cigarId) REFERENCES CigarsTable(rowid) ON DELETE NO ACTION,
-    FOREIGN KEY (humidorId) REFERENCES HumidorsTable(rowid) ON DELETE NO ACTION
-  );
-
-
-allCigarsAsc:
-    SELECT * FROM CigarsTable ORDER BY CASE
+allAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength
+     ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
         WHEN :sort = 'country' THEN country
@@ -89,8 +53,18 @@ allCigarsAsc:
         ELSE NULL
     END ASC;
 
-allCigarsDesc:
-    SELECT * FROM CigarsTable ORDER BY CASE
+
+allDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength
+       ORDER BY CASE
         WHEN :sort = 'name' THEN name
         WHEN :sort = 'brand' THEN brand
         WHEN :sort = 'country' THEN country
@@ -104,143 +78,209 @@ allCigarsDesc:
         ELSE NULL
     END DESC;
 
+pagedAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC
+    LIMIT :limit OFFSET :offset;
 
-cigar:
-SELECT * FROM CigarsTable WHERE rowid = ?;
+pagedDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC
+    LIMIT :limit OFFSET :offset;
 
-cigarName:
-SELECT CigarsTable.name FROM CigarsTable WHERE rowid = :id;
+favoritesAllAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength AND
+        favorites == 1
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC;
 
-addCigar:
-INSERT OR REPLACE INTO CigarsTable (rowid, name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites)
-VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-removeAllCigars:
-DELETE FROM CigarsTable;
+favoritesAllDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength AND
+               favorites == 1
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC;
 
-removeCigar:
+favoritesPagedAsc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength AND
+        favorites == 1
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC
+    LIMIT :limit OFFSET :offset;
+
+favoritesPagedDesc:
+    SELECT * FROM CigarsTable  WHERE
+        name LIKE :name AND
+               brand LIKE :brand AND
+               country LIKE :country AND
+               date >= :date AND
+               cigar LIKE :cigar AND
+               gauge >= :gauge AND
+               length >= :length AND
+               strength >= :strength AND
+               favorites == 1
+       ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END DESC
+    LIMIT :limit OFFSET :offset;
+
+add:
+INSERT INTO CigarsTable (name, brand, country, date, cigar, wrapper, binder, gauge, length, strength, rating, myrating, notes, filler, link, count, shopping, favorites, price, other,relations)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
+
+update:
+UPDATE CigarsTable SET name = :name,
+    brand= :brand,
+    country= :country,
+    date= :date,
+    cigar= :cigar,
+    wrapper= :wrapper,
+    binder= :binder,
+    gauge= :gauge,
+    length= :length,
+    strength= :strength,
+    rating= :rating,
+    myrating= :myrating,
+    notes= :notes,
+    filler= :filler,
+    link= :link,
+    count= :count,
+    shopping= :shopping,
+    favorites= :favorites,
+    price= :price,
+    other= :other,
+    relations=:relations WHERE rowid = :id;
+
+remove:
 DELETE FROM CigarsTable WHERE rowid = :rowid;
 
-cigarImages:
-SELECT ImagesTable.*  FROM ImagesTable WHERE cigarId = :cigar;
+removeAll:
+DELETE FROM CigarsTable;
 
-cigarHumidors:
-SELECT *  FROM CigarHumidorTable WHERE cigarId = :cigar;
+find:
+SELECT * FROM CigarsTable WHERE rowid = :rowid;
 
-addImageToCigar:
-UPDATE ImagesTable SET cigarId = :cigar WHERE rowid = :image;
+count:
+SELECT COUNT(*) FROM CigarsTable  WHERE favorites = :favorites;
 
-cigarHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE cigarId = :cigar ORDER BY date DESC;
-
-cigarCount:
-SELECT CigarsTable.count FROM CigarsTable WHERE rowid = :id;
-
-updateCigarCount:
-UPDATE CigarsTable SET count = :count WHERE rowid = :id;
-
-cigarExists:
+contains:
 SELECT count(1) FROM CigarsTable WHERE rowid = ?;
 
-favoriteCigars:
-SELECT * FROM CigarsTable WHERE favorites = 1;
-
-
-allHumidorsAsc:
-    SELECT * FROM HumidorsTable ORDER BY CASE
-        WHEN :sort = 'name' THEN name
-        WHEN :sort = 'count' THEN count
-        WHEN :sort = 'holds' THEN holds
-        ELSE NULL
-    END ASC;
-
-allHumidorsDesc:
-    SELECT * FROM HumidorsTable ORDER BY CASE
-        WHEN :sort = 'name' THEN name
-        WHEN :sort = 'count' THEN count
-        WHEN :sort = 'holds' THEN holds
-        ELSE NULL
-    END DESC;
-
-humidorsCount:
-SELECT COUNT(*) FROM HumidorsTable;
-
-humidor:
-SELECT HumidorsTable.* FROM HumidorsTable WHERE rowid = :id;
-
-humidorName:
-SELECT HumidorsTable.name FROM HumidorsTable WHERE rowid = :id;
-
-removeAllHumidors:
-DELETE FROM HumidorsTable;
-
-addHumidor:
-INSERT INTO HumidorsTable (name, brand, holds, count, temperature, humidity, notes, link, autoOpen, sorting, type)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-
-updateHumidor:
-UPDATE HumidorsTable SET name = :name, brand = :brand, holds = :holds, count = :count, temperature = :temperature, humidity = :humidity, notes = :notes, link = :link, autoOpen = :autoOpen, sorting = :sorting, type = :type
-WHERE rowid = :id;
-
-
-addCigarToHumidor:
-INSERT INTO CigarHumidorTable (humidorId, cigarId, count)
-VALUES (?,?,?);
-
-humidorCigars:
-SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
-
-humidorHistory:
-SELECT HistoryTable.*  FROM HistoryTable WHERE humidorId = :humidor ORDER BY date DESC;
-
-humidorImages:
-SELECT ImagesTable.*  FROM ImagesTable WHERE humidorId = :humidor;
-
-addImageToHumidor:
-UPDATE ImagesTable SET humidorId = :humidor WHERE rowid = :image;
-
-allHistory:
-SELECT HistoryTable.*
-FROM HistoryTable;
-
-history:
-SELECT HistoryTable.* FROM HistoryTable WHERE rowid = :id;
-
-addHistory:
-INSERT INTO HistoryTable (count, date, left, price, type, cigarId, humidorId)
-VALUES (?, ?, ?, ?, ?,?,?);
-
-historyExists:
-SELECT count(1) FROM HistoryTable WHERE rowid = ?;
-
-image:
-SELECT ImagesTable.* FROM ImagesTable WHERE rowid = :id;
-
-addImage:
-INSERT OR REPLACE INTO ImagesTable (rowid, data,  type, image, notes,cigarId,humidorId)
-VALUES (?, ?, ?, ?, ?,?,?);
-
-removeImage:
-DELETE FROM ImagesTable WHERE rowid = :rowid;
-
-imageExists:
-SELECT count(1) FROM ImagesTable WHERE rowid = ?;
-
-cigarinHumidorExists:
-SELECT count(1) FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
-
-removeCigarFromHumidor:
-DELETE FROM CigarHumidorTable WHERE humidorId = :humidor AND cigarId = :cigar;
-
-humidorCigarExists:
-SELECT count(1) FROM CigarHumidorTable WHERE cigarId = :cigar AND humidorId = :humidor;
+setRating:
+UPDATE CigarsTable SET myrating= :myrating WHERE rowid = :id;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
+favoriteCount:
+SELECT COUNT(*) FROM CigarsTable WHERE favorites = 1;
 
-
-
-
-
-
+setFavorite:
+UPDATE CigarsTable SET favorites= :favorites WHERE rowid = :id;

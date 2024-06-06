@@ -1,6 +1,21 @@
+/*******************************************************************************************************************************************
+ * Copyright (C) 2024 Igor Kosulin
+ * Last modified 6/5/24, 3:01 PM
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************************************************************************/
+
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -8,7 +23,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
@@ -21,77 +35,74 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
-import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.akellolcc.cigars.common.theme.DefaultTheme
+import com.akellolcc.cigars.logging.AnalyticsEvents
+import com.akellolcc.cigars.logging.AnalyticsParams
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.CigarsRoute
-import com.akellolcc.cigars.navigation.FavoritesRoute
-import com.akellolcc.cigars.navigation.HumidorsRoute
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.mvvm.base.ActionsViewModel
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.navigation.CigarsRoute
+import com.akellolcc.cigars.screens.navigation.FavoritesRoute
+import com.akellolcc.cigars.screens.navigation.HumidorsRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.MainRoute
+import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
+import com.akellolcc.cigars.theme.DefaultTheme
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.jvm.Transient
 
-private var tabs: List<ITabItem> = listOf(
+/*private var tabs: List<ITabItem<*>> = listOf(
     CigarsScreen(CigarsRoute),
     HumidorsScreen(HumidorsRoute),
-    FavoritesScreen(FavoritesRoute)
-)
-class MainScreen() : Screen {
+    FavoritesScreen(FavoritesRoute),
+    SearchScreen(SearchCigarRoute)
+)*/
 
+class MainScreen :
+    ITabItem<MainScreenViewModel> {
+    override val route: NavRoute = MainRoute
+
+    @kotlinx.serialization.Transient
     @Transient
-    private val viewModel = MainScreenViewModel()
+    override lateinit var viewModel: MainScreenViewModel
 
     @OptIn(ExperimentalVoyagerApi::class)
     @Composable
     override fun Content() {
-        var isTabsVisible by remember { mutableStateOf(true) }
-        var isDrawerVisible by remember { mutableStateOf(false) }
-        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed){
-            isDrawerVisible = it == DrawerValue.Open
+
+        viewModel = rememberScreenModel { createViewModel(MainScreenViewModel::class) }
+
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) {
+            viewModel.isDrawerVisible = it == DrawerValue.Open
             true
         }
 
-        viewModel.observeEvents {
+        viewModel.observeEvents(tag()) {
             when (it) {
-                is MainScreenViewModel.MainScreenActions.ShowError -> TODO()
-                is MainScreenViewModel.MainScreenActions.TabsVisibility -> {
-                    Log.debug("MainScreen received tabs visible ${it.isVisible}")
-                    isTabsVisible = it.isVisible
-                }
-
-                is MainScreenViewModel.MainScreenActions.OpenDrawer -> {
-                    isDrawerVisible = it.isVisible
-                }
+                is ActionsViewModel.CommonAction.ShowError -> TODO()
             }
         }
 
-        LaunchedEffect(isDrawerVisible) {
-            if (isDrawerVisible) {
+        LaunchedEffect(viewModel.isDrawerVisible) {
+            if (viewModel.isDrawerVisible) {
                 drawerState.open()
             } else {
                 drawerState.close()
             }
         }
-
-        Log.debug("MainScreen tabs visible $isTabsVisible -> $viewModel")
 
         DefaultTheme {
             ModalNavigationDrawer(
@@ -107,23 +118,33 @@ class MainScreen() : Screen {
                         NavigationDrawerItem(
                             label = { Text(text = "Drawer Item") },
                             selected = false,
-                            onClick = { /*TODO*/ }
+                            onClick = {
+
+                            }
                         )
                     }
                 },
-                gesturesEnabled = isTabsVisible,
+                gesturesEnabled = viewModel.isTabsVisible,
             ) {
-                TabNavigator(tabs[0]
-                /*, tabDisposable = { tabNavigator ->
-                    TabDisposable(
-                        navigator = tabNavigator,
-                        tabs = tabs
-                    )}*/
+                TabNavigator(
+                    CigarsScreen(CigarsRoute),
+                    tabDisposable = {
+                        TabDisposable(
+                            navigator = it,
+                            tabs = listOf(
+                                CigarsScreen(CigarsRoute),
+                                HumidorsScreen(HumidorsRoute),
+                                FavoritesScreen(FavoritesRoute),
+                                SearchScreen(SearchCigarRoute)
+                            )
+                        )
+                    }
+
                 ) {
                     Scaffold(
                         bottomBar = {
                             AnimatedVisibility(
-                                visible = isTabsVisible,
+                                visible = viewModel.isTabsVisible,
                                 enter = slideInVertically { height ->
                                     height
                                 },
@@ -131,10 +152,11 @@ class MainScreen() : Screen {
                                     height
                                 }) {
                                 NavigationBar {
-                                    tabs.forEach {
-                                        it.route.sharedViewModel = viewModel
-                                        TabNavigationItem(it.route, tabs)
-                                    }
+                                    TabNavigationItem(CigarsScreen(CigarsRoute))
+                                    TabNavigationItem(HumidorsScreen(HumidorsRoute))
+                                    TabNavigationItem(FavoritesScreen(FavoritesRoute))
+                                    TabNavigationItem(SearchScreen(SearchCigarRoute))
+
                                 }
                             }
                         },
@@ -148,17 +170,26 @@ class MainScreen() : Screen {
 }
 
 @Composable
-fun RowScope.TabNavigationItem(tab: NavRoute, tabs: List<ITabItem>) {
+fun RowScope.TabNavigationItem(tab: ITabItem<*>) {
     val tabNavigator = LocalTabNavigator.current
-    val selected = (tabNavigator.current as ITabItem).route.route == tab.route
     NavigationBarItem(
-        selected = selected,
+        selected = tabNavigator.current == tab,
         onClick = {
-            tabNavigator.current = tabs.first {
-                it.route.route == tab.route
-            }
+            tabNavigator.current = tab
+            Log.debug(
+                "Selected tab ${tab.route.route}", AnalyticsEvents.ScreenEnter, mapOf(
+                    AnalyticsParams.ContentId.parm to tab.route.route
+                )
+            )
         },
-        icon = { loadIcon(tab.icon, Size(width = 24f, height = 24f)) },
-        label = { TextStyled(text = tab.title, style = TextStyles.BarItemTitle) },
+        icon = { loadIcon(tab.route.icon, Size(width = 24f, height = 24f)) },
+        label = {
+            TextStyled(
+                tab.route.title,
+                Localize.nav_tab_title_desc,
+                TextStyles.BarItemTitle,
+                labelStyle = TextStyles.None
+            )
+        },
     )
 }

@@ -1,6 +1,21 @@
+/*******************************************************************************************************************************************
+ * Copyright (C) 2024 Igor Kosulin
+ * Last modified 6/5/24, 1:06 PM
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************************************************************************/
+
 package com.akellolcc.cigars.screens
 
-import TextStyled
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,18 +25,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,23 +43,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.common.theme.DefaultTheme
-import com.akellolcc.cigars.components.DialogButton
-import com.akellolcc.cigars.components.PagedCarousel
-import com.akellolcc.cigars.components.ValueCard
-import com.akellolcc.cigars.components.ValuesCard
-import com.akellolcc.cigars.databases.extensions.Humidor
-import com.akellolcc.cigars.databases.extensions.emptyHumidor
-import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.mvvm.HumidorDetailsScreenViewModel
-import com.akellolcc.cigars.mvvm.MainScreenViewModel
-import com.akellolcc.cigars.navigation.ITabItem
-import com.akellolcc.cigars.navigation.ImagesViewRoute
-import com.akellolcc.cigars.navigation.NavRoute
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.mvvm.base.createViewModel
+import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
+import com.akellolcc.cigars.screens.components.DialogButton
+import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.components.ValueCard
+import com.akellolcc.cigars.screens.components.ValuesCard
+import com.akellolcc.cigars.screens.components.transformations.InputMode
+import com.akellolcc.cigars.screens.navigation.HumidorImagesViewRoute
+import com.akellolcc.cigars.screens.navigation.ITabItem
+import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
@@ -55,23 +69,30 @@ import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 import kotlin.jvm.Transient
 
-class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
-
+class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetailsScreenViewModel> {
+    @kotlinx.serialization.Transient
     @Transient
-    private val viewModel = HumidorDetailsScreenViewModel((route.data ?: emptyHumidor) as Humidor)
+    override lateinit var viewModel: HumidorDetailsScreenViewModel
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+        viewModel =
+            rememberScreenModel {
+                createViewModel(
+                    HumidorDetailsScreenViewModel::class,
+                    route.data
+                )
+            }
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
-        val mainModel = route.sharedViewModel as MainScreenViewModel
-        Log.debug("Images: ${viewModel.images.size} : ${viewModel.loading}  ")
-        viewModel.observeEvents {
-            when (it) {
-                is HumidorDetailsScreenViewModel.Action.OnBackAction -> navigator.pop()
-                is HumidorDetailsScreenViewModel.Action.ShowError -> TODO()
-            }
+
+        viewModel.observeEvents(tag()) {
+            handleAction(it, navigator)
+        }
+
+        LaunchedEffect(viewModel.editing) {
+            viewModel.observeHumidor()
         }
 
         val topColors = centerAlignedTopAppBarColors(
@@ -88,17 +109,8 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                         colors = topColors,
                         navigationIcon = {
                             if (!viewModel.editing) {
-                                IconButton(onClick = {
-                                    viewModel.sendEvent(
-                                        HumidorDetailsScreenViewModel.Action.OnBackAction(
-                                            0
-                                        )
-                                    )
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = null
-                                    )
+                                BackButton {
+                                    viewModel.onBackPress()
                                 }
                             }
                         },
@@ -149,7 +161,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                     loading = viewModel.loading,
                                 ) {
                                     val data = route.data as Humidor
-                                    navigator.push(ImagesViewScreen(ImagesViewRoute.apply {
+                                    navigator.push(ImagesViewScreen(HumidorImagesViewRoute.apply {
                                         this.data = Pair(data, it)
                                     }))
                                 }
@@ -171,20 +183,21 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                             Column {
                                 TextStyled(
                                     viewModel.name,
+                                    Localize.cigar_details_name,
                                     TextStyles.Headline,
-                                    label = if (viewModel.editing) Localize.cigar_details_name else null,
+                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
                                     editable = viewModel.editing,
                                     maxLines = 2,
                                     modifier = Modifier.padding(bottom = 4.dp),
-                                    keepHeight = false,
                                     onValueChange = {
                                         viewModel.name = it
                                     }
                                 )
                                 TextStyled(
                                     viewModel.brand,
+                                    label = Localize.cigar_details_company,
                                     TextStyles.Subhead,
-                                    label = if (viewModel.editing) Localize.cigar_details_company else null,
+                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
                                     editable = viewModel.editing,
                                     modifier = Modifier.padding(bottom = 4.dp),
                                     onValueChange = {
@@ -214,16 +227,16 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                 } else {
                                     TextStyled(
                                         if (viewModel.holds == 0L) "" else viewModel.holds.toString(),
+                                        Localize.humidor_details_holds,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_holds,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
                                             viewModel.holds =
                                                 if (it.isNotBlank()) it.toLong() else 0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Number
                                     )
                                 }
                             }
@@ -252,29 +265,29 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                 } else if (viewModel.editing) {
                                     TextStyled(
                                         if (viewModel.temperature == null || viewModel.temperature == 0L) "" else viewModel.temperature.toString(),
+                                        Localize.humidor_details_temperature,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_temperature,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
                                             viewModel.temperature =
                                                 if (it.isNotBlank()) it.toLong() else 0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Temperature
                                     )
                                     TextStyled(
                                         if (viewModel.humidity == null || viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
+                                        Localize.humidor_details_humidity,
                                         TextStyles.Subhead,
                                         labelStyle = TextStyles.Subhead,
-                                        label = Localize.humidor_details_humidity,
                                         editable = viewModel.editing,
                                         modifier = Modifier.padding(bottom = 10.dp),
                                         onValueChange = {
                                             viewModel.humidity =
                                                 if (it.isNotBlank()) it.toDouble() else 0.0
                                         },
-                                        inputMode = KeyboardType.Number
+                                        inputMode = InputMode.Humidity
                                     )
                                 }
                                 //Cigar Notes and Link
@@ -287,8 +300,9 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                 ) {
                                     TextStyled(
                                         viewModel.notes,
+                                        Localize.cigar_details_notes,
                                         TextStyles.Subhead,
-                                        //label = "Notes",
+                                        labelStyle = TextStyles.None,
                                         editable = viewModel.editing,
                                         onValueChange = {
                                             viewModel.notes = it
@@ -301,8 +315,8 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem {
                                     ) {
                                         TextStyled(
                                             viewModel.link,
+                                            Localize.cigar_details_link,
                                             TextStyles.Subhead,
-                                            label = Localize.cigar_details_link,
                                             labelStyle = TextStyles.Subhead,
                                             editable = viewModel.editing,
                                             maxLines = 1,

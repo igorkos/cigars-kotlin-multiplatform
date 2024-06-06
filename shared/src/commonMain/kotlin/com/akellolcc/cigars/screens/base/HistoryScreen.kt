@@ -1,0 +1,151 @@
+/*******************************************************************************************************************************************
+ * Copyright (C) 2024 Igor Kosulin
+ * Last modified 6/5/24, 1:28 PM
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************************************************************************/
+
+package com.akellolcc.cigars.screens.base
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.databases.models.History
+import com.akellolcc.cigars.databases.models.HistoryType
+import com.akellolcc.cigars.mvvm.base.HistoryScreenViewModel
+import com.akellolcc.cigars.screens.components.BackButton
+import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.navigation.NavRoute
+import com.akellolcc.cigars.theme.Localize
+import com.akellolcc.cigars.theme.MaterialColors
+import com.akellolcc.cigars.theme.TextStyles
+import com.akellolcc.cigars.theme.loadIcon
+import com.akellolcc.cigars.theme.materialColor
+import com.akellolcc.cigars.utils.formatDate
+
+abstract class HistoryScreen<VM : HistoryScreenViewModel>(override val route: NavRoute) :
+    BaseTabListScreen<History, VM>(route) {
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
+        val topColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = materialColor(MaterialColors.color_transparent),
+            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
+        )
+        TopAppBar(
+            title = {
+                TextStyled(
+                    viewModel.name,
+                    Localize.nav_header_title_desc,
+                    TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
+                )
+            },
+            colors = topColors,
+            navigationIcon = {
+                BackButton {
+                    viewModel.onBackPress()
+                }
+            })
+    }
+
+    @Composable
+    override fun EntityListRow(entity: History, modifier: Modifier) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = materialColor(MaterialColors.color_primaryContainer),
+            ),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                loadIcon(HistoryType.icon(entity.type), Size(32.dp.value, 32.dp.value))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 24.dp)
+
+                ) {
+                    Column {
+                        TextStyled(
+                            entity.date.formatDate(),
+                            Localize.history_date_desc,
+                            style = TextStyles.Subhead,
+                            labelStyle = TextStyles.None
+                        )
+                        TextStyled(
+                            entity.cigar?.name ?: entity.humidorFrom.name,
+                            Localize.cigar_details_name,
+                            style = TextStyles.Subhead,
+                            labelStyle = TextStyles.None
+                        )
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            TextStyled(
+                                if (entity.cigar == null) Localize.history_humidor_added(entity.type) else Localize.history_transaction_desc(
+                                    entity.type,
+                                    entity.count
+                                ),
+                                if (entity.cigar == null) Localize.history_type_addition else Localize.history_type_move,
+                                style = TextStyles.Subhead,
+                                labelStyle = TextStyles.None
+                            )
+                            if (entity.price != null) {
+                                TextStyled(
+                                    Localize.history_transaction_price(entity.price!!),
+                                    Localize.cigar_search_details_add_price_dialog,
+                                    style = TextStyles.Subhead,
+                                    labelStyle = TextStyles.None
+                                )
+                            }
+                        }
+                        if (entity.type == HistoryType.Move) {
+                            Column {
+                                TextStyled(
+                                    label = "From",
+                                    text = entity.humidorFrom.name,
+                                    style = TextStyles.Subhead
+                                )
+                                TextStyled(
+                                    label = "To",
+                                    text = entity.humidorTo.name,
+                                    style = TextStyles.Subhead
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

@@ -1,3 +1,19 @@
+/*******************************************************************************************************************************************
+ * Copyright (C) 2024 Igor Kosulin
+ * Last modified 5/31/24, 1:10 PM
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************************************************************************/
+
 package com.akellolcc.cigars.theme
 
 import androidx.compose.foundation.Image
@@ -16,7 +32,12 @@ import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.getImageByFileName
 
 @Composable
-fun loadIcon(id: ImageResource, size: Size, tint: Color? = null, modifier: Modifier = Modifier) {
+fun loadIcon(
+    id: ImageResource,
+    size: Size = Size(24f, 24f),
+    tint: Color? = null,
+    modifier: Modifier = Modifier
+) {
     val painter: Painter = painterResource(id)
     Icon(
         painter = painter,
@@ -65,7 +86,7 @@ class Images {
         val icon_star_empty = MR.images.icon_star_empty
         val icon_star_filled = MR.images.icon_star_full
         val icon_menu_history = MR.images.icon_menu_history
-
+        val icon_cigars = MR.images.icon_cigars
         val icon_arrow_left = MR.images.arrow_left
         val icon_arrow_right = MR.images.arrow_right
         val icon_bin = MR.images.icon_bin
@@ -80,9 +101,13 @@ class Images {
         val icon_menu_sort_alpha_desc = MR.images.icon_menu_sort_alpha_desc
         val icon_menu_sort_amount_asc = MR.images.icon_menu_sort_amount_asc
         val icon_menu_sort_amount_desc = MR.images.icon_menu_sort_amount_desc
-        val icon_menu_sort_numberic_desc = MR.images.icon_menu_sort_numberic_desc
+        val icon_menu_sort_numeric_desc = MR.images.icon_menu_sort_numberic_desc
         val icon_menu_sort_numeric_asc = MR.images.icon_menu_sort_numeric_asc
         val icon_menu_sort = MR.images.icon_menu_sort
+        val tab_icon_search = MR.images.tab_icon_search
+        val icon_menu_checkmark = MR.images.icon_menu_checkmark
+        val icon_drop_down = MR.images.icon_drop_down
+        val icon_drop_up = MR.images.icon_drop_up
     }
 }
 
