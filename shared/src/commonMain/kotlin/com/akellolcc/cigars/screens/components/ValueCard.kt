@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:36 PM
+ * Last modified 6/6/24, 4:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,7 +44,6 @@ import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_C
 import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_HORIZONTAL_TAG
 import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_VERTICAL_TAG
 import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_LABEL_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_TAG
 import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_VALUE_TAG
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
@@ -55,7 +54,7 @@ import dev.icerock.moko.resources.ImageResource
 @Composable
 fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     OutlinedCard(
-        modifier = modifier.testTag(VALUE_CARD_TAG),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             materialColor(MaterialColors.color_primaryContainer),
             materialColor(MaterialColors.color_onPrimaryContainer)

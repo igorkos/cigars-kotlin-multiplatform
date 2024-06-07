@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 2:27 PM
+ * Last modified 6/6/24, 4:46 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,18 +58,23 @@ fun ComposeTestRule.waitForScreen(
 }
 
 /**
+ * Asserts that a list contains a list item with the given text.
+ * @param description The content description of the list node.
+ * @param text The text of the list item to assert.
+ */
+fun ComposeTestRule.assertListNode(description: String, text: String): SemanticsNodeInteraction {
+    return onNode(hasText(text, substring = true).and(hasAnyAncestor(hasContentDescriptionExactly(description)))).assertExists()
+}
+
+/**
  * Asserts that a list is displayed in order.
  * @param description The content description of the list node.
  * @param expected The expected order of the list items.
  */
 fun ComposeTestRule.assertListOrder(description: String, expected: List<String>, reverse: Boolean = false) {
-    fun node(text: String): SemanticsNodeInteraction {
-        return onNode(hasText(text, substring = true).and(hasAnyAncestor(hasContentDescriptionExactly(description)))).assertExists()
-    }
-
     var id = if (reverse) Int.MAX_VALUE else Int.MIN_VALUE
     for (text in expected) {
-        val node = node(text)
+        val node = assertListNode(description, text)
         node.printToLog("node $text")
         val nodeId = node.fetchSemanticsNode().id
         if (reverse) {
@@ -116,6 +121,14 @@ fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String
  */
 fun ComposeTestRule.selectTab(route: NavRoute) {
     onNode(hasContentDescription(Localize.nav_tab_title_desc).and(hasText(route.title))).performClick()
+}
+
+/**
+ * Presses a button in the UI.
+ * @param semantics The content description of the button to press.
+ */
+fun ComposeTestRule.pressButton(semantics: String) {
+    onNodeWithContentDescription(semantics).performClick()
 }
 
 @OptIn(ExperimentalTestApi::class)
@@ -182,9 +195,6 @@ fun ComposeTestRule.textIsDisplayedAtLeastOnce(
     Assert.assertTrue(this.onAllNodesWithText(text).fetchSemanticsNodes().size == minOccurrences)
 }
 
-fun ComposeTestRule.pressButton(semantics: String) {
-    onNodeWithContentDescription(semantics).performClick()
-}
 
 fun ComposeTestRule.pressBackButton() {
     onNodeWithTag("back_button").performClick()

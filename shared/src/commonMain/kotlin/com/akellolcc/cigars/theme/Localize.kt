@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 11:52 PM
+ * Last modified 6/6/24, 4:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,6 +104,15 @@ object Localize {
     val cigar_details_move_to = Strings.cigar_details_move_to.toString()
     val cigar_details_move_select = Strings.cigar_details_move_select.toString()
     val cigar_details_count = Strings.cigar_details_count.toString()
+
+
+    val cigar_details_top_bar_history_desc = Strings.cigar_details_top_bar_history_desc.toString()
+    val cigar_details_top_bar_edit_desc = Strings.cigar_details_top_bar_edit_desc.toString()
+    val cigar_details_ratings_block_desc = Strings.cigar_details_ratings_block_desc.toString()
+    val cigar_details_ratings_block_external_desc = Strings.cigar_details_ratings_block_external_desc.toString()
+    val cigar_details_ratings_block_my_desc = Strings.cigar_details_ratings_block_my_desc.toString()
+    val cigar_details_ratings_block_favorite_add_desc = Strings.cigar_details_ratings_block_favorite_add_desc.toString()
+    val cigar_details_ratings_block_favorite_remove_desc = Strings.cigar_details_ratings_block_favorite_remove_desc.toString()
 
     val cigar_search_details_add_dialog = Strings.cigar_search_details_add_dialog.toString()
     val cigar_search_details_add_count_dialog = Strings.cigar_search_details_add_count_dialog.toString()

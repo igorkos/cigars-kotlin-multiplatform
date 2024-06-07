@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 12:33 PM
+ * Last modified 6/6/24, 4:47 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -120,7 +122,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().testTag(tag()),
+                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
                 topBar = { topTabBar() },
                 bottomBar = { bottomTabBar() }
             ) {
@@ -218,12 +220,12 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             actions = {
                 if (!viewModel.editing) {
                     IconButton(
-                        modifier = Modifier.testTag(tag(TOP_BAR_HISTORY)),
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_history_desc },
                         onClick = { viewModel.historyOpen() }) {
                         loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
                     }
                     IconButton(
-                        modifier = Modifier.testTag(tag(TOP_BAR_EDIT)),
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_edit_desc },
                         onClick = { viewModel.editing = !viewModel.editing }) {
                         loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
                     }
@@ -494,8 +496,9 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
     @Composable
     private fun cigarRatings() {
         if (!viewModel.editing && viewModel.rating == null && viewModel.myRating == null) return
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.testTag(tag(RATINGS_BLOCK))) {
+        Column(horizontalAlignment = Alignment.Start) {
             ValuesCard(
+                modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_desc },
                 label = Localize.cigar_details_ratings,
                 vertical = viewModel.editing,
                 actionIcon = Images.icon_menu_info,
@@ -506,16 +509,20 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                 if (!viewModel.editing) {
                     ValueCard(
                         Localize.cigar_details_rating,
-                        "${viewModel.rating}"
-                    )
+                        "${viewModel.rating}",
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_external_desc })
                     ValueCard(
                         Localize.cigar_details_myrating,
-                        "${viewModel.myRating}"
+                        "${viewModel.myRating}",
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_my_desc }
                     ) {
                         viewModel.cigarRating = true
                     }
                     IconButton(
-                        modifier = Modifier.testTag(tag("$RATINGS_FAVORITE${viewModel.favorites}")),
+                        modifier = Modifier.semantics {
+                            contentDescription =
+                                if (viewModel.favorites) Localize.cigar_details_ratings_block_favorite_remove_desc else Localize.cigar_details_ratings_block_favorite_add_desc
+                        },
                         onClick = {
                             viewModel.favorite()
                         }) {
