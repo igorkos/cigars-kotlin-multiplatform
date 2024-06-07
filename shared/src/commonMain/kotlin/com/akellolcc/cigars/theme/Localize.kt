@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 4:42 PM
+ * Last modified 6/7/24, 12:09 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,15 +75,21 @@ object Localize {
     val screen_list_sort_fields_action_descr = Strings.screen_list_sort_fields_action_descr.toString()
     val screen_list_sort_fields_list_descr = Strings.screen_list_sort_fields_list_descr.toString()
 
+    val cigar_details_origin_block_desc = Strings.cigar_details_origin_block_desc.toString()
     val cigar_details_name = Strings.cigar_details_name.toString()
     val cigar_details_company = Strings.cigar_details_company.toString()
     val cigar_details_country = Strings.cigar_details_country.toString()
 
+
+    val cigar_details_size_block_desc = Strings.cigar_details_size_block_desc.toString()
+    val cigar_details_size_info_dialog_desc = Strings.cigar_details_size_info_dialog_desc.toString()
     val cigar_details_cigars = Strings.cigar_details_cigars.toString()
     val cigar_details_shape = Strings.cigar_details_shape.toString()
     val cigar_details_length = Strings.cigar_details_length.toString()
     val cigar_details_gauge = Strings.cigar_details_gauge.toString()
 
+    val cigar_details_tobacco_block_desc = Strings.cigar_details_tobacco_block_desc.toString()
+    val cigar_details_tobacco_info_dialog_desc = Strings.cigar_details_tobacco_info_dialog_desc.toString()
     val cigar_details_tobacco = Strings.cigar_details_tobacco.toString()
     val cigar_details_wrapper = Strings.cigar_details_wrapper.toString()
     val cigar_details_binder = Strings.cigar_details_binder.toString()
@@ -108,11 +114,16 @@ object Localize {
 
     val cigar_details_top_bar_history_desc = Strings.cigar_details_top_bar_history_desc.toString()
     val cigar_details_top_bar_edit_desc = Strings.cigar_details_top_bar_edit_desc.toString()
+    val cigar_details_images_block_desc = Strings.cigar_details_images_block_desc.toString()
+
     val cigar_details_ratings_block_desc = Strings.cigar_details_ratings_block_desc.toString()
     val cigar_details_ratings_block_external_desc = Strings.cigar_details_ratings_block_external_desc.toString()
     val cigar_details_ratings_block_my_desc = Strings.cigar_details_ratings_block_my_desc.toString()
     val cigar_details_ratings_block_favorite_add_desc = Strings.cigar_details_ratings_block_favorite_add_desc.toString()
     val cigar_details_ratings_block_favorite_remove_desc = Strings.cigar_details_ratings_block_favorite_remove_desc.toString()
+
+    val cigar_details_humidors_block_desc = Strings.cigar_details_humidors_block_desc.toString()
+    val cigar_details_notes_block_desc = Strings.cigar_details_notes_block_desc.toString()
 
     val cigar_search_details_add_dialog = Strings.cigar_search_details_add_dialog.toString()
     val cigar_search_details_add_count_dialog = Strings.cigar_search_details_add_count_dialog.toString()
@@ -168,6 +179,9 @@ object Localize {
 
     val nav_header_title_desc = Strings.nav_header_title_desc.toString()
     val nav_tab_title_desc = Strings.nav_tab_title_desc.toString()
+
+    val images_pager_list_desc = Strings.images_pager_list_desc.toString()
+    val images_pager_list_item_desc = Strings.images_pager_list_item_desc.toString()
 
     val button_title_add_search_field = Strings.button_title_add_search_field.toString()
     fun humidor_cigars(v: Long, v1: Long): String {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 4:46 PM
+ * Last modified 6/6/24, 11:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,9 +22,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
+import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onChildren
@@ -34,7 +34,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.childWithTextLabel
@@ -75,7 +74,6 @@ fun ComposeTestRule.assertListOrder(description: String, expected: List<String>,
     var id = if (reverse) Int.MAX_VALUE else Int.MIN_VALUE
     for (text in expected) {
         val node = assertListNode(description, text)
-        node.printToLog("node $text")
         val nodeId = node.fetchSemanticsNode().id
         if (reverse) {
             nodeId shouldBeLessThan id
@@ -131,6 +129,42 @@ fun ComposeTestRule.pressButton(semantics: String) {
     onNodeWithContentDescription(semantics).performClick()
 }
 
+/**
+ * Asserts that a node with 'node' content description and parent with 'parent' content description exists.
+ * @param parent The content description of parent node.
+ * @param node The content description of the list node.
+ */
+fun ComposeTestRule.assertNode(parent: String, node: String): SemanticsNodeInteraction {
+    return onNode(hasContentDescriptionExactly(node).and(hasAnyAncestor(hasContentDescriptionExactly(parent)))).assertExists()
+}
+
+/**
+ * Asserts that a node with 'node' content description and parent with 'parent' content description with state exist.
+ * @param parent The content description of parent node.
+ * @param node The content description of the list node.
+ * @param state The state of the node.
+ */
+fun ComposeTestRule.assertNodeState(parent: String, node: String, state: String): SemanticsNodeInteraction {
+    return onNode(
+        (hasContentDescription(node).and(hasStateDescription(state))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).assertExists()
+}
+
+/**
+ * Waits for a dialog to be displayed.
+ * @param tag The content description of the dialog.
+ * @param timeoutMillis The timeout in milliseconds.
+ */
+@OptIn(ExperimentalTestApi::class)
+fun ComposeTestRule.waitForDialog(tag: String, timeoutMillis: Long = 10000): SemanticsNodeInteraction {
+    waitUntilAtLeastOneExists(hasContentDescription(tag), timeoutMillis = timeoutMillis)
+    return onNode(hasContentDescription(tag)).assertExists()
+}
+
 @OptIn(ExperimentalTestApi::class)
 fun ComposeTestRule.waitForText(
     text: String,
@@ -171,14 +205,6 @@ fun ComposeTestRule.textIsDisplayed(
     } else {
         TestCase.assertEquals(onAllNodesWithText(text, substring = substring).fetchSemanticsNodes().size, expectedOccurrences)
     }
-}
-
-
-@OptIn(ExperimentalTestApi::class)
-fun ComposeTestRule.waitForDialog(tag: String, timeoutMillis: Long = 10000): SemanticsNodeInteraction {
-    val matcher = hasTestTag(tag).and(hasAnyAncestor(isDialog()))
-    waitUntilAtLeastOneExists(matcher, timeoutMillis = timeoutMillis)
-    return onNode(matcher).assertExists()
 }
 
 

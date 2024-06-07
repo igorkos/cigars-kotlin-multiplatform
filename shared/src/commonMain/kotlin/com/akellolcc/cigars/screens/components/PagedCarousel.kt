@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 6:13 PM
+ * Last modified 6/6/24, 5:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -48,6 +50,7 @@ import app.cash.paging.compose.collectAsLazyPagingItems
 import com.akellolcc.cigars.databases.models.CigarImage
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.materialColor
 import com.akellolcc.cigars.utils.ui.toImageBitmap
@@ -88,12 +91,15 @@ fun PagedCarousel(
         } else {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize().testTag("ImagesCarousel"),
+                modifier = Modifier.fillMaxSize().semantics {
+                    contentDescription = Localize.images_pager_list_desc
+                    stateDescription = "${pagerState.currentPage}:${pagerState.pageCount}"
+                }
             ) { page ->
                 //Log.debug("Images1: ${images?.size}")
                 if (pagingItems.itemCount > 0) {
                     pagingItems[page]?.let {
-                        CarouselItem(it.bytes, scale, page) {
+                        CarouselItem(it, scale, page) {
                             onClick?.invoke(page)
                         }
                     }
@@ -136,22 +142,23 @@ fun PagedCarousel(
 
 @Composable
 fun CarouselItem(
-    image: ByteArray?,
+    image: CigarImage?,
     scale: ContentScale,
     index: Int,
     default: ImageResource? = null,
     onClick: () -> Unit
 ) {
     // Load the image bitmap
-    val imageBitmap = image?.let {
-        toImageBitmap(it)
-    }
+    val imageBitmap = image?.let { toImageBitmap(image.bytes) }
 
     if (imageBitmap == null && default == null) return
     Column(
         modifier = Modifier.fillMaxSize().clickable {
             onClick()
-        }.testTag("ImagesCarouselItem-$index"),
+        }.semantics {
+            contentDescription = Localize.images_pager_list_item_desc
+            stateDescription = "${index}:${image?.type}"
+        },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
