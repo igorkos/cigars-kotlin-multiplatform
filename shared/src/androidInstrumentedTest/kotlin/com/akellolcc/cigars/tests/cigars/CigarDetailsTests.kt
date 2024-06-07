@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 8:43 PM
+ * Last modified 6/7/24, 12:13 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,12 +24,14 @@ import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.printToLog
+import assertListNode
 import assertListOrder
+import assertNodeState
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
 import com.akellolcc.cigars.screens.CigarDetailsScreen
@@ -37,19 +39,16 @@ import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.DIALOG_CIGAR_RA
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.DIALOG_MOVE_CIGARS
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.HUMIDORS_BLOCK
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.HUMIDORS_BLOCK_LIST
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.ORIGIN_BLOCK
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.RATINGS_BLOCK
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.RATINGS_FAVORITE
 import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.SIZE_BLOCK
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.TOBACCO_BLOCK
 import com.akellolcc.cigars.screens.base.BaseTabListScreen.Companion.LIST_TAG
-import com.akellolcc.cigars.screens.components.INFO_IMAGE_DIALOG_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
 import com.akellolcc.cigars.screens.navigation.CigarImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.FavoritesRoute
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasChildWithText
@@ -63,12 +62,15 @@ import com.akellolcc.cigars.utils.childWithText
 import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.dialogWithTag
 import com.akellolcc.cigars.utils.getListRow
+import com.akellolcc.cigars.utils.performValuesCardAction
 import com.akellolcc.cigars.utils.replaceText
+import com.akellolcc.cigars.utils.screenListContentDescription
 import pressBackButton
 import pressButton
 import sleep
 import textIsDisplayed
 import waitForDialog
+import waitForScreen
 import waitForTag
 import waitForText
 import kotlin.test.Test
@@ -76,14 +78,14 @@ import kotlin.test.Test
 @Suppress("SameParameterValue")
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
 open class CigarDetailsTests : BaseUiTest() {
-
+    override var route: NavRoute = CigarsDetailsRoute
     override fun setUp() {
-        route = CigarsRoute
         with(composeTestRule) {
-            waitForTag(tag())
-            onNodeWithText("#1", true).performClick()
-            route = CigarsDetailsRoute
-            waitForTag(tag())
+            waitForScreen(CigarsRoute)
+            //Check items displayed
+            assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
+            assertListNode(screenListContentDescription(CigarsRoute), "#1").performClick()
+            waitForScreen(route)
         }
     }
 
@@ -92,23 +94,31 @@ open class CigarDetailsTests : BaseUiTest() {
         with(composeTestRule) {
 
             //Check images carousel
-            onNodeWithTag("ImagesCarousel").assertExists()
-            onNodeWithTag("ImagesCarousel").onChildren().assertCountEquals(1)
-            onNodeWithTag("ImagesCarouselItem--1").assertDoesNotExist()
-            onNodeWithTag("ImagesCarouselItem-0").assertExists()
+            assertNodeState(Localize.cigar_details_images_block_desc, Localize.images_pager_list_desc, "0:1")
 
             //Check cigar details
-            childWithText(tag(ORIGIN_BLOCK), "#1 Fuente Fuente OpusX Reserva d’Chateau").assertExists()
-            childWithText(tag(ORIGIN_BLOCK), "Fabrica de Tabacos Raices Cubanas S. de R.L.").assertExists()
-            childWithText(tag(ORIGIN_BLOCK), "Dominican").assertExists()
+            childWithTextLabel(
+                Localize.cigar_details_origin_block_desc,
+                Localize.cigar_details_name,
+                "#1 Fuente Fuente OpusX Reserva d’Chateau"
+            ).assertExists()
+            childWithTextLabel(
+                Localize.cigar_details_origin_block_desc,
+                Localize.cigar_details_company,
+                "Fabrica de Tabacos Raices Cubanas S. de R.L."
+            ).assertExists()
+            childWithTextLabel(Localize.cigar_details_origin_block_desc, Localize.cigar_details_country, "Dominican").assertExists()
+
 
             //Check cigar size
-            assertValuesCard(tag(SIZE_BLOCK), Localize.cigar_details_cigars)
-            childWithTag(tag(SIZE_BLOCK), ValuesCardTags.VALUES_CARD_ACTION_TAG).performClick()
-            waitForDialog(INFO_IMAGE_DIALOG_TAG).performClick()
-            waitForTag(tag())
+            //onNodeWithContentDescription(Localize.cigar_details_size_block_desc).printToLog("Test", 10)
+            assertValuesCard(Localize.cigar_details_size_block_desc, Localize.cigar_details_cigars)
+            performValuesCardAction(Localize.cigar_details_size_block_desc)
+
+            waitForDialog(Localize.cigar_details_size_info_dialog_desc).performClick()
+            waitForScreen(route)
             assertValuesCardValues(
-                tag(SIZE_BLOCK),
+                Localize.cigar_details_size_block_desc,
                 mapOf(
                     Localize.cigar_details_shape to "Churchill",
                     Localize.cigar_details_length to "7'",
@@ -117,39 +127,42 @@ open class CigarDetailsTests : BaseUiTest() {
             )
 
             //Check cigar tobacco
-            assertValuesCard(tag(TOBACCO_BLOCK), Localize.cigar_details_tobacco, true)
-            childWithTag(tag(TOBACCO_BLOCK), ValuesCardTags.VALUES_CARD_ACTION_TAG).performClick()
-            waitForDialog(INFO_IMAGE_DIALOG_TAG).performClick()
-            waitForTag(tag())
+            assertValuesCard(Localize.cigar_details_tobacco_block_desc, Localize.cigar_details_tobacco, true)
+            performValuesCardAction(Localize.cigar_details_tobacco_block_desc)
+
+            waitForDialog(Localize.cigar_details_tobacco_info_dialog_desc).performClick()
+            waitForScreen(route)
+
 
             childWithTextLabel(
-                tag(TOBACCO_BLOCK),
+                Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_wrapper, "Dominican",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(TOBACCO_BLOCK),
+                Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_binder, "Dominican",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(TOBACCO_BLOCK),
+                Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_filler, "Dominican",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(TOBACCO_BLOCK),
+                Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_strength, "Medium-Full",
                 substring = true
             ).assertExists()
 
             //Check cigar ratings
-            assertValuesCard(tag(RATINGS_BLOCK), Localize.cigar_details_ratings)
-            childWithTag(tag(RATINGS_BLOCK), ValuesCardTags.VALUES_CARD_ACTION_TAG).performClick()
-            waitForDialog(INFO_IMAGE_DIALOG_TAG).performClick()
-            waitForTag(tag())
+            assertValuesCard(Localize.cigar_details_ratings_block_desc, Localize.cigar_details_ratings)
+            performValuesCardAction(Localize.cigar_details_tobacco_block_desc)
+
+            waitForDialog(Localize.cigar_details_tobacco_info_dialog_desc).performClick()
+            waitForScreen(route)
             assertValuesCardValues(
-                tag(RATINGS_BLOCK),
+                Localize.cigar_details_ratings_block_desc,
                 mapOf(
                     Localize.cigar_details_rating to "97",
                     Localize.cigar_details_myrating to "0"
@@ -157,12 +170,11 @@ open class CigarDetailsTests : BaseUiTest() {
             )
 
             //Check cigar Humidors
-            assertValuesCard(tag(HUMIDORS_BLOCK), Localize.cigar_details_humidors)
-            assertListOrder(tag(HUMIDORS_BLOCK_LIST), listOf("Total number of cigars: 10", "Case"))
+            assertValuesCard(Localize.cigar_details_humidors_block_desc, Localize.cigar_details_humidors, true)
+            assertListOrder(Localize.cigar_details_humidors_block_desc, listOf("Total number of cigars: 10", "Case"))
 
             //Check cigar notes
-            onNodeWithTag(tag(CigarDetailsScreen.NOTES_BLOCK)).assertExists().onChildren().assertCountEquals(3)
-
+            onNodeWithContentDescription(Localize.cigar_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
         }
     }
 
@@ -370,7 +382,6 @@ open class CigarDetailsTests : BaseUiTest() {
             val list = onNodeWithTag(tag(HUMIDORS_BLOCK_LIST), true).assertExists().onChildren()
             for (i in 1..<result.size) {
                 val node = list.getListRow(i)
-                node.printToLog("Test", 10)
                 node.assertHasChildWithText(resultCount[i - 1])
             }
         }

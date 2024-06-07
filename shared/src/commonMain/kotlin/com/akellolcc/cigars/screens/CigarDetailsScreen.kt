@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 12:33 PM
+ * Last modified 6/7/24, 12:12 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,6 +58,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -120,7 +122,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().testTag(tag()),
+                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
                 topBar = { topTabBar() },
                 bottomBar = { bottomTabBar() }
             ) {
@@ -218,12 +220,12 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             actions = {
                 if (!viewModel.editing) {
                     IconButton(
-                        modifier = Modifier.testTag(tag(TOP_BAR_HISTORY)),
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_history_desc },
                         onClick = { viewModel.historyOpen() }) {
                         loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
                     }
                     IconButton(
-                        modifier = Modifier.testTag(tag(TOP_BAR_EDIT)),
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_edit_desc },
                         onClick = { viewModel.editing = !viewModel.editing }) {
                         loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
                     }
@@ -257,6 +259,12 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         HumidorCigarsCountDialog {
             viewModel.onCancelEdit()
         }
+        CigarsRatingDialog {
+            viewModel.cigarRating = false
+        }
+        MoveCigarsDialog {
+            viewModel.moveCigarDialog = false
+        }
         if (viewModel.infoDialog != CigarsDetailsScreenViewModel.InfoActions.None) {
             InfoImageDialog(
                 when (viewModel.infoDialog) {
@@ -264,16 +272,18 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                     CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Images.cigar_tobacco_info
                     CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Images.cigar_ratings_info
                     else -> TODO()
+                },
+                modifier = Modifier.semantics {
+                    contentDescription = when (viewModel.infoDialog) {
+                        CigarsDetailsScreenViewModel.InfoActions.CigarSize -> Localize.cigar_details_size_info_dialog_desc
+                        CigarsDetailsScreenViewModel.InfoActions.CigarTobacco -> Localize.cigar_details_tobacco_info_dialog_desc
+                        CigarsDetailsScreenViewModel.InfoActions.CigarRatings -> Localize.cigar_details_size_info_dialog_desc
+                        else -> ""
+                    }
                 }
             ) {
                 viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
             }
-        }
-        CigarsRatingDialog {
-            viewModel.cigarRating = false
-        }
-        MoveCigarsDialog {
-            viewModel.moveCigarDialog = false
         }
     }
 
@@ -283,7 +293,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             Column(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier.padding(bottom = 10.dp)
-                    .aspectRatio(ratio = 1.8f)
+                    .aspectRatio(ratio = 1.8f).semantics { contentDescription = Localize.cigar_details_images_block_desc }
             ) {
                 PagedCarousel(
                     viewModel.images,
@@ -298,7 +308,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
     @Composable
     private fun cigarOrigin() {
         //Cigar Name,  Company and Country
-        Column(modifier = Modifier.testTag(tag(ORIGIN_BLOCK))) {
+        Column(modifier = Modifier.semantics { contentDescription = Localize.cigar_details_origin_block_desc }) {
             TextStyled(
                 viewModel.name,
                 label = Localize.cigar_details_name,
@@ -342,7 +352,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
         ) {
             ValuesCard(
-                modifier = Modifier.testTag(tag(SIZE_BLOCK)),
+                modifier = Modifier.semantics { contentDescription = Localize.cigar_details_size_block_desc },
                 label = Localize.cigar_details_cigars,
                 vertical = viewModel.editing,
                 actionIcon = Images.icon_menu_info,
@@ -416,7 +426,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         if (!viewModel.editing && viewModel.wrapper.isBlank() && viewModel.binder.isBlank() && viewModel.filler.isBlank() && viewModel.strength == CigarStrength.Unknown) return
         Column {
             ValuesCard(
-                modifier = Modifier.testTag(tag(TOBACCO_BLOCK)),
+                modifier = Modifier.semantics { contentDescription = Localize.cigar_details_tobacco_block_desc },
                 label = Localize.cigar_details_tobacco,
                 vertical = true,
                 actionIcon = Images.icon_menu_info,
@@ -494,8 +504,9 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
     @Composable
     private fun cigarRatings() {
         if (!viewModel.editing && viewModel.rating == null && viewModel.myRating == null) return
-        Column(horizontalAlignment = Alignment.Start, modifier = Modifier.testTag(tag(RATINGS_BLOCK))) {
+        Column(horizontalAlignment = Alignment.Start) {
             ValuesCard(
+                modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_desc },
                 label = Localize.cigar_details_ratings,
                 vertical = viewModel.editing,
                 actionIcon = Images.icon_menu_info,
@@ -506,16 +517,20 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                 if (!viewModel.editing) {
                     ValueCard(
                         Localize.cigar_details_rating,
-                        "${viewModel.rating}"
-                    )
+                        "${viewModel.rating}",
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_external_desc })
                     ValueCard(
                         Localize.cigar_details_myrating,
-                        "${viewModel.myRating}"
+                        "${viewModel.myRating}",
+                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_ratings_block_my_desc }
                     ) {
                         viewModel.cigarRating = true
                     }
                     IconButton(
-                        modifier = Modifier.testTag(tag("$RATINGS_FAVORITE${viewModel.favorites}")),
+                        modifier = Modifier.semantics {
+                            contentDescription =
+                                if (viewModel.favorites) Localize.cigar_details_ratings_block_favorite_remove_desc else Localize.cigar_details_ratings_block_favorite_add_desc
+                        },
                         onClick = {
                             viewModel.favorite()
                         }) {
@@ -562,9 +577,9 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(((viewModel.humidors.count() + 2) * 48).dp)
-                    .testTag(tag(HUMIDORS_BLOCK))
             ) {
                 ValuesCard(
+                    modifier = Modifier.semantics { contentDescription = Localize.cigar_details_humidors_block_desc },
                     label = Localize.cigar_details_humidors,
                     vertical = true,
                     actionIcon = if (viewModel.humidorsCount() > 1) Images.icon_tab else null,
@@ -643,7 +658,9 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                     .padding(bottom = 10.dp, top = 10.dp)
                     .onSizeChanged {
                         notesHeight = it.height
-                    }.testTag(tag(NOTES_BLOCK))
+                    }.semantics {
+                        contentDescription = Localize.cigar_details_notes_block_desc
+                    }
             ) {
                 TextStyled(
                     viewModel.notes,
@@ -687,7 +704,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         if (viewModel.humidorCigarsCount != null) {
             Dialog(onDismissRequest = { onDismissRequest() }) {
                 Card(
-                    modifier = Modifier.wrapContentSize().testTag(tag(DIALOG_CIGAR_COUNT)),
+                    modifier = Modifier.wrapContentSize().semantics { contentDescription = Localize.cigar_details_size_info_dialog_desc },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = materialColor(MaterialColors.color_surfaceVariant),

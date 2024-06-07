@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 8:42 PM
+ * Last modified 6/6/24, 4:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ open class BaseUiTest() {
     @get:Rule(order = 0)
     val composeTestRule = createAndroidComposeRule(ComponentActivity::class.java)
 
-    var route: NavRoute? = null
+    open lateinit var route: NavRoute
 
     @Before
     fun before() {

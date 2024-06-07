@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 1:58 PM
+ * Last modified 6/7/24, 12:00 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,17 +27,17 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.isDialog
+import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onAncestors
 import androidx.compose.ui.test.onChildren
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.logging.Log
-import com.akellolcc.cigars.screens.components.ValuesCardTags
 
 /**
  * Assert node has children with content description
@@ -74,7 +74,7 @@ fun SemanticsNodeInteractionsProvider.childWithTextLabel(
     text: String,
     substring: Boolean = false
 ): SemanticsNodeInteraction {
-    onNode(hasContentDescription(parentTag)).printToLog("-------------childWithTextLabel  '${label}'  '${text}' -------------")
+    //onNode(hasContentDescription(parentTag)).printToLog("-------------childWithTextLabel  '${label}'  '${text}' -------------")
     return onNode(
         (hasContentDescription(label).and(
             if (text.isNotEmpty()) {
@@ -89,6 +89,58 @@ fun SemanticsNodeInteractionsProvider.childWithTextLabel(
             }
         )).and(hasAnyAncestor(hasContentDescription(parentTag)))
     )
+}
+
+/**
+ * Assert Values Card controls
+ * @param tag - tag of Values Card
+ * @param label - label of Values Card
+ * @param vertical - vertical or horizontal
+ * @param action - click action or not
+ */
+fun SemanticsNodeInteractionsProvider.assertValuesCard(
+    tag: String,
+    label: String,
+    vertical: Boolean = false,
+    action: Boolean = true,
+): SemanticsNodeInteraction {
+    val node = onNodeWithContentDescription(tag).assertExists()
+    onNode((hasContentDescription(tag).and(hasStateDescription(vertical.toString()))).and(hasAnyDescendant(hasContentDescription(label)))).assertExists()
+    onNode(
+        hasContentDescription(tag).and(
+            hasAnyDescendant(
+                if (action) {
+                    hasClickAction()
+                } else {
+                    SemanticsMatcher("True") { true }
+                }))).assertExists()
+    return node
+}
+
+/**
+ * Perform action on Values Card
+ * @param tag - Content description of Values Card
+ */
+fun SemanticsNodeInteractionsProvider.performValuesCardAction(
+    tag: String
+) {
+    onNode((hasClickAction().and(hasAnyAncestor(isHeading()))).and(hasAnyAncestor(hasContentDescription(tag)))).performClick()
+}
+
+/**
+ * Assert Values Card values
+ * @param tag - content description of Values Card
+ * @param values - map of values
+ */
+fun SemanticsNodeInteractionsProvider.assertValuesCardValues(
+    tag: String,
+    values: Map<String, String>
+) {
+    val node = onNodeWithContentDescription(tag).onChildren()
+    values.forEach { (key, value) ->
+        val matcher = hasAnyDescendant(hasContentDescription("$key $value"))
+        node.filterToOne(matcher).assertExists()
+    }
 }
 
 internal fun textMatcher(node: SemanticsNode, text: String, substring: Boolean): Boolean {
@@ -190,44 +242,4 @@ fun SemanticsNodeInteractionsProvider.childButtonWithText(
     )
 }
 
-fun SemanticsNodeInteractionsProvider.assertValuesCard(
-    tag: String,
-    label: String,
-    vertical: Boolean = false,
-    action: Boolean = true,
-    useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction {
-    onNodeWithTag(tag).assertExists()
-    childWithTag(
-        tag,
-        if (vertical) ValuesCardTags.VALUES_CARD_VERTICAL_TAG else ValuesCardTags.VALUES_CARD_HORIZONTAL_TAG,
-        useUnmergedTree
-    ).assertExists()
-    childWithText(tag, label, useUnmergedTree).assertExists()
-    val child = childWithTag(tag, ValuesCardTags.VALUES_CARD_ACTION_TAG)
-    if (action) {
-        child.assertExists()
-    } else {
-        child.assertDoesNotExist()
-    }
-    return onNodeWithTag(tag, useUnmergedTree)
-}
 
-fun SemanticsNodeInteractionsProvider.assertValuesCardValues(
-    tag: String,
-    values: Map<String, String>
-) {
-    val node = onNodeWithTag(tag, true).onChildren()
-    values.forEach { (key, value) ->
-        val matcher = hasAnyDescendant(
-            hasTestTag(ValuesCardTags.VALUE_CARD_TAG).and(
-                hasAnyDescendant(hasTestTag(ValuesCardTags.VALUE_CARD_LABEL_TAG).and(hasText(key))).and(
-                    hasAnyDescendant(
-                        hasTestTag(ValuesCardTags.VALUE_CARD_VALUE_TAG).and(hasText(value))
-                    )
-                )
-            )
-        )
-        node.filterToOne(matcher).assertExists()
-    }
-}

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 2:15 PM
+ * Last modified 6/6/24, 4:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ import assertListOrder
 import com.akellolcc.cigars.databases.models.CigarSortingFields
 import com.akellolcc.cigars.screens.components.search.SearchParameterField
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
+import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasNodes
@@ -40,6 +41,12 @@ import kotlin.test.Test
 
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
 open class CigarsListTests : BaseUiTest() {
+    override var route: NavRoute = CigarsRoute
+    private val LIST_TAG: String
+        get() {
+            return "${route.title} ${Localize.screen_list_descr}"
+        }
+
     override fun setUp() {
         with(composeTestRule) {
             waitForScreen(CigarsRoute)
@@ -85,11 +92,11 @@ open class CigarsListTests : BaseUiTest() {
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             onNodeWithContentDescription(Localize.screen_list_sort_fields_list_descr).onChildren()[index].performClick()
             sleep(1000)
-            assertListOrder(screenListContentDescription(CigarsRoute), expected)
+            assertListOrder(screenListContentDescription(route), expected)
             //reverse sort
             onNodeWithContentDescription(Localize.screen_list_sort_action_descr).performClick()
             sleep(1000)
-            assertListOrder(screenListContentDescription(CigarsRoute), expected.reversed(), true)
+            assertListOrder(screenListContentDescription(route), expected.reversed(), true)
         }
     }
 
@@ -323,9 +330,5 @@ open class CigarsListTests : BaseUiTest() {
             onNodeWithContentDescription(LIST_TAG).assertDoesNotExist()
 
         }
-    }
-
-    companion object {
-        val LIST_TAG = "${CigarsRoute.title} ${Localize.screen_list_descr}"
     }
 }

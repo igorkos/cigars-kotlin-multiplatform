@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/2/24, 11:36 PM
+ * Last modified 6/6/24, 11:20 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,12 +30,12 @@ import com.akellolcc.cigars.theme.loadImage
 import dev.icerock.moko.resources.ImageResource
 
 @Composable
-fun InfoImageDialog(image: ImageResource, onDismissRequest: () -> Unit) {
+fun InfoImageDialog(image: ImageResource, modifier: Modifier = Modifier, onDismissRequest: () -> Unit) {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        Surface(modifier = Modifier.fillMaxSize().testTag(INFO_IMAGE_DIALOG_TAG)) {
+        Surface(modifier = modifier.fillMaxSize().testTag(INFO_IMAGE_DIALOG_TAG)) {
             loadImage(image)
             IconButton(
                 modifier = Modifier.size(24.dp),

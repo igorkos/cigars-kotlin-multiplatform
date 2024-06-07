@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:36 PM
+ * Last modified 6/6/24, 11:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,15 +37,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_ACTION_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_HEADER_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_HORIZONTAL_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUES_CARD_VERTICAL_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_LABEL_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_TAG
-import com.akellolcc.cigars.screens.components.ValuesCardTags.Companion.VALUE_CARD_VALUE_TAG
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -55,7 +52,9 @@ import dev.icerock.moko.resources.ImageResource
 @Composable
 fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     OutlinedCard(
-        modifier = modifier.testTag(VALUE_CARD_TAG),
+        modifier = modifier.semantics {
+            isTraversalGroup = true
+        },
         colors = CardDefaults.cardColors(
             materialColor(MaterialColors.color_primaryContainer),
             materialColor(MaterialColors.color_onPrimaryContainer)
@@ -70,7 +69,9 @@ fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onC
         Column(
             modifier = Modifier.padding(8.dp).clickable(onClick = {
                 onClick?.invoke()
-            }),
+            }).semantics(mergeDescendants = true) {
+                contentDescription = "$label $value"
+            },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (label != null) {
@@ -78,16 +79,14 @@ fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onC
                     label,
                     label,
                     TextStyles.Subhead,
-                    labelStyle = TextStyles.None,
-                    modifier = Modifier.testTag(VALUE_CARD_LABEL_TAG)
+                    labelStyle = TextStyles.None
                 )
             }
             TextStyled(
                 value,
                 label ?: "",
                 TextStyles.Subhead,
-                labelStyle = TextStyles.None,
-                modifier = Modifier.testTag(VALUE_CARD_VALUE_TAG)
+                labelStyle = TextStyles.None
             )
         }
     }
@@ -102,7 +101,9 @@ fun ValuesCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.semantics {
+        stateDescription = "$vertical"
+    }) {
         OutlinedCard(
             colors = CardDefaults.cardColors(
                 materialColor(MaterialColors.color_transparent),
@@ -114,14 +115,14 @@ fun ValuesCard(
         ) {
             if (vertical) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag(VALUES_CARD_VERTICAL_TAG),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalAlignment = Alignment.Start
                 ) {
                     content()
                 }
             } else {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).testTag(VALUES_CARD_HORIZONTAL_TAG),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -133,7 +134,9 @@ fun ValuesCard(
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)
-                    .background(materialColor(MaterialColors.color_transparent)).testTag(VALUES_CARD_HEADER_TAG)
+                    .background(materialColor(MaterialColors.color_transparent)).semantics(mergeDescendants = true) {
+                        heading()
+                    }
             ) {
                 TextStyled(
                     label,
@@ -153,7 +156,7 @@ fun ValuesCard(
                         )
                         IconButton(
                             modifier = Modifier.size(24.dp)
-                                .background(materialColor(MaterialColors.color_transparent)).testTag(VALUES_CARD_ACTION_TAG),
+                                .background(materialColor(MaterialColors.color_transparent)),
                             onClick = { onAction?.invoke() }) {
                             loadIcon(
                                 actionIcon,
