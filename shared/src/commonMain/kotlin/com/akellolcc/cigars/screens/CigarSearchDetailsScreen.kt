@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 12:49 PM
+ * Last modified 6/9/24, 10:12 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,7 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
             val count = remember { mutableStateOf(0L) }
             val price = remember { mutableStateOf(0f) }
             val to = remember { mutableStateOf<Humidor?>(null) }
-            val toList = remember { mutableStateOf<List<ValuePickerItem<Humidor>>>(listOf()) }
+            val toList = remember { mutableStateOf<List<ValuePickerItem>>(listOf()) }
 
             fun isValid(): Boolean {
                 return count.value > 0 && price.value > 0 && to.value != null
@@ -179,7 +179,7 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
                                 label = Localize.cigar_details_move_to,
                                 items = toList.value,
                                 onClick = {
-                                    to.value = it.value
+                                    to.value = it.value as Humidor?
                                 }
                             )
                         }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:40 PM
+ * Last modified 6/9/24, 10:56 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,9 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.selectableGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
@@ -53,19 +60,19 @@ import com.akellolcc.cigars.utils.ui.pxToDp
 import dev.icerock.moko.resources.ColorResource
 import dev.icerock.moko.resources.ImageResource
 
-data class ValuePickerItem<T : Comparable<T>>(
-    val value: T?,
+data class ValuePickerItem(
+    val value: Any?,
     val label: String,
     val icon: ImageResource?
 )
 
 @Composable
-fun <T : Comparable<T>> ValuePicker(
+fun ValuePicker(
     modifier: Modifier = Modifier,
     label: String?,
-    value: ValuePickerItem<T>?,
-    items: List<ValuePickerItem<T>>,
-    onClick: ((ValuePickerItem<T>) -> Unit)? = null,
+    value: ValuePickerItem?,
+    items: List<ValuePickerItem>?,
+    onClick: ((ValuePickerItem) -> Unit)? = null,
     backgroundColor: ColorResource? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -73,9 +80,11 @@ fun <T : Comparable<T>> ValuePicker(
     var with by remember { mutableStateOf(0) }
 
     LaunchedEffect(items) {
-        if (items.size == 1 && items[0].value != null && selected?.value?.compareTo(items[0].value!!) != 0) {
-            selected = items[0]
-            onClick?.invoke(items[0])
+        items?.let {
+            if (it.size == 1 && it[0].value != null && selected?.value != it[0].value) {
+                selected = it[0]
+                onClick?.invoke(it[0])
+            }
         }
     }
 
@@ -85,7 +94,13 @@ fun <T : Comparable<T>> ValuePicker(
             TextFieldDefaults.shape
         ).onSizeChanged {
             with = it.width
-        }.testTag("value_picker"),
+        }.semantics(mergeDescendants = true) {
+            isTraversalGroup = true
+            selectableGroup()
+            contentDescription = label ?: ""
+            stateDescription = "${selected?.label}:${expanded}"
+            collectionInfo = CollectionInfo(items?.size ?: 0, 0)
+        },
         horizontalAlignment = Alignment.Start
     ) {
         Row(
@@ -94,7 +109,7 @@ fun <T : Comparable<T>> ValuePicker(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.weight(0.8f).testTag("value_picker_value")
+                modifier = Modifier.weight(0.8f)
             ) {
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onSurfaceVariant)
@@ -119,7 +134,9 @@ fun <T : Comparable<T>> ValuePicker(
                 modifier = Modifier.weight(0.2f)
             ) {
                 IconButton(
-                    modifier = Modifier.fillMaxSize().testTag("value_picker_drop_down"),
+                    modifier = Modifier.fillMaxSize().semantics {
+                        contentDescription = Localize.value_picker_drop_down_action
+                    },
                     onClick = {
                         expanded = !expanded
                     }
@@ -127,19 +144,23 @@ fun <T : Comparable<T>> ValuePicker(
                     loadIcon(
                         Images.icon_drop_down,
                         Size(12.0F, 12.0F),
-                        tint = materialColor(if (items.size > 1) MaterialColors.color_onSurfaceVariant else MaterialColors.color_transparent)
+                        tint = materialColor(
+                            if ((items?.size ?: 0) > 1) MaterialColors.color_onSurfaceVariant else MaterialColors.color_transparent
+                        )
                     )
                 }
             }
         }
-        //if (items.size > 1) {
+
         DropdownMenu(
             expanded = expanded,
-            modifier = Modifier.testTag("value_picker_list").width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
-                .background(materialColor(MaterialColors.color_surfaceVariant)),
+            modifier = Modifier.width(with.pxToDp()).requiredSizeIn(maxHeight = 200.dp)
+                .background(materialColor(MaterialColors.color_surfaceVariant)).semantics {
+                    contentDescription = Localize.value_picker_drop_down_menu
+                },
             onDismissRequest = { expanded = false }
         ) {
-            items.forEach {
+            items?.forEach {
                 DropdownMenuItem(
                     modifier = Modifier.width(with.pxToDp()),
                     leadingIcon = { if (it.icon != null) loadIcon(it.icon) },
@@ -161,7 +182,6 @@ fun <T : Comparable<T>> ValuePicker(
                 )
             }
         }
-        // }
     }
 }
 

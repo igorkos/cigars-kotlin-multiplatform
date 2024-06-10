@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/7/24, 12:00 AM
+ * Last modified 6/10/24, 12:27 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.filterToOne
@@ -33,11 +34,12 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTextExactly
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isHeading
-import androidx.compose.ui.test.onAncestors
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.theme.Localize
 
 /**
  * Assert node has children with content description
@@ -63,7 +65,7 @@ fun SemanticsNodeInteractionsProvider.assertNoNodes(parent: String, expected: Li
 
 /**
  *  Search for TextStyled node with label and text
- * @param parentTag - tag of parent node
+ * @param parentTag - content description of parent node
  * @param label - label of child node
  * @param text - text of child node
  * @param substring - search for substring
@@ -74,7 +76,7 @@ fun SemanticsNodeInteractionsProvider.childWithTextLabel(
     text: String,
     substring: Boolean = false
 ): SemanticsNodeInteraction {
-    //onNode(hasContentDescription(parentTag)).printToLog("-------------childWithTextLabel  '${label}'  '${text}' -------------")
+    //onNode(hasContentDescription(parentTag)).printToLog("childWithTextLabel  '${label}'  '${text}'")
     return onNode(
         (hasContentDescription(label).and(
             if (text.isNotEmpty()) {
@@ -143,6 +145,84 @@ fun SemanticsNodeInteractionsProvider.assertValuesCardValues(
     }
 }
 
+/**
+ * Assert Value Picker controls
+ * @param description - Content description of Values Card
+ * @param value - Selected value
+ * @param expanded - Expanded or not
+ */
+fun SemanticsNodeInteractionsProvider.assertValuePicker(
+    description: String,
+    value: String,
+    expanded: Boolean
+): SemanticsNodeInteraction {
+    return onNode(hasContentDescription(description).and(hasStateDescription("${value}:${expanded}"))).assertExists()
+}
+
+/**
+ * Expand Value Picker
+ */
+fun SemanticsNodeInteractionsProvider.expandValuePicker(
+    description: String
+) {
+    onNode(
+        hasContentDescription(Localize.value_picker_drop_down_action)
+            .and(
+                hasAnyAncestor(
+                    hasContentDescription(description).and(keyIsDefined(SemanticsProperties.SelectableGroup))
+                )
+            )
+    ).performClick()
+}
+
+/**
+ * Select item from Value Picker
+ * @param description - Content description of Values Card
+ * @param value - Selected value
+ */
+fun SemanticsNodeInteractionsProvider.performSelectValuePicker(
+    description: String,
+    value: String
+) {
+    onNode(
+        hasContentDescription(Localize.value_picker_drop_down_action)
+            .and(hasAnyAncestor(hasContentDescription(description)))
+    ).performClick()
+    onNode(
+        hasContentDescription(value).and(
+            hasAnyAncestor(
+                hasContentDescription(Localize.value_picker_drop_down_menu)
+            )
+        )
+    ).performClick()
+    assertValuePicker(description, value, false)
+}
+
+/**
+ * Assert Picker values
+ * @param label - Content description of Picker Values
+ * @param selected - Selected value
+ * @param values - List of values
+ */
+fun SemanticsNodeInteractionsProvider.assertPickerValues(
+    label: String,
+    selected: String,
+    values: List<String>,
+) {
+    assertValuePicker(label, selected, false)
+    expandValuePicker(label)
+    assertValuePicker(label, selected, true)
+    val root = onNodeWithContentDescription(Localize.value_picker_drop_down_menu)
+    root.printToLog("")
+    val node = root.onChildren()
+    values.forEach {
+        node.filterToOne(hasAnyDescendant(hasContentDescription(it))).assertExists()
+    }
+    expandValuePicker(label)
+    assertValuePicker(label, selected, false)
+}
+
+
 internal fun textMatcher(node: SemanticsNode, text: String, substring: Boolean): Boolean {
     val nodeText = node.config.getOrNull(SemanticsProperties.EditableText)?.text
     var isFindText = if (substring) {
@@ -206,24 +286,6 @@ fun SemanticsNodeInteractionsProvider.childWithText(
     return onNode(matcher, useUnmergedTree = useUnmergedTree)
 }
 
-
-fun SemanticsNodeInteractionsProvider.assertPickerValues(
-    parentTag: String,
-    label: String,
-    text: String,
-    values: List<String>,
-    sleep: (Long) -> Unit,
-    substring: Boolean = false,
-    useUnmergedTree: Boolean = false
-) {
-    var node = childWithTextLabel(parentTag, label, text, substring).assertExists()
-    node = node.onAncestors().filterToOne(hasTestTag("value_picker")).assertExists()
-    node = node.onChildren().filterToOne(hasTestTag("value_picker_drop_down")).assertExists().performClick()
-    sleep(500)
-    //assertListOrder("value_picker_list", values)
-    node.performClick()
-    sleep(500)
-}
 
 fun SemanticsNodeInteractionsProvider.dialogWithTag(tag: String): SemanticsNodeInteraction {
     val matcher = hasTestTag(tag).and(hasAnyAncestor(isDialog()))

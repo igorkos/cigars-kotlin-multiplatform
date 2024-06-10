@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 11:48 PM
+ * Last modified 6/10/24, 12:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -32,15 +33,29 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.utils.childWithTextLabel
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
 import junit.framework.TestCase
 import org.junit.Assert
+
+/**
+ * Sleeps for a specified amount of time.
+ */
+@OptIn(ExperimentalTestApi::class)
+fun ComposeTestRule.sleep(
+    timeoutMillis: Long
+) {
+    @Suppress("SwallowedException")
+    try {
+        waitUntilAtLeastOneExists(hasText("NeverFound!"), timeoutMillis = timeoutMillis)
+    } catch (t: Throwable) {
+        // swallow this exception
+    }
+}
 
 /**
  * Waits for a screen to be displayed.
@@ -61,8 +76,8 @@ fun ComposeTestRule.waitForScreen(
  * @param description The content description of the list node.
  * @param text The text of the list item to assert.
  */
-fun ComposeTestRule.assertListNode(description: String, text: String): SemanticsNodeInteraction {
-    return onNode(hasText(text, substring = true).and(hasAnyAncestor(hasContentDescriptionExactly(description)))).assertExists()
+fun ComposeTestRule.assertListNode(description: String, text: String, substring: Boolean = true): SemanticsNodeInteraction {
+    return onNode(hasText(text, substring = substring).and(hasAnyAncestor(hasContentDescriptionExactly(description)))).assertExists()
 }
 
 /**
@@ -70,10 +85,10 @@ fun ComposeTestRule.assertListNode(description: String, text: String): Semantics
  * @param description The content description of the list node.
  * @param expected The expected order of the list items.
  */
-fun ComposeTestRule.assertListOrder(description: String, expected: List<String>, reverse: Boolean = false) {
+fun ComposeTestRule.assertListOrder(description: String, expected: List<String>, reverse: Boolean = false, substring: Boolean = true) {
     var id = if (reverse) Int.MAX_VALUE else Int.MIN_VALUE
     for (text in expected) {
-        val node = assertListNode(description, text)
+        val node = assertListNode(description, text, substring)
         val nodeId = node.fetchSemanticsNode().id
         if (reverse) {
             nodeId shouldBeLessThan id
@@ -107,10 +122,10 @@ fun ComposeTestRule.selectMenuItem(parent: String, index: Int, menu: String) {
  * @param inputLabel The label of the text field.
  * @param text The text to replace the current text with.
  */
-fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String) {
-    val node = childWithTextLabel(parent, inputLabel, "")
-    node.performTextClearance()
-    node.performTextInput(text)
+fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String, currentText: String? = null) {
+    onNode(hasContentDescription(parent)).printToLog("")
+    onNode((hasContentDescription(inputLabel).and(hasSetTextAction())).and(hasAnyAncestor(hasContentDescription(parent))))
+        .performTextReplacement(text)
 }
 
 /**
@@ -183,17 +198,6 @@ fun ComposeTestRule.waitForTag(
     return onNodeWithTag(tag).assertExists()
 }
 
-@OptIn(ExperimentalTestApi::class)
-fun ComposeTestRule.sleep(
-    timeoutMillis: Long
-) {
-    @Suppress("SwallowedException")
-    try {
-        waitUntilAtLeastOneExists(hasText("NeverFound!"), timeoutMillis = timeoutMillis)
-    } catch (t: Throwable) {
-        // swallow this exception
-    }
-}
 
 fun ComposeTestRule.textIsDisplayed(
     text: String,

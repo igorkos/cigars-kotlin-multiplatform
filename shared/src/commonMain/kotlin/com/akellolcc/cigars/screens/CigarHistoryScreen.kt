@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/7/24, 12:10 PM
+ * Last modified 6/10/24, 11:24 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,8 +27,7 @@ class CigarHistoryScreen(route: NavRoute) : HistoryScreen<CigarHistoryScreenView
 
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel { createViewModel(CigarHistoryScreenViewModel::class, route.data) }
+        viewModel = rememberScreenModel { createViewModel(CigarHistoryScreenViewModel::class, route.data) }
         super.Content()
     }
 }

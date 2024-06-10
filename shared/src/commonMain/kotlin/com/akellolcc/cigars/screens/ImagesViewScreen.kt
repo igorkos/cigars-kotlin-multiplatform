@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 12:13 PM
+ * Last modified 6/10/24, 12:16 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -148,7 +150,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().testTag(route.route),
+                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
                 topBar = {
                     CenterAlignedTopAppBar(
                         navigationIcon = {

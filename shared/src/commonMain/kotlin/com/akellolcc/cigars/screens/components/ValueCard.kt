@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 11:42 PM
+ * Last modified 6/10/24, 12:08 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,168 +17,114 @@
 package com.akellolcc.cigars.screens.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import dev.icerock.moko.resources.ImageResource
 
 @Composable
-fun ValueCard(label: String?, value: String?, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
-    OutlinedCard(
-        modifier = modifier.semantics {
-            isTraversalGroup = true
-        },
-        colors = CardDefaults.cardColors(
-            materialColor(MaterialColors.color_primaryContainer),
-            materialColor(MaterialColors.color_onPrimaryContainer)
-        ),
-        shape = RoundedCornerShape(5.dp),
-        border = BorderStroke(
-            if (onClick != null) 1.dp else 0.5.dp,
-            materialColor(MaterialColors.color_onPrimaryContainer)
-        ),
-        elevation = if (onClick != null) CardDefaults.outlinedCardElevation(8.dp) else CardDefaults.outlinedCardElevation()
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp).clickable(onClick = {
-                onClick?.invoke()
-            }).semantics(mergeDescendants = true) {
-                contentDescription = "$label $value"
-            },
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (label != null) {
+fun ValueCard(
+    label: String?,
+    value: Any?,
+    editable: Boolean = false,
+    vertical: Boolean = true,
+    items: List<ValuePickerItem>? = null,
+    inputMode: InputMode = InputMode.Text,
+    modifier: Modifier = Modifier,
+    onValueChange: ((String) -> Unit)? = null,
+    onClick: ((ValuePickerItem?) -> Unit)? = null
+) {
+
+    if (!editable && value == null) return
+
+    if (editable) {
+        when (value) {
+            is String -> {
                 TextStyled(
-                    label,
-                    label,
+                    value,
+                    label = label ?: "",
                     TextStyles.Subhead,
-                    labelStyle = TextStyles.None
+                    labelStyle = TextStyles.Subhead,
+                    inputMode = inputMode,
+                    editable = editable,
+                    modifier = modifier.fillMaxWidth(),
+                    onValueChange = onValueChange
                 )
             }
+
+            is ValuePickerItem -> {
+                ValuePicker(
+                    modifier = modifier,
+                    value = value,
+                    label = label,
+                    items = items,
+                    onClick = onClick
+                )
+            }
+        }
+    } else {
+        if (vertical) {
+            OutlinedCard(
+                modifier = modifier.semantics {
+                    isTraversalGroup = true
+                },
+                colors = CardDefaults.cardColors(
+                    materialColor(MaterialColors.color_primaryContainer),
+                    materialColor(MaterialColors.color_onPrimaryContainer)
+                ),
+                shape = RoundedCornerShape(5.dp),
+                border = BorderStroke(
+                    if (onClick != null) 1.dp else 0.5.dp,
+                    materialColor(MaterialColors.color_onPrimaryContainer)
+                ),
+                elevation = if (onClick != null) CardDefaults.outlinedCardElevation(8.dp) else CardDefaults.outlinedCardElevation()
+            ) {
+                Column(
+                    modifier = Modifier.padding(8.dp).clickable(onClick = {
+                        onClick?.invoke(null)
+                    }).semantics(mergeDescendants = true) {
+                        contentDescription = "$label $value"
+                    },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (label != null) {
+                        TextStyled(
+                            label,
+                            label,
+                            TextStyles.Subhead,
+                            labelStyle = TextStyles.None
+                        )
+                    }
+                    TextStyled(
+                        value as String,
+                        label ?: "",
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.None
+                    )
+                }
+            }
+        } else {
             TextStyled(
-                value,
+                value as String,
                 label ?: "",
                 TextStyles.Subhead,
-                labelStyle = TextStyles.None
+                labelStyle = TextStyles.Subhead,
+                modifier = modifier,
             )
         }
-    }
-}
-
-@Composable
-fun ValuesCard(
-    label: String? = null,
-    vertical: Boolean = false,
-    actionIcon: ImageResource? = null,
-    onAction: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(modifier = modifier.semantics {
-        stateDescription = "$vertical"
-    }) {
-        OutlinedCard(
-            colors = CardDefaults.cardColors(
-                materialColor(MaterialColors.color_transparent),
-                materialColor(MaterialColors.color_onPrimaryContainer)
-            ),
-            border = BorderStroke(0.5.dp, materialColor(MaterialColors.color_onPrimaryContainer)),
-            shape = RoundedCornerShape(5.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp),
-        ) {
-            if (vertical) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    content()
-                }
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    content()
-                }
-            }
-        }
-        if (label != null) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 16.dp)
-                    .background(materialColor(MaterialColors.color_transparent)).semantics(mergeDescendants = true) {
-                        heading()
-                    }
-            ) {
-                TextStyled(
-                    label,
-                    label,
-                    TextStyles.Subhead,
-                    labelStyle = TextStyles.None,
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-                        .background(materialColor(MaterialColors.color_background))
-                )
-                if (actionIcon != null) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Spacer(
-                            modifier = Modifier
-                                .width(28.dp)
-                                .height(8.dp)
-                                .background(materialColor(MaterialColors.color_background))
-                        )
-                        IconButton(
-                            modifier = Modifier.size(24.dp)
-                                .background(materialColor(MaterialColors.color_transparent)),
-                            onClick = { onAction?.invoke() }) {
-                            loadIcon(
-                                actionIcon,
-                                Size(24f, 24f),
-                                modifier = Modifier.background(materialColor(MaterialColors.color_transparent))
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-sealed class ValuesCardTags {
-    companion object {
-        const val VALUES_CARD_VERTICAL_TAG = "ValuesCard-Vertical"
-        const val VALUES_CARD_HORIZONTAL_TAG = "ValuesCard-Horizontal"
-        const val VALUES_CARD_HEADER_TAG = "ValuesCard-Header"
-        const val VALUES_CARD_ACTION_TAG = "ValuesCard-Action"
-        const val VALUE_CARD_TAG = "ValueCard"
-        const val VALUE_CARD_LABEL_TAG = "ValueCard-Label"
-        const val VALUE_CARD_VALUE_TAG = "ValueCard-Value"
     }
 }
