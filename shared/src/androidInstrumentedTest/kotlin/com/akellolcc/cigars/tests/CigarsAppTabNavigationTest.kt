@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 2:30 PM
+ * Last modified 6/10/24, 1:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,9 +25,9 @@ import com.akellolcc.cigars.screens.navigation.HumidorsRoute
 import com.akellolcc.cigars.screens.navigation.SearchCigarRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
+import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.screenListContentDescription
 import selectTab
-import textIsDisplayed
 import waitForScreen
 import kotlin.test.Test
 
@@ -47,7 +47,7 @@ class CigarsAppTabNavigationTest() : BaseUiTest() {
             selectTab(FavoritesRoute)
             waitForScreen(FavoritesRoute)
             onNodeWithTag(screenListContentDescription(FavoritesRoute)).assertDoesNotExist()
-            textIsDisplayed(Localize.list_is_empty)
+            childWithTextLabel(screenListContentDescription(FavoritesRoute), Localize.list_is_empty, Localize.list_is_empty).assertExists()
 
             selectTab(SearchCigarRoute)
             waitForScreen(SearchCigarRoute)

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/7/24, 7:24 PM
+ * Last modified 6/10/24, 12:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,7 @@ object Localize {
     val button_cancel = Strings.button_cancel.toString()
     val button_save = Strings.button_save.toString()
     val button_add = Strings.button_add.toString()
+    val button_back = Strings.button_back.toString()
 
     val list_is_empty = Strings.list_is_empty.toString()
     val list_sorting_item = Strings.list_sorting_item.toString()

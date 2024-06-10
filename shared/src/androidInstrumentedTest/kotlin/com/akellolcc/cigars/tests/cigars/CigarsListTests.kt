@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:47 PM
+ * Last modified 6/10/24, 1:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasNodes
 import com.akellolcc.cigars.utils.assertNoNodes
+import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.screenListContentDescription
 import pressButton
 import replaceText
@@ -332,8 +333,7 @@ open class CigarsListTests : BaseUiTest() {
                 "Dominican"
             )
             sleep(1000)
-            onNodeWithContentDescription(LIST_TAG).assertDoesNotExist()
-
+            childWithTextLabel(LIST_TAG, Localize.list_is_empty, Localize.list_is_empty).assertExists()
         }
     }
 }

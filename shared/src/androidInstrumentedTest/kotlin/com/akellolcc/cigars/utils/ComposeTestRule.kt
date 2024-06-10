@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:41 PM
+ * Last modified 6/10/24, 1:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,20 +18,15 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.printToLog
@@ -39,8 +34,6 @@ import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
-import junit.framework.TestCase
-import org.junit.Assert
 
 /**
  * Sleeps for a specified amount of time.
@@ -69,6 +62,13 @@ fun ComposeTestRule.waitForScreen(
 ): SemanticsNodeInteraction {
     waitUntilAtLeastOneExists(hasContentDescriptionExactly(route.semantics), timeoutMillis = timeoutMillis)
     return onNode(hasContentDescriptionExactly(route.semantics)).assertExists()
+}
+
+/**
+ * Presses the back button.
+ */
+fun ComposeTestRule.pressBackButton() {
+    onNodeWithContentDescription(Localize.button_back).performClick()
 }
 
 /**
@@ -179,55 +179,3 @@ fun ComposeTestRule.waitForDialog(tag: String, timeoutMillis: Long = 10000): Sem
     waitUntilAtLeastOneExists(hasContentDescription(tag), timeoutMillis = timeoutMillis)
     return onNode(hasContentDescription(tag)).assertExists()
 }
-
-@OptIn(ExperimentalTestApi::class)
-fun ComposeTestRule.waitForText(
-    text: String,
-    substring: Boolean = false,
-    timeoutMillis: Long = 10000
-) {
-    waitUntilAtLeastOneExists(hasText(text, substring = substring), timeoutMillis = timeoutMillis)
-}
-
-@OptIn(ExperimentalTestApi::class)
-fun ComposeTestRule.waitForTag(
-    tag: String,
-    timeoutMillis: Long = 10000
-): SemanticsNodeInteraction {
-    waitUntilAtLeastOneExists(hasTestTag(tag), timeoutMillis = timeoutMillis)
-    return onNodeWithTag(tag).assertExists()
-}
-
-
-fun ComposeTestRule.textIsDisplayed(
-    text: String,
-    substring: Boolean = false,
-    expectedOccurrences: Int = 1
-) {
-    if (expectedOccurrences == 1) {
-        onNodeWithText(text, substring = substring).assertIsDisplayed()
-    } else {
-        TestCase.assertEquals(onAllNodesWithText(text, substring = substring).fetchSemanticsNodes().size, expectedOccurrences)
-    }
-}
-
-
-fun ComposeTestRule.textDoesNotExist(
-    text: String
-) {
-    onNodeWithText(text).assertDoesNotExist()
-}
-
-fun ComposeTestRule.textIsDisplayedAtLeastOnce(
-    text: String,
-    minOccurrences: Int = 1
-) {
-    Assert.assertTrue(this.onAllNodesWithText(text).fetchSemanticsNodes().size == minOccurrences)
-}
-
-
-fun ComposeTestRule.pressBackButton() {
-    onNodeWithTag("back_button").performClick()
-}
-
-
