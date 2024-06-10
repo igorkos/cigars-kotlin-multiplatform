@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 8:16 PM
+ * Last modified 6/7/24, 3:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,8 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasAnySibling
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.performTextReplacement
 import androidx.test.platform.app.InstrumentationRegistry
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
@@ -37,21 +37,6 @@ fun screenListContentDescription(route: NavRoute): String {
     return "${route.title} ${Localize.screen_list_descr}"
 }
 
-fun SemanticsNodeInteraction.replaceText(text: String) {
-    performTextReplacement(text)
-}
-
-
-fun SemanticsNodeInteractionCollection.getOrNull(index: Int): SemanticsNodeInteraction? {
-    return try {
-        val node = get(index)
-        node.assertExists()
-        node
-    } catch (e: AssertionError) {
-        null
-    }
-}
-
 
 fun SemanticsNodeInteractionCollection.getListRow(index: Int): SemanticsNodeInteraction {
     val nodes = fetchSemanticsNodes()
@@ -62,5 +47,9 @@ fun SemanticsNodeInteractionCollection.getListRow(index: Int): SemanticsNodeInte
 
 fun SemanticsNodeInteraction.assertHasChildWithText(text: String, substring: Boolean = false) {
     assert(hasAnyDescendant(hasText(text, substring = substring)))
+}
+
+fun SemanticsNodeInteraction.assertHasSiblingWithText(text: String, substring: Boolean = false) {
+    assert(hasAnySibling(hasText(text, substring = substring)))
 }
 

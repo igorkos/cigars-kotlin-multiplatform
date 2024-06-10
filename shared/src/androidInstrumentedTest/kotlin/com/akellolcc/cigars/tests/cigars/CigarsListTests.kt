@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 4:58 PM
+ * Last modified 6/10/24, 12:47 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -118,8 +118,8 @@ open class CigarsListTests : BaseUiTest() {
 
             for (value in values) {
                 replaceText(
-                    Localize.screen_list_filter_control_descr,
                     SearchParameterField.semantics(field, SearchParameterField.INPUT_FIELD_TAG),
+                    CigarSortingFields.localized(field),
                     value.first
                 )
                 sleep(1000)
@@ -276,7 +276,12 @@ open class CigarsListTests : BaseUiTest() {
             )
 
             //Check name search
-            assertSearchingBy(CigarSortingFields.Name, -1, listOf(Pair("Fuente", 1), Pair("", 5), Pair("Serie", 2), Pair("", 5)), null)
+            assertSearchingBy(
+                CigarSortingFields.Name,
+                -1,
+                listOf(Pair("Fuente", 1), Pair("", 5), Pair("Serie", 2), Pair("", 5)),
+                null
+            )
 
             //Check brand search
             assertSearchingBy(
@@ -305,16 +310,16 @@ open class CigarsListTests : BaseUiTest() {
                 )
             )
             replaceText(
-                Localize.screen_list_filter_control_descr,
                 SearchParameterField.semantics(CigarSortingFields.Gauge, SearchParameterField.INPUT_FIELD_TAG),
+                CigarSortingFields.localized(CigarSortingFields.Gauge),
                 "52"
             )
             sleep(1000)
             onNodeWithContentDescription(LIST_TAG).performScrollToIndex(3)
             onNodeWithContentDescription(LIST_TAG).onChildren().assertCountEquals(4)
             replaceText(
-                Localize.screen_list_filter_control_descr,
                 SearchParameterField.semantics(CigarSortingFields.Gauge, SearchParameterField.INPUT_FIELD_TAG),
+                CigarSortingFields.localized(CigarSortingFields.Gauge),
                 "60"
             )
             sleep(1000)
@@ -322,8 +327,8 @@ open class CigarsListTests : BaseUiTest() {
             onNodeWithContentDescription(LIST_TAG).onChildren().assertCountEquals(1)
 
             replaceText(
-                Localize.screen_list_filter_control_descr,
                 SearchParameterField.semantics(CigarSortingFields.Country, SearchParameterField.INPUT_FIELD_TAG),
+                CigarSortingFields.localized(CigarSortingFields.Country),
                 "Dominican"
             )
             sleep(1000)

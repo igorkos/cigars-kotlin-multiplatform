@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/7/24, 12:09 AM
+ * Last modified 6/7/24, 7:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,6 +97,7 @@ object Localize {
     val cigar_details_strength = Strings.cigar_details_strength.toString()
 
     val cigar_details_ratings = Strings.cigar_details_ratings.toString()
+    val cigar_details_ratings_info_dialog_desc = Strings.cigar_details_ratings_info_dialog_desc.toString()
     val cigar_details_rating = Strings.cigar_details_rating.toString()
     val cigar_details_myrating = Strings.cigar_details_myrating.toString()
     val cigar_details_humidors = Strings.cigar_details_humidors.toString()
@@ -105,12 +106,16 @@ object Localize {
     val cigar_details_count_dialog = Strings.cigar_details_count_dialog.toString()
     val cigar_details_count_dialog_price = Strings.cigar_details_count_dialog_price.toString()
     val cigar_details_rating_dialog = Strings.cigar_details_rating_dialog.toString()
+    val cigar_details_update_ratings_dialog_desc = Strings.cigar_details_update_ratings_dialog_desc.toString()
+
     val cigar_details_move_dialog = Strings.cigar_details_move_dialog.toString()
     val cigar_details_move_from = Strings.cigar_details_move_from.toString()
     val cigar_details_move_to = Strings.cigar_details_move_to.toString()
     val cigar_details_move_select = Strings.cigar_details_move_select.toString()
     val cigar_details_count = Strings.cigar_details_count.toString()
-
+    val cigar_details_humidors_move_dialog_from_desc = Strings.cigar_details_humidors_move_dialog_from_desc.toString()
+    val cigar_details_humidors_move_dialog_to_desc = Strings.cigar_details_humidors_move_dialog_to_desc.toString()
+    val cigar_details_humidors_move_dialog_count_desc = Strings.cigar_details_humidors_move_dialog_count_desc.toString()
 
     val cigar_details_top_bar_history_desc = Strings.cigar_details_top_bar_history_desc.toString()
     val cigar_details_top_bar_edit_desc = Strings.cigar_details_top_bar_edit_desc.toString()
@@ -123,11 +128,14 @@ object Localize {
     val cigar_details_ratings_block_favorite_remove_desc = Strings.cigar_details_ratings_block_favorite_remove_desc.toString()
 
     val cigar_details_humidors_block_desc = Strings.cigar_details_humidors_block_desc.toString()
+    val cigar_details_humidors_block_list_desc = Strings.cigar_details_humidors_block_list_desc.toString()
     val cigar_details_notes_block_desc = Strings.cigar_details_notes_block_desc.toString()
 
     val cigar_search_details_add_dialog = Strings.cigar_search_details_add_dialog.toString()
     val cigar_search_details_add_count_dialog = Strings.cigar_search_details_add_count_dialog.toString()
     val cigar_search_details_add_price_dialog = Strings.cigar_search_details_add_price_dialog.toString()
+    val cigar_details_humidors_count_dialog_minus_desc = Strings.cigar_details_humidors_count_dialog_minus_desc.toString()
+    val cigar_details_humidors_count_dialog_plus_desc = Strings.cigar_details_humidors_count_dialog_plus_desc.toString()
 
     val cigar_shape_corona = Strings.cigar_shape_corona.toString()
     val cigar_shape_petit_corona = Strings.cigar_shape_petit_corona.toString()
@@ -184,6 +192,10 @@ object Localize {
     val images_pager_list_item_desc = Strings.images_pager_list_item_desc.toString()
 
     val button_title_add_search_field = Strings.button_title_add_search_field.toString()
+
+    val value_picker_drop_down_action = Strings.value_picker_drop_down_action.toString()
+    val value_picker_drop_down_menu = Strings.value_picker_drop_down_menu.toString()
+
     fun humidor_cigars(v: Long, v1: Long): String {
         return Strings.humidor_cigars.createLocalizedString(v, v1).toString()
     }

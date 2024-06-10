@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/7/24, 12:13 AM
+ * Last modified 6/10/24, 12:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,65 +18,49 @@
 package com.akellolcc.cigars.tests.cigars
 
 import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.printToLog
 import assertListNode
 import assertListOrder
 import assertNodeState
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
-import com.akellolcc.cigars.screens.CigarDetailsScreen
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.DIALOG_CIGAR_RATING
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.DIALOG_MOVE_CIGARS
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.HUMIDORS_BLOCK
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.HUMIDORS_BLOCK_LIST
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.RATINGS_BLOCK
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.RATINGS_FAVORITE
-import com.akellolcc.cigars.screens.CigarDetailsScreen.Companion.SIZE_BLOCK
-import com.akellolcc.cigars.screens.base.BaseTabListScreen.Companion.LIST_TAG
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
-import com.akellolcc.cigars.screens.navigation.CigarImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
-import com.akellolcc.cigars.screens.navigation.FavoritesRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasChildWithText
-import com.akellolcc.cigars.utils.assertNodeText
+import com.akellolcc.cigars.utils.assertHasNodes
+import com.akellolcc.cigars.utils.assertNoNodes
 import com.akellolcc.cigars.utils.assertPickerValues
+import com.akellolcc.cigars.utils.assertValuePicker
 import com.akellolcc.cigars.utils.assertValuesCard
 import com.akellolcc.cigars.utils.assertValuesCardValues
-import com.akellolcc.cigars.utils.childButtonWithText
-import com.akellolcc.cigars.utils.childWithTag
-import com.akellolcc.cigars.utils.childWithText
 import com.akellolcc.cigars.utils.childWithTextLabel
-import com.akellolcc.cigars.utils.dialogWithTag
 import com.akellolcc.cigars.utils.getListRow
+import com.akellolcc.cigars.utils.performSelectValuePicker
 import com.akellolcc.cigars.utils.performValuesCardAction
-import com.akellolcc.cigars.utils.replaceText
 import com.akellolcc.cigars.utils.screenListContentDescription
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 import pressBackButton
 import pressButton
-import sleep
-import textIsDisplayed
+import replaceText
 import waitForDialog
 import waitForScreen
-import waitForTag
-import waitForText
 import kotlin.test.Test
 
 @Suppress("SameParameterValue")
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 open class CigarDetailsTests : BaseUiTest() {
     override var route: NavRoute = CigarsDetailsRoute
     override fun setUp() {
@@ -90,7 +74,7 @@ open class CigarDetailsTests : BaseUiTest() {
     }
 
     @Test
-    fun displayCigarDetailsTest() {
+    fun test1_displayCigarDetails() {
         with(composeTestRule) {
 
             //Check images carousel
@@ -111,7 +95,6 @@ open class CigarDetailsTests : BaseUiTest() {
 
 
             //Check cigar size
-            //onNodeWithContentDescription(Localize.cigar_details_size_block_desc).printToLog("Test", 10)
             assertValuesCard(Localize.cigar_details_size_block_desc, Localize.cigar_details_cigars)
             performValuesCardAction(Localize.cigar_details_size_block_desc)
 
@@ -157,9 +140,9 @@ open class CigarDetailsTests : BaseUiTest() {
 
             //Check cigar ratings
             assertValuesCard(Localize.cigar_details_ratings_block_desc, Localize.cigar_details_ratings)
-            performValuesCardAction(Localize.cigar_details_tobacco_block_desc)
+            performValuesCardAction(Localize.cigar_details_ratings_block_desc)
 
-            waitForDialog(Localize.cigar_details_tobacco_info_dialog_desc).performClick()
+            waitForDialog(Localize.cigar_details_ratings_info_dialog_desc).performClick()
             waitForScreen(route)
             assertValuesCardValues(
                 Localize.cigar_details_ratings_block_desc,
@@ -179,7 +162,7 @@ open class CigarDetailsTests : BaseUiTest() {
     }
 
     @Test
-    fun cigarRatingTest() {
+    fun test2_cigarRating() {
         //Check cigar ratings
         setRating(0, 50)
         setRating(50, 0)
@@ -187,99 +170,69 @@ open class CigarDetailsTests : BaseUiTest() {
 
     private fun setRating(current: Int, rating: Int) {
         with(composeTestRule) {
+            onNodeWithContentDescription(Localize.cigar_details_ratings_block_desc).performScrollTo()
             childWithTextLabel(
-                tag(RATINGS_BLOCK),
-                Localize.cigar_details_myrating, current.toString(),
+                Localize.cigar_details_ratings_block_desc,
+                Localize.cigar_details_myrating,
+                current.toString(),
                 substring = true
             ).assertExists().performClick()
 
-            waitForText(Localize.cigar_details_rating_dialog)
-            dialogWithTag(tag(DIALOG_CIGAR_RATING)).assertExists()
-            childWithText(tag(DIALOG_CIGAR_RATING), Localize.cigar_details_rating_dialog).assertExists()
-            childWithText(tag(DIALOG_CIGAR_RATING), current.toString()).assertExists()
-            childButtonWithText(tag(DIALOG_CIGAR_RATING), Localize.button_cancel).assertExists()
-            childButtonWithText(tag(DIALOG_CIGAR_RATING), Localize.button_save).assertExists()
+            waitForDialog(Localize.cigar_details_rating_dialog)
 
-            childWithText(tag(DIALOG_CIGAR_RATING), current.toString()).performClick()
-            sleep(500)
-            childWithText(tag(DIALOG_CIGAR_RATING), current.toString()).replaceText(rating.toString())
-            childButtonWithText(tag(DIALOG_CIGAR_RATING), Localize.button_save).performClick()
             childWithTextLabel(
-                tag(RATINGS_BLOCK),
-                Localize.cigar_details_myrating, rating.toString(),
+                Localize.cigar_details_rating_dialog,
+                Localize.cigar_details_myrating,
+                current.toString(),
                 substring = true
             ).assertExists()
+
+            replaceText(
+                Localize.cigar_details_rating_dialog,
+                Localize.cigar_details_myrating,
+                rating.toString(),
+                current.toString()
+            )
+
+            pressButton(Localize.button_save)
+
+            waitForScreen(route)
+
+            assertValuesCardValues(
+                Localize.cigar_details_ratings_block_desc,
+                mapOf(
+                    Localize.cigar_details_myrating to rating.toString()
+                )
+            )
         }
     }
 
     @Test
-    fun cigarFavoriteTest() {
-        //Check cigar favorite
-        setFavorite(true)
-        setFavorite(false)
-    }
-
-    private fun setFavorite(favorite: Boolean) {
-        with(composeTestRule) {
-            childWithTag(
-                tag(RATINGS_BLOCK),
-                tag("$RATINGS_FAVORITE${!favorite}"),
-                useUnmergedTree = true
-            ).assertExists().performClick()
-
-            childWithTag(
-                tag(RATINGS_BLOCK),
-                tag("$RATINGS_FAVORITE${favorite}")
-            ).assertExists()
-
-            pressBackButton()
-
-            waitForTag(tag(route = CigarsRoute))
-
-            pressButton(FavoritesRoute.title)
-            route = FavoritesRoute
-            waitForTag(tag())
-
-            if (favorite) {
-                assertListOrder(tag(LIST_TAG), listOf("#1"))
-            } else {
-                onNodeWithTag(tag(LIST_TAG)).assertDoesNotExist()
-                textIsDisplayed(Localize.list_is_empty)
-            }
-
-            pressButton(CigarsRoute.title)
-            waitForTag(tag(route = CigarsRoute))
-
-            onNodeWithText("#1", true).performClick()
-            route = CigarsDetailsRoute
-            waitForTag(tag())
-        }
-    }
-
-    @Test
-    fun cigarHumidorsTest() {
+    fun test3_cigarHumidors() {
         with(composeTestRule) {
 
-            onNodeWithTag(tag(HUMIDORS_BLOCK)).performScrollTo()
+            onNodeWithContentDescription(Localize.cigar_details_humidors_block_desc).performScrollTo()
             //Check cigar humidors
-            assertListOrder(tag(HUMIDORS_BLOCK_LIST), listOf("Total number of cigars: 10", "Case"))
+            assertValuesCard(Localize.cigar_details_humidors_block_desc, Localize.cigar_details_humidors, true)
+            assertListOrder(Localize.cigar_details_humidors_block_desc, listOf("Total number of cigars: 10", "Case"))
+
 
             //Move 5 cigars from Case to Second
             moveCigars(
                 "Case Elegance Renzo Humidor",
                 10,
                 "Second",
-                5,
+                4,
                 listOf("Case Elegance Renzo Humidor"),
                 listOf("Second"),
                 listOf("Total number of cigars: 10", "Case Elegance Renzo Humidor", "Second"),
-                listOf("5", "5"),
+                listOf("6", "4"),
             )
             moveCigars(
                 "Second",
-                5,
+                4,
                 "Case Elegance Renzo Humidor",
-                5,
+                4,
                 listOf("Case Elegance Renzo Humidor", "Second"),
                 listOf("Case Elegance Renzo Humidor"),
                 listOf("Total number of cigars: 10", "Case Elegance Renzo Humidor"),
@@ -321,77 +274,75 @@ open class CigarDetailsTests : BaseUiTest() {
     ) {
         with(composeTestRule) {
             //Open dialog
-            childWithTag(tag(HUMIDORS_BLOCK), "ValuesCard-Action").assertExists().performClick()
-            sleep(500)
+            performValuesCardAction(Localize.cigar_details_humidors_block_desc)
+
+            waitForDialog(Localize.cigar_details_move_dialog)
+
             //Check dialog content
-            childWithTag(tag(DIALOG_MOVE_CIGARS), tag("move_from_humidor")).assertExists()
-            childWithTag(tag(DIALOG_MOVE_CIGARS), tag("move_to_humidor")).assertExists()
-            childWithTag(tag(DIALOG_MOVE_CIGARS), tag("move_count")).assertExists()
-            childButtonWithText(tag(DIALOG_MOVE_CIGARS), Localize.button_cancel).assertExists().assertIsEnabled()
-
             if (fromHumidors.size == 1 && toHumidors.size == 1) {
-                childWithText(tag("move_from_humidor"), from).assertExists()
-                assertNodeText(tag("move_count"), fromCount.toString())
-                childWithText(tag("move_to_humidor"), to).assertExists()
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_from_desc, from, false)
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_to_desc, to, false)
+                childWithTextLabel(
+                    Localize.cigar_details_move_dialog,
+                    Localize.cigar_details_humidors_move_dialog_count_desc,
+                    fromCount.toString(),
+                    substring = true
+                )
             } else if (fromHumidors.size == 1 && toHumidors.size > 1) {
-                childWithText(tag("move_from_humidor"), from).assertExists()
-                assertNodeText(tag("move_count"), fromCount.toString())
-                childWithText(tag("move_to_humidor"), "Select Humidor").assertExists()
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_from_desc, from, false)
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_to_desc, Localize.cigar_details_move_select, false)
+                childWithTextLabel(
+                    Localize.cigar_details_move_dialog,
+                    Localize.cigar_details_humidors_move_dialog_count_desc,
+                    fromCount.toString(),
+                    substring = true
+                )
             } else {
-                childWithText(tag("move_from_humidor"), "Select Humidor").assertExists()
-                assertNodeText(tag("move_count"), "1")
-                childWithText(tag("move_to_humidor"), "Select Humidor").assertExists()
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_from_desc, Localize.cigar_details_move_select, false)
+                assertValuePicker(Localize.cigar_details_humidors_move_dialog_to_desc, Localize.cigar_details_move_select, false)
+                childWithTextLabel(
+                    Localize.cigar_details_move_dialog,
+                    Localize.cigar_details_humidors_move_dialog_count_desc,
+                    "1",
+                    substring = true
+                )
             }
-
 
             //Move cigars
             if (fromHumidors.size > 1) {
-                //Open dropdown from
-                childWithTag(tag("move_from_humidor"), "value_picker_drop_down").assertExists().performClick()
                 //Select from
-                assertListOrder("value_picker_list", fromHumidors)
-                childWithText("value_picker_list", from, true).assertExists().performClick()
-                childWithText(tag("move_from_humidor"), from).assertExists()
-                onNodeWithTag("value_picker_list").assertDoesNotExist()
+                performSelectValuePicker(Localize.cigar_details_humidors_move_dialog_from_desc, from)
             }
-            sleep(500)
+
             if (toHumidors.size - fromHumidors.size > 1) {
-                //Open dropdown from
-                childWithTag(tag("move_to_humidor"), "value_picker_drop_down").assertExists().performClick()
-                //Select from
-                assertListOrder("value_picker_list", toHumidors)
-                childWithText("value_picker_list", to, true).assertExists().performClick()
-                childWithText(tag("move_to_humidor"), to).assertExists()
-                onNodeWithTag("value_picker_list").assertDoesNotExist()
-            } else {
-                childWithText(tag("move_to_humidor"), to).assertExists()
+                //Select to
+                performSelectValuePicker(Localize.cigar_details_humidors_move_dialog_to_desc, to)
             }
+
             //Set move count
-            onNodeWithTag(tag("move_count")).replaceText(moveCount.toString())
-            assertNodeText(tag("move_count"), moveCount.toString())
+            replaceText(
+                Localize.cigar_details_move_dialog,
+                Localize.cigar_details_humidors_move_dialog_count_desc,
+                moveCount.toString(),
+                fromCount.toString()
+            )
 
             //Move cigars
-            childButtonWithText(tag(DIALOG_MOVE_CIGARS), Localize.button_save).assertExists().assertIsEnabled().performClick()
-            sleep(1000)
-            onNodeWithTag(tag(HUMIDORS_BLOCK)).performScrollTo()
-            //Check dialog disappears
-            onNodeWithTag(tag(DIALOG_MOVE_CIGARS)).assertDoesNotExist()
+            pressButton(Localize.button_save)
+            waitForScreen(route)
+            onNodeWithContentDescription(Localize.cigar_details_humidors_block_desc).performScrollTo()
+
             //Check cigars moved
-            sleep(500)
-            assertListOrder(tag(HUMIDORS_BLOCK_LIST), result)
-            val list = onNodeWithTag(tag(HUMIDORS_BLOCK_LIST), true).assertExists().onChildren()
-            for (i in 1..<result.size) {
-                val node = list.getListRow(i)
-                node.assertHasChildWithText(resultCount[i - 1])
-            }
+            assertListOrder(Localize.cigar_details_humidors_block_desc, result)
+            assertListOrder(Localize.cigar_details_humidors_block_desc, resultCount, substring = false)
         }
     }
 
     @Test
-    fun addCigarsToHumidorTest() {
+    fun test4_addCigarsToHumidor() {
         with(composeTestRule) {
             //Check cigar humidors
-            assertListOrder(tag(HUMIDORS_BLOCK_LIST), listOf("Total number of cigars: 10", "Case"))
+            assertListOrder(Localize.cigar_details_humidors_block_desc, listOf("Total number of cigars: 10", "Case"))
 
             changeCigarsCount("Case Elegance Renzo Humidor", 1, 10, 5)
             changeCigarsCount("Case Elegance Renzo Humidor", 1, 5, 10)
@@ -401,206 +352,220 @@ open class CigarDetailsTests : BaseUiTest() {
 
     private fun changeCigarsCount(humidor: String, index: Int, from: Int, to: Int) {
         with(composeTestRule) {
-            onNodeWithTag(tag(HUMIDORS_BLOCK)).performScrollTo()
-            onNodeWithTag(tag(HUMIDORS_BLOCK_LIST), true).assertExists().onChildren().getListRow(index).let {
-                it.assertHasChildWithText(humidor)
-                it.assertHasChildWithText(from.toString())
-                it.onChildren().filterToOne(hasAnyDescendant(hasText(from.toString()))).performClick()
-                sleep(500)
-                onNodeWithTag(tag("humidor_cigar_count_dialog")).assertExists()
-                onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(from.toString())
+            onNodeWithContentDescription(Localize.cigar_details_humidors_block_desc).performScrollTo()
 
-                if (from > to) {
-                    //Minus
-                    for (i in to..<from) {
-                        onNodeWithTag(tag("cigar_count_minus")).assertExists().performClick()
-                    }
-                    onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(to.toString())
-                    onNodeWithTag(tag("cigar_count_price")).assertDoesNotExist()
-                } else {
-                    //Plus
-                    for (i in from..<to) {
-                        onNodeWithTag(tag("cigar_count_plus")).assertExists().performClick()
-                    }
-                    onNodeWithTag(tag("cigar_count")).assertExists().assertTextContains(to.toString())
-                    onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("0.00")
-                    onNodeWithTag(tag("cigar_count_price")).replaceText("100")
-                    onNodeWithTag(tag("cigar_count_price")).assertExists().assertTextContains("1.00")
+            val node = onNodeWithContentDescription(Localize.cigar_details_humidors_block_list_desc).onChildren().getListRow(index)
+            node.assertHasChildWithText(humidor)
+            node.assertHasChildWithText(from.toString())
+            node.onChildren().filterToOne(hasAnyDescendant(hasText(from.toString()))).performClick()
+
+            waitForDialog(Localize.cigar_details_count_dialog)
+
+            childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_search_details_add_count_dialog, from.toString())
+
+            if (from > to) {
+                //Minus
+                for (i in to..<from) {
+                    onNodeWithContentDescription(Localize.cigar_details_humidors_count_dialog_minus_desc).performClick()
                 }
-
-                childButtonWithText(tag("humidor_cigar_count_dialog"), Localize.button_save).assertExists().assertIsEnabled().performClick()
-                sleep(500)
-                onNodeWithTag(tag("humidor_cigar_count_dialog")).assertDoesNotExist()
+                childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_search_details_add_count_dialog, to.toString())
+                assertNoNodes(Localize.cigar_details_count_dialog, listOf(Localize.cigar_details_count_dialog_price))
+            } else {
+                //Plus
+                for (i in from..<to) {
+                    onNodeWithContentDescription(Localize.cigar_details_humidors_count_dialog_plus_desc).performClick()
+                }
+                childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_search_details_add_count_dialog, to.toString())
+                assertHasNodes(Localize.cigar_details_count_dialog, listOf(Localize.cigar_details_count_dialog_price))
+                childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "0.00")
+                replaceText(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "100", "0.00")
+                childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "1.00")
             }
 
-            onNodeWithTag(tag(HUMIDORS_BLOCK_LIST), true).assertExists().onChildren().getListRow(index).let {
-                it.assertHasChildWithText(humidor)
-                it.assertHasChildWithText(to.toString())
-            }
-            assertListOrder(tag(HUMIDORS_BLOCK_LIST), listOf("Total number of cigars: $to", humidor))
+            pressButton(Localize.button_save)
+            waitForScreen(route)
+
+            assertListOrder(Localize.cigar_details_humidors_block_desc, listOf("Total number of cigars: $to", humidor))
+            assertListOrder(Localize.cigar_details_humidors_block_desc, listOf("$to"), substring = false)
         }
     }
 
     @Test
-    fun editCigarDetailsTest() {
+    fun test5_editCigarDetails() {
         with(composeTestRule) {
-            onNodeWithTag(tag(CigarDetailsScreen.TOP_BAR_EDIT)).assertExists().performClick()
+            onNodeWithContentDescription(Localize.cigar_details_top_bar_edit_desc).performClick()
 
             //Check images carousel
-            onNodeWithTag("ImagesCarousel").assertDoesNotExist()
+            onNodeWithContentDescription(Localize.cigar_details_images_block_desc).assertDoesNotExist()
 
             //Check cigar details
-            childWithText(
-                tag(CigarDetailsScreen.ORIGIN_BLOCK),
-                "#1 Fuente Fuente OpusX Reserva d’Chateau",
-                useUnmergedTree = true
+            childWithTextLabel(
+                Localize.cigar_details_origin_block_desc,
+                Localize.cigar_details_name,
+                "#1 Fuente Fuente OpusX Reserva d’Chateau"
             ).assertExists()
-            childWithText(
-                tag(CigarDetailsScreen.ORIGIN_BLOCK),
-                "Fabrica de Tabacos Raices Cubanas S. de R.L.",
-                useUnmergedTree = true
+            childWithTextLabel(
+                Localize.cigar_details_origin_block_desc,
+                Localize.cigar_details_company,
+                "Fabrica de Tabacos Raices Cubanas S. de R.L."
             ).assertExists()
-            childWithText(tag(CigarDetailsScreen.ORIGIN_BLOCK), "Dominican", useUnmergedTree = true).assertExists()
+            childWithTextLabel(
+                Localize.cigar_details_origin_block_desc,
+                Localize.cigar_details_country,
+                "Dominican"
+            ).assertExists()
+
 
             //Check cigar size
-            onNodeWithTag(tag(SIZE_BLOCK)).performScrollTo()
-            childWithText(tag(SIZE_BLOCK), "Churchill", useUnmergedTree = true).assertExists()
+            onNodeWithContentDescription(Localize.cigar_details_size_block_desc).performScrollTo()
+            assertValuePicker(Localize.cigar_details_shape, "Churchill", false)
             assertPickerValues(
-                tag(SIZE_BLOCK),
                 Localize.cigar_details_shape,
                 "Churchill",
                 CigarShapes.enumValues().map { it.second },
-                ::sleep,
-                true
             )
+            assertValuePicker(Localize.cigar_details_shape, "Churchill", false)
 
-            childWithText(tag(SIZE_BLOCK), "48", useUnmergedTree = true).assertExists()
-            childWithText(tag(SIZE_BLOCK), "7'", true, useUnmergedTree = true).assertExists()
+            childWithTextLabel(
+                Localize.cigar_details_size_block_desc,
+                Localize.cigar_details_length,
+                "7'",
+                true
+            ).assertExists()
+
+            childWithTextLabel(
+                Localize.cigar_details_size_block_desc,
+                Localize.cigar_details_gauge,
+                "48",
+                true
+            ).assertExists()
 
             //Check cigar tobacco
-            onNodeWithTag(tag(RATINGS_BLOCK)).performScrollTo()
+            onNodeWithContentDescription(Localize.cigar_details_ratings_block_desc).performScrollTo()
             childWithTextLabel(
-                tag(SIZE_BLOCK),
-                "Wrapper", "Dominican",
+                Localize.cigar_details_tobacco_block_desc,
+                Localize.cigar_details_wrapper, "Dominican",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(SIZE_BLOCK),
-                "Binder", "Dominican",
+                Localize.cigar_details_tobacco_block_desc,
+                Localize.cigar_details_binder, "Dominican",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(SIZE_BLOCK),
-                "Filler", "Dominican",
+                Localize.cigar_details_tobacco_block_desc,
+                Localize.cigar_details_filler, "Dominican",
                 substring = true
             ).assertExists()
-            childWithTextLabel(
-                tag(SIZE_BLOCK),
-                Localize.cigar_details_strength, "Medium-Full",
-                substring = true
-            ).assertExists()
+
+            assertValuePicker(Localize.cigar_details_strength, CigarStrength.localized(CigarStrength.MediumToFull), false).printToLog("")
             assertPickerValues(
-                tag(SIZE_BLOCK),
                 Localize.cigar_details_strength,
                 CigarStrength.localized(CigarStrength.MediumToFull),
                 CigarStrength.enumValues().map { it.second },
-                ::sleep,
-                true,
-                useUnmergedTree = true
             )
+            assertValuePicker(Localize.cigar_details_strength, CigarStrength.localized(CigarStrength.MediumToFull), false)
+
+
             //Check cigar ratings
-            onNodeWithTag(tag("cigar_notes")).performScrollTo()
+            onNodeWithContentDescription(Localize.cigar_details_notes_block_desc).performScrollTo()
             childWithTextLabel(
-                tag(RATINGS_BLOCK),
-                "Rating", "97",
+                Localize.cigar_details_ratings_block_desc,
+                Localize.cigar_details_rating,
+                "97",
                 substring = true
             ).assertExists()
             childWithTextLabel(
-                tag(RATINGS_BLOCK),
-                Localize.cigar_details_myrating, "0",
+                Localize.cigar_details_ratings_block_desc,
+                Localize.cigar_details_myrating,
+                "0",
                 substring = true
             ).assertExists()
 
 
             //Check cigar Humidors
-            onNodeWithTag(tag(HUMIDORS_BLOCK)).assertDoesNotExist()
+            onNodeWithContentDescription(Localize.cigar_details_humidors_block_desc).assertDoesNotExist()
 
             //Check cigar notes
-            onNodeWithTag(tag("cigar_notes")).assertExists().onChildren().assertCountEquals(2)
+            onNodeWithContentDescription(Localize.cigar_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
 
             //Change wrapper
+            onNodeWithContentDescription(Localize.cigar_details_tobacco_block_desc).performScrollTo()
+
+            replaceText(
+                Localize.cigar_details_tobacco_block_desc,
+                Localize.cigar_details_wrapper,
+                "Nicaragua",
+                "Dominican"
+            )
+
+            pressButton(Localize.button_save)
+
             childWithTextLabel(
-                tag(SIZE_BLOCK),
-                "Wrapper", "Dominican",
-                substring = true
-            ).assertExists().replaceText("Nicaragua")
-
-            pressButton("Save")
-
-            sleep(1000)
-
-            childWithTextLabel(
-                tag(SIZE_BLOCK),
-                "Wrapper", "Nicaragua",
+                Localize.cigar_details_tobacco_block_desc,
+                Localize.cigar_details_wrapper, "Nicaragua",
                 substring = true
             ).assertExists()
-
         }
     }
 
     @Test
-    fun cigarHistoryTest() {
+    fun test6_cigarHistory() {
         with(composeTestRule) {
-            onNodeWithTag(tag(CigarDetailsScreen.TOP_BAR_HISTORY)).assertExists().performClick()
-            sleep(500)
-            var nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
-            nodes.assertCountEquals(1)
-            nodes.getListRow(0).assertHasChildWithText("Added 10 cigars")
+            onNodeWithContentDescription(Localize.cigar_details_top_bar_history_desc).assertExists().performClick()
+            waitForScreen(CigarHistoryRoute)
+
+            assertListOrder(screenListContentDescription(CigarHistoryRoute), listOf("Added 10 cigars"))
 
             pressBackButton()
-            sleep(1500)
+            waitForScreen(CigarsDetailsRoute)
+
             changeCigarsCount("Case Elegance Renzo Humidor", 1, 10, 11)
-            onNodeWithTag(tag(CigarDetailsScreen.TOP_BAR_HISTORY)).assertExists().performClick()
-            sleep(500)
-            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
-            nodes.assertCountEquals(2)
-            nodes.getListRow(0).assertHasChildWithText("Added 1 cigar")
+
+            onNodeWithContentDescription(Localize.cigar_details_top_bar_history_desc).assertExists().performClick()
+            waitForScreen(CigarHistoryRoute)
+
+            assertListOrder(screenListContentDescription(CigarHistoryRoute), listOf("Added 1 cigar", "Added 10 cigars"))
 
             pressBackButton()
-            sleep(1500)
+            waitForScreen(CigarsDetailsRoute)
+
             changeCigarsCount("Case Elegance Renzo Humidor", 1, 11, 10)
-            onNodeWithTag(tag(CigarDetailsScreen.TOP_BAR_HISTORY)).assertExists().performClick()
-            sleep(500)
-            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
-            nodes.assertCountEquals(3)
-            nodes.getListRow(0).assertHasChildWithText("Removed 1 cigar")
+
+            onNodeWithContentDescription(Localize.cigar_details_top_bar_history_desc).assertExists().performClick()
+            waitForScreen(CigarHistoryRoute)
+
+            assertListOrder(screenListContentDescription(CigarHistoryRoute), listOf("Removed 1 cigar", "Added 1 cigar", "Added 10 cigars"))
 
             pressBackButton()
-            sleep(1500)
+            waitForScreen(CigarsDetailsRoute)
+
             moveCigars(
                 "Case Elegance Renzo Humidor",
                 10,
                 "Second",
-                5,
+                4,
                 listOf("Case Elegance Renzo Humidor"),
                 listOf("Second"),
                 listOf("Total number of cigars: 10", "Case Elegance Renzo Humidor", "Second"),
-                listOf("5", "5"),
+                listOf("6", "4"),
             )
-            onNodeWithTag(tag(CigarDetailsScreen.TOP_BAR_HISTORY)).assertExists().performClick()
-            sleep(500)
-            nodes = onNodeWithTag("${CigarHistoryRoute.route}-List").assertExists().onChildren()
-            nodes.assertCountEquals(4)
-            nodes.getListRow(0).assertHasChildWithText("Moved 5 cigars")
+
+            onNodeWithContentDescription(Localize.cigar_details_top_bar_history_desc).assertExists().performClick()
+            waitForScreen(CigarHistoryRoute)
+
+            assertListOrder(
+                screenListContentDescription(CigarHistoryRoute),
+                listOf("Moved 4 cigars", "Removed 1 cigar", "Added 1 cigar", "Added 10 cigars")
+            )
         }
     }
 
     @Test
-    fun cigarImagesTest() {
+    fun test7_cigarImages() {
         with(composeTestRule) {
-            onNodeWithTag("ImagesCarousel").assertExists().performClick()
-            sleep(500)
-            onNodeWithTag(CigarImagesViewRoute.route).assertExists()
+            onNodeWithContentDescription(Localize.cigar_details_images_block_desc).assertExists()
+            assertNodeState(Localize.cigar_details_images_block_desc, Localize.images_pager_list_desc, "0:1")
         }
     }
 

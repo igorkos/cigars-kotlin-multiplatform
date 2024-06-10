@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:25 AM
+ * Last modified 6/9/24, 10:12 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -210,13 +210,13 @@ class CigarsDetailsScreenViewModel(private val cigar: Cigar) : DatabaseViewModel
         return repo.count()
     }
 
-    fun moveFromHumidors(): List<ValuePickerItem<HumidorCigar>> {
+    fun moveFromHumidors(): List<ValuePickerItem> {
         return humidors.map {
             ValuePickerItem(it, it.humidor.name, Images.tab_icon_humidors)
         }
     }
 
-    fun moveToHumidors(from: Humidor?): List<ValuePickerItem<Humidor>> {
+    fun moveToHumidors(from: Humidor?): List<ValuePickerItem> {
         val allHumidors = humidorsRepository.allSync()
         val to = if (from == null) allHumidors else allHumidors - from
         return to.map { ValuePickerItem(it, it.name, Images.tab_icon_humidors) }

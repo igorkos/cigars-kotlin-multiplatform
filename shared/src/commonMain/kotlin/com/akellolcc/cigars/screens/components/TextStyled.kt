@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 12:12 AM
+ * Last modified 6/9/24, 12:41 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@ package com.akellolcc.cigars.screens.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
@@ -86,10 +87,10 @@ fun TextStyled(
         }
     }
 
-    Column(modifier = Modifier.semantics(mergeDescendants = true) {
+    Column(modifier = modifier.semantics(mergeDescendants = true) {
         isTraversalGroup = true
         contentDescription = label
-    }) {
+    }.wrapContentSize()) {
         if (editable) {
             var textFieldState by remember {
                 mutableStateOf(
@@ -110,9 +111,10 @@ fun TextStyled(
                 textFieldState.copy(text = inputMode.fromTransformed(text))
             }
 
-
             TextField(
-                modifier = modifier,
+                modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
+                    contentDescription = label
+                },
                 value = textFieldState,
                 trailingIcon = trailingIcon ?: if (inputMode == InputMode.Text) {
                     {
@@ -224,7 +226,6 @@ fun TextStyled(
                     )
                 }
                 Text(
-                    modifier = modifier,
                     text = text ?: "",
                     color = textStyle.color,
                     fontSize = textStyle.fontSize,
@@ -236,11 +237,14 @@ fun TextStyled(
                 )
             }
             if (vertical) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     context()
                 }
             } else {
-                Row {
+                Row(modifier = modifier) {
                     context()
                 }
             }
