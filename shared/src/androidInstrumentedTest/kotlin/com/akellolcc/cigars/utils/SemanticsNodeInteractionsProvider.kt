@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:27 AM
+ * Last modified 6/10/24, 1:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,7 @@
 
 package com.akellolcc.cigars.utils
 
-import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -29,16 +27,12 @@ import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasStateDescription
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.hasTextExactly
-import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
-import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.Localize
 
 /**
@@ -221,87 +215,3 @@ fun SemanticsNodeInteractionsProvider.assertPickerValues(
     expandValuePicker(label)
     assertValuePicker(label, selected, false)
 }
-
-
-internal fun textMatcher(node: SemanticsNode, text: String, substring: Boolean): Boolean {
-    val nodeText = node.config.getOrNull(SemanticsProperties.EditableText)?.text
-    var isFindText = if (substring) {
-        nodeText?.contains(text, false) ?: false
-    } else {
-        nodeText.equals(text, false)
-    }
-    if (!isFindText) {
-        isFindText = node.config.getOrNull(SemanticsProperties.Text)
-            ?.any { item ->
-                if (substring) {
-                    item.text.contains(text, false)
-                } else {
-                    item.text.equals(text, false)
-                }
-            } ?: false
-    }
-    return isFindText
-}
-
-
-fun SemanticsNodeInteractionsProvider.childWithTag(
-    parentTag: String,
-    tag: String,
-    useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction {
-    val matcher = hasTestTag(tag).and(hasAnyAncestor(hasTestTag(parentTag)))
-    return onNode(
-        matcher,
-        useUnmergedTree = useUnmergedTree
-    )
-}
-
-
-fun SemanticsNodeInteractionsProvider.assertNodeText(
-    tag: String,
-    text: String,
-    substring: Boolean = false,
-    useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction {
-    val matcher = hasTestTag(tag).and(if (substring) hasText(text) else hasTextExactly(text))
-    return onNode(
-        matcher,
-        useUnmergedTree = useUnmergedTree
-    ).assertExists()
-}
-
-fun SemanticsNodeInteractionsProvider.childWithText(
-    parentTag: String,
-    text: String,
-    substring: Boolean = false,
-    useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction {
-    Log.debug("-------------childWithText  '${text}' -------------")
-    val matcher = SemanticsMatcher("Search node with text: $text and parent tag: $parentTag") {
-        if (textMatcher(it, text, substring)) {
-            return@SemanticsMatcher hasAnyAncestor(hasTestTag(parentTag)).matches(it)
-        }
-        return@SemanticsMatcher false
-    }
-    return onNode(matcher, useUnmergedTree = useUnmergedTree)
-}
-
-
-fun SemanticsNodeInteractionsProvider.dialogWithTag(tag: String): SemanticsNodeInteraction {
-    val matcher = hasTestTag(tag).and(hasAnyAncestor(isDialog()))
-    return onNode(matcher)
-}
-
-fun SemanticsNodeInteractionsProvider.childButtonWithText(
-    parentTag: String,
-    label: String,
-    useUnmergedTree: Boolean = false
-): SemanticsNodeInteraction {
-    val matcher = (hasTextExactly(label).and(hasClickAction())).and(hasAnyAncestor(hasTestTag(parentTag)))
-    return onNode(
-        matcher,
-        useUnmergedTree = useUnmergedTree
-    )
-}
-
-
