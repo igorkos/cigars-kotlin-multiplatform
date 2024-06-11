@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 1:05 PM
+ * Last modified 6/10/24, 5:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,10 @@
 package com.akellolcc.cigars.tests
 
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import assertListNode
 import assertListOrder
+import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.FavoritesRoute
 import com.akellolcc.cigars.screens.navigation.HumidorsRoute
@@ -27,15 +30,18 @@ import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.screenListContentDescription
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
+import pressBackButton
 import selectTab
 import waitForScreen
 import kotlin.test.Test
 
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class CigarsAppTabNavigationTest() : BaseUiTest() {
 
     @Test
-    fun tabNavigation() {
+    fun test1_tabNavigation() {
         with(composeTestRule) {
             waitForScreen(CigarsRoute)
             assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
@@ -51,6 +57,29 @@ class CigarsAppTabNavigationTest() : BaseUiTest() {
 
             selectTab(SearchCigarRoute)
             waitForScreen(SearchCigarRoute)
+        }
+    }
+
+    @Test
+    fun test2_screenNavigation() {
+        with(composeTestRule) {
+            waitForScreen(CigarsRoute)
+            assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
+
+            assertListNode(screenListContentDescription(CigarsRoute), "#1").performClick()
+            waitForScreen(CigarsDetailsRoute)
+            pressBackButton()
+
+            waitForScreen(CigarsRoute)
+            selectTab(HumidorsRoute)
+            waitForScreen(HumidorsRoute)
+
+            selectTab(CigarsRoute)
+            waitForScreen(CigarsRoute)
+
+            assertListNode(screenListContentDescription(CigarsRoute), "#1").performClick()
+            waitForScreen(CigarsDetailsRoute)
+            pressBackButton()
         }
     }
 }

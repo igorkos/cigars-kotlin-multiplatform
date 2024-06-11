@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 9:45 PM
+ * Last modified 6/10/24, 4:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
@@ -56,7 +58,7 @@ class CigarsScreen(
     @Composable
     override fun Content() {
         viewModel = rememberScreenModel { createViewModel(CigarsScreenViewModel::class) }
-        Navigator(CigarsListScreen<CigarsScreenViewModel>(route, viewModel))
+        LocalNavigator.currentOrThrow.push(CigarsListScreen<CigarsScreenViewModel>(route, viewModel))
     }
 }
 

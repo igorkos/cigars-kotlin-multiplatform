@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 6:03 PM
+ * Last modified 6/10/24, 4:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@ package com.akellolcc.cigars.screens
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.cigars.FavoritesScreenViewModel
 import com.akellolcc.cigars.screens.navigation.ITabItem
@@ -32,9 +33,8 @@ class FavoritesScreen(override val route: NavRoute) : ITabItem<FavoritesScreenVi
 
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel { createViewModel(FavoritesScreenViewModel::class) }
-        Navigator(FavoritesListScreen(route, viewModel))
+        viewModel = rememberScreenModel { createViewModel(FavoritesScreenViewModel::class) }
+        LocalNavigator.currentOrThrow.push(FavoritesListScreen(route, viewModel))
     }
 }
 

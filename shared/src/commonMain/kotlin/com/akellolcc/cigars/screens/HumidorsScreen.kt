@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:12 PM
+ * Last modified 6/10/24, 4:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
@@ -59,9 +61,8 @@ class HumidorsScreen(override val route: NavRoute) : ITabItem<HumidorsViewModel>
 
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel { createViewModel(HumidorsViewModel::class) }
-        Navigator(HumidorsListScreen(route, viewModel))
+        viewModel = rememberScreenModel { createViewModel(HumidorsViewModel::class) }
+        LocalNavigator.currentOrThrow.push(HumidorsListScreen(route, viewModel))
     }
 }
 
