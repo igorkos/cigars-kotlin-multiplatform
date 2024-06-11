@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 9:49 PM
+ * Last modified 6/10/24, 1:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -165,6 +165,7 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
             is LoadState.NotLoading -> {
                 if (pagingItems.itemCount == 0) {
                     Card(
+                        modifier = Modifier.semantics { contentDescription = "${route.title} ${Localize.screen_list_descr}" },
                         colors = CardDefaults.cardColors(
                             containerColor = materialColor(MaterialColors.color_transparent),
                             contentColor = materialColor(MaterialColors.color_onSurfaceVariant)

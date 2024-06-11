@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 4:58 PM
+ * Last modified 6/10/24, 5:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,12 +27,15 @@ import com.akellolcc.cigars.screens.navigation.FavoritesRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.screenListContentDescription
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 import pressBackButton
 import pressButton
 import selectTab
 import waitForScreen
 import kotlin.test.Test
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class FavoriteCigarsListTest : CigarsListTests() {
     override var route: NavRoute = FavoritesRoute
     override fun setUp() {
@@ -51,7 +54,7 @@ class FavoriteCigarsListTest : CigarsListTests() {
     }
 
     @Test
-    fun testFavoriteCigarsList() {
+    fun test01_FavoriteCigarsList() {
         with(composeTestRule) {
             selectTab(FavoritesRoute)
             waitForScreen(FavoritesRoute)

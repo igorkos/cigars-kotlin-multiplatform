@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/27/24, 2:21 PM
+ * Last modified 6/10/24, 3:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,11 @@ class History(
     var cigar: Cigar?,
     var humidorFrom: Humidor,
     var humidorTo: Humidor
-) : BaseEntity()
+) : BaseEntity() {
+    override fun toString(): String {
+        return "History(rowid=$rowid, count=$count, date=$date, left=$left, ${price?.let { "price = $it, " }}type=$type, ${cigar?.let { "cigar = ${it.rowid}, " }}humidorFrom=${humidorFrom.rowid}, humidorTo=${humidorTo.rowid})"
+    }
+}
 
 enum class HistoryType(val type: Long) {
     Addition(0L),

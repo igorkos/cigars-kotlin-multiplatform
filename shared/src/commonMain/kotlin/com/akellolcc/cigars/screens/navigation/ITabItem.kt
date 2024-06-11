@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:16 AM
+ * Last modified 6/10/24, 2:23 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.ActionsViewModel
 import com.akellolcc.cigars.theme.imagePainter
 
@@ -49,6 +50,7 @@ interface ITabItem<VM : ActionsViewModel> : Tab {
 
     fun handleAction(event: Any, navigator: Navigator) {
         if (event is ActionsViewModel.CommonAction.OnBackPressed) {
+            Log.debug("${route.route} -> OnBackPressed")
             navigator.pop()
         }
     }

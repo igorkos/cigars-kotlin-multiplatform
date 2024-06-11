@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/1/24, 3:57 PM
+ * Last modified 6/10/24, 3:44 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -115,6 +115,28 @@ data class Cigar(
             val rel = Json.decodeFromString<List<Relations>>(it)
             this.relations = rel
         }
+    }
+
+    override fun toString(): String {
+        return "Cigar(rowid= $rowid, name = $name, ${brand?.let { "brand = $it, " }}${country?.let { "country = $it, " }}favorites= $favorites, ${date?.let { "date = $it, " }}cigar=$cigar, wrapper=$wrapper, binder=$binder , gauge=$gauge, length=$length, strength= $strength, ${rating?.let { "rating = $it, " }}${myrating?.let { "myrating = $it, " }}${
+            notes?.let {
+                "notes = ${
+                    it.substring(
+                        0,
+                        10
+                    )
+                }..., "
+            }
+        } filler=$filler, ${
+            link?.let {
+                "link = ${
+                    it.substring(
+                        0,
+                        10
+                    )
+                }..., "
+            }
+        } count=$count, shopping=$shopping, ${price?.let { "price = $it, " }}"
     }
 }
 

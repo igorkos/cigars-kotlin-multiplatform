@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:47 PM
+ * Last modified 6/10/24, 5:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,7 +31,10 @@ import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.BaseUiTest
 import com.akellolcc.cigars.utils.assertHasNodes
 import com.akellolcc.cigars.utils.assertNoNodes
+import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.screenListContentDescription
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 import pressButton
 import replaceText
 import selectMenuItem
@@ -40,6 +43,7 @@ import waitForScreen
 import kotlin.test.Test
 
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 open class CigarsListTests : BaseUiTest() {
     override var route: NavRoute = CigarsRoute
     private val LIST_TAG: String
@@ -56,7 +60,7 @@ open class CigarsListTests : BaseUiTest() {
     }
 
     @Test
-    fun cigarsSortTest() {
+    fun test1_cigarsSortTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
             onNodeWithContentDescription(Localize.screen_list_filter_action_descr).assertExists()
@@ -130,7 +134,7 @@ open class CigarsListTests : BaseUiTest() {
     }
 
     @Test
-    fun cigarsFilteringTest() {
+    fun test2_cigarsFilteringTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
             onNodeWithContentDescription(Localize.screen_list_sort_action_descr).assertExists()
@@ -332,8 +336,7 @@ open class CigarsListTests : BaseUiTest() {
                 "Dominican"
             )
             sleep(1000)
-            onNodeWithContentDescription(LIST_TAG).assertDoesNotExist()
-
+            childWithTextLabel(LIST_TAG, Localize.list_is_empty, Localize.list_is_empty).assertExists()
         }
     }
 }

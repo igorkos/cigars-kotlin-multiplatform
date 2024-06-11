@@ -1,6 +1,6 @@
-/*
+/*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 4/25/24, 5:25 PM
+ * Last modified 6/10/24, 3:53 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ ******************************************************************************************************************************************/
 
 package com.akellolcc.cigars.databases.models
 
@@ -57,5 +57,27 @@ data class Humidor(
         humidor.type,
         humidor.other
     )
+
+    override fun toString(): String {
+        return "Humidor(rowid= $rowid, name = $name, brand=$brand, holds=$holds, count=$count, ${temperature?.let { "temperature = $it, " }}${humidity?.let { "humidity = $it, " }}${
+            notes?.let {
+                "notes = ${
+                    it.substring(
+                        0,
+                        10
+                    )
+                }..., "
+            }
+        }${
+            link?.let {
+                "link = ${
+                    it.substring(
+                        0,
+                        10
+                    )
+                }..., "
+            }
+        }price=$price, sorting=$sorting, type=$type, other=$other"
+    }
 }
 

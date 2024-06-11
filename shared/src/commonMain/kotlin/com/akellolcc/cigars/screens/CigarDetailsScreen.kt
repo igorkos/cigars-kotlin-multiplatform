@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 11:45 AM
+ * Last modified 6/10/24, 1:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +56,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -731,7 +730,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                                 TextStyles.Headline,
                                 labelStyle = TextStyles.Subhead,
                                 editable = true,
-                                modifier = Modifier.padding(bottom = 10.dp).testTag(tag(DIALOG_CIGAR_COUNT_PRICE)),
+                                modifier = Modifier.padding(bottom = 10.dp),
                                 onValueChange = {
                                     price.value = it
                                 },
@@ -864,7 +863,7 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                             Localize.cigar_details_humidors_move_dialog_count_desc,
                             TextStyles.Headline,
                             labelStyle = TextStyles.None,
-                            modifier = Modifier.wrapContentSize().testTag(tag(DIALOG_MOVE_CIGARS_COUNT)),
+                            modifier = Modifier.wrapContentSize(),
                             editable = true,
                             maxLines = 1,
                             inputMode = InputMode.Number,
@@ -879,8 +878,4 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         }
     }
 
-    companion object {
-        const val DIALOG_CIGAR_COUNT_PRICE = "cigar_count_price"
-        const val DIALOG_MOVE_CIGARS_COUNT = "move_count"
-    }
 }
