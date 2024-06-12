@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 1:07 PM
+ * Last modified 6/11/24, 5:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,6 +60,11 @@ open class FiltersList(val list: List<FilterParameter<*>> = emptyList()) : List<
 
     override fun toString(): String {
         return "FiltersList(list=$list)"
+    }
+
+    fun append(items: List<FilterParameter<*>>, tail: Boolean = true): FiltersList {
+        val updated = if (tail) list + items else items + list
+        return FiltersList(updated)
     }
 
     internal infix operator fun plus(other: FilterParameter<*>): FiltersList {

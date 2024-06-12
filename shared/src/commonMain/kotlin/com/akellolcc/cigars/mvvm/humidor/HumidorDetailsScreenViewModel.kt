@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 11:25 AM
+ * Last modified 6/11/24, 12:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,7 +102,7 @@ class HumidorDetailsScreenViewModel(private var humidor: Humidor) :
 
     fun cancelEdit() {
         editing = false
-        if (humidorsDatabase == null) {
+        if (humidor.rowid < 0) {
             onBackPress()
         }
     }

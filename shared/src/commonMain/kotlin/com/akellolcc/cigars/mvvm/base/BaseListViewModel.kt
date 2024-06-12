@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 9:26 PM
+ * Last modified 6/11/24, 7:28 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,9 @@ import com.akellolcc.cigars.databases.repository.Repository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.search.data.FilterCollection
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.screens.components.search.data.FiltersList
+import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
@@ -36,15 +39,21 @@ abstract class BaseListViewModel<T : BaseEntity> : DatabaseViewModel<T>() {
 
     var items by mutableStateOf<Flow<PagingData<T>>?>(null)
 
-
+    lateinit var topBarMenu: FiltersList
     var search by mutableStateOf(false)
-
+    var accenting by mutableStateOf(true)
     var sortingFields by mutableStateOf<FilterCollection?>(null)
     var searchingFields by mutableStateOf<FilterCollection?>(null)
+    val sortOrderField = FilterParameter(
+        Localize.cigar_details_top_bar_sort_order_desc,
+        true,
+        Localize.screen_list_sort_accenting,
+        Images.icon_menu_sort_alpha_asc,
+        false
+    )
 
     abstract fun entitySelected(entity: T)
 
-    var accenting by mutableStateOf(true)
 
     var sorting: FilterParameter<Boolean>?
         get() = sortField

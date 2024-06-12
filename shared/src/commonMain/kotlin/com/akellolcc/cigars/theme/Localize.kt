@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:58 PM
+ * Last modified 6/11/24, 4:53 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,6 +73,8 @@ object Localize {
     val filter_control_add_field_menu_descr = Strings.filter_control_add_field_menu_descr.toString()
 
     val screen_list_sort_action_descr = Strings.screen_list_sort_action_descr.toString()
+    val screen_list_sort_accenting = Strings.screen_list_sort_accenting.toString()
+    val screen_list_sort_descending = Strings.screen_list_sort_descending.toString()
     val screen_list_sort_fields_action_descr = Strings.screen_list_sort_fields_action_descr.toString()
     val screen_list_sort_fields_list_descr = Strings.screen_list_sort_fields_list_descr.toString()
 
@@ -119,6 +121,10 @@ object Localize {
     val cigar_details_humidors_move_dialog_count_desc = Strings.cigar_details_humidors_move_dialog_count_desc.toString()
 
     val cigar_details_top_bar_history_desc = Strings.cigar_details_top_bar_history_desc.toString()
+    val cigar_details_top_bar_info_desc = Strings.cigar_details_top_bar_info_desc.toString()
+    val cigar_details_top_bar_divider_desc = Strings.cigar_details_top_bar_divider_desc.toString()
+    val cigar_details_top_bar_sort_order_desc = Strings.cigar_details_top_bar_sort_order_desc.toString()
+
     val cigar_details_top_bar_edit_desc = Strings.cigar_details_top_bar_edit_desc.toString()
     val cigar_details_images_block_desc = Strings.cigar_details_images_block_desc.toString()
 
@@ -170,7 +176,7 @@ object Localize {
     val cigar_strength_full = Strings.cigar_strength_full.toString()
 
     val demo_humidor_name = Strings.demo_humidor_name.toString()
-
+    val humidor_list_add_action_desc = Strings.humidor_list_add_action_desc.toString()
     val humidor_details_holds = Strings.humidor_details_holds.toString()
     val humidor_details_count = Strings.humidor_details_count.toString()
     val humidor_details_temperature = Strings.humidor_details_temperature.toString()

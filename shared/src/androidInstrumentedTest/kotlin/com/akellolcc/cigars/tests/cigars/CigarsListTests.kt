@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 5:08 PM
+ * Last modified 6/11/24, 3:16 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,13 +63,13 @@ open class CigarsListTests : BaseUiTest() {
     fun test1_cigarsSortTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
-            onNodeWithContentDescription(Localize.screen_list_filter_action_descr).assertExists()
-            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).assertExists()
-            //Check available sort fields menu
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            //Check available sort fields menu
             assertListOrder(
                 Localize.screen_list_sort_fields_list_descr,
                 listOf(
+                    Localize.screen_list_filter_action_descr,
+                    Localize.screen_list_sort_descending,
                     CigarSortingFields.localized(CigarSortingFields.Name),
                     CigarSortingFields.localized(CigarSortingFields.Brand),
                     CigarSortingFields.localized(CigarSortingFields.Country),
@@ -81,26 +81,29 @@ open class CigarsListTests : BaseUiTest() {
             //Closes menu
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             //Check sorting
-            assertSortingBy(0, listOf("#1", "#2", "#3", "#4", "#5"))
-            assertSortingBy(1, listOf("#1", "#2", "#3", "#5", "#4"))
-            assertSortingBy(2, listOf("#1", "#2", "#3", "#4", "#5"))
-            assertSortingBy(3, listOf("#1", "#2", "#3", "#4", "#5"))
-            assertSortingBy(4, listOf("#1", "#3", "#4", "#5", "#2"))
-            assertSortingBy(5, listOf("#2", "#3", "#5", "#4", "#1"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Name), listOf("#1", "#2", "#3", "#4", "#5"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Brand), listOf("#1", "#2", "#3", "#5", "#4"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Country), listOf("#1", "#2", "#3", "#4", "#5"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Shape), listOf("#1", "#2", "#3", "#4", "#5"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Gauge), listOf("#1", "#3", "#4", "#5", "#2"))
+            assertSortingBy(CigarSortingFields.localized(CigarSortingFields.Length), listOf("#2", "#3", "#5", "#4", "#1"))
 
         }
     }
 
-    private fun assertSortingBy(index: Int, expected: List<String>) {
+    private fun assertSortingBy(item: String, expected: List<String>) {
         with(composeTestRule) {
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
-            onNodeWithContentDescription(Localize.screen_list_sort_fields_list_descr).onChildren()[index].performClick()
-            sleep(1000)
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, item)
             assertListOrder(screenListContentDescription(route), expected)
             //reverse sort
-            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).performClick()
-            sleep(1000)
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_descending)
             assertListOrder(screenListContentDescription(route), expected.reversed(), true)
+
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_accenting)
+            assertListOrder(screenListContentDescription(route), expected)
         }
     }
 
@@ -108,7 +111,7 @@ open class CigarsListTests : BaseUiTest() {
         with(composeTestRule) {
             if (menuIndex >= 0) {
                 pressButton(Localize.button_title_add_search_field)
-                selectMenuItem(Localize.filter_control_add_field_menu_descr, menuIndex, CigarSortingFields.localized(field))
+                selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(field))
             }
 
             if (remove != null) {
@@ -137,9 +140,8 @@ open class CigarsListTests : BaseUiTest() {
     fun test2_cigarsFilteringTest() {
         with(composeTestRule) {
             //Check that all top bar elements are displayed
-            onNodeWithContentDescription(Localize.screen_list_sort_action_descr).assertExists()
-            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists()
-            onNodeWithContentDescription(Localize.screen_list_filter_action_descr).assertExists().performClick()
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_filter_action_descr)
 
             onNodeWithContentDescription(Localize.screen_list_filter_control_descr).assertExists()
             onNodeWithContentDescription(SearchParameterField.semantics(CigarSortingFields.Name)).assertExists()
@@ -164,7 +166,7 @@ open class CigarsListTests : BaseUiTest() {
             )
 
             //Select Brand
-            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Brand))
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(CigarSortingFields.Brand))
             assertHasNodes(
                 Localize.screen_list_filter_control_descr,
                 listOf(
@@ -174,7 +176,7 @@ open class CigarsListTests : BaseUiTest() {
             )
 
             pressButton(Localize.button_title_add_search_field)
-            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Country))
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(CigarSortingFields.Country))
             assertHasNodes(
                 Localize.screen_list_filter_control_descr,
                 listOf(
@@ -185,7 +187,7 @@ open class CigarsListTests : BaseUiTest() {
             )
 
             pressButton(Localize.button_title_add_search_field)
-            selectMenuItem(Localize.filter_control_add_field_menu_descr, 1, CigarSortingFields.localized(CigarSortingFields.Gauge))
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(CigarSortingFields.Gauge))
             assertHasNodes(
                 Localize.screen_list_filter_control_descr,
                 listOf(
@@ -249,7 +251,7 @@ open class CigarsListTests : BaseUiTest() {
                 )
             )
             //Add name remove other
-            selectMenuItem(Localize.filter_control_add_field_menu_descr, 0, CigarSortingFields.localized(CigarSortingFields.Name))
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(CigarSortingFields.Name))
             onNodeWithContentDescription(
                 SearchParameterField.semantics(
                     CigarSortingFields.Brand,
@@ -305,7 +307,7 @@ open class CigarsListTests : BaseUiTest() {
 
             //Check country + gauge search
             pressButton(Localize.button_title_add_search_field)
-            selectMenuItem(Localize.filter_control_add_field_menu_descr, 3, CigarSortingFields.localized(CigarSortingFields.Gauge))
+            selectMenuItem(Localize.filter_control_add_field_menu_descr, CigarSortingFields.localized(CigarSortingFields.Gauge))
             assertHasNodes(
                 Localize.screen_list_filter_control_descr,
                 listOf(

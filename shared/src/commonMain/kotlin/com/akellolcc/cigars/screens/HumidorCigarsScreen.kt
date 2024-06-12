@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:00 PM
+ * Last modified 6/11/24, 7:35 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,14 +17,14 @@
 package com.akellolcc.cigars.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.models.HumidorCigar
@@ -32,22 +32,23 @@ import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorCigarsScreenViewModel
+import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.BackButton
 import com.akellolcc.cigars.screens.components.CigarListRow
 import com.akellolcc.cigars.screens.components.TextStyled
+import com.akellolcc.cigars.screens.components.search.SearchComponent
+import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
 import com.akellolcc.cigars.screens.navigation.HumidorHistoryRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
-import com.akellolcc.cigars.theme.materialColor
 
-class HumidorCigarsScreen(override val route: NavRoute) :
+open class HumidorCigarsScreen(override val route: NavRoute) :
     BaseTabListScreen<HumidorCigar, HumidorCigarsScreenViewModel>(
         route
     ) {
@@ -106,51 +107,72 @@ class HumidorCigarsScreen(override val route: NavRoute) :
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun topTabBar(scrollBehavior: TopAppBarScrollBehavior?) {
-        val topColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
-        LargeTopAppBar(
-            title = {
-                Column {
-                    TextStyled(
-                        text = viewModel.humidor.name,
-                        Localize.nav_header_title_desc,
-                        TextStyles.ScreenTitle,
-                        labelStyle = TextStyles.None
-                    )
-                    TextStyled(
-                        text = Localize.humidor_cigars(
-                            viewModel.humidor.count,
-                            viewModel.humidor.holds - viewModel.humidor.count
-                        ),
-                        Localize.humidor_details_humidor,
-                        style = TextStyles.Subhead,
-                        labelStyle = TextStyles.None
-                    )
+    override fun topTabBarNavigation() {
+        BackButton {
+            viewModel.onBackPress()
+        }
+    }
+
+    override fun performTabBarActions(action: FilterParameter<*>) {
+        when (action.key) {
+            Localize.cigar_details_top_bar_history_desc -> {
+                viewModel.openHistory()
+            }
+
+            Localize.cigar_details_top_bar_info_desc -> {
+                viewModel.humidorDetails()
+            }
+
+            else -> {
+                super.performTabBarActions(action)
+            }
+        }
+    }
+
+    @Composable
+    override fun topTabBarActions() {
+        IconButton(onClick = { viewModel.addCigar() }) {
+            loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
+        }
+        super.topTabBarActions()
+    }
+
+    @Composable
+    override fun ContentHeader(modifier: Modifier) {
+        if (viewModel.search && viewModel.searchingFields != null) {
+            SearchComponent(
+                modifier = modifier.semantics { contentDescription = Localize.screen_list_filter_control_descr },
+                fields = viewModel.searchingFields!!,
+            ) { action ->
+                Log.debug("Search control action $action")
+                when (action) {
+                    is CigarsSearchFieldBaseViewModel.Action.ExecuteSearch -> {
+                        viewModel.paging(true)
+                    }
+
+                    else -> {}
                 }
-            },
-            colors = topColors,
-            navigationIcon = {
-                BackButton {
-                    viewModel.onBackPress()
-                }
-            },
-            actions = {
-                IconButton(onClick = { viewModel.openHistory() }) {
-                    loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
-                }
-                IconButton(onClick = { viewModel.humidorDetails() }) {
-                    loadIcon(Images.icon_menu_info, Size(24.0F, 24.0F))
-                }
-                IconButton(onClick = { viewModel.addCigar() }) {
-                    loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
-                }
-            })
+            }
+        } else {
+            Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                TextStyled(
+                    text = viewModel.humidor.name,
+                    Localize.nav_header_title_desc,
+                    TextStyles.ScreenTitle,
+                    labelStyle = TextStyles.None
+                )
+                TextStyled(
+                    text = Localize.humidor_cigars(
+                        viewModel.humidor.count,
+                        viewModel.humidor.holds - viewModel.humidor.count
+                    ),
+                    Localize.humidor_details_humidor,
+                    style = TextStyles.Subhead,
+                    labelStyle = TextStyles.None
+                )
+            }
+        }
     }
 
     @Composable

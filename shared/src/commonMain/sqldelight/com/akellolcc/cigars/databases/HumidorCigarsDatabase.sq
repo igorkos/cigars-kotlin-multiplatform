@@ -48,16 +48,86 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 cigarHumidors:
-SELECT *  FROM CigarHumidorTable WHERE cigarId = :cigar;
+SELECT CigarHumidorTable.*  FROM CigarHumidorTable
+INNER JOIN HumidorsTable ON CigarHumidorTable.humidorId = HumidorsTable.rowid
+    WHERE
+        CigarHumidorTable.cigarId = :cigarId AND
+        name LIKE :name AND
+        brand LIKE :brand
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'count' THEN CigarHumidorTable.count
+        ELSE NULL
+    END ASC;
 
 pagedCigarHumidors:
-    SELECT * FROM CigarHumidorTable WHERE cigarId = :cigar
+    SELECT CigarHumidorTable.*  FROM CigarHumidorTable
+    INNER JOIN HumidorsTable ON CigarHumidorTable.humidorId = HumidorsTable.rowid
+        WHERE
+            CigarHumidorTable.cigarId = :cigarId AND
+            name LIKE :name AND
+            brand LIKE :brand
+         ORDER BY CASE
+            WHEN :sort = 'name' THEN name
+            WHEN :sort = 'brand' THEN brand
+            WHEN :sort = 'count' THEN CigarHumidorTable.count
+            ELSE NULL
+        END ASC
     LIMIT :limit OFFSET :offset;
 
 
 humidorCigars:
-SELECT CigarHumidorTable.*  FROM CigarHumidorTable WHERE humidorId = :humidor;
+SELECT CigarHumidorTable.* FROM CigarHumidorTable
+    INNER JOIN CigarsTable ON CigarHumidorTable.cigarId = CigarsTable.rowid
+    WHERE
+        CigarHumidorTable.humidorId = :humidorId AND
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC;
 
 pagedHumidorCigars:
-    SELECT * FROM CigarHumidorTable WHERE humidorId = :humidor
+    SELECT CigarHumidorTable.* FROM CigarHumidorTable
+    INNER JOIN CigarsTable ON CigarHumidorTable.cigarId = CigarsTable.rowid
+    WHERE
+        CigarHumidorTable.humidorId = :humidorId AND
+        name LIKE :name AND
+        brand LIKE :brand AND
+        country LIKE :country AND
+        date >= :date AND
+        cigar LIKE :cigar AND
+        gauge >= :gauge AND
+        length >= :length AND
+        strength >= :strength
+     ORDER BY CASE
+        WHEN :sort = 'name' THEN name
+        WHEN :sort = 'brand' THEN brand
+        WHEN :sort = 'country' THEN country
+        WHEN :sort = 'date' THEN date
+        WHEN :sort = 'cigar' THEN cigar
+        WHEN :sort = 'gauge' THEN gauge
+        WHEN :sort = 'length' THEN length
+        WHEN :sort = 'strength' THEN strength
+        WHEN :sort = 'rating' THEN rating
+        WHEN :sort = 'myrating' THEN myrating
+        ELSE NULL
+    END ASC
     LIMIT :limit OFFSET :offset;

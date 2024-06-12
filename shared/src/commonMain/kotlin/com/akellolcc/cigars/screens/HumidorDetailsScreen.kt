@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:06 PM
+ * Last modified 6/11/24, 12:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -77,13 +79,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel {
-                createViewModel(
-                    HumidorDetailsScreenViewModel::class,
-                    route.data
-                )
-            }
+        viewModel = rememberScreenModel { createViewModel(HumidorDetailsScreenViewModel::class, route.data) }
         var notesHeight by remember { mutableStateOf(0) }
         val navigator = LocalNavigator.currentOrThrow
 
@@ -103,7 +99,7 @@ class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetai
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
                 topBar = {
                     CenterAlignedTopAppBar(
                         colors = topColors,

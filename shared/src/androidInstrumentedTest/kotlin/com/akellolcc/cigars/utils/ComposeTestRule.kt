@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 1:05 PM
+ * Last modified 6/11/24, 3:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,8 +14,6 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasAnyAncestor
@@ -25,7 +23,6 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
@@ -105,15 +102,9 @@ fun ComposeTestRule.assertListOrder(description: String, expected: List<String>,
  * @param index The index of the menu item to select.
  * @param menu The text of the menu item to select.
  */
-fun ComposeTestRule.selectMenuItem(parent: String, index: Int, menu: String) {
-    val menuItem = onNode(hasContentDescriptionExactly(parent)).assertExists().onChildren()[index]
-    if (menuItem.fetchSemanticsNode().config.getOrNull(SemanticsProperties.ContentDescription)?.any {
-            it.contains(menu)
-        } != true) {
-        menuItem.performClick()
-    } else {
-        assert(false) { "Menu item not found" }
-    }
+fun ComposeTestRule.selectMenuItem(parent: String, menu: String) {
+    onNode(hasContentDescriptionExactly(parent)).printToLog("")
+    onNode(hasText(menu).and(hasAnyAncestor(hasContentDescriptionExactly(parent)))).assertExists().performClick()
 }
 
 /**

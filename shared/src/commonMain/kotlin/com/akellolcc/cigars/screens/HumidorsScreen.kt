@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 4:57 PM
+ * Last modified 6/11/24, 12:02 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,12 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.emptyHumidor
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.MainScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
@@ -85,7 +88,11 @@ class HumidorsListScreen(
                 }) { loadIcon(Images.icon_menu_dots, Size(24.0F, 24.0F)) }
             },
             actions = {
-                IconButton(onClick = { viewModel.addHumidor() }) {
+                IconButton(
+                    modifier = Modifier.semantics {
+                        contentDescription = Localize.humidor_list_add_action_desc
+                    },
+                    onClick = { viewModel.addHumidor() }) {
                     loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
                 }
             },
@@ -148,6 +155,7 @@ class HumidorsListScreen(
 
     override fun handleAction(event: Any, navigator: Navigator) {
         val mainModel = createViewModel(MainScreenViewModel::class)
+        Log.debug("${this::class.simpleName} Process event: $event")
         when (event) {
             is HumidorsViewModel.Action.RouteToHumidor -> {
                 Log.debug("Selected humidor ${event.humidor.rowid}")
@@ -163,7 +171,7 @@ class HumidorsListScreen(
                     HumidorDetailsScreen(
                         HumidorDetailsRoute
                             .apply {
-                                this.data = null
+                                this.data = emptyHumidor.copy()
                             })
                 )
             }

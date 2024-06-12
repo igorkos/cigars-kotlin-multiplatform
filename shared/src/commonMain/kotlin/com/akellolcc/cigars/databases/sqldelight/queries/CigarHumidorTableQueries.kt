@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:24 PM
+ * Last modified 6/12/24, 12:28 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,13 +39,32 @@ class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQuerie
         filter: FiltersList?,
         vararg args: Pair<String, Any?>
     ): Query<HumidorCigar> {
+        val sortKey = sorting?.key ?: "name"
         args.find { it.first == CIGAR_ID }?.let {
             val rowId = it.second as Long
-            return queries.cigarHumidors(rowId, ::humidorCigarFactory)
+            return queries.cigarHumidors(
+                rowId,
+                FiltersList.getSQLWhere<String>(filter, "name"),
+                FiltersList.getSQLWhere<String>(filter, "brand"),
+                sortKey,
+                ::humidorCigarFactory
+            )
         }
         args.find { it.first == HUMIDOR_ID }?.let {
             val rowId = it.second as Long
-            return queries.humidorCigars(rowId, ::humidorCigarFactory)
+            return queries.humidorCigars(
+                rowId,
+                FiltersList.getSQLWhere<String>(filter, "name"),
+                FiltersList.getSQLWhere<String>(filter, "brand"),
+                FiltersList.getSQLWhere<String>(filter, "country"),
+                FiltersList.getSQLWhere<Long>(filter, "date"),
+                FiltersList.getSQLWhere<String>(filter, "cigar"),
+                FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                FiltersList.getSQLWhere<String>(filter, "length"),
+                FiltersList.getSQLWhere<Long>(filter, "strength"),
+                sortKey,
+                ::humidorCigarFactory
+            )
         }
         throw IllegalArgumentException("No cigar or humidor specified")
     }
@@ -56,13 +75,33 @@ class CigarHumidorTableQueries(override val queries: HumidorCigarsDatabaseQuerie
         vararg args: Pair<String, Any?>
     ): app.cash.paging.PagingSource<Int, HumidorCigar> {
         fun queryProvider(limit: Long, offset: Long): Query<HumidorCigar> {
+            val sortKey = sorting?.key ?: "name"
             args.find { it.first == CIGAR_ID }?.let {
                 val rowId = it.second as Long
-                return queries.pagedCigarHumidors(rowId, limit, offset, ::humidorCigarFactory)
+                return queries.pagedCigarHumidors(
+                    rowId,
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    sortKey,
+                    limit, offset, ::humidorCigarFactory
+                )
             }
             args.find { it.first == HUMIDOR_ID }?.let {
                 val rowId = it.second as Long
-                return queries.pagedHumidorCigars(rowId, limit, offset, ::humidorCigarFactory)
+                return queries.pagedHumidorCigars(
+                    rowId,
+                    FiltersList.getSQLWhere<String>(filter, "name"),
+                    FiltersList.getSQLWhere<String>(filter, "brand"),
+                    FiltersList.getSQLWhere<String>(filter, "country"),
+                    FiltersList.getSQLWhere<Long>(filter, "date"),
+                    FiltersList.getSQLWhere<String>(filter, "cigar"),
+                    FiltersList.getSQLWhere<Long>(filter, "gauge"),
+                    FiltersList.getSQLWhere<String>(filter, "length"),
+                    FiltersList.getSQLWhere<Long>(filter, "strength"),
+                    sortKey,
+                    limit, offset, ::humidorCigarFactory
+                )
+                //return queries.pagedHumidorCigars(rowId, limit, offset, ::humidorCigarFactory)
             }
             Log.warn("No cigar or humidor specified return all")
             return queries.all(::humidorCigarFactory)
