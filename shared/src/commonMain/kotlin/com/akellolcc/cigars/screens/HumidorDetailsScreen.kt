@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 1:06 PM
+ * Last modified 6/14/24, 2:53 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,320 +16,178 @@
 
 package com.akellolcc.cigars.screens
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.humidor.HumidorDetailsScreenViewModel
-import com.akellolcc.cigars.screens.components.BackButton
-import com.akellolcc.cigars.screens.components.DialogButton
-import com.akellolcc.cigars.screens.components.PagedCarousel
+import com.akellolcc.cigars.screens.base.BaseItemDetailsScreen
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.ValueCard
 import com.akellolcc.cigars.screens.components.ValuesCard
 import com.akellolcc.cigars.screens.components.transformations.InputMode
-import com.akellolcc.cigars.screens.navigation.HumidorImagesViewRoute
-import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.theme.DefaultTheme
-import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.loadIcon
-import com.akellolcc.cigars.theme.materialColor
-import kotlin.jvm.Transient
 
-class HumidorDetailsScreen(override val route: NavRoute) : ITabItem<HumidorDetailsScreenViewModel> {
-    @kotlinx.serialization.Transient
-    @Transient
-    override lateinit var viewModel: HumidorDetailsScreenViewModel
-
-    @OptIn(ExperimentalMaterial3Api::class)
+class HumidorDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<HumidorDetailsScreenViewModel>(route) {
     @Composable
     override fun Content() {
-        viewModel =
-            rememberScreenModel {
-                createViewModel(
-                    HumidorDetailsScreenViewModel::class,
-                    route.data
-                )
-            }
-        var notesHeight by remember { mutableStateOf(0) }
-        val navigator = LocalNavigator.currentOrThrow
+        viewModel = rememberScreenModel { createViewModel(HumidorDetailsScreenViewModel::class, route.data) }
+        super.Content()
+    }
 
-        viewModel.observeEvents(tag()) {
-            handleAction(it, navigator)
-        }
+    @Composable
+    override fun details() {
+        humidorOrigin()
+        humidorCapacity()
+        humidorParameters()
+        humidorNotes()
+    }
 
-        LaunchedEffect(viewModel.editing) {
-            viewModel.observeHumidor()
-        }
-
-        val topColors = centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
-
-        DefaultTheme {
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                topBar = {
-                    CenterAlignedTopAppBar(
-                        colors = topColors,
-                        navigationIcon = {
-                            if (!viewModel.editing) {
-                                BackButton {
-                                    viewModel.onBackPress()
-                                }
-                            }
-                        },
-                        actions = {
-                            if (!viewModel.editing) {
-                                IconButton(onClick = { viewModel.editing = !viewModel.editing }) {
-                                    loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
-                                }
-                            }
-                        },
-                        title = {})
-                },
-                bottomBar = {
-                    if (viewModel.editing) {
-                        BottomAppBar(
-                            actions = {
-                                Box(modifier = Modifier.weight(1f))
-                                DialogButton(
-                                    title = Localize.button_cancel,
-                                    modifier = Modifier.padding(end = 10.dp).weight(2f),
-                                    onClick = { viewModel.cancelEdit() })
-                                DialogButton(
-                                    modifier = Modifier.weight(2f),
-                                    enabled = viewModel.verifyFields(),
-                                    title = Localize.button_save,
-                                    onClick = { viewModel.saveEdit() })
-                            }
-                        )
-                    }
+    @Composable
+    private fun humidorOrigin() {
+        //Humidor Name Brand
+        ValuesCard(
+            modifier = Modifier.semantics { contentDescription = Localize.humidor_details_origin_block_desc },
+            vertical = true,
+            border = false
+        ) {
+            TextStyled(
+                viewModel.name,
+                Localize.cigar_details_name,
+                TextStyles.Headline,
+                labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
+                editable = viewModel.editing,
+                maxLines = 2,
+                modifier = Modifier.padding(bottom = 4.dp),
+                onValueChange = {
+                    viewModel.name = it
                 }
-            ) {
-                CompositionLocalProvider(
-                    LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
-                )
-                {
-                    Column(
-                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-                    ) {
-                        //Top Images view
-                        if (!viewModel.editing) {
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.padding(bottom = 10.dp)
-                                    .aspectRatio(ratio = 1.8f)
-                            ) {
-                                PagedCarousel(
-                                    viewModel.images,
-                                    loading = viewModel.loading,
-                                ) {
-                                    val data = route.data as Humidor
-                                    navigator.push(ImagesViewScreen(HumidorImagesViewRoute.apply {
-                                        this.data = Pair(data, it)
-                                    }))
-                                }
-                            }
-                        }
-                        //Humidor details
-                        Column(modifier = with(Modifier) {
-                            fillMaxSize()
-                                .padding(
-                                    PaddingValues(
-                                        16.dp,
-                                        if (!viewModel.editing) 16.dp else it.calculateTopPadding(),
-                                        16.dp,
-                                        it.calculateBottomPadding() + 16.dp
-                                    )
-                                )
-                        }) {
-                            //Humidor Name Brand
-                            Column {
-                                TextStyled(
-                                    viewModel.name,
-                                    Localize.cigar_details_name,
-                                    TextStyles.Headline,
-                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
-                                    editable = viewModel.editing,
-                                    maxLines = 2,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                    onValueChange = {
-                                        viewModel.name = it
-                                    }
-                                )
-                                TextStyled(
-                                    viewModel.brand,
-                                    label = Localize.cigar_details_company,
-                                    TextStyles.Subhead,
-                                    labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
-                                    editable = viewModel.editing,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                    onValueChange = {
-                                        viewModel.brand = it
-                                    }
-                                )
-                            }
-                            //Humidor cigars
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
-                            ) {
-                                if (!viewModel.editing) {
-                                    ValuesCard(
-                                        label = Localize.humidor_details_cigars,
-                                        vertical = viewModel.editing
-                                    ) {
-                                        ValueCard(
-                                            Localize.humidor_details_holds,
-                                            viewModel.holds.toString()
-                                        )
-                                        ValueCard(
-                                            Localize.humidor_details_count,
-                                            viewModel.count.toString()
-                                        )
-                                    }
-                                } else {
-                                    TextStyled(
-                                        if (viewModel.holds == 0L) "" else viewModel.holds.toString(),
-                                        Localize.humidor_details_holds,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.holds =
-                                                if (it.isNotBlank()) it.toLong() else 0
-                                        },
-                                        inputMode = InputMode.Number
-                                    )
-                                }
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
-                            ) {
-                                if (!viewModel.editing && (viewModel.temperature != null || viewModel.humidity != null)) {
-                                    ValuesCard(
-                                        label = Localize.humidor_details_humidor,
-                                        vertical = viewModel.editing
-                                    ) {
-                                        viewModel.temperature?.let {
-                                            ValueCard(
-                                                Localize.humidor_details_temperature,
-                                                it.toString()
-                                            )
-                                        }
-                                        viewModel.humidity?.let {
-                                            ValueCard(
-                                                Localize.humidor_details_humidity,
-                                                it.toString()
-                                            )
-                                        }
-                                    }
-                                } else if (viewModel.editing) {
-                                    TextStyled(
-                                        if (viewModel.temperature == null || viewModel.temperature == 0L) "" else viewModel.temperature.toString(),
-                                        Localize.humidor_details_temperature,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.temperature =
-                                                if (it.isNotBlank()) it.toLong() else 0
-                                        },
-                                        inputMode = InputMode.Temperature
-                                    )
-                                    TextStyled(
-                                        if (viewModel.humidity == null || viewModel.humidity == 0.0) "" else viewModel.humidity.toString(),
-                                        Localize.humidor_details_humidity,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.Subhead,
-                                        editable = viewModel.editing,
-                                        modifier = Modifier.padding(bottom = 10.dp),
-                                        onValueChange = {
-                                            viewModel.humidity =
-                                                if (it.isNotBlank()) it.toDouble() else 0.0
-                                        },
-                                        inputMode = InputMode.Humidity
-                                    )
-                                }
-                                //Cigar Notes and Link
-                                Column(
-                                    modifier = Modifier
-                                        .padding(bottom = 10.dp, top = 10.dp)
-                                        .onSizeChanged {
-                                            notesHeight = it.height
-                                        }
-                                ) {
-                                    TextStyled(
-                                        viewModel.notes,
-                                        Localize.cigar_details_notes,
-                                        TextStyles.Subhead,
-                                        labelStyle = TextStyles.None,
-                                        editable = viewModel.editing,
-                                        onValueChange = {
-                                            viewModel.notes = it
-                                        }
-                                    )
-                                }
-                                if (viewModel.link != null || viewModel.editing) {
-                                    Column(
-                                        modifier = Modifier.padding(bottom = 10.dp)
-                                    ) {
-                                        TextStyled(
-                                            viewModel.link,
-                                            Localize.cigar_details_link,
-                                            TextStyles.Subhead,
-                                            labelStyle = TextStyles.Subhead,
-                                            editable = viewModel.editing,
-                                            maxLines = 1,
-                                            onValueChange = {
-                                                viewModel.link = it
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
+            )
+            TextStyled(
+                viewModel.brand,
+                label = Localize.cigar_details_company,
+                TextStyles.Subhead,
+                labelStyle = if (viewModel.editing) TextStyles.Description else TextStyles.None,
+                editable = viewModel.editing,
+                modifier = Modifier.padding(bottom = 4.dp),
+                onValueChange = {
+                    viewModel.brand = it
+                }
+            )
+        }
+    }
 
+    @Composable
+    private fun humidorCapacity() {
+        ValuesCard(
+            modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                .semantics { contentDescription = Localize.humidor_details_size_block_desc },
+            label = Localize.humidor_details_cigars,
+            vertical = viewModel.editing
+        ) {
+            ValueCard(
+                Localize.humidor_details_holds,
+                viewModel.holds.toString(),
+                viewModel.editing,
+                inputMode = InputMode.Number,
+                onValueChange = {
+                    viewModel.holds =
+                        if (it.isNotBlank()) it.toLong() else 0
+                })
+            ValueCard(
+                Localize.humidor_details_count,
+                viewModel.count.toString(),
+                viewModel.editing,
+                inputMode = InputMode.Number,
+                onValueChange = {
+                    viewModel.count =
+                        if (it.isNotBlank()) it.toLong() else 0
+                })
+        }
+    }
+
+    @Composable
+    private fun humidorParameters() {
+        //Humidor Parameters
+        ValuesCard(
+            modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                .semantics { contentDescription = Localize.humidor_details_params_block_desc },
+            label = Localize.humidor_details_humidor,
+            vertical = viewModel.editing
+        ) {
+            ValueCard(
+                Localize.humidor_details_temperature,
+                viewModel.temperature.toString(),
+                viewModel.editing,
+                inputMode = InputMode.Number,
+                onValueChange = {
+                    viewModel.temperature =
+                        if (it.isNotBlank()) it.toLong() else 0
+                })
+            ValueCard(
+                Localize.humidor_details_humidity,
+                viewModel.humidity.toString(),
+                viewModel.editing,
+                inputMode = InputMode.Number,
+                onValueChange = {
+                    viewModel.humidity =
+                        if (it.isNotBlank()) it.toDouble() else 0.0
+                })
+        }
+    }
+
+    @Composable
+    private fun humidorNotes() {
+        var notesHeight by remember { mutableStateOf(0) }
+        if (viewModel.editing || viewModel.notes != null || viewModel.notes != null) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = 10.dp, top = 10.dp)
+                    .onSizeChanged {
+                        notesHeight = it.height
+                    }.semantics {
+                        contentDescription = Localize.humidor_details_notes_block_desc
+                    }
+            ) {
+                if (viewModel.link != null || viewModel.editing) {
+                    TextStyled(
+                        viewModel.notes,
+                        Localize.cigar_details_notes,
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.None,
+                        modifier = Modifier.fillMaxWidth(),
+                        editable = viewModel.editing,
+                        onValueChange = {
+                            viewModel.notes = it
+                        }
+                    )
+                }
+                if (viewModel.link != null || viewModel.editing) {
+                    TextStyled(
+                        viewModel.link,
+                        Localize.cigar_details_link,
+                        TextStyles.Subhead,
+                        labelStyle = TextStyles.Subhead,
+                        editable = viewModel.editing,
+                        maxLines = 1,
+                        modifier = Modifier.fillMaxWidth(),
+                        onValueChange = {
+                            viewModel.link = it
+                        }
+                    )
                 }
             }
         }

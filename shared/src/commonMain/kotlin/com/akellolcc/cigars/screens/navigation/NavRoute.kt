@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 2:41 PM
+ * Last modified 6/14/24, 12:24 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,8 @@ expect class NavRoute(
     val isDrawerVisible: Boolean
     val isLoadingCover: Boolean
     val isSearchEnabled: Boolean
+
+    fun applyData(data: Any?): NavRoute
 }
 
 val MainRoute = NavRoute(

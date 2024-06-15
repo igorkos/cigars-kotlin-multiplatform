@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 1:15 PM
+ * Last modified 6/14/24, 6:19 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,6 @@ import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.theme.Localize
 
 /**
@@ -134,23 +133,9 @@ fun SemanticsNodeInteractionsProvider.assertValuesCardValues(
 ) {
     val node = onNodeWithContentDescription(tag).onChildren()
     values.forEach { (key, value) ->
-        val matcher = hasAnyDescendant(hasContentDescription("$key $value"))
+        val matcher = hasAnyDescendant(hasContentDescription("$key $value", substring = true))
         node.filterToOne(matcher).assertExists()
     }
-}
-
-/**
- * Assert Value Picker controls
- * @param description - Content description of Values Card
- * @param value - Selected value
- * @param expanded - Expanded or not
- */
-fun SemanticsNodeInteractionsProvider.assertValuePicker(
-    description: String,
-    value: String,
-    expanded: Boolean
-): SemanticsNodeInteraction {
-    return onNode(hasContentDescription(description).and(hasStateDescription("${value}:${expanded}"))).assertExists()
 }
 
 /**
@@ -167,51 +152,4 @@ fun SemanticsNodeInteractionsProvider.expandValuePicker(
                 )
             )
     ).performClick()
-}
-
-/**
- * Select item from Value Picker
- * @param description - Content description of Values Card
- * @param value - Selected value
- */
-fun SemanticsNodeInteractionsProvider.performSelectValuePicker(
-    description: String,
-    value: String
-) {
-    onNode(
-        hasContentDescription(Localize.value_picker_drop_down_action)
-            .and(hasAnyAncestor(hasContentDescription(description)))
-    ).performClick()
-    onNode(
-        hasContentDescription(value).and(
-            hasAnyAncestor(
-                hasContentDescription(Localize.value_picker_drop_down_menu)
-            )
-        )
-    ).performClick()
-    assertValuePicker(description, value, false)
-}
-
-/**
- * Assert Picker values
- * @param label - Content description of Picker Values
- * @param selected - Selected value
- * @param values - List of values
- */
-fun SemanticsNodeInteractionsProvider.assertPickerValues(
-    label: String,
-    selected: String,
-    values: List<String>,
-) {
-    assertValuePicker(label, selected, false)
-    expandValuePicker(label)
-    assertValuePicker(label, selected, true)
-    val root = onNodeWithContentDescription(Localize.value_picker_drop_down_menu)
-    root.printToLog("")
-    val node = root.onChildren()
-    values.forEach {
-        node.filterToOne(hasAnyDescendant(hasContentDescription(it))).assertExists()
-    }
-    expandValuePicker(label)
-    assertValuePicker(label, selected, false)
 }

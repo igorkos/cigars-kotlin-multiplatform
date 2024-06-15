@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 1:05 PM
+ * Last modified 6/14/24, 8:06 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,11 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
 import androidx.compose.ui.test.hasSetTextAction
@@ -28,10 +28,12 @@ import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextReplacement
-import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
+import com.akellolcc.cigars.utils.expandValuePicker
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
 
@@ -54,13 +56,21 @@ fun ComposeTestRule.sleep(
  * Waits for a screen to be displayed.
  * @param route The navigation route of screen to wait for.
  * @param timeoutMillis The timeout in milliseconds.
+ *
  */
 @OptIn(ExperimentalTestApi::class)
 fun ComposeTestRule.waitForScreen(
     route: NavRoute,
     timeoutMillis: Long = 10000
 ): SemanticsNodeInteraction {
-    waitUntilAtLeastOneExists(hasContentDescriptionExactly(route.semantics), timeoutMillis = timeoutMillis)
+    try {
+        waitUntilAtLeastOneExists(
+            hasContentDescriptionExactly(route.semantics).and(hasStateDescription("false")),
+            timeoutMillis = timeoutMillis
+        )
+    } catch (t: Throwable) {
+        assert(false) { "Screen ${route.route} not found" }
+    }
     return onNode(hasContentDescriptionExactly(route.semantics)).assertExists()
 }
 
@@ -89,6 +99,7 @@ fun ComposeTestRule.assertListOrder(description: String, expected: List<String>,
     var id = if (reverse) Int.MAX_VALUE else Int.MIN_VALUE
     for (text in expected) {
         val node = assertListNode(description, text, substring)
+        node.performScrollTo()
         val nodeId = node.fetchSemanticsNode().id
         if (reverse) {
             nodeId shouldBeLessThan id
@@ -105,15 +116,8 @@ fun ComposeTestRule.assertListOrder(description: String, expected: List<String>,
  * @param index The index of the menu item to select.
  * @param menu The text of the menu item to select.
  */
-fun ComposeTestRule.selectMenuItem(parent: String, index: Int, menu: String) {
-    val menuItem = onNode(hasContentDescriptionExactly(parent)).assertExists().onChildren()[index]
-    if (menuItem.fetchSemanticsNode().config.getOrNull(SemanticsProperties.ContentDescription)?.any {
-            it.contains(menu)
-        } != true) {
-        menuItem.performClick()
-    } else {
-        assert(false) { "Menu item not found" }
-    }
+fun ComposeTestRule.selectMenuItem(parent: String, menu: String) {
+    onNode(hasText(menu).and(hasAnyAncestor(hasContentDescriptionExactly(parent)))).assertExists().performClick()
 }
 
 /**
@@ -123,7 +127,6 @@ fun ComposeTestRule.selectMenuItem(parent: String, index: Int, menu: String) {
  * @param text The text to replace the current text with.
  */
 fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String, currentText: String? = null) {
-    onNode(hasContentDescription(parent)).printToLog("")
     onNode((hasContentDescription(inputLabel).and(hasSetTextAction())).and(hasAnyAncestor(hasContentDescription(parent))))
         .performTextReplacement(text)
 }
@@ -178,4 +181,72 @@ fun ComposeTestRule.assertNodeState(parent: String, node: String, state: String)
 fun ComposeTestRule.waitForDialog(tag: String, timeoutMillis: Long = 10000): SemanticsNodeInteraction {
     waitUntilAtLeastOneExists(hasContentDescription(tag), timeoutMillis = timeoutMillis)
     return onNode(hasContentDescription(tag)).assertExists()
+}
+
+/**
+ * Assert Value Picker controls
+ * @param description - Content description of Values Card
+ * @param value - Selected value
+ * @param expanded - Expanded or not
+ */
+@OptIn(ExperimentalTestApi::class)
+fun ComposeTestRule.assertValuePicker(
+    description: String,
+    value: String,
+    expanded: Boolean
+): SemanticsNodeInteraction {
+    val mather = hasContentDescription(description).and(hasStateDescription("${value}:${expanded}"))
+    try {
+        waitUntilAtLeastOneExists(mather, 5000)
+    } catch (t: Throwable) {
+        // swallow this exception
+    }
+    return onNode(mather).assertExists()
+}
+
+/**
+ * Select item from Value Picker
+ * @param description - Content description of Values Card
+ * @param value - Selected value
+ */
+fun ComposeTestRule.performSelectValuePicker(
+    description: String,
+    value: String
+) {
+    onNode(
+        hasContentDescription(Localize.value_picker_drop_down_action)
+            .and(hasAnyAncestor(hasContentDescription(description)))
+    ).performClick()
+    onNodeWithContentDescription(Localize.value_picker_drop_down_menu).performScrollToNode(hasContentDescription(value))
+    onNode(
+        hasContentDescription(value).and(
+            hasAnyAncestor(
+                hasContentDescription(Localize.value_picker_drop_down_menu)
+            )
+        )
+    ).performClick()
+    assertValuePicker(description, value, false)
+}
+
+/**
+ * Assert Picker values
+ * @param label - Content description of Picker Values
+ * @param selected - Selected value
+ * @param values - List of values
+ */
+fun ComposeTestRule.assertPickerValues(
+    label: String,
+    selected: String,
+    values: List<String>,
+) {
+    assertValuePicker(label, selected, false)
+    expandValuePicker(label)
+    assertValuePicker(label, selected, true)
+    val root = onNodeWithContentDescription(Localize.value_picker_drop_down_menu)
+    val node = root.onChildren()
+    values.forEach {
+        node.filterToOne(hasAnyDescendant(hasContentDescription(it))).assertExists()
+    }
+    expandValuePicker(label)
+    assertValuePicker(label, selected, false)
 }

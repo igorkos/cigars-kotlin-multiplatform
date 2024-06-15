@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/9/24, 10:12 PM
+ * Last modified 6/13/24, 6:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,45 +17,34 @@
 package com.akellolcc.cigars.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.screens.components.BackButton
-import com.akellolcc.cigars.screens.components.DefaultButton
 import com.akellolcc.cigars.screens.components.DialogButton
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.ValuePicker
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
 
 class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScreen(route) {
@@ -73,62 +62,13 @@ class CigarSearchDetailsScreen(override val route: NavRoute) : CigarDetailsScree
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    override fun topTabBar() {
-        val topColors = centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
-
-        CenterAlignedTopAppBar(
-            colors = topColors,
-            navigationIcon = {
-                if (!viewModel.editing) {
-                    BackButton {
-                        viewModel.onBackPress()
-                    }
-                }
-            },
-            actions = {
-                if (!viewModel.editing) {
-                    IconButton(onClick = { viewModel.editing = true }) {
-                        loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
-                    }
-                }
-            },
-            title = {})
-    }
-
     @Composable
     override fun dialogs() {
         AddCigarsDialog { viewModel.moveCigarDialog = false }
     }
 
     @Composable
-    override fun bottomTabBar() {
-        if (viewModel.editing) {
-            BottomAppBar(
-                actions = {
-                    Box(modifier = Modifier.weight(1f))
-                    DefaultButton(
-                        title = Localize.button_cancel,
-                        modifier = Modifier.padding(end = 10.dp).weight(2f),
-                        onClick = { viewModel.onCancelEdit() })
-                    DefaultButton(
-                        modifier = Modifier.weight(2f),
-                        enabled = viewModel.verifyFields(),
-                        title = Localize.button_add,
-                        onClick = { viewModel.moveCigarDialog = true })
-                }
-            )
-        }
-    }
-
-    @Composable
     private fun AddCigarsDialog(onDismissRequest: () -> Unit) {
-
         if (viewModel.moveCigarDialog) {
             val count = remember { mutableStateOf(0L) }
             val price = remember { mutableStateOf(0f) }

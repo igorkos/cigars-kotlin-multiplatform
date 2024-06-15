@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/21/24, 11:34 AM
+ * Last modified 6/14/24, 4:29 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,6 @@ import com.akellolcc.cigars.databases.repository.HumidorImagesRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.databases.repository.ImagesRepository
 import com.akellolcc.cigars.databases.sqldelight.SqlDelightDatabase
-import com.akellolcc.cigars.databases.test.DemoTestSets
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.imageData
@@ -58,24 +57,14 @@ enum class DatabaseType {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <T> loadDemoSet(resource: FileResource, inMemory: Boolean): List<T> {
-    if (inMemory) {
-        return when (resource) {
-            AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(DemoTestSets.humidorsSet) as List<T>
-            AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(DemoTestSets.cigarsSet) as List<T>
-            else -> emptyList()
-        }
-    } else {
-        val jsonString = readTextFile(resource) ?: ""
-        return when (resource) {
-            AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
-            AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
-            AssetFiles.demo_cigars_images -> Json.decodeFromString<List<CigarImage>>(
-                jsonString
-            ) as List<T>
-
-            else -> emptyList()
-        }
+fun <T> loadDemoSet(resource: FileResource): List<T> {
+    val jsonString = readTextFile(resource) ?: ""
+    return when (resource) {
+        AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
+        AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
+        AssetFiles.test_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
+        AssetFiles.demo_cigars_images -> Json.decodeFromString<List<CigarImage>>(jsonString) as List<T>
+        else -> emptyList()
     }
 }
 
@@ -108,9 +97,9 @@ class Database(override val inMemory: Boolean) : DatabaseInterface {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun createDemoSet(): Flow<Boolean> {
-        val demoHumidors: List<Humidor> = loadDemoSet(AssetFiles.demo_humidors, inMemory)
-        val demoCigars: List<Cigar> = loadDemoSet(AssetFiles.demo_cigars, inMemory)
-        val demoCigarsImages: List<CigarImage> = loadDemoSet(AssetFiles.demo_cigars_images, inMemory)
+        val demoHumidors: List<Humidor> = loadDemoSet(AssetFiles.demo_humidors)
+        val demoCigars: List<Cigar> = loadDemoSet(AssetFiles.demo_cigars)
+        val demoCigarsImages: List<CigarImage> = loadDemoSet(AssetFiles.demo_cigars_images)
         val humidorDatabase: HumidorsRepository = createRepository(HumidorsRepository::class)
         val cigarsDatabase: CigarsRepository = createRepository(CigarsRepository::class)
         var imagesDatabase: ImagesRepository

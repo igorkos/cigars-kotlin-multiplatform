@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 4:57 PM
+ * Last modified 6/14/24, 12:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,8 @@
 
 package com.akellolcc.cigars.screens
 
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -35,16 +33,11 @@ import com.akellolcc.cigars.mvvm.cigars.CigarsScreenViewModel
 import com.akellolcc.cigars.mvvm.search.CigarsSearchFieldBaseViewModel
 import com.akellolcc.cigars.screens.base.BaseTabListScreen
 import com.akellolcc.cigars.screens.components.CigarListRow
-import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.search.SearchComponent
-import com.akellolcc.cigars.screens.components.search.data.FilterParameter
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.theme.TextStyles
-import com.akellolcc.cigars.theme.loadIcon
 import kotlinx.serialization.Transient
 
 
@@ -68,39 +61,13 @@ open class CigarsListScreen<V : ScreenModel>(
     @kotlin.jvm.Transient
     override var viewModel: CigarsScreenViewModel
 ) : BaseTabListScreen<Cigar, CigarsScreenViewModel>(route) {
-    @Suppress("UNCHECKED_CAST")
-    @Composable
-    override fun RightActionMenu(onDismiss: () -> Unit) {
-        viewModel.sortingFields?.selected?.map {
-            val selected = viewModel.sorting == it
-            DropdownMenuItem(
-                leadingIcon = {
-                    loadIcon(if (selected) Images.icon_menu_checkmark else Images.icon_menu_sort, Size(24.0F, 24.0F))
-                },
-                text = {
-                    TextStyled(
-                        it.label,
-                        Localize.list_sorting_item,
-                        TextStyles.Subhead,
-                        labelStyle = TextStyles.None
-                    )
-                },
-                onClick = {
-                    viewModel.sorting = it as FilterParameter<Boolean>
-                    onDismiss()
-                }
-            )
-        }
-    }
 
     override fun handleAction(event: Any, navigator: Navigator) {
         val mainModel = createViewModel(MainScreenViewModel::class)
         when (event) {
             is CigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
-                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
-                    data = event.cigar
-                }))
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.applyData(event.cigar)))
                 mainModel.isTabsVisible = false
             }
 

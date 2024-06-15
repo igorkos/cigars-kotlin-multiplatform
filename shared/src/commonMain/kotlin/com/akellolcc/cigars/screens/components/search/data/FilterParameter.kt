@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/22/24, 11:37 AM
+ * Last modified 6/11/24, 5:45 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,15 +17,20 @@
 package com.akellolcc.cigars.screens.components.search.data
 
 import com.akellolcc.cigars.screens.components.transformations.InputMode
-import com.akellolcc.cigars.theme.Images
 import dev.icerock.moko.resources.ImageResource
 
-data class FilterParameter<T>(val key: String, var value: T, val label: String, val icon: ImageResource) :
+data class FilterParameter<T>(
+    val key: String,
+    var value: T,
+    var label: String,
+    var icon: ImageResource? = null,
+    var selectable: Boolean = true
+) :
     Comparable<FilterParameter<T>> {
 
-    constructor(key: String, value: T) : this(key, value, "", Images.tab_icon_search)
+    constructor(key: String, value: T) : this(key, value, "", null, true)
 
-    constructor(key: String, value: T, label: String) : this(key, value, label, Images.tab_icon_search)
+    constructor(key: String, value: T, label: String) : this(key, value, label, null, true)
 
     val keyboardType: InputMode
         get() = when (value) {

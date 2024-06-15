@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 1:11 PM
+ * Last modified 6/14/24, 8:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,12 +19,9 @@ package com.akellolcc.cigars.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,19 +30,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,9 +48,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
@@ -70,12 +56,11 @@ import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.models.HumidorCigar
 import com.akellolcc.cigars.databases.models.emptyCigar
 import com.akellolcc.cigars.logging.Log
+import com.akellolcc.cigars.mvvm.base.BaseDetailsScreenViewModel
 import com.akellolcc.cigars.mvvm.base.createViewModel
 import com.akellolcc.cigars.mvvm.cigars.CigarsDetailsScreenViewModel
-import com.akellolcc.cigars.screens.components.BackButton
-import com.akellolcc.cigars.screens.components.DefaultButton
+import com.akellolcc.cigars.screens.base.BaseItemDetailsScreen
 import com.akellolcc.cigars.screens.components.InfoImageDialog
-import com.akellolcc.cigars.screens.components.PagedCarousel
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.TwoButtonDialog
 import com.akellolcc.cigars.screens.components.ValueCard
@@ -86,78 +71,49 @@ import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
 import com.akellolcc.cigars.screens.navigation.CigarImagesViewRoute
 import com.akellolcc.cigars.screens.navigation.HumidorCigarsRoute
-import com.akellolcc.cigars.screens.navigation.ITabItem
 import com.akellolcc.cigars.screens.navigation.NavRoute
-import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Images
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.MaterialColors
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.materialColor
-import kotlin.jvm.Transient
 
-open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDetailsScreenViewModel> {
-    @kotlinx.serialization.Transient
-    @Transient
-    override lateinit var viewModel: CigarsDetailsScreenViewModel
+open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDetailsScreenViewModel>(route) {
 
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel { createViewModel(CigarsDetailsScreenViewModel::class, route.data ?: emptyCigar) }
-        val navigator = LocalNavigator.currentOrThrow
-
-        LaunchedEffect(Unit) {
-            viewModel.observeEvents(tag()) {
-                handleAction(it, navigator)
-            }
-        }
-
-        LaunchedEffect(viewModel.editing) {
-            viewModel.observeCigar()
-        }
-
-        DefaultTheme {
-            Scaffold(
-                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
-                topBar = { topTabBar() },
-                bottomBar = { bottomTabBar() }
-            ) {
-                CompositionLocalProvider(LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)) {
-                    dialogs()
-                    Column(
-                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-                    ) {
-                        //Top Images view
-                        imagesView()
-                        //Cigar details
-                        Column(modifier = with(Modifier) {
-                            fillMaxSize()
-                                .padding(
-                                    PaddingValues(
-                                        16.dp,
-                                        if (!viewModel.editing) 16.dp else it.calculateTopPadding(),
-                                        16.dp,
-                                        it.calculateBottomPadding() + 16.dp
-                                    )
-                                )
-                        }) {
-                            cigarOrigin()
-                            //Cigar Shape Length and Gauge
-                            cigarSize()
-                            //Cigar tobacco
-                            cigarTobacco()
-                            //Cigar ratings
-                            cigarRatings()
-                            //Cigar humidors
-                            cigarHumidors()
-                            //Cigar Notes and Link
-                            cigarNotes()
-                        }
-                    }
+        viewModel = rememberScreenModel {
+            createViewModel(
+                CigarsDetailsScreenViewModel::class, when (route.data) {
+                    null -> emptyCigar
+                    is Cigar -> route.data as Cigar
+                    is Humidor -> emptyCigar
+                    else -> {}
+                }
+            ).apply {
+                if (route.data is Humidor) {
+                    humidor = route.data as Humidor
                 }
             }
+
         }
+        super.Content()
+    }
+
+    @Composable
+    override fun details() {
+        cigarOrigin()
+        //Cigar Shape Length and Gauge
+        cigarSize()
+        //Cigar tobacco
+        cigarTobacco()
+        //Cigar ratings
+        cigarRatings()
+        //Cigar humidors
+        cigarHumidors()
+        //Cigar Notes and Link
+        cigarNotes()
     }
 
     override fun handleAction(
@@ -168,27 +124,21 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddToHumidor -> viewModel.humidorCigarsCount = event.humidor
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHumidor -> navigator.push(
-                HumidorCigarsScreen(
-                    HumidorCigarsRoute.apply {
-                        this.data = event.humidor
-                    })
+                HumidorCigarsScreen(HumidorCigarsRoute.applyData(event.humidor))
             )
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.OpenHistory -> navigator.push(
+            is BaseDetailsScreenViewModel.DetailsAction.OpenHistory -> navigator.push(
                 CigarHistoryScreen(
-                    CigarHistoryRoute.apply {
-                        this.data = event.cigar
-                    })
+                    CigarHistoryRoute.applyData(event.entity)
+                )
             )
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.MoveCigar -> viewModel.moveCigarDialog =
                 true
 
-            is CigarsDetailsScreenViewModel.CigarsDetailsAction.ShowImages -> {
+            is BaseDetailsScreenViewModel.DetailsAction.ShowImages -> {
                 val data = route.data as Cigar
-                navigator.push(ImagesViewScreen(CigarImagesViewRoute.apply {
-                    this.data = Pair(data, event.selected)
-                }))
+                navigator.push(ImagesViewScreen(CigarImagesViewRoute.applyData(Pair(data, event.selected))))
             }
 
             is CigarsDetailsScreenViewModel.CigarsDetailsAction.AddCigarToHumidor -> TODO()
@@ -196,63 +146,18 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    open fun topTabBar() {
-        val topColors = centerAlignedTopAppBarColors(
-            containerColor = materialColor(MaterialColors.color_transparent),
-            navigationIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-            actionIconContentColor = materialColor(MaterialColors.color_onPrimaryContainer),
-        )
-
-        CenterAlignedTopAppBar(
-            colors = topColors,
-            navigationIcon = {
-                if (!viewModel.editing) {
-                    BackButton {
-                        viewModel.onBackPress()
-                    }
-                }
-            },
-            actions = {
-                if (!viewModel.editing) {
-                    IconButton(
-                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_history_desc },
-                        onClick = { viewModel.historyOpen() }) {
-                        loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
-                    }
-                    IconButton(
-                        modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_edit_desc },
-                        onClick = { viewModel.editing = !viewModel.editing }) {
-                        loadIcon(Images.icon_menu_edit, Size(24.0F, 24.0F))
-                    }
-                }
-            },
-            title = {})
-    }
-
-    @Composable
-    open fun bottomTabBar() {
-        if (viewModel.editing) {
-            BottomAppBar(
-                actions = {
-                    Box(modifier = Modifier.weight(1f))
-                    DefaultButton(
-                        title = Localize.button_cancel,
-                        modifier = Modifier.padding(end = 10.dp).weight(2f),
-                        onClick = { viewModel.onCancelEdit() })
-                    DefaultButton(
-                        modifier = Modifier.weight(2f),
-                        enabled = viewModel.verifyFields(),
-                        title = Localize.button_save,
-                        onClick = { viewModel.onSaveEdit() })
-                }
-            )
+    override fun topTabBarActions() {
+        IconButton(
+            modifier = Modifier.semantics { contentDescription = Localize.cigar_details_top_bar_history_desc },
+            onClick = { viewModel.historyOpen() }) {
+            loadIcon(Images.icon_menu_history, Size(24.0F, 24.0F))
         }
+        super.topTabBarActions()
     }
 
     @Composable
-    open fun dialogs() {
+    override fun dialogs() {
         HumidorCigarsCountDialog {
             viewModel.humidorCigarsCount = null
         }
@@ -280,24 +185,6 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                 }
             ) {
                 viewModel.infoDialog = CigarsDetailsScreenViewModel.InfoActions.None
-            }
-        }
-    }
-
-    @Composable
-    private fun imagesView() {
-        if (!viewModel.editing) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier.padding(bottom = 10.dp)
-                    .aspectRatio(ratio = 1.8f).semantics { contentDescription = Localize.cigar_details_images_block_desc }
-            ) {
-                PagedCarousel(
-                    viewModel.images,
-                    loading = viewModel.loading,
-                ) {
-                    viewModel.showImages(it)
-                }
             }
         }
     }
@@ -343,6 +230,31 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                 onValueChange = {
                     viewModel.country = it
                 })
+            if (viewModel.editing && viewModel.humidor != null) {
+                TextStyled(
+                    viewModel.count.toString(),
+                    Localize.cigar_search_details_add_count_dialog,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.Description,
+                    inputMode = InputMode.Number,
+                    editable = viewModel.editing,
+                    modifier = Modifier.padding(bottom = 4.dp).fillMaxWidth(),
+                    onValueChange = {
+                        viewModel.count = it.toLong()
+                    })
+                TextStyled(
+                    viewModel.price.toString(),
+                    Localize.cigar_details_count_dialog_price,
+                    TextStyles.Subhead,
+                    labelStyle = TextStyles.Description,
+                    editable = viewModel.editing,
+                    inputMode = InputMode.Price,
+                    modifier = Modifier.padding(bottom = 4.dp).fillMaxWidth(),
+                    onValueChange = {
+                        viewModel.price = it.toDouble()
+                    })
+
+            }
         }
     }
 
@@ -375,8 +287,10 @@ open class CigarDetailsScreen(override val route: NavRoute) : ITabItem<CigarsDet
                     ValuePickerItem(it.first, it.second, Images.tab_icon_cigars)
                 },
                 modifier = Modifier.padding(bottom = 10.dp),
-                onClick = {
-                    viewModel.shape = it?.value as String
+                onClick = { value ->
+                    value?.let {
+                        viewModel.shape = (it.value as CigarShapes).name
+                    }
                 })
 
             ValueCard(

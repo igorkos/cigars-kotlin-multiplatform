@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 1:44 PM
+ * Last modified 6/14/24, 11:56 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,10 @@ import kotlinx.coroutines.launch
 
 open class DatabaseViewModel<T : BaseEntity> : ActionsViewModel() {
     protected val database: Database = Database.instance
-    var loading by mutableStateOf(false)
+    private var loading by mutableStateOf(false)
+
+    val loadingState: Boolean
+        get() = loading
 
     protected fun <Q> executeQuery(query: Flow<Q>, onCompletion: ((Q) -> Unit)? = null) {
         screenModelScope.launch {
@@ -45,8 +48,10 @@ open class DatabaseViewModel<T : BaseEntity> : ActionsViewModel() {
 
     protected fun <Q> execute(query: Flow<Q>, onCompletion: ((Q) -> Unit)? = null): Job {
         return screenModelScope.launch {
+            loading = true
             query.cancellable().collect {
                 onCompletion?.invoke(it)
+                loading = false
             }
         }
     }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/5/24, 3:01 PM
+ * Last modified 6/13/24, 2:03 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,10 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import cafe.adriel.voyager.jetpack.ProvideNavigatorLifecycleKMPSupport
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.TabDisposable
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.akellolcc.cigars.logging.AnalyticsEvents
 import com.akellolcc.cigars.logging.AnalyticsParams
@@ -62,14 +65,16 @@ import com.akellolcc.cigars.theme.DefaultTheme
 import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
+import com.akellolcc.cigars.utils.ui.BackHandler
 import kotlin.jvm.Transient
 
-/*private var tabs: List<ITabItem<*>> = listOf(
+private var tabs: List<ITabItem<*>> = listOf(
     CigarsScreen(CigarsRoute),
     HumidorsScreen(HumidorsRoute),
     FavoritesScreen(FavoritesRoute),
     SearchScreen(SearchCigarRoute)
-)*/
+)
+
 
 class MainScreen :
     ITabItem<MainScreenViewModel> {
@@ -79,7 +84,7 @@ class MainScreen :
     @Transient
     override lateinit var viewModel: MainScreenViewModel
 
-    @OptIn(ExperimentalVoyagerApi::class)
+    @OptIn(ExperimentalVoyagerApi::class, InternalVoyagerApi::class)
     @Composable
     override fun Content() {
 
@@ -126,42 +131,39 @@ class MainScreen :
                 },
                 gesturesEnabled = viewModel.isTabsVisible,
             ) {
-                TabNavigator(
-                    CigarsScreen(CigarsRoute),
-                    tabDisposable = {
-                        TabDisposable(
-                            navigator = it,
-                            tabs = listOf(
-                                CigarsScreen(CigarsRoute),
-                                HumidorsScreen(HumidorsRoute),
-                                FavoritesScreen(FavoritesRoute),
-                                SearchScreen(SearchCigarRoute)
-                            )
-                        )
-                    }
-
-                ) {
-                    Scaffold(
-                        bottomBar = {
-                            AnimatedVisibility(
-                                visible = viewModel.isTabsVisible,
-                                enter = slideInVertically { height ->
-                                    height
-                                },
-                                exit = slideOutVertically { height ->
-                                    height
-                                }) {
-                                NavigationBar {
-                                    TabNavigationItem(CigarsScreen(CigarsRoute))
-                                    TabNavigationItem(HumidorsScreen(HumidorsRoute))
-                                    TabNavigationItem(FavoritesScreen(FavoritesRoute))
-                                    TabNavigationItem(SearchScreen(SearchCigarRoute))
-
-                                }
-                            }
-                        },
+                ProvideNavigatorLifecycleKMPSupport {
+                    TabNavigator(
+                        CigarsScreen(CigarsRoute)
                     ) {
-                        CurrentTab()
+                        val navigator = LocalNavigator.currentOrThrow
+                        BackHandler {
+                            Log.debug("Main Screen Back pressed")
+                            if (!(navigator.lastItem is SearchCigarScreen || navigator.lastItem is HumidorsListScreen || navigator.lastItem is FavoritesListScreen || navigator.lastItem is CigarsListScreen<*>)) {
+                                (navigator.lastItem as ITabItem<*>).viewModel.onBackPress()
+                                navigator.dispose(this)
+                                true
+                            } else false
+                        }
+                        Scaffold(
+                            bottomBar = {
+                                AnimatedVisibility(
+                                    visible = viewModel.isTabsVisible,
+                                    enter = slideInVertically { height ->
+                                        height
+                                    },
+                                    exit = slideOutVertically { height ->
+                                        height
+                                    }) {
+                                    NavigationBar {
+                                        tabs.map {
+                                            TabNavigationItem(it)
+                                        }
+                                    }
+                                }
+                            },
+                        ) {
+                            CurrentTab()
+                        }
                     }
                 }
             }

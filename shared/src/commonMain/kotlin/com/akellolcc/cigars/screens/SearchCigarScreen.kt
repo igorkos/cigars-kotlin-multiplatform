@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 4:57 PM
+ * Last modified 6/14/24, 12:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,7 +64,7 @@ class SearchScreen(
 
     @Composable
     override fun Content() {
-        viewModel = rememberScreenModel { createViewModel(SearchCigarScreenViewModel::class, route.data) }
+        viewModel = rememberScreenModel { createViewModel(SearchCigarScreenViewModel::class) }
         LocalNavigator.currentOrThrow.push(SearchCigarScreen(route, viewModel))
     }
 }
@@ -119,7 +119,7 @@ class SearchCigarScreen(
 
     @Composable
     override fun ListFooter(modifier: Modifier) {
-        if (viewModel.loading) {
+        if (viewModel.loadingState) {
             Box(
                 modifier = modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -182,9 +182,7 @@ class SearchCigarScreen(
             is SearchCigarScreenViewModel.Actions.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
-                navigator.push(CigarSearchDetailsScreen(CigarSearchDetailsRoute.apply {
-                    data = event.cigar
-                }))
+                navigator.push(CigarSearchDetailsScreen(CigarSearchDetailsRoute.applyData(event.cigar)))
             }
 
             else -> super.handleAction(event, navigator)

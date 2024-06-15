@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 11:12 AM
+ * Last modified 6/11/24, 5:43 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,9 @@ private data class SearchComponentImplement(
                         fields.availableFields.map {
                             DropdownMenuItem(
                                 leadingIcon = {
-                                    loadIcon(it.icon, Size(24.0F, 24.0F))
+                                    it.icon?.let { icon ->
+                                        loadIcon(icon, Size(24.0F, 24.0F))
+                                    }
                                 },
                                 text = {
                                     TextStyled(

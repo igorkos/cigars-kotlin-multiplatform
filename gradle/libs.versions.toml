@@ -24,7 +24,7 @@ sqldelight-paging = "3.3.0-alpha02-0.5.1"
 sqldelight-version-test = "1.5.5"
 sqldelight-stately-version = "2.0.7"
 
-voyagerNavigator = "1.0.0-rc08"
+voyager = "1.1.0-beta02"
 
 multiplatform-settings-version = "1.1.1"
 accompanist = "0.34.0"
@@ -77,10 +77,11 @@ locale = { module = "com.vanniktech:multiplatform-locale", version.ref = "locale
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources-version" }
 moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-resources-version" }
 
-voyager-bottom-sheet-navigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyagerNavigator" }
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyagerNavigator" }
-voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyagerNavigator" }
-voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyagerNavigator" }
+voyager-lifecycle-kmp = { module = "cafe.adriel.voyager:voyager-lifecycle-kmp", version.ref = "voyager" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight-version" }
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight-version" }
@@ -160,7 +161,7 @@ google-gms-services = { id = "com.google.gms.google-services", version.ref = "go
 [bundles]
 ktor-common = ["ktor-client-core", "ktor-client-serialization", "kotlinx-coroutines-core", "ktor-client-logging"]
 moko-common = ["moko-resources-compose", "moko-resources"]
-voyager-common = ["voyager-bottom-sheet-navigator", "voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
+voyager-common = ["voyager-screenmodel", "voyager-lifecycle-kmp", "voyager-navigator", "voyager-tab-navigator", "voyager-transitions"]
 sqldelight-common = ["sqldelight-runtime", "sqldelight-coroutines", "sqldelight-paging", "sqldelight-paging-ext"]
 sqldelight-ios-bundle = ["sqldelight-ios", "sqldelight-paging-ios", "sqldelight-stately-common-ios", "sqldelight-stately-isolate-ios", "sqldelight-stately-iso-collections-ios"]
 android-firebase = ["firebase-analytics", "firebase-bom", "google-firebase-crashlytics"]

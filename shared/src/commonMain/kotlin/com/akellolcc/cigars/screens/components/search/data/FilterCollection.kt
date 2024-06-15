@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/28/24, 1:07 PM
+ * Last modified 6/13/24, 1:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,11 @@ open class FiltersList(val list: List<FilterParameter<*>> = emptyList()) : List<
         return "FiltersList(list=$list)"
     }
 
+    fun append(items: List<FilterParameter<*>>, tail: Boolean = true): FiltersList {
+        val updated = if (tail) list + items else items + list
+        return FiltersList(updated)
+    }
+
     internal infix operator fun plus(other: FilterParameter<*>): FiltersList {
         return FiltersList(list + other)
     }
@@ -84,8 +89,8 @@ abstract class FilterCollection {
 
     abstract fun build(param: FilterParameter<*>): SearchParameterField<*>
 
-    fun validate(): Boolean {
-        return controls.all { it.validate() }
+    fun validate(allowEmpty: Boolean = true): Boolean {
+        return controls.all { it.validate(allowEmpty) }
     }
 
     val showLeading: Boolean

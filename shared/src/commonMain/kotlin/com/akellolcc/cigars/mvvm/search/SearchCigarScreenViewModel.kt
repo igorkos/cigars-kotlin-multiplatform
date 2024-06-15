@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 10:41 AM
+ * Last modified 6/14/24, 11:56 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@ import com.akellolcc.cigars.mvvm.base.BaseListViewModel
 import com.akellolcc.cigars.screens.components.search.data.CigarSearchParameters
 import com.akellolcc.cigars.screens.components.search.data.CigarSortingParameters
 import com.akellolcc.cigars.screens.components.search.data.FilterParameter
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.ObjectFactory
 
 class SearchCigarScreenViewModel : BaseListViewModel<Cigar>() {
@@ -33,6 +34,13 @@ class SearchCigarScreenViewModel : BaseListViewModel<Cigar>() {
         sortField = FilterParameter(CigarSortingFields.Name.value, false)
         sortingFields = CigarSortingParameters()
         searchingFields = CigarSearchParameters()
+        topBarMenu = (sortingFields as CigarSortingParameters).selected.append(
+            listOf(
+                sortOrderField,
+                FilterParameter(Localize.cigar_details_top_bar_divider_desc, true, "", selectable = false)
+            ),
+            false
+        )
     }
 
     override fun entitySelected(entity: Cigar) {
@@ -41,6 +49,12 @@ class SearchCigarScreenViewModel : BaseListViewModel<Cigar>() {
 
     override fun sortingOrder(ascending: Boolean) {
         sortField?.value = ascending
+    }
+
+    override fun paging(reset: Boolean) {
+        if (searchingFields?.validate(false) == true) {
+            super.paging(reset)
+        }
     }
 
     companion object Factory : ObjectFactory<SearchCigarScreenViewModel>() {

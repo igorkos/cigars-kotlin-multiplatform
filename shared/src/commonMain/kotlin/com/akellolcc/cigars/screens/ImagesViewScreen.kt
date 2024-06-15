@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 12:16 PM
+ * Last modified 6/14/24, 11:56 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -150,7 +151,10 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
+                modifier = Modifier.fillMaxSize().semantics {
+                    contentDescription = route.semantics
+                    stateDescription = "${viewModel.loadingState}"
+                },
                 topBar = {
                     CenterAlignedTopAppBar(
                         navigationIcon = {
@@ -176,7 +180,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                 CompositionLocalProvider(
                     LocalContentColor provides materialColor(MaterialColors.color_onPrimaryContainer)
                 ) {
-                    if (viewModel.loading) {
+                    if (viewModel.loadingState) {
                         Box(
                             modifier = Modifier.fillMaxSize()
                                 .background(materialColor(MaterialColors.color_transparent)),
@@ -191,7 +195,7 @@ class ImagesViewScreen(override val route: NavRoute) : ITabItem<BaseImagesViewSc
                         ) {
                             PagedCarousel(
                                 viewModel.items,
-                                loading = viewModel.loading,
+                                loading = viewModel.loadingState,
                                 scale = ContentScale.Fit,
                                 select = viewModel.select,
                             )
