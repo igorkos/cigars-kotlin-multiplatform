@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 7:26 PM
+ * Last modified 6/14/24, 11:04 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,6 +44,7 @@ open class ObjectRegistry<F> {
         modelKClass: KClass<*>,
         data: Any? = null
     ): F {
+        //Log.debug("Registry creating $modelKClass")
         if (factories.containsKey(modelKClass)) {
             val factory = factories[modelKClass] as ObjectFactory<F>
             return factory.factory(data)

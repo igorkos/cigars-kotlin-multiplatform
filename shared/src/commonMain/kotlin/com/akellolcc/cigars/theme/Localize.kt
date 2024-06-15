@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 4:53 PM
+ * Last modified 6/14/24, 6:44 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +49,7 @@ object Localize {
     val title_cigar_history_desc: String = Strings.title_cigar_history_desc.toString()
     val title_humidor_details: String = Strings.title_humidor_details.toString()
     val title_humidor_details_desc: String = Strings.title_humidor_details_desc.toString()
+    val title_humidor_details_menu_desc: String = Strings.title_humidor_details_menu_desc.toString()
     val title_humidor_history: String = Strings.title_humidor_history.toString()
     val title_humidor_history_desc: String = Strings.title_humidor_history_desc.toString()
     val title_cigar_images: String = Strings.title_cigar_images.toString()
@@ -177,11 +178,18 @@ object Localize {
 
     val demo_humidor_name = Strings.demo_humidor_name.toString()
     val humidor_list_add_action_desc = Strings.humidor_list_add_action_desc.toString()
+    val humidor_cigars_list_add_action_desc = Strings.humidor_cigars_list_add_action_desc.toString()
+    val humidor_details_origin_block_desc = Strings.humidor_details_origin_block_desc.toString()
+    val humidor_details_images_block_desc = Strings.humidor_details_images_block_desc.toString()
+
+    val humidor_details_size_block_desc = Strings.humidor_details_size_block_desc.toString()
     val humidor_details_holds = Strings.humidor_details_holds.toString()
     val humidor_details_count = Strings.humidor_details_count.toString()
+    val humidor_details_params_block_desc = Strings.humidor_details_params_block_desc.toString()
     val humidor_details_temperature = Strings.humidor_details_temperature.toString()
     val humidor_details_humidity = Strings.humidor_details_humidity.toString()
     val humidor_details_cigars = Strings.humidor_details_cigars.toString()
+    val humidor_details_notes_block_desc = Strings.humidor_details_notes_block_desc.toString()
     val humidor_details_humidor = Strings.humidor_details_humidor.toString()
 
     val menu_item_camera: String = Strings.menu_item_camera.toString()

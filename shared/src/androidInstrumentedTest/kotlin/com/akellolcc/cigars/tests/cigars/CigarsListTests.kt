@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 3:16 PM
+ * Last modified 6/14/24, 6:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import com.akellolcc.cigars.screens.components.search.SearchParameterField
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.utils.BaseUiTest
+import com.akellolcc.cigars.utils.CigarDetailsUtils
 import com.akellolcc.cigars.utils.assertHasNodes
 import com.akellolcc.cigars.utils.assertNoNodes
 import com.akellolcc.cigars.utils.childWithTextLabel
@@ -44,7 +44,7 @@ import kotlin.test.Test
 
 @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-open class CigarsListTests : BaseUiTest() {
+open class CigarsListTests : CigarDetailsUtils() {
     override var route: NavRoute = CigarsRoute
     private val LIST_TAG: String
         get() {
@@ -69,7 +69,7 @@ open class CigarsListTests : BaseUiTest() {
                 Localize.screen_list_sort_fields_list_descr,
                 listOf(
                     Localize.screen_list_filter_action_descr,
-                    Localize.screen_list_sort_descending,
+                    Localize.screen_list_sort_accenting,
                     CigarSortingFields.localized(CigarSortingFields.Name),
                     CigarSortingFields.localized(CigarSortingFields.Brand),
                     CigarSortingFields.localized(CigarSortingFields.Country),
@@ -95,14 +95,17 @@ open class CigarsListTests : BaseUiTest() {
         with(composeTestRule) {
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             selectMenuItem(Localize.screen_list_sort_fields_list_descr, item)
+            waitForScreen(route)
             assertListOrder(screenListContentDescription(route), expected)
             //reverse sort
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
-            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_descending)
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_accenting)
+            waitForScreen(route)
             assertListOrder(screenListContentDescription(route), expected.reversed(), true)
 
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
-            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_accenting)
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.screen_list_sort_descending)
+            waitForScreen(route)
             assertListOrder(screenListContentDescription(route), expected)
         }
     }

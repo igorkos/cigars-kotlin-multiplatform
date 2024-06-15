@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 7:28 PM
+ * Last modified 6/13/24, 1:36 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,7 +71,7 @@ abstract class BaseListViewModel<T : BaseEntity> : DatabaseViewModel<T>() {
         search = value
     }
 
-    fun paging(reset: Boolean = false) {
+    open fun paging(reset: Boolean = false) {
         if (reset || items == null) {
             Log.debug("${this::class.simpleName} reload paging")
             items = repository.paging(sortField, searchingFields?.selected)

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 11:54 AM
+ * Last modified 6/13/24, 1:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ abstract class SearchParameterField<T : Comparable<T>>(
     var onAction: ((CigarsSearchFieldBaseViewModel.Action) -> Unit)? = null
 ) {
 
-    abstract fun validate(): Boolean
+    abstract fun validate(allowEmpty: Boolean = true): Boolean
 
     @Composable
     abstract fun Content()

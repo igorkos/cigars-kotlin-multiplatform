@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 7:50 PM
+ * Last modified 6/14/24, 1:38 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import app.cash.paging.compose.collectAsLazyPagingItems
@@ -121,7 +122,10 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
 
         DefaultTheme {
             Scaffold(
-                modifier = Modifier.fillMaxSize().semantics { contentDescription = route.semantics },
+                modifier = Modifier.fillMaxSize().semantics {
+                    contentDescription = route.semantics
+                    stateDescription = "${viewModel.loadingState}"
+                },
                 topBar = { topTabBar(scrollBehavior) },
                 bottomBar = {
                     Box(
@@ -190,7 +194,9 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
                 } else {
                     // Log.debug("${this::class.simpleName} items count: ${pagingItems.itemCount}")
                     LazyColumn(
-                        modifier = Modifier.semantics { contentDescription = "${route.title} ${Localize.screen_list_descr}" },
+                        modifier = Modifier.semantics {
+                            contentDescription = "${route.title} ${Localize.screen_list_descr}"
+                        },
                         state = listState,
                         reverseLayout = !viewModel.accenting,
                         verticalArrangement = Arrangement.Top,
@@ -221,12 +227,14 @@ abstract class BaseTabListScreen<E : BaseEntity, VM : BaseListViewModel<E>>(over
             }
 
             else -> {
-                Log.debug("${this::class.simpleName} load data state: ${pagingItems?.loadState?.refresh}")
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ProgressIndicator()
+                pagingItems?.let {
+                    Log.debug("${this::class.simpleName} load data state: ${pagingItems.loadState.refresh}")
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ProgressIndicator()
+                    }
                 }
             }
         }

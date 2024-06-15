@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 12:59 PM
+ * Last modified 6/12/24, 11:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.core.registry.rememberScreen
+import cafe.adriel.voyager.jetpack.ProvideNavigatorLifecycleKMPSupport
 import cafe.adriel.voyager.navigator.Navigator
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.logging.Log
@@ -123,6 +125,7 @@ internal fun registerViewModels() {
     )
 }
 
+@OptIn(ExperimentalVoyagerApi::class)
 @Composable
 fun CigarsApplication() {
     ScreenRegistry {
@@ -165,7 +168,15 @@ fun CigarsApplication() {
             }
         } else {
             val postMainScreen = rememberScreen(SharedScreen.MainScreen)
-            Navigator(postMainScreen)
+            ProvideNavigatorLifecycleKMPSupport {
+                Navigator(
+                    postMainScreen,
+                    onBackPressed = {
+                        Log.debug("Root navigation Back pressed")
+                        false
+                    }
+                )
+            }
         }
     }
 }

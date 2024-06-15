@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 7:37 PM
+ * Last modified 6/14/24, 7:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,7 +46,7 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) : BaseListViewModel<Hum
                 ),
                 FilterParameter(
                     Localize.cigar_details_top_bar_info_desc, true,
-                    Localize.title_humidor_details_desc,
+                    Localize.title_humidor_details_menu_desc,
                     Images.icon_menu_info,
                     false
                 ),
@@ -83,7 +83,7 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) : BaseListViewModel<Hum
     }
 
     fun addCigar() {
-        sendEvent(CigarsAction.AddCigar())
+        sendEvent(CigarsAction.AddCigar(humidor))
     }
 
     fun openHistory() {
@@ -100,7 +100,7 @@ class HumidorCigarsScreenViewModel(val humidor: Humidor) : BaseListViewModel<Hum
     sealed interface CigarsAction : CommonAction {
         data class RouteToHumidorDetails(val humidor: Humidor) : CigarsAction
         data class RouteToCigar(val cigar: Cigar) : CigarsAction
-        data class AddCigar(val cigar: Cigar? = null) : CigarsAction
+        data class AddCigar(val humidor: Humidor) : CigarsAction
         data class OpenHistory(val dummy: Int) : CigarsAction
     }
 }

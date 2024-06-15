@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 5:54 PM
+ * Last modified 6/14/24, 7:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,6 +35,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +48,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import app.cash.paging.compose.LazyPagingItems
 import app.cash.paging.compose.collectAsLazyPagingItems
 import com.akellolcc.cigars.databases.models.CigarImage
 import com.akellolcc.cigars.logging.Log
@@ -73,28 +76,38 @@ fun PagedCarousel(
     select: Int = 0,
     onClick: ((page: Int) -> Unit)? = null
 ) {
-    val pagingItems = images?.collectAsLazyPagingItems()
+    val pagingItems: LazyPagingItems<CigarImage>? = images?.collectAsLazyPagingItems()
+    val count = remember { mutableStateOf(0) }
 
-    val pagerState = rememberPagerState(select) { pagingItems?.itemCount ?: 1 }
+    LaunchedEffect(pagingItems?.itemCount) {
+        count.value = pagingItems?.itemCount ?: 0
+    }
 
-    LaunchedEffect(loading, select, pagingItems?.itemCount) {
+    val pagerState = rememberPagerState(select) {
+        count.value
+    }
+
+    LaunchedEffect(loading, select, count) {
         Log.debug("Loading: $loading select: $select from ${pagingItems?.itemCount}")
-        if (!loading && (pagingItems?.itemCount ?: 0) > select) {
+        if (!loading && count.value > select) {
             pagerState.scrollToPage(select)
         }
     }
 
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier.fillMaxSize().semantics {
+            contentDescription = Localize.images_pager_list_desc
+            stateDescription = "${pagerState.currentPage}:${count.value}"
+        },
+        contentAlignment = Alignment.Center
+    ) {
         // HorizontalPager composable: Swiping through images
         if (pagingItems == null || pagingItems.loadState.refresh is LoadState.Loading) {
             ProgressIndicator()
         } else {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize().semantics {
-                    contentDescription = Localize.images_pager_list_desc
-                    stateDescription = "${pagerState.currentPage}:${pagerState.pageCount}"
-                }
+                modifier = Modifier.fillMaxSize()
             ) { page ->
                 //Log.debug("Images1: ${images?.size}")
                 if (pagingItems.itemCount > 0) {

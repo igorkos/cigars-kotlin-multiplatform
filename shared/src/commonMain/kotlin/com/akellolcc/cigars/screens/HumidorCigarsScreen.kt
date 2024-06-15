@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 7:35 PM
+ * Last modified 6/14/24, 7:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -69,38 +69,22 @@ open class HumidorCigarsScreen(override val route: NavRoute) :
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToCigar -> {
                 Log.debug("Selected cigar ${event.cigar.rowid}")
                 mainModel.isTabsVisible = false
-                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
-                    data = event.cigar
-                }))
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.applyData(event.cigar)))
             }
 
             is HumidorCigarsScreenViewModel.CigarsAction.AddCigar -> {
                 mainModel.isTabsVisible = false
-                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.apply {
-                    this.data = null
-                }))
+                navigator.push(CigarDetailsScreen(CigarsDetailsRoute.applyData(event.humidor)))
             }
 
             is HumidorCigarsScreenViewModel.CigarsAction.RouteToHumidorDetails -> {
                 mainModel.isTabsVisible = false
-                navigator.push(
-                    HumidorDetailsScreen(
-                        HumidorDetailsRoute
-                            .apply {
-                                this.data = event.humidor
-                            })
-                )
+                navigator.push(HumidorDetailsScreen(HumidorDetailsRoute.applyData(event.humidor)))
             }
 
             is HumidorCigarsScreenViewModel.CigarsAction.OpenHistory -> {
                 mainModel.isTabsVisible = false
-                navigator.push(
-                    HumidorHistoryScreen(
-                        HumidorHistoryRoute
-                            .apply {
-                                this.data = viewModel.humidor
-                            })
-                )
+                navigator.push(HumidorHistoryScreen(HumidorHistoryRoute.applyData(viewModel.humidor)))
             }
 
             else -> super.handleAction(event, navigator)
@@ -132,7 +116,10 @@ open class HumidorCigarsScreen(override val route: NavRoute) :
 
     @Composable
     override fun topTabBarActions() {
-        IconButton(onClick = { viewModel.addCigar() }) {
+        IconButton(
+            modifier = Modifier.semantics { contentDescription = Localize.humidor_cigars_list_add_action_desc },
+            onClick = { viewModel.addCigar() }
+        ) {
             loadIcon(Images.icon_menu_plus, Size(24.0F, 24.0F))
         }
         super.topTabBarActions()

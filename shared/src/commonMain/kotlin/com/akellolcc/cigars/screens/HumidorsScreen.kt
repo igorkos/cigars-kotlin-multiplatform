@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 12:02 PM
+ * Last modified 6/14/24, 12:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -160,20 +160,12 @@ class HumidorsListScreen(
             is HumidorsViewModel.Action.RouteToHumidor -> {
                 Log.debug("Selected humidor ${event.humidor.rowid}")
                 mainModel.isTabsVisible = false
-                navigator.push(HumidorCigarsScreen(HumidorCigarsRoute.apply {
-                    this.data = event.humidor
-                }))
+                navigator.push(HumidorCigarsScreen(HumidorCigarsRoute.applyData(event.humidor)))
             }
 
             is HumidorsViewModel.Action.AddHumidor -> {
                 mainModel.isTabsVisible = false
-                navigator.push(
-                    HumidorDetailsScreen(
-                        HumidorDetailsRoute
-                            .apply {
-                                this.data = emptyHumidor.copy()
-                            })
-                )
+                navigator.push(HumidorDetailsScreen(HumidorDetailsRoute.applyData(emptyHumidor.copy())))
             }
 
             else -> super.handleAction(event, navigator)

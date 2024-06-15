@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/31/24, 10:41 AM
+ * Last modified 6/13/24, 1:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -61,7 +61,7 @@ abstract class CigarsSearchFieldBaseViewModel(protected val parameter: FilterPar
         valueFlow.value = value
     }
 
-    abstract fun validate(): Boolean
+    abstract fun validate(allowEmpty: Boolean = true): Boolean
 
     /**
      * Control data

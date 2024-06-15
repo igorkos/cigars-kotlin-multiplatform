@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 11:41 AM
+ * Last modified 6/13/24, 1:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,9 +62,9 @@ class CigarsSearchParameterField<T : Comparable<T>>(
 
     private val viewModel = createViewModel(CigarsSearchFieldViewModel::class, parameter)
 
-    override fun validate(): Boolean {
-        val valid = viewModel.validate()
-        Log.debug("validate(${parameter.key}): $valid")
+    override fun validate(allowEmpty: Boolean): Boolean {
+        val valid = viewModel.validate(allowEmpty)
+        Log.debug("validate(${parameter.key}, $allowEmpty): $valid")
         return valid
     }
 

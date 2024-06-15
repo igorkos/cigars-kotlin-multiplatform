@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/11/24, 5:06 PM
+ * Last modified 6/13/24, 1:48 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -89,8 +89,8 @@ abstract class FilterCollection {
 
     abstract fun build(param: FilterParameter<*>): SearchParameterField<*>
 
-    fun validate(): Boolean {
-        return controls.all { it.validate() }
+    fun validate(allowEmpty: Boolean = true): Boolean {
+        return controls.all { it.validate(allowEmpty) }
     }
 
     val showLeading: Boolean

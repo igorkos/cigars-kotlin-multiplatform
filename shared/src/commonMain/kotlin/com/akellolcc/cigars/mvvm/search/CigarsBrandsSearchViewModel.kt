@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/19/24, 1:13 PM
+ * Last modified 6/13/24, 1:49 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,7 +57,8 @@ class CigarsBrandsSearchViewModel(parameter: FilterParameter<Long>) :
         getBrands(value)
     }
 
-    override fun validate(): Boolean {
+    override fun validate(allowEmpty: Boolean): Boolean {
+        if (allowEmpty && value.isEmpty()) return true
         isError = !loading && value.length > 2
         return selectedBrand != null
     }
