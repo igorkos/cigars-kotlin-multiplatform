@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 7:20 PM
+ * Last modified 6/15/24, 12:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +16,14 @@
 
 package com.akellolcc.cigars.tests.cigars
 
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import assertListNode
 import assertListOrder
-import assertNodeState
 import com.akellolcc.cigars.databases.loadDemoSet
 import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.databases.models.emptyCigar
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
@@ -37,14 +34,10 @@ import com.akellolcc.cigars.screens.navigation.HumidorsRoute
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.Localize
-import com.akellolcc.cigars.utils.assertValuesCard
-import com.akellolcc.cigars.utils.assertValuesCardValues
-import com.akellolcc.cigars.utils.childWithTextLabel
 import com.akellolcc.cigars.utils.screenListContentDescription
 import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
 import pressButton
-import replaceText
 import selectMenuItem
 import selectTab
 import sleep
@@ -55,15 +48,16 @@ import kotlin.test.Test
 class HumidorCigarsListTest : CigarsListTests() {
     override var route: NavRoute = HumidorCigarsRoute
     override fun setUp() {
+        val humidors: List<Humidor> = loadDemoSet(AssetFiles.demo_humidors)
         with(composeTestRule) {
             waitForScreen(CigarsRoute)
             assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
 
             selectTab(HumidorsRoute)
             waitForScreen(HumidorsRoute)
-            assertListOrder(screenListContentDescription(HumidorsRoute), listOf("Case Elegance Renzo Humidor", "Second"))
+            assertListOrder(screenListContentDescription(HumidorsRoute), humidors.map { it.name })
 
-            assertListNode(screenListContentDescription(HumidorsRoute), "Case Elegance").performClick()
+            assertListNode(screenListContentDescription(HumidorsRoute), humidors.first().name).performClick()
             waitForScreen(HumidorCigarsRoute)
         }
     }
@@ -88,58 +82,24 @@ class HumidorCigarsListTest : CigarsListTests() {
         }
     }
 
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun test03_displayHumidorDetails() {
+        val humidors: List<Humidor> = humidors()
         with(composeTestRule) {
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.title_humidor_details_menu_desc)
 
             waitForScreen(HumidorDetailsRoute)
-
-            //Check images carousel
-            assertNodeState(Localize.cigar_details_images_block_desc, Localize.images_pager_list_desc, "0:3")
-
-            //Check humidor details
-            childWithTextLabel(
-                Localize.humidor_details_origin_block_desc,
-                Localize.cigar_details_name,
-                "Case Elegance Renzo Humidor"
-            ).assertExists()
-
-            childWithTextLabel(
-                Localize.humidor_details_origin_block_desc,
-                Localize.cigar_details_company,
-                "Klaro"
-            ).assertExists()
-
-            //Check humidor capacity
-            assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars)
-            assertValuesCardValues(
-                Localize.humidor_details_size_block_desc,
-                mapOf(
-                    Localize.humidor_details_holds to "50",
-                    Localize.humidor_details_count to "50"
-                )
-            )
-
-            //Check humidor details
-            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor)
-            assertValuesCardValues(
-                Localize.humidor_details_params_block_desc,
-                mapOf(
-                    Localize.humidor_details_temperature to "72",
-                    Localize.humidor_details_humidity to "72.0"
-                )
-            )
-
-            //Check cigar notes
-            onNodeWithContentDescription(Localize.humidor_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
+            humidors.forEach {
+                assertDisplayHumidorDetails(it, 3)
+            }
         }
     }
 
     @Test
     fun test04_editHumidorDetails() {
+        val humidor: Humidor = humidors().first()
+        val updated: Humidor = loadDemoSet<Humidor>(AssetFiles.test_humidors).first()
         with(composeTestRule) {
             onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
             selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.title_humidor_details_menu_desc)
@@ -148,71 +108,16 @@ class HumidorCigarsListTest : CigarsListTests() {
 
             onNodeWithContentDescription(Localize.cigar_details_top_bar_edit_desc).performClick()
 
-            //Check images carousel
-            onNodeWithContentDescription(Localize.cigar_details_images_block_desc).assertDoesNotExist()
-
             //Check humidor details
-            childWithTextLabel(
-                Localize.humidor_details_origin_block_desc,
-                Localize.cigar_details_name,
-                "Case Elegance Renzo Humidor"
-            ).assertExists()
+            assertHumidorDetailsEditing(humidor)
 
-            childWithTextLabel(
-                Localize.humidor_details_origin_block_desc,
-                Localize.cigar_details_company,
-                "Klaro"
-            ).assertExists()
-
-
-            //Check humidor capacity
-            assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars, true)
-            childWithTextLabel(
-                Localize.humidor_details_size_block_desc,
-                Localize.humidor_details_holds,
-                "50"
-            ).assertExists()
-
-            childWithTextLabel(
-                Localize.humidor_details_size_block_desc,
-                Localize.humidor_details_count,
-                "50"
-            ).assertExists()
-
-            //Check humidor details
-            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor, true)
-            childWithTextLabel(
-                Localize.humidor_details_params_block_desc,
-                Localize.humidor_details_temperature,
-                "72"
-            ).assertExists()
-
-            childWithTextLabel(
-                Localize.humidor_details_params_block_desc,
-                Localize.humidor_details_humidity,
-                "72.0"
-            ).assertExists()
-
-            //Check cigar notes
-            onNodeWithContentDescription(Localize.humidor_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
-
-            replaceText(
-                Localize.humidor_details_params_block_desc,
-                Localize.humidor_details_humidity,
-                "60",
-                "72.0"
-            )
+            editHumidorDetails(humidor, updated)
 
             pressButton(Localize.button_save)
 
-            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor)
-            assertValuesCardValues(
-                Localize.humidor_details_params_block_desc,
-                mapOf(
-                    Localize.humidor_details_temperature to "72",
-                    Localize.humidor_details_humidity to "60.0"
-                )
-            )
+            waitForScreen(HumidorDetailsRoute)
+
+            assertDisplayHumidorDetails(updated, 3)
         }
     }
 

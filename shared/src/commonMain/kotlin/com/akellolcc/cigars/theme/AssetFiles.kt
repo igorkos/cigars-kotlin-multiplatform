@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 4:18 PM
+ * Last modified 6/14/24, 11:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,5 +26,6 @@ class AssetFiles {
         val demo_cigars_images = MR.files.demo_cigars_images
         val demo_cigars = MR.files.demo_cigars
         val test_cigars = MR.files.test_cigars
+        val test_humidors = MR.files.test_humidors
     }
 }

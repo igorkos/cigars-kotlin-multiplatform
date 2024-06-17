@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 6:19 PM
+ * Last modified 6/15/24, 7:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 package com.akellolcc.cigars.utils
 
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -27,12 +28,47 @@ import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasStateDescription
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import com.akellolcc.cigars.theme.Localize
+
+
+internal fun hasText(
+    text: String?,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false
+): SemanticsMatcher {
+    val propertyName = "${SemanticsProperties.Text.name} + ${SemanticsProperties.EditableText.name}"
+    return SemanticsMatcher(
+        "$propertyName contains '$text' (ignoreCase: $ignoreCase) as substring"
+    ) {
+        val nodeEditText = it.config.getOrNull(SemanticsProperties.EditableText)?.text
+        println("hasText: ${it.config} -> $nodeEditText")
+        val isInEditableTextValue = if (!text.isNullOrEmpty()) {
+            if (substring) {
+                nodeEditText?.contains(text, ignoreCase) ?: false
+            } else {
+                nodeEditText?.equals(text, ignoreCase) ?: false
+            }
+        } else {
+            nodeEditText.isNullOrEmpty()
+        }
+        val nodeText = it.config.getOrNull(SemanticsProperties.Text)
+        val isInTextValue =
+            if (!text.isNullOrEmpty()) {
+                if (substring) {
+                    nodeText?.any { item -> item.text.contains(text, ignoreCase) } ?: false
+                } else {
+                    nodeText?.any { item -> item.text.equals(text, ignoreCase) } ?: false
+                }
+            } else {
+                nodeText.isNullOrEmpty()
+            }
+        isInEditableTextValue || isInTextValue
+    }
+}
 
 /**
  * Assert node has children with content description
@@ -66,22 +102,23 @@ fun SemanticsNodeInteractionsProvider.assertNoNodes(parent: String, expected: Li
 fun SemanticsNodeInteractionsProvider.childWithTextLabel(
     parentTag: String,
     label: String,
-    text: String,
+    text: String? = null,
     substring: Boolean = false
 ): SemanticsNodeInteraction {
     //onNode(hasContentDescription(parentTag)).printToLog("childWithTextLabel  '${label}'  '${text}'")
     return onNode(
         (hasContentDescription(label).and(
-            if (text.isNotEmpty()) {
-                hasText(
-                    text,
-                    substring = substring
+            hasText(
+                text,
+                substring = substring
+            ).or(
+                hasAnyDescendant(
+                    hasText(
+                        text,
+                        substring = substring
+                    )
                 )
-            } else {
-                SemanticsMatcher("True") {
-                    true
-                }
-            }
+            )
         )).and(hasAnyAncestor(hasContentDescription(parentTag)))
     )
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 2:53 PM
+ * Last modified 6/15/24, 12:33 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,21 +130,21 @@ class HumidorDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<HumidorDetai
         ) {
             ValueCard(
                 Localize.humidor_details_temperature,
-                viewModel.temperature.toString(),
+                viewModel.temperature?.toString() ?: "72",
                 viewModel.editing,
                 inputMode = InputMode.Number,
                 onValueChange = {
                     viewModel.temperature =
-                        if (it.isNotBlank()) it.toLong() else 0
+                        if (it.isNotBlank()) it.toLong() else null
                 })
             ValueCard(
                 Localize.humidor_details_humidity,
-                viewModel.humidity.toString(),
+                viewModel.humidity?.toString() ?: "72",
                 viewModel.editing,
                 inputMode = InputMode.Number,
                 onValueChange = {
                     viewModel.humidity =
-                        if (it.isNotBlank()) it.toDouble() else 0.0
+                        if (it.isNotBlank()) it.toDouble() else null
                 })
         }
     }

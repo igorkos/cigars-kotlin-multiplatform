@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 3:40 PM
+ * Last modified 6/17/24, 1:42 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,31 +23,93 @@ import com.akellolcc.cigars.logging.Log
 
 class InchesVisualTransformation : ExtendedVisualTransformation() {
     private val delimiters = arrayOf("' ", "/", "“")
+
+    private enum class State {
+        Start,
+        Inches,
+        PartOne,
+        PartTwo,
+        Error
+    }
+
     override fun toTransformed(text: String): String {
-        Log.debug("toTransformed: $text")
         if (text.isEmpty()) return text
-        val parts = text.split(" ", "' ", "'", "/", "“", ".", ",", "-")
+        var state = State.Start
         var transformed = ""
-        parts.forEachIndexed { index, part ->
-            if (part.isNotBlank()) {
-                transformed += part + delimiters[index]
+        text.forEach {
+            when {
+                it.isDigit() -> {
+                    transformed += it
+                    if (state == State.Start) state = State.Inches
+                }
+
+                it.isWhitespace() -> {
+                    if (state == State.Inches) {
+                        transformed += delimiters[0]
+                        state = State.PartOne
+                    }
+                }
+
+                it == '.' || it == ',' -> {
+                    if (state == State.PartOne) {
+                        transformed += delimiters[1]
+                        state = State.PartTwo
+                    }
+                }
             }
         }
+        if (state == State.PartTwo) transformed += delimiters[2]
+        Log.debug("toTransformed: from '$text' to '$transformed'")
         return transformed
     }
 
     override fun fromTransformed(text: String): String {
-        Log.debug("fromTransformed: $text")
         if (text.isEmpty()) return text
-        val parts = text.split(" ", "' ", "'", "/", "“", ".", ",", "-")
-        return parts.joinToString(" ")
+        val from = text.replace("'", " ")
+            .replace("/", ".")
+            .replace("“", "")
+            .replace("  ", " ")
+        Log.debug("fromTransformed: from '$text' to '$from'")
+        return from
     }
 
     override fun validate(text: String): Boolean {
-        return text.length <= 8
+        if (text.isEmpty()) return true
+        if (text.length > 8) return false
+        Log.debug("validate: '$text'")
+        var state = State.Start
+        text.forEach {
+            when {
+                it.isDigit() -> {
+                    state = when (state) {
+                        State.Start -> State.Inches
+                        else -> state
+                    }
+                }
+
+                it.isWhitespace() -> {
+                    state = when (state) {
+                        State.Inches -> State.PartOne
+                        else -> State.Error
+                    }
+                }
+
+                it == '.' || it == ',' -> {
+                    state = when (state) {
+                        State.PartOne -> State.PartTwo
+                        else -> State.Error
+                    }
+                }
+
+                else -> state = State.Error
+            }
+            if (state == State.Error) return false
+        }
+        return true
     }
 
     override fun filter(text: AnnotatedString): TransformedText {
+        Log.debug("filter: '$text'")
         val transformedText = AnnotatedString(toTransformed(text.text))
         val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {
@@ -56,7 +118,7 @@ class InchesVisualTransformation : ExtendedVisualTransformation() {
                     1 -> offset
                     else -> offset + 1
                 }
-                Log.debug("originalToTransformed: '$text' $offset -> $off")
+                Log.debug("originalToTransformed: '$text' offset: $offset -> $off")
                 return off
             }
 
@@ -66,7 +128,7 @@ class InchesVisualTransformation : ExtendedVisualTransformation() {
                     1 -> offset
                     else -> offset - 1
                 }
-                Log.debug("transformedToOriginal: '$text' $offset -> $off")
+                Log.debug("transformedToOriginal: '$text' offset: $offset -> $off")
                 return off
             }
 

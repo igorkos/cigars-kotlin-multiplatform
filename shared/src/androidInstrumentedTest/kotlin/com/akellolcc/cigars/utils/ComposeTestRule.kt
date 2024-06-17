@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 8:06 PM
+ * Last modified 6/15/24, 8:18 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@ import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasContentDescriptionExactly
-import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -30,6 +29,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import com.akellolcc.cigars.theme.Localize
@@ -126,9 +126,46 @@ fun ComposeTestRule.selectMenuItem(parent: String, menu: String) {
  * @param inputLabel The label of the text field.
  * @param text The text to replace the current text with.
  */
-fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String, currentText: String? = null) {
-    onNode((hasContentDescription(inputLabel).and(hasSetTextAction())).and(hasAnyAncestor(hasContentDescription(parent))))
-        .performTextReplacement(text)
+fun ComposeTestRule.replaceText(parent: String, inputLabel: String, text: String) {
+    onNode(
+        (hasContentDescription(Localize.styled_text_field_edit).and(hasAnyAncestor(hasContentDescription(inputLabel)))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).performTextReplacement(text)
+}
+
+/**
+ * Perform the text input in a text field.
+ * @param parent The content description of the parent node of the text field.
+ * @param inputLabel The label of the text field.
+ * @param text The text to input the current text with.
+ */
+fun ComposeTestRule.performTextInput(parent: String, inputLabel: String, text: String) {
+    onNode(
+        (hasContentDescription(Localize.styled_text_field_edit).and(hasAnyAncestor(hasContentDescription(inputLabel)))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).performTextInput(text)
+}
+
+/**
+ * Perform the text input in a text field.
+ * @param parent The content description of the parent node of the text field.
+ * @param inputLabel The label of the text field.
+ * @param text The text to input the current text with.
+ */
+fun ComposeTestRule.performTextClearance(parent: String, inputLabel: String) {
+    onNode(
+        (hasContentDescription(Localize.styled_text_field_action).and(hasAnyAncestor(hasContentDescription(inputLabel)))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).performClick()
 }
 
 /**

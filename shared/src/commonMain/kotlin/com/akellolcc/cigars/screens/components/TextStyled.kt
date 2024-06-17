@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/9/24, 12:41 PM
+ * Last modified 6/16/24, 3:17 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
@@ -47,9 +48,17 @@ import androidx.compose.ui.unit.dp
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.transformations.InputMode
 import com.akellolcc.cigars.theme.Images
+import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.theme.TextStyles
 import com.akellolcc.cigars.theme.loadIcon
 import com.akellolcc.cigars.theme.textStyle
+
+data class TextStyledState(val editable: Boolean, val vertical: Boolean, val labelVisible: Boolean) {
+    override fun toString(): String {
+        return "{\"editable\":$editable, \"vertical\":$vertical, \"labelVisible\":$labelVisible}"
+    }
+}
+
 
 @Composable
 fun TextStyled(
@@ -72,7 +81,6 @@ fun TextStyled(
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     supportingText: @Composable (() -> Unit)? = null,
-    selection: TextRange? = null,
     prefix: String? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -90,36 +98,39 @@ fun TextStyled(
     Column(modifier = modifier.semantics(mergeDescendants = true) {
         isTraversalGroup = true
         contentDescription = label
+        stateDescription = TextStyledState(editable, vertical, labelStyle != TextStyles.None).toString()
     }.wrapContentSize()) {
         if (editable) {
             var textFieldState by remember {
                 mutableStateOf(
                     TextFieldValue(
-                        text = text ?: "",
+                        text = text?.let { inputMode.fromTransformed(it) } ?: "",
                         selection = when {
                             text.isNullOrEmpty() -> TextRange.Zero
-                            selection != null -> selection
+                            //selection != null -> selection
                             else -> TextRange(text.length, text.length)
                         }
                     )
                 )
             }
 
-            textFieldState = if (selection != null) {
-                textFieldState.copy(text = inputMode.fromTransformed(text), selection = selection)
-            } else {
-                textFieldState.copy(text = inputMode.fromTransformed(text))
-            }
+            // textFieldState = if (selection != null) {
+            //        textFieldState.copy(text = inputMode.fromTransformed(text), selection = selection)
+            //  } else {
+            //        textFieldState = textFieldState.copy(text = inputMode.fromTransformed(text))
+            //  }
 
             TextField(
                 modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {
-                    contentDescription = label
+                    contentDescription = Localize.styled_text_field_edit
                 },
                 value = textFieldState,
                 trailingIcon = trailingIcon ?: if (inputMode == InputMode.Text) {
                     {
                         IconButton(
-                            modifier = Modifier.wrapContentSize(),
+                            modifier = Modifier.wrapContentSize().semantics(mergeDescendants = true) {
+                                contentDescription = Localize.styled_text_field_action
+                            },
                             onClick = {
                                 onValueChange?.invoke("")
                                 onKeyboardAction?.invoke(ImeAction.Default)
@@ -132,6 +143,9 @@ fun TextStyled(
                 label = if (labelStyle != TextStyles.None) {
                     {
                         Text(
+                            modifier = Modifier.semantics(mergeDescendants = true) {
+                                contentDescription = Localize.styled_text_field_label
+                            },
                             text = label,
                             color = styleLabel.color,
                             fontSize = styleLabel.fontSize,

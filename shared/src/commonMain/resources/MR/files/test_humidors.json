@@ -1,0 +1,18 @@
+[
+  {
+    "rowid": -1,
+    "name": "Second",
+    "brand": "Klaro",
+    "holds": 150,
+    "count": 0,
+    "temperature": "72",
+    "humidity": "72",
+    "notes": "This is test humidor",
+    "link": "http://demo",
+    "autoOpen": false,
+    "sorting": 0,
+    "type": 0,
+    "price": 99.99,
+    "other": 0
+  }
+]

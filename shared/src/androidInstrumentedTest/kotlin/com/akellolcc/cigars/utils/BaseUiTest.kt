@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/6/24, 4:58 PM
+ * Last modified 6/15/24, 12:01 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.akellolcc.cigars.CigarsApplication
 import com.akellolcc.cigars.databases.Database
+import com.akellolcc.cigars.databases.createRepository
+import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.navigation.NavRoute
 import dev.icerock.moko.resources.FileResource
@@ -76,6 +79,11 @@ open class BaseUiTest() {
         val root = route?.route ?: this.route?.route ?: ""
         if (component == null) return root
         return "${root}-$component"
+    }
+
+    fun humidors(): List<Humidor> {
+        var humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
+        return humidorsDatabase?.allSync() ?: emptyList()
     }
 
     companion object {

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 8:41 PM
+ * Last modified 6/15/24, 7:09 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ import assertValuePicker
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
+import com.akellolcc.cigars.databases.models.Humidor
 import com.akellolcc.cigars.theme.Localize
 import performSelectValuePicker
 import pressButton
@@ -150,7 +151,6 @@ open class CigarDetailsUtils : BaseUiTest() {
                 Localize.cigar_details_rating_dialog,
                 Localize.cigar_details_myrating,
                 rating.toString(),
-                current.toString()
             )
 
             pressButton(Localize.button_save)
@@ -227,8 +227,7 @@ open class CigarDetailsUtils : BaseUiTest() {
             replaceText(
                 Localize.cigar_details_move_dialog,
                 Localize.cigar_details_humidors_move_dialog_count_desc,
-                moveCount.toString(),
-                fromCount.toString()
+                moveCount.toString()
             )
 
             //Move cigars
@@ -270,7 +269,7 @@ open class CigarDetailsUtils : BaseUiTest() {
                 childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_search_details_add_count_dialog, to.toString())
                 assertHasNodes(Localize.cigar_details_count_dialog, listOf(Localize.cigar_details_count_dialog_price))
                 childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "0.00")
-                replaceText(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "100", "0.00")
+                replaceText(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "100")
                 childWithTextLabel(Localize.cigar_details_count_dialog, Localize.cigar_details_count_dialog_price, "1.00")
             }
 
@@ -398,35 +397,30 @@ open class CigarDetailsUtils : BaseUiTest() {
             replaceText(
                 Localize.cigar_details_origin_block_desc,
                 Localize.cigar_details_name,
-                updated.name,
-                cigar.name
+                updated.name
             )
             replaceText(
                 Localize.cigar_details_origin_block_desc,
                 Localize.cigar_details_company,
-                updated.brand!!,
-                cigar.brand ?: ""
+                updated.brand!!
             )
             replaceText(
                 Localize.cigar_details_origin_block_desc,
                 Localize.cigar_details_country,
-                updated.country!!,
-                cigar.country ?: ""
+                updated.country!!
             )
 
             if (cigar.rowid < 0) {
                 replaceText(
                     Localize.cigar_details_origin_block_desc,
                     Localize.cigar_search_details_add_count_dialog,
-                    updated.count.toString(),
-                    cigar.count.toString()
+                    updated.count.toString()
                 )
                 val price = updated.price.toString().replace(".", "")
                 replaceText(
                     Localize.cigar_details_origin_block_desc,
                     Localize.cigar_details_count_dialog_price,
-                    price,
-                    cigar.price.toString()
+                    price
                 )
             }
 
@@ -438,15 +432,13 @@ open class CigarDetailsUtils : BaseUiTest() {
             replaceText(
                 Localize.cigar_details_size_block_desc,
                 Localize.cigar_details_length,
-                length,
-                cigar.length
+                length
             )
 
             replaceText(
                 Localize.cigar_details_size_block_desc,
                 Localize.cigar_details_gauge,
-                updated.gauge.toString(),
-                cigar.gauge.toString()
+                updated.gauge.toString()
             )
 
             //Check cigar tobacco
@@ -454,20 +446,17 @@ open class CigarDetailsUtils : BaseUiTest() {
             replaceText(
                 Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_wrapper,
-                updated.wrapper,
-                cigar.wrapper,
+                updated.wrapper
             )
             replaceText(
                 Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_binder,
-                updated.binder,
-                cigar.binder
+                updated.binder
             )
             replaceText(
                 Localize.cigar_details_tobacco_block_desc,
                 Localize.cigar_details_filler,
-                updated.filler,
-                cigar.filler
+                updated.filler
             )
             performSelectValuePicker(Localize.cigar_details_strength, CigarStrength.localized(updated.strength))
 
@@ -476,29 +465,185 @@ open class CigarDetailsUtils : BaseUiTest() {
             replaceText(
                 Localize.cigar_details_ratings_block_desc,
                 Localize.cigar_details_rating,
-                updated.rating.toString(),
-                cigar.rating.toString()
+                updated.rating.toString()
             )
             replaceText(
                 Localize.cigar_details_ratings_block_desc,
                 Localize.cigar_details_myrating,
-                updated.myrating.toString(),
-                cigar.myrating.toString()
+                updated.myrating.toString()
             )
 
             onNodeWithContentDescription(Localize.cigar_details_notes_block_desc).performScrollTo()
             replaceText(
                 Localize.cigar_details_notes_block_desc,
                 Localize.cigar_details_notes,
-                updated.notes!!,
-                cigar.notes
+                updated.notes!!
             )
             replaceText(
                 Localize.cigar_details_notes_block_desc,
                 Localize.cigar_details_link,
-                updated.link!!,
-                cigar.link
+                updated.link!!
             )
+        }
+    }
+
+    fun assertDisplayHumidorDetails(humidor: Humidor, images: Int) {
+        with(composeTestRule) {
+            //Check images carousel
+            assertNodeState(Localize.cigar_details_images_block_desc, Localize.images_pager_list_desc, "0:$images")
+
+            //Check humidor details
+            childWithTextLabel(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_name,
+                humidor.name
+            ).assertExists()
+
+            childWithTextLabel(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_company,
+                humidor.brand
+            ).assertExists()
+
+            //Check humidor capacity
+            assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars)
+            assertValuesCardValues(
+                Localize.humidor_details_size_block_desc,
+                mapOf(
+                    Localize.humidor_details_holds to humidor.holds.toString(),
+                    Localize.humidor_details_count to humidor.count.toString(),
+                )
+            )
+
+            //Check humidor details
+            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor)
+            assertValuesCardValues(
+                Localize.humidor_details_params_block_desc,
+                mapOf(
+                    Localize.humidor_details_temperature to humidor.temperature.toString(),
+                    Localize.humidor_details_humidity to humidor.humidity.toString(),
+                )
+            )
+
+            //Check cigar notes
+            onNodeWithContentDescription(Localize.humidor_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
+        }
+    }
+
+    fun assertHumidorDetailsEditing(humidor: Humidor) {
+        with(composeTestRule) {
+
+            //Check images carousel
+            onNodeWithContentDescription(Localize.cigar_details_images_block_desc).assertDoesNotExist()
+
+            //Check humidor details
+            childWithTextLabel(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_name,
+                humidor.name
+            ).assertExists()
+
+            childWithTextLabel(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_company,
+                humidor.brand
+            ).assertExists()
+
+
+            //Check humidor capacity
+            assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars, true)
+            childWithTextLabel(
+                Localize.humidor_details_size_block_desc,
+                Localize.humidor_details_holds,
+                humidor.holds.toString()
+            ).assertExists()
+
+            childWithTextLabel(
+                Localize.humidor_details_size_block_desc,
+                Localize.humidor_details_count,
+                humidor.count.toString()
+            ).assertExists()
+
+            //Check humidor details
+            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor, true)
+            childWithTextLabel(
+                Localize.humidor_details_params_block_desc,
+                Localize.humidor_details_temperature,
+                humidor.temperature.toString()
+            ).assertExists()
+
+            childWithTextLabel(
+                Localize.humidor_details_params_block_desc,
+                Localize.humidor_details_humidity,
+                humidor.humidity.toString()
+            ).assertExists()
+
+            //Check humidor notes
+            onNodeWithContentDescription(Localize.humidor_details_notes_block_desc).assertExists().onChildren().assertCountEquals(2)
+        }
+    }
+
+    fun editHumidorDetails(humidor: Humidor, updated: Humidor) {
+        with(composeTestRule) {
+            //Check images carousel
+            onNodeWithContentDescription(Localize.cigar_details_images_block_desc).assertDoesNotExist()
+
+            //Check humidor details
+            replaceText(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_name,
+                updated.name
+            )
+
+            replaceText(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_company,
+                updated.brand
+            )
+
+
+            //Check humidor capacity
+            assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars, true)
+            replaceText(
+                Localize.humidor_details_size_block_desc,
+                Localize.humidor_details_holds,
+                updated.holds.toString()
+            )
+
+            replaceText(
+                Localize.humidor_details_size_block_desc,
+                Localize.humidor_details_count,
+                updated.count.toString()
+            )
+
+            //Check humidor details
+            assertValuesCard(Localize.humidor_details_params_block_desc, Localize.humidor_details_humidor, true)
+            replaceText(
+                Localize.humidor_details_params_block_desc,
+                Localize.humidor_details_temperature,
+                updated.temperature.toString()
+            )
+
+            replaceText(
+                Localize.humidor_details_params_block_desc,
+                Localize.humidor_details_humidity,
+                updated.humidity.toString()
+            )
+
+            //Check cigar notes
+            replaceText(
+                Localize.humidor_details_notes_block_desc,
+                Localize.cigar_details_notes,
+                updated.notes!!
+            )
+
+            replaceText(
+                Localize.humidor_details_notes_block_desc,
+                Localize.cigar_details_link,
+                updated.link!!
+            )
+
+            assertHumidorDetailsEditing(updated)
         }
     }
 

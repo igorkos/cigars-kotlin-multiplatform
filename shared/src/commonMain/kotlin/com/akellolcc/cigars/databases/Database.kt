@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 4:29 PM
+ * Last modified 6/14/24, 11:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,8 +62,9 @@ fun <T> loadDemoSet(resource: FileResource): List<T> {
     return when (resource) {
         AssetFiles.demo_humidors -> Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
         AssetFiles.demo_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
-        AssetFiles.test_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
         AssetFiles.demo_cigars_images -> Json.decodeFromString<List<CigarImage>>(jsonString) as List<T>
+        AssetFiles.test_cigars -> Json.decodeFromString<List<Cigar>>(jsonString) as List<T>
+        AssetFiles.test_humidors -> Json.decodeFromString<List<Humidor>>(jsonString) as List<T>
         else -> emptyList()
     }
 }

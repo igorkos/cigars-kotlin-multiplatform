@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 6:44 PM
+ * Last modified 6/15/24, 6:59 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -210,6 +210,10 @@ object Localize {
 
     val value_picker_drop_down_action = Strings.value_picker_drop_down_action.toString()
     val value_picker_drop_down_menu = Strings.value_picker_drop_down_menu.toString()
+
+    val styled_text_field_edit = Strings.styled_text_field_edit.toString()
+    val styled_text_field_label = Strings.styled_text_field_label.toString()
+    val styled_text_field_action = Strings.styled_text_field_action.toString()
 
     fun humidor_cigars(v: Long, v1: Long): String {
         return Strings.humidor_cigars.createLocalizedString(v, v1).toString()
