@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 3:18 PM
+ * Last modified 6/17/24, 2:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ class HumidorDetailsScreenViewModel(humidor: Humidor) : BaseDetailsScreenViewMod
     var temperature by mutableStateOf(humidor.temperature)
     var humidity by mutableStateOf(humidor.humidity)
     var notes by mutableStateOf(humidor.notes)
+    var price by mutableStateOf(humidor.price)
     var link by mutableStateOf(humidor.link)
     var type by mutableStateOf(humidor.type)
 
@@ -53,6 +54,7 @@ class HumidorDetailsScreenViewModel(humidor: Humidor) : BaseDetailsScreenViewMod
                 notes = it.notes
                 link = it.link
                 type = it.type
+                price = it.price
             }
         }
         images = imagesDatabase!!.paging(null, null)
@@ -72,7 +74,8 @@ class HumidorDetailsScreenViewModel(humidor: Humidor) : BaseDetailsScreenViewMod
             temperature = temperature,
             humidity = humidity,
             notes = notes,
-            link = link
+            link = link,
+            price = price,
         )
         if (entity.rowid < 0) {
             executeQuery(humidorsDatabase!!.add(updated)) {

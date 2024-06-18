@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 3:53 PM
+ * Last modified 6/17/24, 4:58 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,19 +62,13 @@ data class Humidor(
         return "Humidor(rowid= $rowid, name = $name, brand=$brand, holds=$holds, count=$count, ${temperature?.let { "temperature = $it, " }}${humidity?.let { "humidity = $it, " }}${
             notes?.let {
                 "notes = ${
-                    it.substring(
-                        0,
-                        10
-                    )
+                    if (it.length > 10) it.substring(0, 10) else it
                 }..., "
             }
         }${
             link?.let {
                 "link = ${
-                    it.substring(
-                        0,
-                        10
-                    )
+                    if (it.length > 10) it.substring(0, 10) else it
                 }..., "
             }
         }price=$price, sorting=$sorting, type=$type, other=$other"

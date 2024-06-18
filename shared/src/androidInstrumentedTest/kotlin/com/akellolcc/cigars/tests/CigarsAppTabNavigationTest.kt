@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/10/24, 5:08 PM
+ * Last modified 6/17/24, 3:11 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,7 +48,7 @@ class CigarsAppTabNavigationTest() : BaseUiTest() {
 
             selectTab(HumidorsRoute)
             waitForScreen(HumidorsRoute)
-            assertListOrder(screenListContentDescription(HumidorsRoute), listOf("Case Elegance Renzo Humidor", "Second"))
+            assertListOrder(screenListContentDescription(HumidorsRoute), listOf("Case Elegance Renzo Humidor"))
 
             selectTab(FavoritesRoute)
             waitForScreen(FavoritesRoute)

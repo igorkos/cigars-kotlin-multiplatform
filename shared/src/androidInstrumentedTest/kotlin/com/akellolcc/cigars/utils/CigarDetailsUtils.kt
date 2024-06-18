@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/15/24, 7:09 PM
+ * Last modified 6/17/24, 6:15 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,14 +28,22 @@ import assertListOrder
 import assertNodeState
 import assertPickerValues
 import assertValuePicker
+import com.akellolcc.cigars.databases.loadDemoSet
 import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.CigarShapes
 import com.akellolcc.cigars.databases.models.CigarStrength
 import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.models.emptyHumidor
+import com.akellolcc.cigars.screens.navigation.CigarsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorDetailsRoute
+import com.akellolcc.cigars.screens.navigation.HumidorsRoute
+import com.akellolcc.cigars.theme.AssetFiles
 import com.akellolcc.cigars.theme.Localize
 import performSelectValuePicker
+import pressBackButton
 import pressButton
 import replaceText
+import selectTab
 import waitForDialog
 import waitForScreen
 
@@ -521,7 +529,7 @@ open class CigarDetailsUtils : BaseUiTest() {
                 Localize.humidor_details_params_block_desc,
                 mapOf(
                     Localize.humidor_details_temperature to humidor.temperature.toString(),
-                    Localize.humidor_details_humidity to humidor.humidity.toString(),
+                    Localize.humidor_details_humidity to humidor.humidity?.toLong().toString(),
                 )
             )
 
@@ -550,6 +558,13 @@ open class CigarDetailsUtils : BaseUiTest() {
             ).assertExists()
 
 
+            childWithTextLabel(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_count_dialog_price,
+                humidor.price.toString()
+            ).assertExists()
+
+
             //Check humidor capacity
             assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars, true)
             childWithTextLabel(
@@ -575,7 +590,7 @@ open class CigarDetailsUtils : BaseUiTest() {
             childWithTextLabel(
                 Localize.humidor_details_params_block_desc,
                 Localize.humidor_details_humidity,
-                humidor.humidity.toString()
+                humidor.humidity?.toLong().toString()
             ).assertExists()
 
             //Check humidor notes
@@ -601,6 +616,11 @@ open class CigarDetailsUtils : BaseUiTest() {
                 updated.brand
             )
 
+            replaceText(
+                Localize.humidor_details_origin_block_desc,
+                Localize.cigar_details_count_dialog_price,
+                updated.price.toString().replace(".", "")
+            )
 
             //Check humidor capacity
             assertValuesCard(Localize.humidor_details_size_block_desc, Localize.humidor_details_cigars, true)
@@ -644,6 +664,25 @@ open class CigarDetailsUtils : BaseUiTest() {
             )
 
             assertHumidorDetailsEditing(updated)
+        }
+    }
+
+    fun addHumidorTestHumidor() {
+        with(composeTestRule) {
+            selectTab(HumidorsRoute)
+            waitForScreen(HumidorsRoute)
+
+            val newHumidor: Humidor = loadDemoSet<Humidor>(AssetFiles.test_humidors).first()
+            pressButton(Localize.humidor_list_add_action_desc)
+            waitForScreen(HumidorDetailsRoute)
+            editHumidorDetails(emptyHumidor, newHumidor)
+            pressButton(Localize.button_save)
+            waitForScreen(HumidorDetailsRoute)
+            pressBackButton()
+            waitForScreen(HumidorsRoute)
+
+            selectTab(CigarsRoute)
+            waitForScreen(CigarsRoute)
         }
     }
 

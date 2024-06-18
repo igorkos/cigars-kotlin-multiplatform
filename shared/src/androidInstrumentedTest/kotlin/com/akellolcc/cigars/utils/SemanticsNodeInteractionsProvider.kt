@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/15/24, 7:54 PM
+ * Last modified 6/17/24, 3:50 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -156,7 +156,10 @@ fun SemanticsNodeInteractionsProvider.assertValuesCard(
 fun SemanticsNodeInteractionsProvider.performValuesCardAction(
     tag: String
 ) {
-    onNode((hasClickAction().and(hasAnyAncestor(isHeading()))).and(hasAnyAncestor(hasContentDescription(tag)))).performClick()
+    onNode(
+        (hasClickAction().and(hasAnyAncestor(isHeading())))
+            .and(hasAnyAncestor(hasContentDescription(tag)))
+    ).performClick()
 }
 
 /**

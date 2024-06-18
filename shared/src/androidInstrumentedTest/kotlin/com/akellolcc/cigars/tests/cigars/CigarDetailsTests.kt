@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 6:57 PM
+ * Last modified 6/17/24, 6:13 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 package com.akellolcc.cigars.tests.cigars
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -25,6 +26,7 @@ import assertListOrder
 import assertNodeState
 import com.akellolcc.cigars.databases.loadDemoSet
 import com.akellolcc.cigars.databases.models.Cigar
+import com.akellolcc.cigars.databases.useTestHumidors
 import com.akellolcc.cigars.screens.navigation.CigarHistoryRoute
 import com.akellolcc.cigars.screens.navigation.CigarsDetailsRoute
 import com.akellolcc.cigars.screens.navigation.CigarsRoute
@@ -47,13 +49,20 @@ import kotlin.test.Test
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 open class CigarDetailsTests : CigarDetailsUtils() {
     override var route: NavRoute = CigarsDetailsRoute
+
+    @Composable
+    override fun initData() {
+        useTestHumidors = true
+        super.initData()
+    }
+
     override fun setUp() {
         with(composeTestRule) {
             waitForScreen(CigarsRoute)
             //Check items displayed
             assertListOrder(screenListContentDescription(CigarsRoute), listOf("#1", "#2", "#3", "#4", "#5"))
+
             assertListNode(screenListContentDescription(CigarsRoute), "#1").performClick()
-            sleep(3000)
             waitForScreen(route)
         }
     }
@@ -77,7 +86,6 @@ open class CigarDetailsTests : CigarDetailsUtils() {
     @Test
     fun test3_cigarHumidors() {
         with(composeTestRule) {
-
             onNodeWithContentDescription(Localize.cigar_details_humidors_block_desc).performScrollTo()
             //Check cigar humidors
             assertValuesCard(Localize.cigar_details_humidors_block_desc, Localize.cigar_details_humidors, true)

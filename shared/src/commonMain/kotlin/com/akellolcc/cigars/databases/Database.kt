@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 11:59 PM
+ * Last modified 6/17/24, 5:32 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,8 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
+
+var useTestHumidors: Boolean = false
 
 enum class DatabaseType {
     SqlDelight,
@@ -98,7 +100,13 @@ class Database(override val inMemory: Boolean) : DatabaseInterface {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun createDemoSet(): Flow<Boolean> {
-        val demoHumidors: List<Humidor> = loadDemoSet(AssetFiles.demo_humidors)
+        var demoHumidors: List<Humidor> = loadDemoSet(AssetFiles.demo_humidors)
+
+        if (useTestHumidors) {
+            val testHumidors: List<Humidor> = loadDemoSet(AssetFiles.test_humidors)
+            demoHumidors = demoHumidors + testHumidors
+        }
+
         val demoCigars: List<Cigar> = loadDemoSet(AssetFiles.demo_cigars)
         val demoCigarsImages: List<CigarImage> = loadDemoSet(AssetFiles.demo_cigars_images)
         val humidorDatabase: HumidorsRepository = createRepository(HumidorsRepository::class)

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 8:03 PM
+ * Last modified 6/17/24, 6:05 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -697,11 +697,13 @@ open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDet
         }
     }
 
-    private fun isValid(from: HumidorCigar?, to: Humidor?, count: Long): Boolean {
+    private fun isValid(from: HumidorCigar?, to: Humidor?, count: Long?): Boolean {
         return from?.let { fromCH ->
             fromCH.humidor.let { fromH ->
                 to?.let { to ->
-                    from.count >= count && to.compareTo(fromH) != 0
+                    count?.let {
+                        from.count >= it && to.compareTo(fromH) != 0
+                    }
                 }
             }
         } ?: false
@@ -710,7 +712,7 @@ open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDet
     @Composable
     private fun MoveCigarsDialog(onDismissRequest: () -> Unit) {
         if (viewModel.moveCigarDialog) {
-            val count = remember { mutableStateOf(1L) }
+            val count = remember { mutableStateOf<Long?>(null) }
             val from = remember { mutableStateOf<HumidorCigar?>(null) }
             val to = remember { mutableStateOf<Humidor?>(null) }
             val fromList = remember { mutableStateOf<List<ValuePickerItem>>(listOf()) }
@@ -725,9 +727,14 @@ open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDet
             TwoButtonDialog(
                 Localize.cigar_details_move_dialog,
                 onDismissRequest = onDismissRequest,
-                onVerify = { isValid(from.value, to.value, count.value) },
+                onVerify = { isValid(from.value, to.value, count?.value) },
                 onComplete = {
-                    viewModel.moveCigar(from.value!!, to.value!!, count.value)
+                    if (isValid(from.value, to.value, count.value)) {
+                        viewModel.moveCigar(from.value!!, to.value!!, count.value!!)
+                        from.value = null
+                        to.value = null
+                        count.value = null
+                    }
                 }
             ) {
                 Column(
@@ -773,7 +780,7 @@ open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDet
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         TextStyled(
-                            if (count.value > 0) "${count.value}" else "",
+                            count.value?.let { if (it > 0) "${count.value}" else null } ?: "",
                             Localize.cigar_details_humidors_move_dialog_count_desc,
                             TextStyles.Headline,
                             labelStyle = TextStyles.None,

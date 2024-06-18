@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/15/24, 12:29 PM
+ * Last modified 6/17/24, 2:53 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 package com.akellolcc.cigars.tests.cigars
 
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import assertListNode
 import assertListOrder
@@ -35,6 +36,7 @@ import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
 import pressBackButton
 import pressButton
+import selectMenuItem
 import selectTab
 import sleep
 import waitForScreen
@@ -84,10 +86,17 @@ open class HumidorsListTests : CigarDetailsUtils() {
 
             editHumidorDetails(emptyHumidor, newHumidor)
             pressButton(Localize.button_save)
+            waitForScreen(HumidorDetailsRoute)
+
+            pressBackButton()
             waitForScreen(HumidorsRoute)
 
             assertListNode(screenListContentDescription(HumidorsRoute), newHumidor.name).performClick()
             waitForScreen(HumidorCigarsRoute)
+
+            onNodeWithContentDescription(Localize.screen_list_sort_fields_action_descr).assertExists().performClick()
+            selectMenuItem(Localize.screen_list_sort_fields_list_descr, Localize.title_humidor_details_menu_desc)
+            waitForScreen(HumidorDetailsRoute)
 
             assertDisplayHumidorDetails(newHumidor, 0)
 
