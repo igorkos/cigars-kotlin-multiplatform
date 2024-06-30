@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/17/24, 6:13 PM
+ * Last modified 6/19/24, 4:54 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,6 @@ import org.junit.FixMethodOrder
 import org.junit.runners.MethodSorters
 import pressBackButton
 import pressButton
-import sleep
 import waitForScreen
 import kotlin.test.Test
 
@@ -151,10 +150,10 @@ open class CigarDetailsTests : CigarDetailsUtils() {
 
     @Test
     fun test5_editCigarDetails() {
-        val demoCigars: List<Cigar> = loadDemoSet(AssetFiles.demo_cigars)
+        val demoCigars: List<Cigar> = cigars()
         val updatedCigars: List<Cigar> = loadDemoSet(AssetFiles.test_cigars)
         val cigar = demoCigars[0]
-        val updated = updatedCigars[0]
+        val updated = updatedCigars[0].apply { rowid = cigar.rowid }
         with(composeTestRule) {
             onNodeWithContentDescription(Localize.cigar_details_top_bar_edit_desc).performClick()
             checkEditCigarDetails(cigar)
@@ -162,7 +161,6 @@ open class CigarDetailsTests : CigarDetailsUtils() {
             onNodeWithContentDescription(Localize.cigar_details_origin_block_desc).performScrollTo()
             checkEditCigarDetails(updated)
             pressButton(Localize.button_save)
-            sleep(1000)
             displayCigarDetails(updated, 1)
         }
     }

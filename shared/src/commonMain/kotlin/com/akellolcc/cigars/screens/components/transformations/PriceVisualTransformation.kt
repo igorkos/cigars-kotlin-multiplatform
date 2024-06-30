@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:56 PM
+ * Last modified 6/20/24, 12:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.TransformedText
 import com.akellolcc.cigars.logging.Log
 
 class PriceVisualTransformation : ExtendedVisualTransformation() {
-    override fun toTransformed(text: String): String {
+    override fun toTransformed(text: String, tag: String?): String {
         val transformed = when (text.length) {
             0 -> "0.00"
             1 -> "0.0${text}"
@@ -37,14 +37,14 @@ class PriceVisualTransformation : ExtendedVisualTransformation() {
         return transformed
     }
 
-    override fun fromTransformed(text: String): String {
+    override fun fromTransformed(text: String, tag: String?): String {
         Log.debug("fromTransformed: $text")
         if (text.isEmpty()) return text
         val original = text.filter { it.isDigit() }
         return original.trimStart('0')
     }
 
-    override fun validate(text: String): Boolean {
+    override fun validate(text: String, tag: String?): Boolean {
         if (text.isEmpty()) return true
         try {
             text.toDouble()

@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/17/24, 6:13 PM
+ * Last modified 6/18/24, 7:10 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.akellolcc.cigars.CigarsApplication
 import com.akellolcc.cigars.databases.Database
 import com.akellolcc.cigars.databases.createRepository
+import com.akellolcc.cigars.databases.models.Cigar
 import com.akellolcc.cigars.databases.models.Humidor
+import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -90,8 +92,13 @@ open class BaseUiTest() {
     }
 
     fun humidors(): List<Humidor> {
-        var humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
+        val humidorsDatabase: HumidorsRepository? = createRepository(HumidorsRepository::class)
         return humidorsDatabase?.allSync() ?: emptyList()
+    }
+
+    fun cigars(): List<Cigar> {
+        val cigarsDatabase: CigarsRepository = createRepository(CigarsRepository::class)
+        return cigarsDatabase.allSync() ?: emptyList()
     }
 
     companion object {

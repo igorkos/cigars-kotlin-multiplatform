@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/17/24, 3:50 PM
+ * Last modified 6/20/24, 11:39 AM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@ import androidx.compose.ui.test.isHeading
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToLog
 import com.akellolcc.cigars.theme.Localize
 
 
@@ -105,22 +106,27 @@ fun SemanticsNodeInteractionsProvider.childWithTextLabel(
     text: String? = null,
     substring: Boolean = false
 ): SemanticsNodeInteraction {
-    //onNode(hasContentDescription(parentTag)).printToLog("childWithTextLabel  '${label}'  '${text}'")
-    return onNode(
-        (hasContentDescription(label).and(
-            hasText(
-                text,
-                substring = substring
-            ).or(
-                hasAnyDescendant(
-                    hasText(
-                        text,
-                        substring = substring
+    //
+    try {
+        return onNode(
+            (hasContentDescription(label).and(
+                hasText(
+                    text,
+                    substring = substring
+                ).or(
+                    hasAnyDescendant(
+                        hasText(
+                            text,
+                            substring = substring
+                        )
                     )
                 )
-            )
-        )).and(hasAnyAncestor(hasContentDescription(parentTag)))
-    )
+            )).and(hasAnyAncestor(hasContentDescription(parentTag)))
+        ).assertExists()
+    } catch (e: Throwable) {
+        onNode(hasContentDescription(parentTag)).printToLog("childWithTextLabel  '${label}'  '${text}'")
+        throw e
+    }
 }
 
 /**

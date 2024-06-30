@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/17/24, 2:05 PM
+ * Last modified 6/24/24, 6:22 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@ import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.unit.dp
+import clearText
 import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.screens.components.TextStyled
 import com.akellolcc.cigars.screens.components.TextStyledState
@@ -57,6 +58,7 @@ import org.junit.runners.MethodSorters
 import performTextClearance
 import performTextInput
 import replaceText
+import textInputState
 import kotlin.test.Test
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -91,7 +93,7 @@ class TextStyledTests {
                                     text = text,
                                     Localize.cigar_details_name,
                                     style = TextStyles.Headline,
-                                    labelStyle = TextStyles.None
+                                    labelStyle = TextStyles.None,
                                 )
                             }
                         }
@@ -156,7 +158,7 @@ class TextStyledTests {
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Test
-    fun test3_DisplayTextLabel() {
+    fun test3_DisplayTextLabelVertical() {
         val semantics = "Test card"
         val text = "Test text"
         with(composeTestRule) {
@@ -234,7 +236,6 @@ class TextStyledTests {
                                     style = TextStyles.Headline,
                                     editable = true,
                                     modifier = Modifier.padding(16.dp),
-                                    inputMode = InputMode.Text,
                                     onValueChange = { text.value = it }
                                 )
                             }
@@ -340,7 +341,7 @@ class TextStyledTests {
             setContent {
                 setAppContext(LocalContext.current)
                 Log.initLog { }
-                val number = remember { mutableStateOf<String?>(null) }
+                val number = remember { mutableStateOf<String?>("1'") }
                 DefaultTheme {
                     Scaffold(
                         modifier = Modifier.fillMaxSize()
@@ -383,28 +384,44 @@ class TextStyledTests {
                 )
             ).assertExists()
 
+            textInputState(semantics, Localize.cigar_details_name, "1")
+            clearText(semantics, Localize.cigar_details_name)
+
+            replaceText(semantics, Localize.cigar_details_name, "2")
+            textInputState(semantics, Localize.cigar_details_name, "2")
+            childWithTextLabel(semantics, Localize.cigar_details_name, "2'", true).assertExists()
+
+            replaceText(semantics, Localize.cigar_details_name, "3.")
+            textInputState(semantics, Localize.cigar_details_name, "3.")
+            childWithTextLabel(semantics, Localize.cigar_details_name, "3' ", true).assertExists()
+
+            replaceText(semantics, Localize.cigar_details_name, "4.2.3“")
+            textInputState(semantics, Localize.cigar_details_name, "4.2.3")
+            childWithTextLabel(semantics, Localize.cigar_details_name, "4' 2/3“", true).assertExists()
+
+            //sleep(1000000000000000L)
+            Log.debug("Input '1'")
             performTextInput(semantics, Localize.cigar_details_name, "1")
-            onNodeWithContentDescription(semantics)
-            childWithTextLabel(semantics, Localize.cigar_details_name, "1", true).assertExists()
+            childWithTextLabel(semantics, Localize.cigar_details_name, "1'", true).assertExists()
 
+            Log.debug("Input '2'")
             performTextInput(semantics, Localize.cigar_details_name, "2")
-            onNodeWithContentDescription(semantics)
-            childWithTextLabel(semantics, Localize.cigar_details_name, "12", true).assertExists()
+            childWithTextLabel(semantics, Localize.cigar_details_name, "12'", true).assertExists()
 
+            Log.debug("Input ' '")
             performTextInput(semantics, Localize.cigar_details_name, " ")
-            onNodeWithContentDescription(semantics)
             childWithTextLabel(semantics, Localize.cigar_details_name, "12' ", true).assertExists()
 
+            Log.debug("Input '3'")
             performTextInput(semantics, Localize.cigar_details_name, "3")
-            onNodeWithContentDescription(semantics)
             childWithTextLabel(semantics, Localize.cigar_details_name, "12' 3", true).assertExists()
 
+            Log.debug("Input '.'")
             performTextInput(semantics, Localize.cigar_details_name, ".")
-            onNodeWithContentDescription(semantics)
             childWithTextLabel(semantics, Localize.cigar_details_name, "12' 3/", true).assertExists()
 
+            Log.debug("Input '4'")
             performTextInput(semantics, Localize.cigar_details_name, "4")
-            onNodeWithContentDescription(semantics)
             childWithTextLabel(semantics, Localize.cigar_details_name, "12' 3/4“", true).assertExists()
 
             replaceText(semantics, Localize.cigar_details_name, "")

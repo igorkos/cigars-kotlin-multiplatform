@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/14/24, 2:56 PM
+ * Last modified 6/20/24, 12:08 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 
 class NumberVisualTransformation : ExtendedVisualTransformation() {
-    override fun toTransformed(text: String): String {
+    override fun toTransformed(text: String, tag: String?): String {
         for (i in text.indices) {
             try {
                 val pref = text.substring(0, text.length - i)
@@ -35,11 +35,11 @@ class NumberVisualTransformation : ExtendedVisualTransformation() {
         return ""
     }
 
-    override fun fromTransformed(text: String): String {
+    override fun fromTransformed(text: String, tag: String?): String {
         return text
     }
 
-    override fun validate(text: String): Boolean {
+    override fun validate(text: String, tag: String?): Boolean {
         if (text.isEmpty()) return true
         try {
             text.toLong()

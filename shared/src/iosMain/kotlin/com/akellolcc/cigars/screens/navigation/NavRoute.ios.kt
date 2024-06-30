@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 5/17/24, 5:40 PM
+ * Last modified 6/24/24, 3:44 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@ actual class NavRoute {
     actual constructor(
         route: String,
         title: String,
+        semantics: String,
         icon: ImageResource,
         data: Any?,
         isTabsVisible: Boolean,
@@ -33,6 +34,7 @@ actual class NavRoute {
     ) {
         this.route = route
         this.title = title
+        this.semantics = semantics
         this.icon = icon
         this.data = data
         this.isTabsVisible = isTabsVisible
@@ -43,6 +45,7 @@ actual class NavRoute {
 
     actual val route: String
     actual val title: String
+    actual val semantics: String
 
     @Transient
     actual val icon: ImageResource
@@ -54,4 +57,7 @@ actual class NavRoute {
     actual val isLoadingCover: Boolean
     actual val isSearchEnabled: Boolean
 
+    actual fun applyData(data: Any?): NavRoute {
+        return NavRoute(route, title, semantics, icon, data, isTabsVisible, isDrawerVisible, isLoadingCover, isSearchEnabled)
+    }
 }

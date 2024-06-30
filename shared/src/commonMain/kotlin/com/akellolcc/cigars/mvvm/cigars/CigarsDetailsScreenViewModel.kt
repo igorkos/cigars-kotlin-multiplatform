@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/14/24, 9:02 PM
+ * Last modified 6/18/24, 12:25 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,6 +29,7 @@ import com.akellolcc.cigars.databases.repository.CigarHumidorsRepository
 import com.akellolcc.cigars.databases.repository.CigarImagesRepository
 import com.akellolcc.cigars.databases.repository.CigarsRepository
 import com.akellolcc.cigars.databases.repository.HumidorsRepository
+import com.akellolcc.cigars.logging.Log
 import com.akellolcc.cigars.mvvm.base.BaseDetailsScreenViewModel
 import com.akellolcc.cigars.screens.components.ValuePickerItem
 import com.akellolcc.cigars.theme.Images
@@ -208,6 +209,7 @@ class CigarsDetailsScreenViewModel(cigar: Cigar, var humidor: Humidor? = null) :
     }
 
     fun moveCigar(from: HumidorCigar, to: Humidor, count: Long) {
+        Log.debug("Move cigar from ${from.humidor.name} to ${to.name} -> $count")
         cigarHumidorRepository?.let {
             executeQuery(it.moveCigar(from, to, count)) { moveCigarDialog = false }
         }

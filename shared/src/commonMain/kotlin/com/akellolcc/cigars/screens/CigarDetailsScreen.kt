@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/17/24, 6:05 PM
+ * Last modified 6/18/24, 6:16 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -723,14 +723,23 @@ open class CigarDetailsScreen(route: NavRoute) : BaseItemDetailsScreen<CigarsDet
                 toList.value = viewModel.moveToHumidors(from.value?.humidor)
                 count.value = from.value?.count ?: 1L
             }
-
+            Log.debug("Move cigar dialog ${from.value?.humidor?.name} to ${to.value?.name} -> ${count.value}")
             TwoButtonDialog(
                 Localize.cigar_details_move_dialog,
-                onDismissRequest = onDismissRequest,
-                onVerify = { isValid(from.value, to.value, count?.value) },
+                onDismissRequest = {
+                    onDismissRequest()
+                    fromList.value = listOf()
+                    toList.value = listOf()
+                    from.value = null
+                    to.value = null
+                    count.value = null
+                },
+                onVerify = { isValid(from.value, to.value, count.value) },
                 onComplete = {
                     if (isValid(from.value, to.value, count.value)) {
                         viewModel.moveCigar(from.value!!, to.value!!, count.value!!)
+                        fromList.value = listOf()
+                        toList.value = listOf()
                         from.value = null
                         to.value = null
                         count.value = null

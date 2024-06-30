@@ -1,6 +1,6 @@
 /*******************************************************************************************************************************************
  * Copyright (C) 2024 Igor Kosulin
- * Last modified 6/15/24, 8:18 PM
+ * Last modified 6/24/24, 5:57 PM
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,8 @@
  * limitations under the License.
  ******************************************************************************************************************************************/
 
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.filterToOne
@@ -29,6 +31,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import com.akellolcc.cigars.screens.navigation.NavRoute
@@ -36,6 +39,7 @@ import com.akellolcc.cigars.theme.Localize
 import com.akellolcc.cigars.utils.expandValuePicker
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldBeLessThan
+import io.kotest.matchers.shouldBe
 
 /**
  * Sleeps for a specified amount of time.
@@ -150,6 +154,39 @@ fun ComposeTestRule.performTextInput(parent: String, inputLabel: String, text: S
             )
         )
     ).performTextInput(text)
+}
+
+/**
+ * Perform the text input in a text field.
+ * @param parent The content description of the parent node of the text field.
+ * @param inputLabel The label of the text field.
+ * @param text The text to input the current text with.
+ */
+fun ComposeTestRule.textInputState(parent: String, inputLabel: String, text: String) {
+    val state = onNode(
+        (hasContentDescription(Localize.styled_text_field_edit).and(hasAnyAncestor(hasContentDescription(inputLabel)))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).assertExists().fetchSemanticsNode().config.getOrNull(SemanticsProperties.StateDescription)
+    state shouldBe text
+}
+
+/**
+ * Perform the text input in a text field.
+ * @param parent The content description of the parent node of the text field.
+ * @param inputLabel The label of the text field.
+ * @param text The text to input the current text with.
+ */
+fun ComposeTestRule.clearText(parent: String, inputLabel: String) {
+    val state = onNode(
+        (hasContentDescription(Localize.styled_text_field_edit).and(hasAnyAncestor(hasContentDescription(inputLabel)))).and(
+            hasAnyAncestor(
+                hasContentDescription(parent)
+            )
+        )
+    ).performTextClearance()
 }
 
 /**
